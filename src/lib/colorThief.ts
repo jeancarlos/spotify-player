@@ -1,6 +1,5 @@
-// color-thief-ts requer um HTMLImageElement com crossOrigin definido antes do load.
-// Esta função carrega a imagem, extrai a paleta de forma síncrona e retorna
-// duas cores dominantes como strings rgb(), ou null em caso de falha.
+// src/lib/colorThief.ts
+// Returns colors as "r,g,b" (no wrapper) so callers can use rgba(${color},alpha) in CSS.
 export async function extractPalette(imageUrl: string): Promise<[string, string] | null> {
   try {
     const { default: ColorThief } = await import('color-thief-ts')
@@ -17,8 +16,8 @@ export async function extractPalette(imageUrl: string): Promise<[string, string]
     const palette = thief.getPalette(img, 2) as number[][]
 
     return [
-      `rgb(${palette[0][0]},${palette[0][1]},${palette[0][2]})`,
-      `rgb(${palette[1][0]},${palette[1][1]},${palette[1][2]})`,
+      `${palette[0][0]},${palette[0][1]},${palette[0][2]}`,
+      `${palette[1][0]},${palette[1][1]},${palette[1][2]}`,
     ]
   } catch {
     return null
