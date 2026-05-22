@@ -15,10 +15,12 @@ import type { SpotifyTrack } from '@/types/spotify'
 
 type Tab = 'tracks' | 'albums'
 
+const TRACKS_PER_PAGE = 10
+
 export function ArtistDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { dispatch } = usePlayer()
+  const { dispatch, state } = usePlayer()
 
   const [tab, setTab] = useState<Tab>('tracks')
   const [tracksPage, setTracksPage] = useState(0)
@@ -28,22 +30,23 @@ export function ArtistDetail() {
   const topTracks = useArtistTopTracks(id!)
   const albums = useArtistAlbums(id!, albumsPage)
 
-  const TRACKS_PER_PAGE = 10
   const pagedTracks = topTracks.data?.slice(tracksPage * TRACKS_PER_PAGE, (tracksPage + 1) * TRACKS_PER_PAGE) ?? []
   const totalTrackPages = Math.ceil((topTracks.data?.length ?? 0) / TRACKS_PER_PAGE)
 
   const handlePlay = useCallback(
     async (track: SpotifyTrack) => {
       dispatch({ type: 'SET_TRACK', payload: track })
-      dispatch({ type: 'TOGGLE_PLAY' })
+      if (!state.isPlaying) dispatch({ type: 'TOGGLE_PLAY' })
       const imageUrl = track.album.images[0]?.url
       if (imageUrl) {
         const palette = await extractPalette(imageUrl)
         if (palette) dispatch({ type: 'SET_PALETTE', payload: palette })
       }
     },
-    [dispatch]
+    [dispatch, state.isPlaying]
   )
+
+  if (!id) return null
 
   if (artist.isPending) {
     return (
@@ -153,7 +156,7 @@ export function ArtistDetail() {
                 ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="w-40 h-56 rounded-2xl" />)
                 : albums.data?.items.map(album => <AlbumCard key={album.id} album={album} />)}
             </div>
-            {albums.data && albums.data.total > 10 && (
+            {albums.data && albums.data.total > albums.data.limit && (
               <div className="flex justify-center gap-3">
                 <button
                   disabled={albumsPage === 1}
