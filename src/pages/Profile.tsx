@@ -23,7 +23,7 @@ export function Profile() {
   const { state: auth } = useAuth()
   const [timeRange, setTimeRange] = useState<TimeRange>('short_term')
 
-  const topTracks = useUserTopTracks('short_term', 5)
+  const topTracks = useUserTopTracks(timeRange, 5)
   const topArtists = useUserTopArtistsFull(timeRange, 10)
 
   const trackIds = useMemo(() => topTracks.data?.map(t => t.id) ?? [], [topTracks.data])
@@ -89,7 +89,7 @@ export function Profile() {
 
       <div className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-bold uppercase tracking-wide text-white/70">{t('profile.audioProfile')}</h2>
-        {audioFeatures.isPending || topTracks.isPending ? (
+        {audioFeatures.isLoading || topTracks.isPending ? (
           <Skeleton className="h-48 w-full rounded-xl" />
         ) : radarData.length > 0 ? (
           <ResponsiveContainer width="100%" height={220}>
