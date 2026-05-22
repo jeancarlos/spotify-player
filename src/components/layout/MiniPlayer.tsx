@@ -45,8 +45,14 @@ export function MiniPlayer() {
   )
 
   const handleVolume = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch({ type: 'SET_VOLUME', payload: Number(e.target.value) })
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Number(e.target.value)
+      dispatch({ type: 'SET_VOLUME', payload: value })
+      try {
+        await api.put('/me/player/volume', null, {
+          params: { volume_percent: Math.round(value * 100) },
+        })
+      } catch { /* silent */ }
     },
     [dispatch]
   )

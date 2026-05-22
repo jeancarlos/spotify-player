@@ -54,6 +54,19 @@ export function FullscreenPlayer() {
     try { await api.put('/me/player/repeat', null, { params: { state: next } }) } catch { /* silent */ }
   }, [dispatch, repeat])
 
+  const handleVolume = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Number(e.target.value)
+      dispatch({ type: 'SET_VOLUME', payload: value })
+      try {
+        await api.put('/me/player/volume', null, {
+          params: { volume_percent: Math.round(value * 100) },
+        })
+      } catch { /* silent */ }
+    },
+    [dispatch]
+  )
+
   return (
     <AnimatePresence>
       {isFullscreen && (
@@ -200,7 +213,7 @@ export function FullscreenPlayer() {
                   max={1}
                   step={0.01}
                   value={volume}
-                  onChange={e => dispatch({ type: 'SET_VOLUME', payload: Number(e.target.value) })}
+                  onChange={handleVolume}
                   className="w-28 h-1 appearance-none bg-white/20 rounded-full accent-white cursor-pointer"
                 />
               </div>
