@@ -8,7 +8,7 @@ interface RecommendationsResponse {
 
 export function useRecommendations(seedArtistIds: string[], limit = 20) {
   return useQuery({
-    queryKey: ['recommendations', seedArtistIds, limit],
+    queryKey: ['recommendations', seedArtistIds.join(','), limit],
     enabled: seedArtistIds.length > 0,
     queryFn: async () => {
       const params = new URLSearchParams({ limit: String(limit) })
