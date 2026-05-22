@@ -88,3 +88,44 @@ export interface RecentlyPlayedResponse {
 export interface NewReleasesResponse {
   albums: PagingObject<SpotifyAlbumSimple>
 }
+
+export interface AudioFeatures {
+  id: string
+  danceability: number   // 0-1
+  energy: number         // 0-1
+  valence: number        // 0-1
+  acousticness: number   // 0-1
+  speechiness: number    // 0-1
+  instrumentalness: number
+  liveness: number
+  loudness: number
+  tempo: number
+  duration_ms: number
+  key: number
+  mode: number
+  time_signature: number
+}
+
+export interface SearchArtistsResponse {
+  artists: PagingObject<SpotifyArtist>
+}
+
+export interface SearchAlbumsResponse {
+  albums: PagingObject<SpotifyAlbumSimple>
+}
+
+export interface ArtistTopTracksResponse {
+  tracks: SpotifyTrack[]
+}
+
+export interface ArtistAlbumsResponse extends PagingObject<SpotifyAlbumSimple> {}
+
+export interface PlayerState {
+  is_playing: boolean
+  progress_ms: number | null
+  item: SpotifyTrack | null
+  repeat_state: 'off' | 'track' | 'context'
+  shuffle_state: boolean
+}
+
+export interface TopItemsResponse<T> extends PagingObject<T> {}
