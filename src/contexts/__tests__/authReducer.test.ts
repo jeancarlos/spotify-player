@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { authReducer, initialAuthState } from '../AuthContext'
+import { authReducer, initialAuthState } from '../authReducer'
 
 describe('authReducer', () => {
   it('SET_TOKENS atualiza os tokens e define isAuthenticated como true', () => {
