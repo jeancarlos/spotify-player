@@ -24,14 +24,14 @@ export function Artists() {
 
   const genres = useMemo(() => {
     if (!artists.data) return []
-    const all = artists.data.flatMap(a => a.genres)
+    const all = artists.data.items.flatMap(a => a.genres)
     return [...new Set(all)].slice(0, 12)
   }, [artists.data])
 
   const filteredArtists = useMemo(() => {
     if (!artists.data) return []
-    if (!activeGenre) return artists.data
-    return artists.data.filter(a => a.genres.includes(activeGenre))
+    if (!activeGenre) return artists.data.items
+    return artists.data.items.filter(a => a.genres.includes(activeGenre))
   }, [artists.data, activeGenre])
 
   const isLoading = mode === 'artist' ? artists.isPending : albums.isPending
@@ -125,7 +125,7 @@ export function Artists() {
         </>
       ) : (
         <div className="flex flex-wrap gap-4">
-          {(albums.data ?? []).map(album => (
+          {(albums.data?.items ?? []).map(album => (
             <AlbumCard key={album.id} album={album} />
           ))}
         </div>
@@ -143,8 +143,9 @@ export function Artists() {
           </button>
           <span className="text-sm text-white/50">{page}</span>
           <button
+            disabled={mode === 'artist' ? !artists.data?.next : !albums.data?.next}
             onClick={() => setPage(p => p + 1)}
-            className="px-4 py-1.5 glass-button rounded-lg text-sm"
+            className="px-4 py-1.5 glass-button rounded-lg text-sm disabled:opacity-30"
           >
             {t('artists.next')} →
           </button>
