@@ -26,9 +26,9 @@ export function ArtistDetail() {
   const [tracksPage, setTracksPage] = useState(0)
   const [albumsPage, setAlbumsPage] = useState(1)
 
-  const artist = useArtist(id!)
-  const topTracks = useArtistTopTracks(id!)
-  const albums = useArtistAlbums(id!, albumsPage)
+  const artist = useArtist(id)
+  const topTracks = useArtistTopTracks(id)
+  const albums = useArtistAlbums(id, albumsPage)
 
   const pagedTracks = topTracks.data?.slice(tracksPage * TRACKS_PER_PAGE, (tracksPage + 1) * TRACKS_PER_PAGE) ?? []
   const totalTrackPages = Math.ceil((topTracks.data?.length ?? 0) / TRACKS_PER_PAGE)

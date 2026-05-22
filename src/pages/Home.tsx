@@ -24,7 +24,7 @@ export function Home() {
   const handlePlay = useCallback(
     async (track: SpotifyTrack) => {
       dispatch({ type: 'SET_TRACK', payload: track })
-      dispatch({ type: 'TOGGLE_PLAY' })
+      dispatch({ type: 'SET_PLAYING', payload: true })
       const imageUrl = track.album.images[0]?.url
       if (imageUrl) {
         const palette = await extractPalette(imageUrl)

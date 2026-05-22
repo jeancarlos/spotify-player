@@ -58,4 +58,11 @@ describe('playerReducer', () => {
     const state = playerReducer(initialPlayerState, { type: 'TOGGLE_FULLSCREEN' })
     expect(state.isFullscreen).toBe(true)
   })
+
+  it('SET_PLAYING define isPlaying diretamente', () => {
+    const s1 = playerReducer(initialPlayerState, { type: 'SET_PLAYING', payload: true })
+    expect(s1.isPlaying).toBe(true)
+    const s2 = playerReducer(s1, { type: 'SET_PLAYING', payload: false })
+    expect(s2.isPlaying).toBe(false)
+  })
 })

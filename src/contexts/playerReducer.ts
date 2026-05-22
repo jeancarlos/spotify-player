@@ -17,6 +17,7 @@ export interface PlayerState {
 export type PlayerAction =
   | { type: 'SET_TRACK'; payload: SpotifyTrack }
   | { type: 'TOGGLE_PLAY' }
+  | { type: 'SET_PLAYING'; payload: boolean }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_PROGRESS'; payload: number }
   | { type: 'SET_VOLUME'; payload: number }
@@ -51,6 +52,8 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       }
     case 'TOGGLE_PLAY':
       return { ...state, isPlaying: !state.isPlaying }
+    case 'SET_PLAYING':
+      return { ...state, isPlaying: action.payload }
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload }
     case 'SET_PROGRESS':
