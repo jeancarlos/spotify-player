@@ -27,7 +27,11 @@ export function ArtistCard({ artist, onPlay }: ArtistCardProps) {
         )}
         <div
           className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity flex items-center justify-center"
-          onClick={e => { e.stopPropagation(); onPlay?.(artist) }}
+          onClick={e => {
+            e.stopPropagation()
+            if (onPlay) onPlay(artist)
+            else navigate(`/artists/${artist.id}`)
+          }}
         >
           <Play size={28} className="text-white fill-white" />
         </div>

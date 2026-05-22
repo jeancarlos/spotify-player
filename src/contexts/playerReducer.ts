@@ -22,6 +22,7 @@ export type PlayerAction =
   | { type: 'SET_PROGRESS'; payload: number }
   | { type: 'SET_VOLUME'; payload: number }
   | { type: 'TOGGLE_SHUFFLE' }
+  | { type: 'SET_SHUFFLE'; payload: boolean }
   | { type: 'SET_REPEAT'; payload: 'off' | 'track' | 'context' }
   | { type: 'TOGGLE_FULLSCREEN' }
   | { type: 'SET_PALETTE'; payload: [string, string] }
@@ -62,6 +63,8 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       return { ...state, volume: Math.min(1, Math.max(0, action.payload)) }
     case 'TOGGLE_SHUFFLE':
       return { ...state, shuffle: !state.shuffle }
+    case 'SET_SHUFFLE':
+      return { ...state, shuffle: action.payload }
     case 'SET_REPEAT':
       return { ...state, repeat: action.payload }
     case 'TOGGLE_FULLSCREEN':

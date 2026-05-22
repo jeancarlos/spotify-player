@@ -65,6 +65,7 @@ api.interceptors.response.use(
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: params,
       })
+      if (!res.ok) throw new Error('Token refresh failed')
       const data = (await res.json()) as { access_token: string; refresh_token?: string }
 
       sessionStorage.setItem('access_token', data.access_token)

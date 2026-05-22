@@ -43,9 +43,9 @@ export function PlayerSync() {
       }
     }
 
-    // Sync shuffle
+    // Sync shuffle — SET_SHUFFLE is deterministic; avoids double-toggle from stale closure
     if (data.shuffle_state !== state.shuffle) {
-      dispatch({ type: 'TOGGLE_SHUFFLE' })
+      dispatch({ type: 'SET_SHUFFLE', payload: data.shuffle_state })
     }
 
     // Sync repeat

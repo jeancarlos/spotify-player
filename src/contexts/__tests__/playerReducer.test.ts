@@ -65,4 +65,14 @@ describe('playerReducer', () => {
     const s2 = playerReducer(s1, { type: 'SET_PLAYING', payload: false })
     expect(s2.isPlaying).toBe(false)
   })
+
+  it('SET_SHUFFLE define shuffle diretamente sem toggle', () => {
+    const s1 = playerReducer(initialPlayerState, { type: 'SET_SHUFFLE', payload: true })
+    expect(s1.shuffle).toBe(true)
+    // idempotente — não togla se já está true
+    const s2 = playerReducer(s1, { type: 'SET_SHUFFLE', payload: true })
+    expect(s2.shuffle).toBe(true)
+    const s3 = playerReducer(s2, { type: 'SET_SHUFFLE', payload: false })
+    expect(s3.shuffle).toBe(false)
+  })
 })

@@ -20,6 +20,17 @@ export function DynamicBackground() {
       animate={{ background: gradient }}
       transition={{ duration: 0.8, ease: 'easeInOut' }}
     >
+      {/* Idle pulse: slow breathing glow ~8s, hidden when playing */}
+      {!isPlaying && (
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(45,27,105,0.15) 0%, transparent 60%)',
+          }}
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 8, ease: 'easeInOut', repeat: Infinity }}
+        />
+      )}
       <div
         className="absolute inset-0 opacity-[0.04]"
         style={{ backgroundImage: 'url(/noise.svg)', backgroundSize: '200px 200px' }}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
+import { formatNumber } from '@/utils/formatNumber'
 import { useUserTopTracks, useUserTopArtistsFull } from '@/hooks/queries/useUserTopItems'
 import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import {
@@ -75,7 +76,7 @@ export function Profile() {
           <p className="text-sm text-white/50">{profile?.email}</p>
           <div className="flex items-center gap-4 mt-1">
             <span className="text-xs text-white/40">
-              {profile?.followers.total} {t('profile.followers')}
+              {formatNumber(profile?.followers.total ?? 0)} {t('profile.followers')}
             </span>
             <span className={cn(
               'text-xs px-2 py-0.5 rounded-full',

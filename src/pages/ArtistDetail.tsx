@@ -54,7 +54,14 @@ export function ArtistDetail() {
     )
   }
 
-  if (!artist.data) return null
+  if (artist.isError || !artist.data) return (
+    <div className="p-6 flex flex-col items-center justify-center gap-3 py-24">
+      <p className="text-white/40 text-sm">{artist.isError ? 'Artista não encontrado.' : ''}</p>
+      <button onClick={() => navigate('/artists')} className="glass-button px-4 py-2 rounded-xl text-sm text-white/60 hover:text-white">
+        ← Voltar para Artistas
+      </button>
+    </div>
+  )
 
   const heroImage = artist.data.images[0]?.url
 
