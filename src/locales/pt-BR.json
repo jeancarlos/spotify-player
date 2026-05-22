@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Início",
+    "artists": "Artistas",
+    "profile": "Perfil",
+    "favorites": "Favoritos"
+  },
+  "home": {
+    "recentlyPlayed": "Tocadas Recentemente",
+    "newReleases": "Novos Lançamentos",
+    "recommendations": "Recomendados para Você",
+    "seeMore": "Ver mais"
+  },
+  "login": {
+    "title": "Spoter",
+    "subtitle": "Sua experiência musical imersiva",
+    "button": "Entrar com Spotify"
+  },
+  "player": {
+    "nowPlaying": "Tocando agora"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Algo deu errado",
+    "retry": "Tentar novamente"
+  }
+}

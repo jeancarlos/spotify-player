@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "home": "Home",
+    "artists": "Artists",
+    "profile": "Profile",
+    "favorites": "Favorites"
+  },
+  "home": {
+    "recentlyPlayed": "Recently Played",
+    "newReleases": "New Releases",
+    "recommendations": "Recommended for You",
+    "seeMore": "See more"
+  },
+  "login": {
+    "title": "Spoter",
+    "subtitle": "Your immersive music experience",
+    "button": "Sign in with Spotify"
+  },
+  "player": {
+    "nowPlaying": "Now playing"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again"
+  }
+}
