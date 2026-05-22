@@ -22,7 +22,8 @@ describe('formatDuration', () => {
     expect(formatDuration(0)).toBe('0:00')
   })
 
-  it('trata durações longas (mais de uma hora em minutos)', () => {
-    expect(formatDuration(3661000)).toBe('61:01')
+  it('trata durações longas (mais de uma hora)', () => {
+    expect(formatDuration(3661000)).toBe('1:01:01')
+    expect(formatDuration(3600000)).toBe('1:00:00')
   })
 })

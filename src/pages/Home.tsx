@@ -8,7 +8,6 @@ import { SectionRow } from '@/components/shared/SectionRow'
 import { TrackCard } from '@/components/shared/TrackCard'
 import { AlbumCard } from '@/components/shared/AlbumCard'
 import { usePlayer } from '@/hooks/usePlayer'
-import { extractPalette } from '@/lib/colorThief'
 import type { SpotifyTrack } from '@/types/spotify'
 
 export function Home() {
@@ -22,14 +21,10 @@ export function Home() {
   const recommendations = useRecommendations(seedIds, 20)
 
   const handlePlay = useCallback(
-    async (track: SpotifyTrack) => {
+    (track: SpotifyTrack) => {
       dispatch({ type: 'SET_TRACK', payload: track })
       dispatch({ type: 'SET_PLAYING', payload: true })
-      const imageUrl = track.album.images[0]?.url
-      if (imageUrl) {
-        const palette = await extractPalette(imageUrl)
-        if (palette) dispatch({ type: 'SET_PALETTE', payload: palette })
-      }
+      // Palette extraction is handled centrally by PlayerSync
     },
     [dispatch]
   )

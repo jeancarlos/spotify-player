@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Início", "artists": "Artistas", "profile": "Perfil", "favorites": "Favoritos" },
+  "nav": { "home": "Início", "artists": "Artistas", "profile": "Perfil", "favorites": "Favoritos", "collapse": "Recolher" },
   "home": {
     "recentlyPlayed": "Tocadas Recentemente",
     "newReleases": "Novos Lançamentos",
@@ -11,7 +11,7 @@
     "subtitle": "Sua experiência musical imersiva",
     "button": "Entrar com Spotify"
   },
-  "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada" },
+  "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada", "queue": "Fila de reprodução", "closeQueue": "Fechar fila" },
   "common": { "loading": "Carregando...", "error": "Algo deu errado", "retry": "Tentar novamente" },
   "artists": {
     "searchPlaceholder": "Buscar artistas...",

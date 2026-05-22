@@ -36,9 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (state.isAuthenticated && !state.profile) {
-      api.get<SpotifyUser>('/me').then(res => {
-        dispatch({ type: 'SET_PROFILE', payload: res.data })
-      })
+      api.get<SpotifyUser>('/me')
+        .then(res => dispatch({ type: 'SET_PROFILE', payload: res.data }))
+        .catch(() => dispatch({ type: 'LOGOUT' }))
     }
   }, [state.isAuthenticated, state.profile])
 

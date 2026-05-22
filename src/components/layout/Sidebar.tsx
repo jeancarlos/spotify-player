@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Mic2, User, Heart, ChevronLeft, ChevronRight, Globe } from 'lucide-react'
+import { Home, Mic2, User, Heart, ChevronLeft, ChevronRight, Globe, LogOut } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef } from 'react'
 import { useUI } from '@/hooks/useUI'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
@@ -18,6 +19,9 @@ export function Sidebar() {
   const { state, dispatch } = useUI()
   const { state: authState, logout } = useAuth()
   const collapsed = state.sidebarCollapsed
+
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   function toggleLanguage() {
     dispatch({
@@ -75,18 +79,73 @@ export function Sidebar() {
           {!collapsed && <span>{i18n.language === 'pt-BR' ? 'PT' : 'EN'}</span>}
         </button>
 
-        {authState.profile && !collapsed && (
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-white/40 hover:text-white/70 text-xs transition-all"
-          >
-            <img
-              src={authState.profile.images[0]?.url ?? '/favicon.svg'}
-              alt="avatar"
-              className="w-6 h-6 rounded-full object-cover"
-            />
-            <span className="truncate">{authState.profile.display_name}</span>
-          </button>
+        {/* Profile com popup */}
+        {authState.profile && (
+          <div ref={profileRef} className="relative">
+            <button
+              id="profile-popup-trigger"
+              onMouseEnter={() => setProfileOpen(true)}
+              onMouseLeave={() => setProfileOpen(false)}
+              onClick={() => setProfileOpen(o => !o)}
+              className={cn(
+                'flex items-center gap-2 px-3 py-2 rounded-xl text-white/40 hover:text-white/80 text-xs transition-all w-full',
+                collapsed && 'justify-center'
+              )}
+            >
+              <img
+                src={authState.profile.images[0]?.url ?? '/favicon.svg'}
+                alt="avatar"
+                className="w-6 h-6 rounded-full object-cover shrink-0"
+              />
+              {!collapsed && (
+                <span className="truncate">{authState.profile.display_name}</span>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {profileOpen && (
+                <motion.div
+                  id="profile-popup"
+                  initial={{ opacity: 0, x: -8, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -8, scale: 0.96 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  onMouseEnter={() => setProfileOpen(true)}
+                  onMouseLeave={() => setProfileOpen(false)}
+                  className="absolute bottom-full left-full ml-2 mb-1 glass-card border border-white/10 rounded-2xl p-4 min-w-[220px] z-50 shadow-xl"
+                >
+                  {/* Avatar + nome */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <img
+                      src={authState.profile.images[0]?.url ?? '/favicon.svg'}
+                      alt="avatar"
+                      className="w-12 h-12 rounded-full object-cover ring-2 ring-white/20"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white truncate">
+                        {authState.profile.display_name}
+                      </p>
+                      <p className="text-xs text-white/40 truncate">
+                        {authState.profile.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Separator */}
+                  <div className="border-t border-white/10 my-2" />
+
+                  {/* Ações */}
+                  <button
+                    onClick={logout}
+                    className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg text-sm text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                  >
+                    <LogOut size={14} />
+                    <span>Logout</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
 
         {/* Toggle recolher */}
@@ -99,7 +158,7 @@ export function Sidebar() {
           )}
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          {!collapsed && <span className="text-xs">Recolher</span>}
+          {!collapsed && <span className="text-xs">{t('nav.collapse')}</span>}
         </button>
       </div>
     </motion.aside>

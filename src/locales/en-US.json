@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Home", "artists": "Artists", "profile": "Profile", "favorites": "Favorites" },
+  "nav": { "home": "Home", "artists": "Artists", "profile": "Profile", "favorites": "Favorites", "collapse": "Collapse" },
   "home": {
     "recentlyPlayed": "Recently Played",
     "newReleases": "New Releases",
@@ -11,7 +11,7 @@
     "subtitle": "Your immersive music experience",
     "button": "Sign in with Spotify"
   },
-  "player": { "nowPlaying": "Now playing", "noTrack": "No track selected" },
+  "player": { "nowPlaying": "Now playing", "noTrack": "No track selected", "queue": "Play queue", "closeQueue": "Close queue" },
   "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Try again" },
   "artists": {
     "searchPlaceholder": "Search artists...",

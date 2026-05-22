@@ -6,7 +6,6 @@ import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { usePlayer } from '@/hooks/usePlayer'
-import { extractPalette } from '@/lib/colorThief'
 import { formatNumber } from '@/utils/formatNumber'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { AlbumCard } from '@/components/shared/AlbumCard'
@@ -25,25 +24,21 @@ export function ArtistDetail() {
   const { dispatch, state } = usePlayer()
 
   const [tab, setTab] = useState<Tab>('tracks')
-  const [tracksPage, setTracksPage] = useState(0)
+  const [tracksPage, setTracksPage] = useState(1)
   const [albumsPage, setAlbumsPage] = useState(1)
 
   const artist = useArtist(id)
   const topTracks = useArtistTopTracks(id)
   const albums = useArtistAlbums(id, albumsPage)
 
-  const pagedTracks = topTracks.data?.slice(tracksPage * TRACKS_PER_PAGE, (tracksPage + 1) * TRACKS_PER_PAGE) ?? []
+  const pagedTracks = topTracks.data?.slice((tracksPage - 1) * TRACKS_PER_PAGE, tracksPage * TRACKS_PER_PAGE) ?? []
   const totalTrackPages = Math.ceil((topTracks.data?.length ?? 0) / TRACKS_PER_PAGE)
 
   const handlePlay = useCallback(
-    async (track: SpotifyTrack) => {
+    (track: SpotifyTrack) => {
       dispatch({ type: 'SET_TRACK', payload: track })
       if (!state.isPlaying) dispatch({ type: 'TOGGLE_PLAY' })
-      const imageUrl = track.album.images[0]?.url
-      if (imageUrl) {
-        const palette = await extractPalette(imageUrl)
-        if (palette) dispatch({ type: 'SET_PALETTE', payload: palette })
-      }
+      // Palette extraction is handled centrally by PlayerSync
     },
     [dispatch, state.isPlaying]
   )
@@ -128,20 +123,20 @@ export function ArtistDetail() {
                   <TrackRow
                     key={track.id}
                     track={track}
-                    index={tracksPage * TRACKS_PER_PAGE + i}
+                    index={(tracksPage - 1) * TRACKS_PER_PAGE + i}
                     onPlay={handlePlay}
                   />
                 ))}
             {totalTrackPages > 1 && (
               <div className="flex justify-center gap-3 pt-2">
                 <button
-                  disabled={tracksPage === 0}
+                  disabled={tracksPage === 1}
                   onClick={() => setTracksPage(p => p - 1)}
                   className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
                 >← {t('artistDetail.previous')}</button>
-                <span className="text-xs text-white/50 self-center">{tracksPage + 1}/{totalTrackPages}</span>
+                <span className="text-xs text-white/50 self-center">{tracksPage}/{totalTrackPages}</span>
                 <button
-                  disabled={tracksPage >= totalTrackPages - 1}
+                  disabled={tracksPage >= totalTrackPages}
                   onClick={() => setTracksPage(p => p + 1)}
                   className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
                 >{t('artistDetail.next')} →</button>
