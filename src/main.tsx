@@ -1,5 +1,4 @@
 import '@/styles/globals.css'
-import '@/styles/glass.css'
 import '@/lib/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
