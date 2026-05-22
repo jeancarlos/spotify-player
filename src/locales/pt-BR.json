@@ -1,10 +1,5 @@
 {
-  "nav": {
-    "home": "Início",
-    "artists": "Artistas",
-    "profile": "Perfil",
-    "favorites": "Favoritos"
-  },
+  "nav": { "home": "Início", "artists": "Artistas", "profile": "Perfil", "favorites": "Favoritos" },
   "home": {
     "recentlyPlayed": "Tocadas Recentemente",
     "newReleases": "Novos Lançamentos",
@@ -16,12 +11,38 @@
     "subtitle": "Sua experiência musical imersiva",
     "button": "Entrar com Spotify"
   },
-  "player": {
-    "nowPlaying": "Tocando agora"
+  "player": { "nowPlaying": "Tocando agora" },
+  "common": { "loading": "Carregando...", "error": "Algo deu errado", "retry": "Tentar novamente" },
+  "artists": {
+    "searchPlaceholder": "Buscar artistas...",
+    "searchAlbums": "Buscar álbuns",
+    "searchArtists": "Buscar artistas",
+    "filterByGenre": "Filtrar por gênero",
+    "noResults": "Nenhum resultado encontrado",
+    "searchPrompt": "Digite para buscar artistas"
   },
-  "common": {
-    "loading": "Carregando...",
-    "error": "Algo deu errado",
-    "retry": "Tentar novamente"
+  "favorites": {
+    "title": "Título",
+    "artist": "Artista",
+    "album": "Álbum",
+    "note": "Nota pessoal",
+    "addButton": "Adicionar favorito",
+    "searchPlaceholder": "Buscar nos favoritos...",
+    "emptyList": "Nenhum favorito ainda",
+    "removeConfirm": "Remover",
+    "cancel": "Cancelar",
+    "titleRequired": "Título é obrigatório",
+    "artistRequired": "Artista é obrigatório"
+  },
+  "profile": {
+    "followers": "seguidores",
+    "topArtists": "Artistas Mais Ouvidos",
+    "topTracks": "Faixas Favoritas",
+    "audioProfile": "Perfil Musical",
+    "fourWeeks": "4 semanas",
+    "sixMonths": "6 meses",
+    "allTime": "Longo prazo",
+    "mostPlayedAlbums": "Álbuns Mais Ouvidos",
+    "tracks": "faixas"
   }
 }
