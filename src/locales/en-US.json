@@ -19,7 +19,9 @@
     "searchArtists": "Search artists",
     "filterByGenre": "Filter by genre",
     "noResults": "No results found",
-    "searchPrompt": "Type to search artists"
+    "searchPrompt": "Type to search artists",
+    "previous": "Previous",
+    "next": "Next"
   },
   "favorites": {
     "title": "Title",

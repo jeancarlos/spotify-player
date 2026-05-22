@@ -19,7 +19,9 @@
     "searchArtists": "Buscar artistas",
     "filterByGenre": "Filtrar por gênero",
     "noResults": "Nenhum resultado encontrado",
-    "searchPrompt": "Digite para buscar artistas"
+    "searchPrompt": "Digite para buscar artistas",
+    "previous": "Anterior",
+    "next": "Próxima"
   },
   "favorites": {
     "title": "Título",
