@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useReducer, useEffect, useCallback } from 'react'
 import type { SpotifyUser } from '@/types/spotify'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/lib/pkce'
