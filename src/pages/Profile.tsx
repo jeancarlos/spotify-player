@@ -26,7 +26,7 @@ export function Profile() {
   const topTracks = useUserTopTracks('short_term', 5)
   const topArtists = useUserTopArtistsFull(timeRange, 10)
 
-  const trackIds = topTracks.data?.map(t => t.id) ?? []
+  const trackIds = useMemo(() => topTracks.data?.map(t => t.id) ?? [], [topTracks.data])
   const audioFeatures = useAudioFeatures(trackIds)
 
   const radarData = useMemo(() => {
@@ -48,10 +48,10 @@ export function Profile() {
   )
 
   const albumCounts = useMemo(() => {
-    const map = new Map<string, { name: string; image: string; count: number }>()
+    const map = new Map<string, { id: string; name: string; image: string; count: number }>()
     topTracks.data?.forEach(track => {
       const al = track.album
-      const entry = map.get(al.id) ?? { name: al.name, image: al.images[0]?.url ?? '', count: 0 }
+      const entry = map.get(al.id) ?? { id: al.id, name: al.name, image: al.images[0]?.url ?? '', count: 0 }
       entry.count++
       map.set(al.id, entry)
     })
@@ -100,7 +100,7 @@ export function Profile() {
             </RadarChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-white/30 text-sm text-center py-8">Ouça mais músicas para ver seu perfil</p>
+          <p className="text-white/30 text-sm text-center py-8">{t('profile.listenMore')}</p>
         )}
       </div>
 
@@ -149,7 +149,7 @@ export function Profile() {
           <h2 className="text-sm font-bold uppercase tracking-wide text-white/70">{t('profile.mostPlayedAlbums')}</h2>
           <div className="space-y-2">
             {albumCounts.map(al => (
-              <div key={al.name} className="flex items-center gap-3">
+              <div key={al.id} className="flex items-center gap-3">
                 {al.image && <img src={al.image} alt={al.name} className="w-10 h-10 rounded object-cover" />}
                 <div className="flex-1 overflow-hidden">
                   <p className="text-sm truncate">{al.name}</p>
