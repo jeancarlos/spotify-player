@@ -11,7 +11,7 @@
     "subtitle": "Your immersive music experience",
     "button": "Sign in with Spotify"
   },
-  "player": { "nowPlaying": "Now playing" },
+  "player": { "nowPlaying": "Now playing", "noTrack": "No track selected" },
   "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Try again" },
   "artists": {
     "searchPlaceholder": "Search artists...",
@@ -19,7 +19,19 @@
     "searchArtists": "Search artists",
     "filterByGenre": "Filter by genre",
     "noResults": "No results found",
-    "searchPrompt": "Type to search artists"
+    "searchPrompt": "Type to search artists",
+    "previous": "Previous",
+    "next": "Next",
+    "all": "All",
+    "unknownGenre": "Unknown genre",
+    "followers": "followers"
+  },
+  "artistDetail": {
+    "topTracks": "Top Tracks",
+    "albums": "Albums",
+    "popularity": "Popularity",
+    "previous": "Previous",
+    "next": "Next"
   },
   "favorites": {
     "title": "Title",
@@ -27,12 +39,25 @@
     "album": "Album",
     "note": "Personal note",
     "addButton": "Add favorite",
+    "addHeading": "Add Favorite",
     "searchPlaceholder": "Search favorites...",
     "emptyList": "No favorites yet",
     "removeConfirm": "Remove",
     "cancel": "Cancel",
     "titleRequired": "Title is required",
     "artistRequired": "Artist is required"
+  },
+  "lyrics": {
+    "searching": "Searching lyrics...",
+    "notFound": "Lyrics not found",
+    "album": "Album",
+    "releaseDate": "Release date",
+    "popularity": "Popularity",
+    "duration": "Duration",
+    "nowPlaying": "Now playing"
+  },
+  "trackRow": {
+    "popularity": "Popularity"
   },
   "profile": {
     "followers": "followers",

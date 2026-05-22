@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
@@ -20,6 +21,7 @@ const TRACKS_PER_PAGE = 10
 export function ArtistDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { dispatch, state } = usePlayer()
 
   const [tab, setTab] = useState<Tab>('tracks')
@@ -88,7 +90,7 @@ export function ArtistDetail() {
             </span>
           </div>
           <div className="flex items-center gap-2 mt-3">
-            <span className="text-xs text-white/40">Popularidade</span>
+            <span className="text-xs text-white/40">{t('artistDetail.popularity')}</span>
             <div className="h-1 w-32 bg-white/20 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white/70 rounded-full"
@@ -103,16 +105,16 @@ export function ArtistDetail() {
       {/* Tabs */}
       <div className="p-6 space-y-4">
         <div className="flex glass-card-md rounded-xl overflow-hidden w-fit">
-          {(['tracks', 'albums'] as Tab[]).map(t => (
+          {(['tracks', 'albums'] as Tab[]).map(tabKey => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabKey}
+              onClick={() => setTab(tabKey)}
               className={cn(
                 'px-5 py-2 text-sm transition-colors',
-                tab === t ? 'bg-white/15 text-white font-bold' : 'text-white/50 hover:text-white'
+                tab === tabKey ? 'bg-white/15 text-white font-bold' : 'text-white/50 hover:text-white'
               )}
             >
-              {t === 'tracks' ? 'Top Tracks' : 'Álbuns'}
+              {tabKey === 'tracks' ? t('artistDetail.topTracks') : t('artistDetail.albums')}
             </button>
           ))}
         </div>
@@ -136,13 +138,13 @@ export function ArtistDetail() {
                   disabled={tracksPage === 0}
                   onClick={() => setTracksPage(p => p - 1)}
                   className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >← Anterior</button>
+                >← {t('artistDetail.previous')}</button>
                 <span className="text-xs text-white/50 self-center">{tracksPage + 1}/{totalTrackPages}</span>
                 <button
                   disabled={tracksPage >= totalTrackPages - 1}
                   onClick={() => setTracksPage(p => p + 1)}
                   className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >Próxima →</button>
+                >{t('artistDetail.next')} →</button>
               </div>
             )}
           </div>
@@ -162,13 +164,13 @@ export function ArtistDetail() {
                   disabled={albumsPage === 1}
                   onClick={() => setAlbumsPage(p => p - 1)}
                   className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >← Anterior</button>
+                >← {t('artistDetail.previous')}</button>
                 <span className="text-xs text-white/50 self-center">{albumsPage}</span>
                 <button
                   disabled={!albums.data.next}
                   onClick={() => setAlbumsPage(p => p + 1)}
                   className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >Próxima →</button>
+                >{t('artistDetail.next')} →</button>
               </div>
             )}
           </div>

@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-export function useLyrics(artist: string, title: string) {
+export function useLyrics(artist: string, title: string, enabled = true) {
   return useQuery<string | null>({
     queryKey: ['lyrics', artist, title],
-    enabled: !!artist && !!title,
+    enabled: enabled && !!artist && !!title,
     retry: false,
     staleTime: Infinity,
     queryFn: async () => {

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, SkipBack, Play, Pause, SkipForward, Volume2, Shuffle, Repeat, Repeat1, Music } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useLyrics } from '@/hooks/queries/useLyrics'
 import { formatDuration } from '@/utils/formatDuration'
@@ -9,12 +10,13 @@ import api from '@/lib/axios'
 
 export function FullscreenPlayer() {
   const { state, dispatch } = usePlayer()
+  const { t } = useTranslation()
   const { currentTrack, isPlaying, progress, duration, volume, shuffle, repeat, isFullscreen, palette } = state
   const [showLyrics, setShowLyrics] = useState(false)
 
   const artistName = currentTrack?.artists[0]?.name ?? ''
   const trackName = currentTrack?.name ?? ''
-  const lyrics = useLyrics(artistName, trackName)
+  const lyrics = useLyrics(artistName, trackName, isFullscreen && showLyrics)
 
   const [primary, secondary] = palette ?? ['45,27,105', '22,33,62']
 
@@ -102,7 +104,7 @@ export function FullscreenPlayer() {
               >
                 <X size={18} />
               </button>
-              <p className="text-xs text-white/40 uppercase tracking-widest">Tocando agora</p>
+              <p className="text-xs text-white/40 uppercase tracking-widest">{t('lyrics.nowPlaying')}</p>
               <button
                 onClick={() => setShowLyrics(l => !l)}
                 className={cn('glass-button p-2 rounded-xl transition-colors', showLyrics && 'bg-white/20')}
@@ -136,23 +138,23 @@ export function FullscreenPlayer() {
               {showLyrics && (
                 <div className="flex-1 h-full overflow-y-auto glass-card p-6">
                   {lyrics.isPending ? (
-                    <p className="text-white/30 text-sm">Buscando letra...</p>
+                    <p className="text-white/30 text-sm">{t('lyrics.searching')}</p>
                   ) : lyrics.data ? (
                     <pre className="font-sans text-sm text-white/80 leading-relaxed whitespace-pre-wrap">
                       {lyrics.data}
                     </pre>
                   ) : (
                     <div className="text-center space-y-2 py-8">
-                      <p className="text-white/30 text-sm">Letra não encontrada</p>
+                      <p className="text-white/30 text-sm">{t('lyrics.notFound')}</p>
                       {currentTrack && (
                         <div className="glass-card-md p-4 text-left space-y-1 mt-4">
-                          <p className="text-xs text-white/50">Álbum: {currentTrack.album.name}</p>
+                          <p className="text-xs text-white/50">{t('lyrics.album')}: {currentTrack.album.name}</p>
                           <p className="text-xs text-white/50">
-                            Lançamento: {currentTrack.album.release_date}
+                            {t('lyrics.releaseDate')}: {currentTrack.album.release_date}
                           </p>
-                          <p className="text-xs text-white/50">Popularidade: {currentTrack.popularity}</p>
+                          <p className="text-xs text-white/50">{t('lyrics.popularity')}: {currentTrack.popularity}</p>
                           <p className="text-xs text-white/50">
-                            Duração: {formatDuration(currentTrack.duration_ms)}
+                            {t('lyrics.duration')}: {formatDuration(currentTrack.duration_ms)}
                           </p>
                         </div>
                       )}

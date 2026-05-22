@@ -120,7 +120,7 @@ export interface ArtistTopTracksResponse {
 
 export interface ArtistAlbumsResponse extends PagingObject<SpotifyAlbumSimple> {}
 
-export interface PlayerState {
+export interface SpotifyPlayerState {
   is_playing: boolean
   progress_ms: number | null
   item: SpotifyTrack | null

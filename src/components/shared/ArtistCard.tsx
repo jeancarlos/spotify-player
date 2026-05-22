@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Play } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { GlassCard } from './GlassCard'
 import { formatNumber } from '@/utils/formatNumber'
 import type { SpotifyArtist } from '@/types/spotify'
@@ -11,6 +12,7 @@ interface ArtistCardProps {
 
 export function ArtistCard({ artist, onPlay }: ArtistCardProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const image = artist.images[0]?.url
 
   return (
@@ -33,9 +35,9 @@ export function ArtistCard({ artist, onPlay }: ArtistCardProps) {
       <div className="overflow-hidden">
         <p className="text-xs font-bold truncate">{artist.name}</p>
         <p className="text-xs text-white/40 truncate">
-          {artist.genres.slice(0, 2).join(', ') || 'Unknown genre'}
+          {artist.genres.slice(0, 2).join(', ') || t('artists.unknownGenre')}
         </p>
-        <p className="text-xs text-white/30 mt-1">{formatNumber(artist.followers.total)} followers</p>
+        <p className="text-xs text-white/30 mt-1">{formatNumber(artist.followers.total)} {t('artists.followers')}</p>
       </div>
     </GlassCard>
   )

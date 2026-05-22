@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Play } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
@@ -12,6 +13,7 @@ interface TrackRowProps {
 
 export function TrackRow({ track, index, onPlay }: TrackRowProps) {
   const [hovered, setHovered] = useState(false)
+  const { t } = useTranslation()
   const image = track.album.images[0]?.url
 
   return (
@@ -39,7 +41,7 @@ export function TrackRow({ track, index, onPlay }: TrackRowProps) {
       <div className="flex items-center gap-1">
         <div
           className="h-1 bg-white/20 rounded-full overflow-hidden w-16"
-          title={`Popularity: ${track.popularity}`}
+          title={`${t('trackRow.popularity')}: ${track.popularity}`}
         >
           <div
             className="h-full bg-white/60 rounded-full"

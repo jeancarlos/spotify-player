@@ -87,7 +87,7 @@ export function Artists() {
             onClick={() => setActiveGenre(null)}
             className={cn('cursor-pointer text-xs', !activeGenre && 'bg-white/15')}
           >
-            Todos
+            {t('artists.all')}
           </Badge>
           {genres.map(g => (
             <Badge
@@ -139,14 +139,14 @@ export function Artists() {
             onClick={() => setPage(p => p - 1)}
             className="px-4 py-1.5 glass-button rounded-lg text-sm disabled:opacity-30"
           >
-            ← Anterior
+            ← {t('artists.previous')}
           </button>
           <span className="text-sm text-white/50">{page}</span>
           <button
             onClick={() => setPage(p => p + 1)}
             className="px-4 py-1.5 glass-button rounded-lg text-sm"
           >
-            Próxima →
+            {t('artists.next')} →
           </button>
         </div>
       )}

@@ -11,7 +11,7 @@
     "subtitle": "Sua experiência musical imersiva",
     "button": "Entrar com Spotify"
   },
-  "player": { "nowPlaying": "Tocando agora" },
+  "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada" },
   "common": { "loading": "Carregando...", "error": "Algo deu errado", "retry": "Tentar novamente" },
   "artists": {
     "searchPlaceholder": "Buscar artistas...",
@@ -19,7 +19,19 @@
     "searchArtists": "Buscar artistas",
     "filterByGenre": "Filtrar por gênero",
     "noResults": "Nenhum resultado encontrado",
-    "searchPrompt": "Digite para buscar artistas"
+    "searchPrompt": "Digite para buscar artistas",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "all": "Todos",
+    "unknownGenre": "Gênero desconhecido",
+    "followers": "seguidores"
+  },
+  "artistDetail": {
+    "topTracks": "Top Tracks",
+    "albums": "Álbuns",
+    "popularity": "Popularidade",
+    "previous": "Anterior",
+    "next": "Próxima"
   },
   "favorites": {
     "title": "Título",
@@ -27,12 +39,25 @@
     "album": "Álbum",
     "note": "Nota pessoal",
     "addButton": "Adicionar favorito",
+    "addHeading": "Adicionar Favorito",
     "searchPlaceholder": "Buscar nos favoritos...",
     "emptyList": "Nenhum favorito ainda",
     "removeConfirm": "Remover",
     "cancel": "Cancelar",
     "titleRequired": "Título é obrigatório",
     "artistRequired": "Artista é obrigatório"
+  },
+  "lyrics": {
+    "searching": "Buscando letra...",
+    "notFound": "Letra não encontrada",
+    "album": "Álbum",
+    "releaseDate": "Lançamento",
+    "popularity": "Popularidade",
+    "duration": "Duração",
+    "nowPlaying": "Tocando agora"
+  },
+  "trackRow": {
+    "popularity": "Popularidade"
   },
   "profile": {
     "followers": "seguidores",

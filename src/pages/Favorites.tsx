@@ -33,7 +33,7 @@ export function Favorites() {
     <div className="p-6 space-y-8 max-w-2xl mx-auto">
       <div className="glass-card p-6 space-y-4">
         <h2 className="text-sm font-bold uppercase tracking-wide text-white/70">
-          Adicionar Favorito
+          {t('favorites.addHeading')}
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <div>
