@@ -49,9 +49,9 @@ describe('playerReducer', () => {
   it('SET_PALETTE atualiza a paleta', () => {
     const state = playerReducer(initialPlayerState, {
       type: 'SET_PALETTE',
-      payload: ['rgb(100,50,200)', 'rgb(50,100,150)'],
+      payload: ['100,50,200', '50,100,150'],
     })
-    expect(state.palette).toEqual(['rgb(100,50,200)', 'rgb(50,100,150)'])
+    expect(state.palette).toEqual(['100,50,200', '50,100,150'])
   })
 
   it('TOGGLE_FULLSCREEN inverte isFullscreen', () => {
