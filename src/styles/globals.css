@@ -32,3 +32,17 @@
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes bg-breathe {
+  0%   { background-color: hsl(0,   0%,  100%); }
+  16%  { background-color: hsl(340, 55%, 98%);  }
+  33%  { background-color: hsl(220, 55%, 98%);  }
+  50%  { background-color: hsl(160, 55%, 98%);  }
+  66%  { background-color: hsl(40,  55%, 98%);  }
+  83%  { background-color: hsl(280, 55%, 98%);  }
+  100% { background-color: hsl(0,   0%,  100%); }
+}
+
+.bg-breathe {
+  animation: bg-breathe 45s ease-in-out infinite;
+}

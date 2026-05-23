@@ -30,7 +30,7 @@ export function Home() {
   const albumArt = state.currentTrack?.album.images[0]?.url
 
   return (
-    <div className="relative min-h-screen bg-white overflow-hidden">
+    <div className="relative min-h-screen bg-breathe overflow-hidden">
       {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
