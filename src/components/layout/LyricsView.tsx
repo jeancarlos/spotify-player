@@ -35,22 +35,33 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
     return () => ro.disconnect()
   }, [])
 
-  // Centraliza a linha ativa sempre que ela ou o paddingH mudarem.
+  // Centraliza a linha ativa sempre que ela, o paddingH ou as linhas mudarem.
   useLayoutEffect(() => {
     const container = containerRef.current
     const el = activeRef.current
     if (!container || !el || container.clientHeight === 0) return
-    const center = container.clientHeight / 2
-    const elMid = el.offsetTop + el.clientHeight / 2
-    setTranslateY(center - elMid)
-  }, [activeIndex, paddingH])
+    
+    // Pequeno delay para garantir que o DOM estabilizou
+    const timeout = setTimeout(() => {
+      const center = container.clientHeight / 2
+      const elMid = el.offsetTop + el.clientHeight / 2
+      setTranslateY(center - elMid)
+    }, 50)
+
+    return () => clearTimeout(timeout)
+  }, [activeIndex, paddingH, lines])
 
   return (
     <div ref={containerRef} className="flex-1 overflow-hidden relative">
       <motion.div
-        className="absolute inset-x-0 flex flex-col items-center gap-5 px-8"
+        className="absolute inset-x-0 flex flex-col items-center gap-6 px-8"
         animate={{ y: translateY }}
-        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ 
+          type: 'spring',
+          damping: 30,
+          stiffness: 150,
+          mass: 0.8
+        }}
       >
         {/* Spacer superior — igual à meia altura do container, centraliza a primeira linha */}
         <div style={{ height: paddingH, flexShrink: 0 }} />

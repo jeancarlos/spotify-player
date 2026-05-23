@@ -18,13 +18,13 @@ export function PlayerSync() {
     isPlayingRef.current = state.isPlaying
   }, [state.isPlaying])
 
-  // Timer local: incrementa progress a cada 1s enquanto tocando
+  // Timer local: incrementa progress a cada 100ms enquanto tocando
   useEffect(() => {
     const interval = setInterval(() => {
       if (isPlayingRef.current) {
-        dispatch({ type: 'TICK_PROGRESS' })
+        dispatch({ type: 'TICK_PROGRESS', payload: 100 })
       }
-    }, 1000)
+    }, 100)
     
     return () => clearInterval(interval)
   }, [dispatch])
