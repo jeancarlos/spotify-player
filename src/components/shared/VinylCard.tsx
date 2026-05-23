@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
 
@@ -14,22 +15,23 @@ export function VinylCard({
   onPlay,
   size = 'md',
 }: VinylCardProps) {
+  const { t } = useTranslation()
   const dim = size === 'sm' ? 80 : 104
 
   return (
     <div
-      className="cursor-pointer flex flex-col items-center gap-1"
+      className="cursor-pointer flex flex-col items-center gap-1 focus:outline-none"
       style={{ width: dim }}
       onClick={() => onPlay?.(track)}
       role="button"
       tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onPlay?.(track)}
-      aria-label={`Tocar ${track.name}`}
+      aria-label={t('player.playTrack', { name: track.name })}
     >
       <div
         className={cn(
-          'glass-card overflow-hidden shrink-0',
-          isActive && 'ring-2 ring-black/30'
+          'glass-card overflow-hidden shrink-0 transition-transform hover:scale-105 active:scale-95',
+          isActive && 'ring-2 ring-black/30 scale-105'
         )}
         style={{ width: dim, height: dim, borderRadius: 14 }}
       >

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -11,11 +11,6 @@ import { TrackRow } from '@/components/shared/TrackRow'
 import { EmptyState } from '@/components/shared/EmptyState'
 import type { SpotifyTrack } from '@/types/spotify'
 
-const SearchSchema = z.object({
-  query: z.string().min(2, 'Digite pelo menos 2 caracteres'),
-})
-type SearchForm = z.infer<typeof SearchSchema>
-
 export function Favorites() {
   const { t } = useTranslation()
   const { tracks, addTrack, removeTrack, isLoading } = useSpoterPlaylist()
@@ -23,12 +18,22 @@ export function Favorites() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showForm, setShowForm] = useState(false)
 
+  // Schema reativo para mensagens de erro traduzidas
+  const searchSchema = useMemo(() => z.object({
+    query: z.string().min(2, t('favorites.minQuery')),
+  }), [t])
+
+  type SearchForm = z.infer<typeof searchSchema>
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<SearchForm>({ resolver: zodResolver(SearchSchema) })
+  } = useForm<SearchForm>({ 
+    resolver: zodResolver(searchSchema),
+    defaultValues: { query: '' }
+  })
 
   const searchResults = useSearchTracks(searchQuery, searchQuery.length >= 2)
 
@@ -48,13 +53,13 @@ export function Favorites() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-6">
-          <h1 className="text-2xl font-black text-black">Spoter List</h1>
+          <h1 className="text-2xl font-black text-black">{t('playlist.defaultName')}</h1>
           <button
             onClick={() => setShowForm(v => !v)}
             className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"
           >
             {showForm ? <X size={16} /> : <Plus size={16} />}
-            {showForm ? 'Fechar' : t('favorites.addButton')}
+            {showForm ? t('favorites.close') : t('favorites.addButton')}
           </button>
         </div>
 
@@ -110,7 +115,7 @@ export function Favorites() {
                       onClick={() => handleAdd(track)}
                       className="px-3 py-1 bg-black text-white rounded-full text-xs font-medium hover:bg-black/80 transition-colors shrink-0"
                     >
-                      + Adicionar
+                      {t('favorites.addTrack')}
                     </button>
                   </div>
                 ))}

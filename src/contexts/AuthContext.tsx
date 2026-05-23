@@ -2,6 +2,7 @@ import React, { createContext, useReducer, useEffect, useCallback } from 'react'
 import type { SpotifyUser } from '@/types/spotify'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/lib/pkce'
 import api from '@/lib/axios'
+import i18n from '@/lib/i18n'
 import { authReducer, initialAuthState } from './authReducer'
 import type { AuthState } from './authReducer'
 
@@ -69,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const verifier = sessionStorage.getItem('pkce_verifier')
 
     if (receivedState !== savedState || !verifier) {
-      throw new Error('Estado OAuth inválido ou verifier ausente')
+      throw new Error(i18n.t('auth.invalidState'))
     }
 
     const params = new URLSearchParams({
@@ -86,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       body: params,
     })
 
-    if (!res.ok) throw new Error('Troca de token falhou')
+    if (!res.ok) throw new Error(i18n.t('auth.tokenExchangeFailed'))
 
     const data = (await res.json()) as { access_token: string; refresh_token: string }
 

@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 
 export function OAuthCallback() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { handleCallback } = useAuth()
   const handled = useRef(false)
 
@@ -29,7 +31,7 @@ export function OAuthCallback() {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <p className="text-white/60 text-sm font-mono">Autenticando...</p>
+      <p className="text-white/60 text-sm font-mono">{t('auth.authenticating')}</p>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
@@ -11,10 +12,12 @@ interface TrackRowProps {
 }
 
 export function TrackRow({ track, index, isActive = false, onPlay }: TrackRowProps) {
+  const { t } = useTranslation()
+  
   return (
     <div
       className={cn(
-        'flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-black/5 transition-colors group cursor-pointer',
+        'flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-black/5 transition-colors group cursor-pointer focus:outline-none focus:bg-black/5',
         isActive && 'bg-black/8'
       )}
       onClick={() => onPlay?.(track)}
@@ -29,10 +32,10 @@ export function TrackRow({ track, index, isActive = false, onPlay }: TrackRowPro
       )}
       <button
         className={cn(
-          'w-6 shrink-0 items-center justify-center hidden group-hover:flex',
+          'w-6 shrink-0 items-center justify-center hidden group-hover:flex focus:outline-none',
           index === undefined && 'flex'
         )}
-        aria-label={`Tocar ${track.name}`}
+        aria-label={t('player.playTrack', { name: track.name })}
       >
         <Play size={12} className="fill-black text-black" />
       </button>

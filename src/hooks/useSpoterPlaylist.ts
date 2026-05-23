@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { AxiosError } from 'axios'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserPlaylists } from '@/hooks/queries/useUserPlaylists'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
@@ -8,11 +9,13 @@ import { useAddToPlaylist } from '@/hooks/mutations/useAddToPlaylist'
 import { useRemoveFromPlaylist } from '@/hooks/mutations/useRemoveFromPlaylist'
 
 const STORAGE_KEY = 'spoter_playlist_id'
-const PLAYLIST_NAME = 'Spoter List'
 
 export function useSpoterPlaylist() {
+  const { t } = useTranslation()
   const { state: authState } = useAuth()
   const userId = authState.profile?.id ?? ''
+
+  const playlistName = useMemo(() => t('playlist.defaultName'), [t])
 
   const [playlistId, setPlaylistId] = useState<string>(
     () => localStorage.getItem(STORAGE_KEY) ?? ''
@@ -27,13 +30,15 @@ export function useSpoterPlaylist() {
   useEffect(() => {
     if (!playlists.data || playlistId) return
 
-    const existing = playlists.data.items.find(p => p.name === PLAYLIST_NAME)
+    // Busca por nome exato da playlist (pode variar se o usuário mudou o idioma)
+    // No entanto, o ID é persistido no localStorage para evitar duplicatas
+    const existing = playlists.data.items.find(p => p.name === playlistName)
     if (existing) {
       setPlaylistId(existing.id)
       localStorage.setItem(STORAGE_KEY, existing.id)
     } else if (userId) {
       createPlaylist.mutate(
-        { userId, name: PLAYLIST_NAME, isPublic: false },
+        { userId, name: playlistName, isPublic: false },
         {
           onSuccess: playlist => {
             setPlaylistId(playlist.id)
@@ -42,7 +47,7 @@ export function useSpoterPlaylist() {
         }
       )
     }
-  }, [playlists.data, playlistId, userId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [playlists.data, playlistId, userId, playlistName, createPlaylist])
 
   // ID salvo pode estar desatualizado (playlist deletada no Spotify)
   useEffect(() => {

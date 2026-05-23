@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useUI } from '@/hooks/useUI'
 
 const LANGUAGES = [
@@ -11,12 +12,13 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
   const { state, dispatch } = useUI()
+  const { t } = useTranslation()
 
   return (
     <div
       className={`flex items-center gap-1 border border-black/15 rounded-full p-1 bg-white/60 backdrop-blur-sm ${className}`}
       role="group"
-      aria-label="Language switcher"
+      aria-label={t('nav.languageSwitcher')}
     >
       {LANGUAGES.map(({ code, label }) => (
         <button

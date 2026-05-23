@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import vinylWebp from '@/assets/vinyl.webp'
 
 interface VinylDiskProps {
@@ -12,6 +13,7 @@ const SIZE_MAP = { xs: 44, sm: 180, md: 360, lg: 560, xl: 720 } as const
 
 export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className }: VinylDiskProps) {
   const px = SIZE_MAP[size]
+  const { t } = useTranslation()
 
   const transition = isPlaying
     ? { duration: 8, ease: 'linear', repeat: Infinity }
@@ -42,7 +44,7 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
           >
             <motion.img
               src={albumArt}
-              alt="álbum"
+              alt={t('favorites.album')}
               className="w-full h-full object-cover"
               animate={animation}
               transition={transition}

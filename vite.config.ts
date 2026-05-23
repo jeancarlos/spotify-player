@@ -3,9 +3,41 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+import { VitePWA } from 'vite-plugin-pwa'
+
 export default defineConfig({
-  // @ts-expect-error - Conflito de tipagem entre Vite 8 e Vitest 2
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'robots.txt'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,webp}'],
+      },
+      manifest: {
+        name: 'Spoter',
+        short_name: 'Spoter',
+        description: 'A modern Spotify player with a vinyl touch',
+        theme_color: '#44aa00',
+        background_color: '#000000',
+        display: 'standalone',
+        icons: [
+          {
+            src: 'favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any',
+          },
+          {
+            src: 'favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'maskable',
+          },
+        ],
+      },
+    }),
+  ] as any,
   server: {
     host: '127.0.0.1',
   },

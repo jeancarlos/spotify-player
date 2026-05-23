@@ -29,11 +29,11 @@ export function ArtistDetail() {
 
   const radarData = audioFeatures.data
     ? [
-        { subject: 'Dança', A: Math.round((audioFeatures.data[0]?.danceability ?? 0) * 100) },
-        { subject: 'Energia', A: Math.round((audioFeatures.data[0]?.energy ?? 0) * 100) },
-        { subject: 'Valência', A: Math.round((audioFeatures.data[0]?.valence ?? 0) * 100) },
-        { subject: 'Acústica', A: Math.round((audioFeatures.data[0]?.acousticness ?? 0) * 100) },
-        { subject: 'Ao Vivo', A: Math.round((audioFeatures.data[0]?.liveness ?? 0) * 100) },
+        { subject: t('artistDetail.danceability'), A: Math.round((audioFeatures.data[0]?.danceability ?? 0) * 100) },
+        { subject: t('artistDetail.energy'), A: Math.round((audioFeatures.data[0]?.energy ?? 0) * 100) },
+        { subject: t('artistDetail.valence'), A: Math.round((audioFeatures.data[0]?.valence ?? 0) * 100) },
+        { subject: t('artistDetail.acousticness'), A: Math.round((audioFeatures.data[0]?.acousticness ?? 0) * 100) },
+        { subject: t('artistDetail.liveness'), A: Math.round((audioFeatures.data[0]?.liveness ?? 0) * 100) },
       ]
     : []
 
@@ -68,17 +68,20 @@ export function ArtistDetail() {
         {topTracks.data && topTracks.data.length > 0 && (
           <div className="flex justify-center">
             <ArcCarousel
-              items={topTracks.data.slice(0, 5).map((track, i) => (
-                <div key={track.id} className="flex flex-col items-center gap-1">
-                  <span className="text-xs font-bold text-black/40">{String(i + 1).padStart(2, '0')}</span>
-                  <VinylCard
-                    track={track}
-                    isActive={state.currentTrack?.id === track.id}
-                    onPlay={playTrack}
-                    size="md"
-                  />
-                </div>
-              ))}
+              items={topTracks.data.slice(0, 5).map((track, i) => ({
+                id: track.id,
+                content: (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-xs font-bold text-black/40">{String(i + 1).padStart(2, '0')}</span>
+                    <VinylCard
+                      track={track}
+                      isActive={state.currentTrack?.id === track.id}
+                      onPlay={playTrack}
+                      size="md"
+                    />
+                  </div>
+                )
+              }))}
               radius={220}
               arcDeg={120}
             />

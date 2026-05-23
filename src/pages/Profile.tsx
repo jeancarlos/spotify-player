@@ -35,7 +35,7 @@ export function Profile() {
             </div>
             <div className="text-center">
               <p className="text-lg font-bold text-black capitalize">{profile.product}</p>
-              <p className="text-xs text-black/40">Plano</p>
+              <p className="text-xs text-black/40">{t('profile.plan')}</p>
             </div>
           </div>
         </div>
