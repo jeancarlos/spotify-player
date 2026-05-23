@@ -33,16 +33,45 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-@keyframes bg-breathe {
-  0%   { background-color: hsl(0,   0%,  100%); }
-  16%  { background-color: hsl(340, 55%, 98%);  }
-  33%  { background-color: hsl(220, 55%, 98%);  }
-  50%  { background-color: hsl(160, 55%, 98%);  }
-  66%  { background-color: hsl(40,  55%, 98%);  }
-  83%  { background-color: hsl(280, 55%, 98%);  }
-  100% { background-color: hsl(0,   0%,  100%); }
+@keyframes blob-drift-1 {
+  0%, 100% { transform: translate(0, 0)      scale(1);    }
+  33%       { transform: translate(80px, -60px) scale(1.1);  }
+  66%       { transform: translate(-40px, 80px) scale(0.9);  }
+}
+@keyframes blob-drift-2 {
+  0%, 100% { transform: translate(0, 0)        scale(1);    }
+  33%       { transform: translate(-70px, 50px)  scale(0.95); }
+  66%       { transform: translate(60px, -80px)  scale(1.05); }
+}
+@keyframes blob-drift-3 {
+  0%, 100% { transform: translate(0, 0)        scale(1);    }
+  33%       { transform: translate(50px, 70px)   scale(1.08); }
+  66%       { transform: translate(-80px, -40px) scale(0.92); }
 }
 
-.bg-breathe {
-  animation: bg-breathe 45s ease-in-out infinite;
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.22;
+  filter: blur(80px);
+  will-change: transform;
+}
+.blob-1 {
+  width: 500px; height: 500px;
+  background: hsl(340, 75%, 82%);
+  top: -120px; left: -80px;
+  animation: blob-drift-1 20s ease-in-out infinite;
+}
+.blob-2 {
+  width: 420px; height: 420px;
+  background: hsl(220, 75%, 82%);
+  bottom: 60px; right: -60px;
+  animation: blob-drift-2 26s ease-in-out infinite;
+}
+.blob-3 {
+  width: 360px; height: 360px;
+  background: hsl(160, 75%, 82%);
+  top: 45%; left: 35%;
+  animation: blob-drift-3 22s ease-in-out infinite;
+  animation-delay: -8s;
 }

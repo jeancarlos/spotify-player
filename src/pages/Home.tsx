@@ -30,7 +30,14 @@ export function Home() {
   const albumArt = state.currentTrack?.album.images[0]?.url
 
   return (
-    <div className="relative min-h-screen bg-breathe overflow-hidden">
+    <div className="relative min-h-screen bg-white overflow-hidden">
+      {/* Ambient blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+      </div>
+
       {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
@@ -42,7 +49,7 @@ export function Home() {
       </div>
 
       {/* Vinyl + Arc Carousel */}
-      <div className="relative flex justify-center mt-4" style={{ height: 580 }}>
+      <div className="relative flex justify-center mt-4 h-[580px]" >
         {/* Arc Carousel — centered above the vinyl */}
         <div className="absolute bottom-[260px] left-1/2 -translate-x-1/2">
           {tracks.length > 0 && (
@@ -67,7 +74,7 @@ export function Home() {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[20px]">
           <motion.div
             initial={{ scale: 0.6, y: 80, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
+            animate={{ scale: 1.5, y: 400, opacity: 1 }}
             transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
           >
             <VinylDisk size="lg" isPlaying={state.isPlaying} albumArt={albumArt} />
