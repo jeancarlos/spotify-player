@@ -90,7 +90,11 @@
     "minQuery": "Type at least 2 characters",
     "close": "Close",
     "addTrack": "+ Add",
-    "viewOnSpotify": "View on Spotify"
+    "viewOnSpotify": "View on Spotify",
+    "addToList": "Add to Spoter List",
+    "removeFromList": "Remove from Spoter List",
+    "addedToList": "Added!",
+    "removedFromList": "Removed!"
   },
   "lyrics": {
     "searching": "Searching lyrics...",

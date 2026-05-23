@@ -2,7 +2,7 @@
 import { useCallback } from 'react'
 import {
   SkipBack, Play, Pause, SkipForward,
-  Shuffle, Repeat, Repeat1, ListMusic,
+  Shuffle, Repeat, Repeat1, ListMusic, Heart,
 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'
@@ -14,6 +14,7 @@ import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 import type { AxiosError } from 'axios'
+import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 
 function Tip({ label }: { label: string }) {
   return (
@@ -68,6 +69,20 @@ export function MiniPlayer() {
     dispatch({ type: 'SET_REPEAT', payload: next })
     try { await api.put('/me/player/repeat', null, { params: { state: next } }) } catch { /* silent */ }
   }, [dispatch, repeat])
+
+  const { tracks, addTrack, removeTrack } = useSpoterPlaylist()
+  const isSaved = !!currentTrack && tracks.some(t => t.uri === currentTrack.uri)
+
+  const handleHeart = useCallback(() => {
+    if (!currentTrack) return
+    if (isSaved) {
+      removeTrack(currentTrack.uri)
+      toast(t('favorites.removedFromList'), 'info')
+    } else {
+      addTrack(currentTrack.uri)
+      toast(t('favorites.addedToList'), 'success')
+    }
+  }, [currentTrack, isSaved, addTrack, removeTrack, toast, t])
 
   const isPlayerPage = location.pathname === '/player'
 
@@ -147,6 +162,23 @@ export function MiniPlayer() {
               <p className="text-xs text-black/30">{t('player.noTrack')}</p>
             )}
           </div>
+
+          {/* Coração */}
+          {currentTrack && (
+            <div className="relative group shrink-0">
+              <button
+                onClick={handleHeart}
+                aria-label={isSaved ? t('favorites.removeFromList') : t('favorites.addToList')}
+                className={cn(
+                  'p-1.5 rounded-lg transition-all',
+                  isSaved ? 'text-red-500 scale-110' : 'text-black/30 hover:text-red-400',
+                )}
+              >
+                <Heart size={16} className={isSaved ? 'fill-current' : ''} />
+              </button>
+              <Tip label={isSaved ? t('favorites.removeFromList') : t('favorites.addToList')} />
+            </div>
+          )}
 
           {/* Controles */}
           {currentTrack && (

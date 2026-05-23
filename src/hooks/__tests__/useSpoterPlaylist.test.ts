@@ -13,6 +13,12 @@ vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
 vi.mock('@/hooks/mutations/useCreatePlaylist', () => ({
   useCreatePlaylist: () => ({ mutate: vi.fn() }),
 }))
+vi.mock('@/hooks/mutations/useUpdatePlaylist', () => ({
+  useUpdatePlaylist: () => ({ mutate: vi.fn() }),
+}))
+vi.mock('@/hooks/mutations/useUploadPlaylistCover', () => ({
+  useUploadPlaylistCover: () => ({ mutate: vi.fn() }),
+}))
 vi.mock('@/hooks/mutations/useAddToPlaylist', () => ({
   useAddToPlaylist: () => ({ mutate: vi.fn() }),
 }))

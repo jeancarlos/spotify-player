@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query'
-import api from '@/lib/axios'
 
 interface UploadCoverVars {
   playlistId: string
@@ -9,9 +8,21 @@ interface UploadCoverVars {
 export function useUploadPlaylistCover() {
   return useMutation<void, Error, UploadCoverVars>({
     mutationFn: async ({ playlistId, base64Jpeg }) => {
-      await api.put(`/playlists/${playlistId}/images`, base64Jpeg, {
-        headers: { 'Content-Type': 'image/jpeg' },
-      })
+      const token = sessionStorage.getItem('access_token')
+      if (!token) throw new Error('Sem token de acesso')
+      const res = await fetch(
+        `https://api.spotify.com/v1/playlists/${playlistId}/images`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'image/jpeg',
+          },
+          body: base64Jpeg,
+        },
+      )
+      // Spotify retorna 202 Accepted (sem body)
+      if (!res.ok) throw new Error(`upload capa: ${res.status}`)
     },
   })
 }
