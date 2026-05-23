@@ -11,7 +11,7 @@
   body {
     background: #ffffff;
     color: #111111;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'JetBrains Mono', monospace;
     -webkit-font-smoothing: antialiased;
   }
 }

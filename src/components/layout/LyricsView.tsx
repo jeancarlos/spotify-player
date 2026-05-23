@@ -65,7 +65,7 @@ export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProp
               }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
               onClick={() => onSeek?.(Math.round((i / lines.length) * duration))}
-              className={`text-center leading-relaxed select-none ${
+              className={`font-sans text-center leading-relaxed select-none ${
                 isActive ? 'text-white font-bold text-xl' : 'text-white text-base font-normal'
               } ${onSeek ? 'cursor-pointer' : ''}`}
             >

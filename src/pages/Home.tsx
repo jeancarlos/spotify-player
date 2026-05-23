@@ -27,8 +27,9 @@ function useDiskLayout() {
   const translateY = Math.round(diskPx * 0.28)
   const arcRadius = Math.max(130, Math.round(diskPx * 0.36))
   const arcBottom = Math.max(80, diskPx - translateY - arcRadius - 20)
+  const arcDeg = vw < 768 ? 130 : 90
 
-  return { translateY, arcRadius, arcBottom }
+  return { translateY, arcRadius, arcBottom, arcDeg }
 }
 
 export function Home() {
@@ -37,7 +38,7 @@ export function Home() {
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
-  const { translateY, arcRadius, arcBottom } = useDiskLayout()
+  const { translateY, arcRadius, arcBottom, arcDeg } = useDiskLayout()
   const [offset, setOffset] = useState(0)
 
   const allTracks: SpotifyTrack[] = recentlyPlayed.data
@@ -60,6 +61,17 @@ export function Home() {
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
+
+      {/* Hint text — visível apenas no mobile, espaço entre searchbar e disco */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="md:hidden fixed bottom-[42%] left-0 right-0 z-[4] flex flex-col items-center gap-1 pointer-events-none"
+      >
+        <p className="text-[11px] text-black/25 tracking-widest uppercase">{t('home.interactiveHint')}</p>
+        {hasNav && <p className="text-[10px] text-black/18 tracking-wider">{t('home.navHint')}</p>}
+      </motion.div>
 
       {/* Mobile semi-circle nav buttons — fixed to screen edges */}
       {hasNav && (
@@ -140,7 +152,7 @@ export function Home() {
                   ),
                 }))}
                 radius={arcRadius}
-                arcDeg={90}
+                arcDeg={arcDeg}
                 baseDelay={DISK_DONE_DELAY}
                 title={t('home.recentlyPlayed')}
               />

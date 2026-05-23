@@ -58,8 +58,8 @@ export function ArcCarousel({
 
   // Arc text path logic
   const cx = radius
-  const cy = radius + 120
-  const tR = radius + 72
+  const cy = radius + 70
+  const tR = radius + 46
   const halfRad = ((arcDeg / 2) * Math.PI) / 180
   const x1 = cx - tR * Math.sin(halfRad)
   const y1 = cy - tR * Math.cos(halfRad)
@@ -68,7 +68,7 @@ export function ArcCarousel({
   const arcPath = `M ${x1} ${y1} A ${tR} ${tR} 0 0 1 ${x2} ${y2}`
 
   return (
-    <div className="relative" style={{ width: radius * 2, height: radius + 120 }}>
+    <div className="relative" style={{ width: radius * 2, height: radius + 70 }}>
       <div className="absolute inset-0 flex items-end justify-center">
         <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
@@ -104,9 +104,9 @@ export function ArcCarousel({
 
       {title && (
         <motion.svg
-          className="absolute top-[-130px] inset-0 pointer-events-none"
+          className="absolute top-[-70px] inset-0 pointer-events-none"
           width={radius * 2}
-          height={radius + 120}
+          height={radius + 70}
           style={{ overflow: 'visible' }}
           overflow="visible"
           initial={{ opacity: 0 }}

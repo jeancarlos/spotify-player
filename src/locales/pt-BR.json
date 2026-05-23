@@ -13,7 +13,9 @@
     "recentlyPlayed": "Tocadas Recentemente",
     "newReleases": "Novos Lançamentos",
     "recommendations": "Recomendados para Você",
-    "seeMore": "Ver mais"
+    "seeMore": "Ver mais",
+    "interactiveHint": "Toque nas capas para reproduzir",
+    "navHint": "Use as setas para navegar"
   },
   "login": {
     "title": "Spoter",

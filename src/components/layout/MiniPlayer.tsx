@@ -97,10 +97,12 @@ const toggleShuffle = useCallback(async () => {
         </div>
       )}
 
-      <div className="glass rounded-3xl shadow-xl">
+      <div className="relative rounded-3xl shadow-xl">
+        {/* Backdrop separado dos filhos animados — filhos com transform/animation quebram backdrop-filter no pai */}
+        <div className="absolute inset-0 glass rounded-3xl pointer-events-none" />
 
         {/* Controles */}
-        <div className="px-4 py-3 flex items-center gap-3">
+        <div className="relative px-4 py-3 flex items-center gap-3">
         {/* Home — oculto na própria página do player */}
         {!isPlayerPage && (
           <div className="relative group shrink-0">
