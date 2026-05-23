@@ -31,7 +31,8 @@
     "albums": "Albums",
     "popularity": "Popularity",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "audioProfile": "Audio Profile"
   },
   "favorites": {
     "title": "Title",

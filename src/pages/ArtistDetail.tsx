@@ -1,182 +1,166 @@
-import { useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
-import { usePlayer } from '@/hooks/usePlayer'
-import { formatNumber } from '@/utils/formatNumber'
+import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
+import { usePlayTrack } from '@/hooks/usePlayTrack'
+import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
+import { VinylCard } from '@/components/shared/VinylCard'
 import { TrackRow } from '@/components/shared/TrackRow'
-import { AlbumCard } from '@/components/shared/AlbumCard'
-import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
-import type { SpotifyTrack } from '@/types/spotify'
-
-type Tab = 'tracks' | 'albums'
-
-const TRACKS_PER_PAGE = 10
+import { Pagination } from '@/components/shared/Pagination'
+import { usePlayer } from '@/hooks/usePlayer'
 
 export function ArtistDetail() {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const { t } = useTranslation()
-  const { dispatch, state } = usePlayer()
-
-  const [tab, setTab] = useState<Tab>('tracks')
-  const [tracksPage, setTracksPage] = useState(1)
-  const [albumsPage, setAlbumsPage] = useState(1)
+  const { state } = usePlayer()
+  const playTrack = usePlayTrack()
+  const [albumPage, setAlbumPage] = useState(1)
 
   const artist = useArtist(id)
   const topTracks = useArtistTopTracks(id)
-  const albums = useArtistAlbums(id, albumsPage)
+  const albums = useArtistAlbums(id, albumPage, 10)
 
-  const pagedTracks = topTracks.data?.slice((tracksPage - 1) * TRACKS_PER_PAGE, tracksPage * TRACKS_PER_PAGE) ?? []
-  const totalTrackPages = Math.ceil((topTracks.data?.length ?? 0) / TRACKS_PER_PAGE)
+  const topIds = topTracks.data?.slice(0, 5).map(t => t.id) ?? []
+  const audioFeatures = useAudioFeatures(topIds)
 
-  const handlePlay = useCallback(
-    (track: SpotifyTrack) => {
-      dispatch({ type: 'SET_TRACK', payload: track })
-      if (!state.isPlaying) dispatch({ type: 'TOGGLE_PLAY' })
-      // Palette extraction is handled centrally by PlayerSync
-    },
-    [dispatch, state.isPlaying]
-  )
+  const radarData = audioFeatures.data
+    ? [
+        { subject: 'Dança', A: Math.round((audioFeatures.data[0]?.danceability ?? 0) * 100) },
+        { subject: 'Energia', A: Math.round((audioFeatures.data[0]?.energy ?? 0) * 100) },
+        { subject: 'Valência', A: Math.round((audioFeatures.data[0]?.valence ?? 0) * 100) },
+        { subject: 'Acústica', A: Math.round((audioFeatures.data[0]?.acousticness ?? 0) * 100) },
+        { subject: 'Ao Vivo', A: Math.round((audioFeatures.data[0]?.liveness ?? 0) * 100) },
+      ]
+    : []
 
-  if (!id) return null
-
-  if (artist.isPending) {
-    return (
-      <div className="p-6 space-y-6">
-        <Skeleton className="h-64 w-full rounded-2xl" />
-        <Skeleton className="h-8 w-48" />
-      </div>
-    )
-  }
-
-  if (artist.isError || !artist.data) return (
-    <div className="p-6 flex flex-col items-center justify-center gap-3 py-24">
-      <p className="text-white/40 text-sm">{artist.isError ? 'Artista não encontrado.' : ''}</p>
-      <button onClick={() => navigate('/artists')} className="glass-button px-4 py-2 rounded-xl text-sm text-white/60 hover:text-white">
-        ← Voltar para Artistas
-      </button>
-    </div>
-  )
-
-  const heroImage = artist.data.images[0]?.url
+  const hasNextAlbums = albums.data
+    ? (albums.data.offset + albums.data.limit) < albums.data.total
+    : false
 
   return (
-    <div className="min-h-full">
-      {/* Hero */}
-      <div className="relative h-72 overflow-hidden rounded-b-2xl">
-        {heroImage && (
-          <img src={heroImage} alt={artist.data.name} className="w-full h-full object-cover object-top" />
+    <div className="min-h-screen bg-white pb-24">
+      {/* Artist hero */}
+      <div className="relative h-64 overflow-hidden">
+        {artist.data?.images[0]?.url && (
+          <img
+            src={artist.data.images[0].url}
+            alt={artist.data.name}
+            className="w-full h-full object-cover object-top"
+          />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-        <button
-          onClick={() => navigate('/artists')}
-          className="absolute top-4 left-4 glass-button p-2 rounded-xl"
-        >
-          <ArrowLeft size={18} />
-        </button>
-
-        <div className="absolute bottom-6 left-6 right-6">
-          <h1 className="text-4xl font-bold drop-shadow">{artist.data.name}</h1>
-          <div className="flex items-center gap-4 mt-2">
-            <span className="text-sm text-white/70">
-              {formatNumber(artist.data.followers.total)} followers
-            </span>
-            <span className="text-sm text-white/50">
-              {artist.data.genres.slice(0, 3).join(' · ')}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 mt-3">
-            <span className="text-xs text-white/40">{t('artistDetail.popularity')}</span>
-            <div className="h-1 w-32 bg-white/20 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white/70 rounded-full"
-                style={{ width: `${artist.data.popularity}%` }}
-              />
-            </div>
-            <span className="text-xs text-white/40">{artist.data.popularity}</span>
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white" />
+        <div className="absolute bottom-4 left-6">
+          <h1 className="text-4xl font-black text-black">{artist.data?.name}</h1>
+          <p className="text-sm text-black/50 mt-1">
+            {artist.data?.followers.total.toLocaleString()} {t('artists.followers')}
+          </p>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="p-6 space-y-4">
-        <div className="flex glass-card-md rounded-xl overflow-hidden w-fit">
-          {(['tracks', 'albums'] as Tab[]).map(tabKey => (
-            <button
-              key={tabKey}
-              onClick={() => setTab(tabKey)}
-              className={cn(
-                'px-5 py-2 text-sm transition-colors',
-                tab === tabKey ? 'bg-white/15 text-white font-bold' : 'text-white/50 hover:text-white'
-              )}
-            >
-              {tabKey === 'tracks' ? t('artistDetail.topTracks') : t('artistDetail.albums')}
-            </button>
-          ))}
-        </div>
+      {/* Top Tracks Arc */}
+      <div className="px-6 pt-4">
+        <h2 className="text-base font-bold text-black/60 mb-2 text-center">{t('artistDetail.topTracks')}</h2>
 
-        {/* Top Tracks */}
-        {tab === 'tracks' && (
-          <div className="space-y-1">
-            {topTracks.isPending
-              ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)
-              : pagedTracks.map((track, i) => (
-                  <TrackRow
-                    key={track.id}
+        {topTracks.data && topTracks.data.length > 0 && (
+          <div className="flex justify-center">
+            <ArcCarousel
+              items={topTracks.data.slice(0, 5).map((track, i) => (
+                <div key={track.id} className="flex flex-col items-center gap-1">
+                  <span className="text-xs font-bold text-black/40">{String(i + 1).padStart(2, '0')}</span>
+                  <VinylCard
                     track={track}
-                    index={(tracksPage - 1) * TRACKS_PER_PAGE + i}
-                    onPlay={handlePlay}
+                    isActive={state.currentTrack?.id === track.id}
+                    onPlay={playTrack}
+                    size="md"
                   />
-                ))}
-            {totalTrackPages > 1 && (
-              <div className="flex justify-center gap-3 pt-2">
-                <button
-                  disabled={tracksPage === 1}
-                  onClick={() => setTracksPage(p => p - 1)}
-                  className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >← {t('artistDetail.previous')}</button>
-                <span className="text-xs text-white/50 self-center">{tracksPage}/{totalTrackPages}</span>
-                <button
-                  disabled={tracksPage >= totalTrackPages}
-                  onClick={() => setTracksPage(p => p + 1)}
-                  className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >{t('artistDetail.next')} →</button>
-              </div>
-            )}
+                </div>
+              ))}
+              radius={220}
+              arcDeg={120}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Full top tracks list */}
+      <div className="px-4 mb-8">
+        {topTracks.data?.map((track, i) => (
+          <TrackRow
+            key={track.id}
+            track={track}
+            index={i}
+            isActive={state.currentTrack?.id === track.id}
+            onPlay={playTrack}
+          />
+        ))}
+      </div>
+
+      {/* Charts + Albums */}
+      <div className="px-6 flex flex-col lg:flex-row gap-8">
+        {/* Radar chart */}
+        {radarData.length > 0 && (
+          <div className="glass-card p-5 lg:w-80 shrink-0">
+            <p className="text-sm font-bold text-black mb-3">
+              {t('artistDetail.audioProfile')}
+            </p>
+            <ResponsiveContainer width="100%" height={200}>
+              <RadarChart data={radarData}>
+                <PolarGrid stroke="rgba(0,0,0,0.1)" />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fill: 'rgba(0,0,0,0.5)', fontSize: 11 }}
+                />
+                <Radar
+                  dataKey="A"
+                  stroke="#111"
+                  fill="#111"
+                  fillOpacity={0.15}
+                  strokeWidth={1.5}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: 'rgba(255,255,255,0.9)',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
           </div>
         )}
 
-        {/* Albums */}
-        {tab === 'albums' && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-4">
-              {albums.isPending
-                ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="w-40 h-56 rounded-2xl" />)
-                : albums.data?.items.map(album => <AlbumCard key={album.id} album={album} />)}
-            </div>
-            {albums.data && albums.data.total > albums.data.limit && (
-              <div className="flex justify-center gap-3">
-                <button
-                  disabled={albumsPage === 1}
-                  onClick={() => setAlbumsPage(p => p - 1)}
-                  className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >← {t('artistDetail.previous')}</button>
-                <span className="text-xs text-white/50 self-center">{albumsPage}</span>
-                <button
-                  disabled={!albums.data.next}
-                  onClick={() => setAlbumsPage(p => p + 1)}
-                  className="px-3 py-1 glass-button rounded-lg text-xs disabled:opacity-30"
-                >{t('artistDetail.next')} →</button>
+        {/* Albums table */}
+        <div className="flex-1">
+          <h3 className="text-sm font-bold text-black/60 mb-3">{t('artistDetail.albums')}</h3>
+          <div className="space-y-2">
+            {albums.data?.items.map(album => (
+              <div key={album.id} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors">
+                <img
+                  src={album.images[0]?.url}
+                  alt={album.name}
+                  className="w-10 h-10 rounded-lg object-cover shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-black truncate">{album.name}</p>
+                  <p className="text-xs text-black/40">{album.release_date?.slice(0, 4)}</p>
+                </div>
+                <span className="text-xs text-black/30 shrink-0 capitalize">{album.album_type}</span>
               </div>
-            )}
+            ))}
           </div>
-        )}
+          <Pagination
+            page={albumPage}
+            hasNext={hasNextAlbums}
+            onPrev={() => setAlbumPage(p => Math.max(1, p - 1))}
+            onNext={() => setAlbumPage(p => p + 1)}
+            className="mt-4"
+          />
+        </div>
       </div>
     </div>
   )
