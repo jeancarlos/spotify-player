@@ -65,7 +65,7 @@ export function Home() {
 
         {/* VinylDisk — entrance from bottom */}
         <motion.div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-[-20px]"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[20px]"
           initial={{ scale: 0.6, y: 80, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
