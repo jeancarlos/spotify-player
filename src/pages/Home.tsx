@@ -38,7 +38,9 @@ export function Home() {
   const recentlyPlayed = useRecentlyPlayed(5)
   const { translateY, arcRadius, arcBottom } = useDiskLayout()
 
-  const tracks: SpotifyTrack[] = recentlyPlayed.data?.map(i => i.track) ?? []
+  const tracks: SpotifyTrack[] = recentlyPlayed.data
+    ? [...new Map(recentlyPlayed.data.map(i => [i.track.id, i.track])).values()]
+    : []
 
   const handleSearch = useCallback((query: string, tab: SearchTab) => {
     if (query.trim()) navigate(`/artists?q=${encodeURIComponent(query)}&tab=${tab}`)
