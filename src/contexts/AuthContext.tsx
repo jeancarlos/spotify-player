@@ -22,6 +22,7 @@ const SCOPES = [
   'user-read-playback-state', 'user-modify-playback-state',
   'streaming', 'playlist-read-private',
   'playlist-modify-private', 'playlist-modify-public',
+  'ugc-image-upload',
 ].join(' ')
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
