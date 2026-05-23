@@ -47,6 +47,12 @@ export function Home() {
   const { translateY, arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
   const [offset, setOffset] = useState(0)
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    document.documentElement.style.overflow = 'hidden'
+    return () => { document.documentElement.style.overflow = '' }
+  }, [])
+
   const allTracks: SpotifyTrack[] = recentlyPlayed.data
     ? [...new Map(recentlyPlayed.data.map(i => [i.track.id, i.track])).values()]
     : []
