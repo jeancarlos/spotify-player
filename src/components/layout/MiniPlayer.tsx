@@ -157,8 +157,8 @@ export function MiniPlayer() {
               <Tip label={t('player.shuffle')} />
             </div>
 
-            {/* Anterior */}
-            <div className="relative group">
+            {/* Anterior — oculto em telas muito pequenas */}
+            <div className="relative group hidden min-[400px]:block">
               <button
                 onClick={handlePrev}
                 aria-label={t('player.previous')}
@@ -185,8 +185,8 @@ export function MiniPlayer() {
               </div>
             </div>
 
-            {/* Próximo */}
-            <div className="relative group">
+            {/* Próximo — oculto em telas muito pequenas */}
+            <div className="relative group hidden min-[400px]:block">
               <button
                 onClick={handleNext}
                 aria-label={t('player.next')}

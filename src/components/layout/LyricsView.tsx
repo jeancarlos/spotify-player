@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 interface LyricsViewProps {
@@ -17,19 +17,20 @@ export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProp
   const activeRef = useRef<HTMLDivElement>(null)
   const [translateY, setTranslateY] = useState(0)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current
     const el = activeRef.current
-    if (!container || !el) return
+    if (!container || !el || container.clientHeight === 0) return
     const center = container.clientHeight / 2
     const elMid = el.offsetTop + el.clientHeight / 2
     setTranslateY(center - elMid)
   }, [activeIndex])
 
+
   return (
     <div ref={containerRef} className="flex-1 overflow-hidden relative">
       <motion.div
-        className="absolute inset-x-0 flex flex-col items-center gap-5 px-8 pt-4"
+        className="absolute inset-x-0 flex flex-col items-center gap-5 px-8 pt-[40%] pb-[40%]"
         animate={{ y: translateY }}
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       >

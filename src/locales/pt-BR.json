@@ -124,7 +124,24 @@
     "duration": "Duração",
     "instrumental": "Instrumental",
     "major": "Maior",
-    "minor": "Menor"
+    "minor": "Menor",
+    "tempo": "Tempo",
+    "loudness": "Volume",
+    "valence": "Valência",
+    "speechiness": "Vocal",
+    "instrumentalness": "Instrumentalidade",
+    "audioFeatures": "Características de Áudio",
+    "moodZone": "Zona de Humor",
+    "intense": "Intenso",
+    "chill": "Tranquilo",
+    "sad": "Sombrio",
+    "happy": "Alegre",
+    "mood": {
+      "happyEnergetic": "Animado & Enérgico",
+      "darkEnergetic": "Intenso & Sombrio",
+      "happyChill": "Leve & Alegre",
+      "darkChill": "Introspectivo"
+    }
   },
   "playlist": {
     "defaultName": "Spoter List"

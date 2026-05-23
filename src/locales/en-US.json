@@ -124,7 +124,24 @@
     "duration": "Duration",
     "instrumental": "Instrumental",
     "major": "Major",
-    "minor": "Minor"
+    "minor": "Minor",
+    "tempo": "Tempo",
+    "loudness": "Loudness",
+    "valence": "Valence",
+    "speechiness": "Speechiness",
+    "instrumentalness": "Instrumentalness",
+    "audioFeatures": "Audio Features",
+    "moodZone": "Mood Zone",
+    "intense": "Intense",
+    "chill": "Chill",
+    "sad": "Dark",
+    "happy": "Happy",
+    "mood": {
+      "happyEnergetic": "Happy & Energetic",
+      "darkEnergetic": "Intense & Dark",
+      "happyChill": "Light & Joyful",
+      "darkChill": "Introspective"
+    }
   },
   "playlist": {
     "defaultName": "Spoter List"
