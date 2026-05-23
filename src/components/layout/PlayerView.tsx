@@ -22,7 +22,13 @@ export function PlayerView() {
 
   const artistName = currentTrack?.artists[0]?.name ?? ''
   const trackName = currentTrack?.name ?? ''
-  const lyrics = useLyrics(artistName, trackName)
+  const albumName = currentTrack?.album.name
+  const lyrics = useLyrics({ 
+    artist: artistName, 
+    title: trackName, 
+    album: albumName, 
+    durationMs: duration 
+  })
   const albumArt = currentTrack?.album.images[0]?.url
 
   const handleSeek = useCallback(async (ms: number) => {

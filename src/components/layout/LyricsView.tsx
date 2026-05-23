@@ -1,17 +1,20 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { LyricLine } from '@/types/lyrics'
 
 interface LyricsViewProps {
-  lines: string[]
+  lines: LyricLine[]
   progress: number
   duration: number
   onSeek?: (ms: number) => void
 }
 
 export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProps) {
-  const activeIndex = duration > 0
-    ? Math.max(0, Math.min(lines.length - 1, Math.floor((progress / duration) * lines.length)))
-    : 0
+  // findLastIndex ensures we get the most recent line that has already started
+  const activeIndex = lines.reduce((acc, line, i) => {
+    if (line.time <= progress) return i
+    return acc
+  }, 0)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
@@ -57,19 +60,19 @@ export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProp
           const isActive = i === activeIndex
           return (
             <motion.div
-              key={i}
+              key={`${i}-${line.time}`}
               ref={isActive ? activeRef : undefined}
               animate={{
                 opacity: isActive ? 1 : Math.max(0.12, 1 - dist * 0.22),
                 scale: isActive ? 1.04 : 1,
               }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              onClick={() => onSeek?.(Math.round((i / lines.length) * duration))}
-              className={`font-sans text-center leading-relaxed select-none ${
-                isActive ? 'text-white font-bold text-xl' : 'text-white text-base font-normal'
+              onClick={() => onSeek?.(line.time)}
+              className={`font-sans text-center leading-relaxed select-none transition-colors duration-300 ${
+                isActive ? 'text-white font-bold text-xl' : 'text-white/60 text-base font-normal hover:text-white/90'
               } ${onSeek ? 'cursor-pointer' : ''}`}
             >
-              {line}
+              {line.text}
             </motion.div>
           )
         })}
