@@ -1,5 +1,5 @@
 // src/components/layout/PlayerView.tsx
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, FileText } from 'lucide-react'
@@ -10,9 +10,10 @@ import { LyricsView } from '@/components/layout/LyricsView'
 import { MiniPlayer } from '@/components/layout/MiniPlayer'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
+import api from '@/lib/axios'
 
 export function PlayerView() {
-  const { state } = usePlayer()
+  const { state, dispatch } = usePlayer()
   const { currentTrack, progress, duration } = state
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -22,6 +23,12 @@ export function PlayerView() {
   const trackName = currentTrack?.name ?? ''
   const lyrics = useLyrics(artistName, trackName)
   const albumArt = currentTrack?.album.images[0]?.url
+
+  const handleSeek = useCallback(async (ms: number) => {
+    dispatch({ type: 'SET_PROGRESS', payload: ms })
+    try { await api.put('/me/player/seek', null, { params: { position_ms: ms } }) } catch { /* silent */ }
+  }, [dispatch])
+
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
   const isShowingInfo = showInfo || noLyrics
 
@@ -114,6 +121,7 @@ export function PlayerView() {
               lines={lyrics.data ?? []}
               progress={progress}
               duration={duration}
+              onSeek={handleSeek}
             />
           )}
         </AnimatePresence>

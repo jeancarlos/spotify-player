@@ -5,9 +5,10 @@ interface LyricsViewProps {
   lines: string[]
   progress: number
   duration: number
+  onSeek?: (ms: number) => void
 }
 
-export function LyricsView({ lines, progress, duration }: LyricsViewProps) {
+export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProps) {
   const activeIndex = duration > 0
     ? Math.max(0, Math.min(lines.length - 1, Math.floor((progress / duration) * lines.length)))
     : 0
@@ -31,11 +32,12 @@ export function LyricsView({ lines, progress, duration }: LyricsViewProps) {
               scale: isActive ? 1.04 : 1,
             }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className={`text-center leading-relaxed ${
+            onClick={() => onSeek?.(Math.round((i / lines.length) * duration))}
+          className={`text-center leading-relaxed ${
               isActive
                 ? 'text-white font-bold text-xl'
                 : 'text-white text-base font-normal'
-            }`}
+            } ${onSeek ? 'cursor-pointer hover:opacity-100' : ''}`}
           >
             {line}
           </motion.div>
