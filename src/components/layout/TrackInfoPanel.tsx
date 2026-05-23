@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts'
 import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { formatDuration } from '@/utils/formatDuration'
 import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
+import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 
 const KEY_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A♭', 'B']
 
@@ -66,24 +66,6 @@ export function TrackInfoPanel({ track }: Props) {
   const keyLabel = f.key >= 0
     ? `${KEY_NAMES[f.key]} ${f.mode === 1 ? t('track.major') : t('track.minor')}`
     : null
-
-  const radarData = [
-    { label: t('artistDetail.danceability'), v: Math.round(f.danceability * 100) },
-    { label: t('artistDetail.energy'),       v: Math.round(f.energy * 100) },
-    { label: t('artistDetail.valence'),      v: Math.round(f.valence * 100) },
-    { label: t('artistDetail.acousticness'), v: Math.round(f.acousticness * 100) },
-    { label: t('artistDetail.liveness'),     v: Math.round(f.liveness * 100) },
-  ]
-
-  const featureBars = [
-    { key: 'danceability',     value: f.danceability,     color: '#1DB954', label: t('artistDetail.danceability') },
-    { key: 'energy',           value: f.energy,           color: '#f97316', label: t('artistDetail.energy') },
-    { key: 'valence',          value: f.valence,           color: '#fbbf24', label: t('track.valence') },
-    { key: 'acousticness',     value: f.acousticness,     color: '#60a5fa', label: t('artistDetail.acousticness') },
-    { key: 'speechiness',      value: f.speechiness,      color: '#a78bfa', label: t('track.speechiness') },
-    { key: 'instrumentalness', value: f.instrumentalness, color: '#34d399', label: t('track.instrumentalness') },
-    { key: 'liveness',         value: f.liveness,         color: '#fb7185', label: t('artistDetail.liveness') },
-  ]
 
   // Mood quadrant: x=valence (0=sad→1=happy), y=energy (0=chill→1=intense)
   const moodX = f.valence * 100   // % from left
@@ -173,70 +155,8 @@ export function TrackInfoPanel({ track }: Props) {
           ))}
         </div>
 
-        {/* Radar + Feature bars — lado a lado no desktop, empilhados no mobile */}
-        <div className="w-full max-w-sm md:max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Audio profile radar */}
-          <div>
-            <p className="text-[9px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">
-              {t('artistDetail.audioProfile')}
-            </p>
-            <ResponsiveContainer width="100%" height={200}>
-              <RadarChart data={radarData} outerRadius="72%">
-                <PolarGrid stroke="rgba(255,255,255,0.07)" radialLines={false} />
-                <PolarAngleAxis
-                  dataKey="label"
-                  tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 9, fontWeight: 600 }}
-                />
-                <Radar
-                  dataKey="v"
-                  stroke="#1DB954"
-                  fill="#1DB954"
-                  fillOpacity={0.18}
-                  strokeWidth={1.5}
-                  animationBegin={200}
-                  animationDuration={900}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: 'rgba(10,10,10,0.95)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: 10,
-                    fontSize: 10,
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-                  }}
-                  itemStyle={{ color: '#fff' }}
-                  formatter={(v: number) => [`${v}%`, '']}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Feature bars */}
-          <div>
-            <p className="text-[9px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">
-              {t('track.audioFeatures')}
-            </p>
-            <div className="flex flex-col gap-3">
-              {featureBars.map(({ key, value, color, label }, i) => (
-                <div key={key}>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] text-white/50 font-medium">{label}</span>
-                    <span className="text-[10px] font-bold tabular-nums" style={{ color }}>{Math.round(value * 100)}%</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${value * 100}%` }}
-                      transition={{ duration: 0.7, delay: 0.1 + i * 0.07, ease: 'easeOut' }}
-                      style={{ background: color, boxShadow: `0 0 6px ${color}66` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Radar + Feature bars */}
+        <MusicalProfileCharts features={f} theme="dark" />
 
         {/* Mood quadrant */}
         <Section label={t('track.moodZone')}>
