@@ -27,6 +27,7 @@ export type PlayerAction =
   | { type: 'TOGGLE_FULLSCREEN' }
   | { type: 'SET_PALETTE'; payload: [string, string] }
   | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
+  | { type: 'TICK_PROGRESS' }
 
 export const initialPlayerState: PlayerState = {
   currentTrack: null,
@@ -73,6 +74,9 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       return { ...state, palette: action.payload }
     case 'SET_QUEUE':
       return { ...state, queue: action.payload }
+    case 'TICK_PROGRESS':
+      if (state.duration === 0) return state
+      return { ...state, progress: Math.min(state.progress + 1000, state.duration) }
     default:
       return state
   }

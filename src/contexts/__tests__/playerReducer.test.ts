@@ -75,4 +75,24 @@ describe('playerReducer', () => {
     const s3 = playerReducer(s2, { type: 'SET_SHUFFLE', payload: false })
     expect(s3.shuffle).toBe(false)
   })
+
+  describe('TICK_PROGRESS', () => {
+    it('incrementa progress em 1000ms quando abaixo do duration', () => {
+      const state = { ...initialPlayerState, progress: 5000, duration: 30000, isPlaying: true }
+      const next = playerReducer(state, { type: 'TICK_PROGRESS' })
+      expect(next.progress).toBe(6000)
+    })
+
+    it('não ultrapassa duration', () => {
+      const state = { ...initialPlayerState, progress: 29500, duration: 30000, isPlaying: true }
+      const next = playerReducer(state, { type: 'TICK_PROGRESS' })
+      expect(next.progress).toBe(30000)
+    })
+
+    it('não avança quando duration é 0', () => {
+      const state = { ...initialPlayerState, progress: 0, duration: 0 }
+      const next = playerReducer(state, { type: 'TICK_PROGRESS' })
+      expect(next.progress).toBe(0)
+    })
+  })
 })
