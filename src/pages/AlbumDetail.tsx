@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
@@ -21,8 +21,6 @@ const LIMIT = 20
 
 export function AlbumDetail() {
   const { id } = useParams<{ id: string }>()
-  const location = useLocation()
-  const navigate = useNavigate()
   const { t } = useTranslation()
 
   const [page, setPage] = useState(1)
@@ -41,11 +39,6 @@ export function AlbumDetail() {
   const avgFeatures = audioFeatures.data && audioFeatures.data.length > 0
     ? averageAudioFeatures(audioFeatures.data)
     : null
-
-  const handleBack = useCallback(() => {
-    const from = (location.state as { from?: string } | null)?.from
-    navigate(from ?? '/artists')
-  }, [location.state, navigate])
 
   const handlePlay = useCallback(() => {
     if (album.data?.uri) playContext(album.data.uri)
@@ -95,7 +88,6 @@ export function AlbumDetail() {
         year={albumYear}
         playLabel={t('albumDetail.playAlbum')}
         onPlay={handlePlay}
-        onBack={handleBack}
         onLayout={handleLayout}
       />
 

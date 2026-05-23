@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePlaylist } from '@/hooks/queries/usePlaylist'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
@@ -17,8 +17,6 @@ const LIMIT = 20
 
 export function PlaylistDetail() {
   const { id } = useParams<{ id: string }>()
-  const location = useLocation()
-  const navigate = useNavigate()
   const { t } = useTranslation()
 
   const [page, setPage] = useState(1)
@@ -30,11 +28,6 @@ export function PlaylistDetail() {
   const playContext = usePlayContext()
   const playTrack = usePlayTrack()
   const { state: playerState } = usePlayer()
-
-  const handleBack = useCallback(() => {
-    const from = (location.state as { from?: string } | null)?.from
-    navigate(from ?? '/')
-  }, [location.state, navigate])
 
   const handlePlay = useCallback(() => {
     if (playlist.data?.uri) playContext(playlist.data.uri)
@@ -63,7 +56,6 @@ export function PlaylistDetail() {
         subtitle={subtitle}
         playLabel={t('playlistDetail.playPlaylist')}
         onPlay={handlePlay}
-        onBack={handleBack}
         onLayout={handleLayout}
       />
 

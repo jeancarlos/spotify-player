@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface CollectionHeaderProps {
@@ -10,7 +9,6 @@ interface CollectionHeaderProps {
   year?: string
   playLabel: string
   onPlay: () => void
-  onBack: () => void
   onLayout: (height: number) => void
   className?: string
 }
@@ -25,7 +23,6 @@ function useCollectionLayout() {
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
   const translateY = Math.round(imgPx * 0.25)
-  // visible image height + name block (~100px) + button (~52px) + padding (32px)
   const headerHeight = imgPx - translateY + 184
 
   return { imgPx, translateY, headerHeight }
@@ -38,7 +35,6 @@ export function CollectionHeader({
   year,
   playLabel,
   onPlay,
-  onBack,
   onLayout,
 }: CollectionHeaderProps) {
   const { imgPx, translateY, headerHeight } = useCollectionLayout()
@@ -48,20 +44,11 @@ export function CollectionHeader({
   }, [headerHeight, onLayout])
 
   return (
-    <div className="fixed inset-x-0 top-0 z-[5] pointer-events-none">
-      {/* Botão voltar */}
-      <button
-        onClick={onBack}
-        className="pointer-events-auto absolute top-4 left-4 flex items-center gap-1 text-sm font-medium text-black/60 hover:text-black transition-colors z-10 bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-full"
-      >
-        <ChevronLeft size={16} />
-        Voltar
-      </button>
-
+    <div className="">
       {/* Imagem saindo do topo */}
       <div
         className="absolute left-1/2"
-        style={{ transform: `translateX(-50%) translateY(-${translateY}px)`, top: 0 }}
+        style={{ transform: `translateX(-50%) translateY(-16px)`, top: 0 }}
       >
         <motion.div
           initial={{ scale: 0.8, y: 60, opacity: 0 }}
@@ -72,11 +59,10 @@ export function CollectionHeader({
             <img
               src={imageUrl}
               alt={name}
-              className="object-cover shadow-2xl"
+              className="object-cover shadow-2xl rounded-xl"
               style={{
                 width: imgPx,
                 height: imgPx,
-                borderRadius: imgPx * 0.12,
               }}
               draggable={false}
             />
@@ -94,7 +80,7 @@ export function CollectionHeader({
       {/* Metadados + botão */}
       <motion.div
         className="absolute left-0 right-0 flex flex-col items-center pointer-events-auto"
-        style={{ top: imgPx - translateY + 16 }}
+        style={{ top: imgPx }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
