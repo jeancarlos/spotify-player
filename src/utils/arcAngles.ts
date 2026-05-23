@@ -23,7 +23,7 @@ export function calcArcPositions(
     return {
       x: Math.sin(rad) * radius,
       y: -Math.cos(rad) * radius,
-      tilt: angleDeg * 0.25,
+      tilt: angleDeg * 1,
     }
   })
 }

@@ -5,7 +5,7 @@ import {
   SkipBack, Play, Pause, SkipForward,
   Shuffle, Repeat, Repeat1, ListMusic, Heart,
 } from 'lucide-react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
@@ -29,8 +29,17 @@ export function MiniPlayer() {
   const { currentTrack, isPlaying, shuffle, repeat, progress, duration } = state
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams] = useSearchParams()
   const { toast } = useToast()
   const { t } = useTranslation()
+
+  const isPlayerPage = location.pathname === '/player'
+  const activeTab = (searchParams.get('tab') as 'lyrics' | 'info') || 'lyrics'
+
+  const goBack = () => {
+    const from = location.state?.from ?? '/'
+    navigate(from)
+  }
 
   // Helper para eventos de teclado em elementos com role="button"
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
@@ -92,8 +101,6 @@ export function MiniPlayer() {
     }
   }, [currentTrack, isSaved, addTrack, removeTrack, toast, t])
 
-  const isPlayerPage = location.pathname === '/player'
-
   return (
     <motion.aside
       initial={{ y: 300 }}
@@ -129,10 +136,16 @@ export function MiniPlayer() {
         {/* Track info + waveform */}
         <div
           className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden cursor-pointer group/track"
-          onClick={() => currentTrack && navigate('/player')}
+          onClick={() => {
+            if (isPlayerPage) goBack()
+            else if (currentTrack) navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+          }}
           role="button"
           tabIndex={currentTrack ? 0 : -1}
-          onKeyDown={(e) => currentTrack && handleKeyDown(e, () => navigate('/player'))}
+          onKeyDown={(e) => {
+            if (isPlayerPage) handleKeyDown(e, goBack)
+            else if (currentTrack) handleKeyDown(e, () => navigate('/player?tab=lyrics', { state: { from: location.pathname } }))
+          }}
           aria-label={currentTrack ? `${t('player.viewTrack')}: ${currentTrack.name}` : undefined}
         >
           {currentTrack ? (
@@ -143,10 +156,26 @@ export function MiniPlayer() {
                 isPlaying={isPlaying}
                 albumName={currentTrack.album.name}
               />
-              <div className="min-w-0 flex-1 overflow-hidden justify-center items-center">
-                <p className="text-xs font-bold text-black truncate group-hover/track:underline ">
-                  {currentTrack.name}
-                </p>
+              <div className="min-w-0 flex-1 overflow-hidden flex flex-col justify-center">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-xs font-bold text-black truncate group-hover/track:underline">
+                    {currentTrack.name}
+                  </span>
+                  <span className="text-black/20 text-[10px] shrink-0">·</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+                    }}
+                    onKeyDown={(e) => {
+                      e.stopPropagation()
+                      handleKeyDown(e, () => navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } }))
+                    }}
+                    className="text-[10px] font-medium text-black/40 hover:text-black hover:underline truncate outline-none"
+                  >
+                    {currentTrack.album.name}
+                  </button>
+                </div>
                 <div className="flex gap-1 overflow-hidden">
                   {currentTrack.artists.map((a, i) => (
                     <button
@@ -201,7 +230,7 @@ export function MiniPlayer() {
             >
               <Heart size={16} className={isSaved ? 'fill-current' : ''} />
             </button>
-            <Tip label={isSaved ? t('favorites.removeFromList') : t('favorites.addToList')} />
+            <Tip label={isSaved ? t('favorites.removedFromList') : t('favorites.addToList')} />
           </div>
         )}
 
@@ -272,19 +301,25 @@ export function MiniPlayer() {
               <Tip label={t('player.repeat')} />
             </div>
 
-            {/* Fila — oculto em telas pequenas e na página do player */}
-            {!isPlayerPage && (
-              <div className="relative group hidden sm:block">
-                <button
-                  onClick={() => navigate('/player')}
-                  aria-label={t('player.queue')}
-                  className="p-1.5 rounded-lg text-black/30 hover:text-black transition-colors"
-                >
-                  <ListMusic size={15} />
-                </button>
-                <Tip label={t('player.queue')} />
-              </div>
-            )}
+            {/* Detalhes — Lógica 3 estágios: Letra -> Detalhes -> Fechar */}
+            <div className="relative group hidden sm:block">
+              <button
+                onClick={() => {
+                  if (!isPlayerPage) {
+                    navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+                  } else if (activeTab === 'lyrics') {
+                    navigate('/player?tab=info', { replace: true })
+                  } else {
+                    goBack()
+                  }
+                }}
+                aria-label={isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')}
+                className="p-1.5 rounded-lg transition-colors outline-none text-black/30 hover:text-black"
+              >
+                <ListMusic size={15} />
+              </button>
+              <Tip label={isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')} />
+            </div>
           </div>
         )}
       </div>

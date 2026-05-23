@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect } from 'react'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Info, Music2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -16,8 +16,16 @@ export function PlayerView() {
   const { state, dispatch } = usePlayer()
   const { currentTrack, progress, duration } = state
   const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<PlayerTab>('lyrics')
+  
+  // Sincroniza estado com a URL (Single source of truth)
+  const activeTab = (searchParams.get('tab') as PlayerTab) || 'lyrics'
+
+  const handleTabChange = (tab: PlayerTab) => {
+    setSearchParams({ tab }, { replace: true })
+  }
 
   const artistName = currentTrack?.artists[0]?.name ?? ''
   const trackName = currentTrack?.name ?? ''
@@ -25,17 +33,21 @@ export function PlayerView() {
   const lyrics = useLyrics({ artist: artistName, title: trackName, album: albumName, durationMs: duration })
   const albumArt = currentTrack?.album.images[0]?.url
 
+  const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
+
+  // Se não tem letra e estamos na aba de letra, força ida para info na URL
+  useEffect(() => {
+    if (noLyrics && activeTab === 'lyrics') {
+      setSearchParams({ tab: 'info' }, { replace: true })
+    }
+  }, [noLyrics, activeTab, setSearchParams])
+
   const handleSeek = useCallback(async (ms: number) => {
     dispatch({ type: 'SET_PROGRESS', payload: ms, isManual: true })
     try { 
       await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' }) 
     } catch { /* silent */ }
   }, [dispatch])
-
-  const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
-  
-  // Se não tem letra, força aba de info
-  const effectiveTab = noLyrics ? 'info' : activeTab
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
@@ -57,8 +69,11 @@ export function PlayerView() {
       {/* Header */}
       <header className="relative z-20 flex items-center justify-between p-6 shrink-0">
         <button
-          onClick={() => navigate(-1)}
-          className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors"
+          onClick={() => {
+            const from = location.state?.from ?? '/'
+            navigate(from)
+          }}
+          className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none"
           aria-label={t('common.back')}
         >
           <ArrowLeft size={20} className="text-white" />
@@ -67,10 +82,10 @@ export function PlayerView() {
         <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
           {!noLyrics && (
             <button
-              onClick={() => setActiveTab('lyrics')}
+              onClick={() => handleTabChange('lyrics')}
               className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all",
-                effectiveTab === 'lyrics' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white/70"
+                "flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none",
+                activeTab === 'lyrics' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white/70"
               )}
             >
               <Music2 size={14} />
@@ -78,14 +93,14 @@ export function PlayerView() {
             </button>
           )}
           <button
-            onClick={() => setActiveTab('info')}
+            onClick={() => handleTabChange('info')}
             className={cn(
-              "flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all",
-              effectiveTab === 'info' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white/70"
+              "flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none",
+              activeTab === 'info' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white/70"
             )}
           >
             <Info size={14} />
-            {t('track.audioFeatures')}
+            {t('track.songDetails')}
           </button>
         </div>
 
@@ -95,7 +110,7 @@ export function PlayerView() {
       {/* Main Area */}
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
         <AnimatePresence mode="wait">
-          {effectiveTab === 'info' ? (
+          {activeTab === 'info' ? (
             <motion.div
               key="info"
               initial={{ opacity: 0, x: 20 }}

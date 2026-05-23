@@ -17,7 +17,7 @@ export function VinylCard({
   size = 'md',
 }: VinylCardProps) {
   const { t } = useTranslation()
-  const dim = size === 'sm' ? 84 : 112
+  const dim = size === 'sm' ? 100 : 132
 
   return (
     <div
@@ -76,11 +76,11 @@ export function VinylCard({
         )}
 
         {/* Text at bottom */}
-        <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
-          <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">
+        <div className="absolute inset-x-0 bottom-0 px-3 pb-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+          <p className="text-[11px] font-bold text-white truncate leading-tight drop-shadow-sm">
             {track.name}
           </p>
-          <p className="text-[8px] text-white/60 truncate leading-tight">
+          <p className="text-[10px] text-white/70 truncate leading-tight mt-0.5">
             {track.artists.map(a => a.name).join(', ')}
           </p>
         </div>

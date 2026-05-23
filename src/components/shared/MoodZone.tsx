@@ -29,7 +29,7 @@ export function MoodZone({ valence, energy, theme = 'dark', className }: MoodZon
   return (
     <div 
       className={cn(
-        "relative w-full aspect-square max-w-[220px] mx-auto rounded-2xl overflow-hidden border",
+        "relative w-full aspect-square max-w-[220px] mx-auto rounded-2xl overflow-hidden border group",
         isDark ? "border-white/5" : "border-black/5",
         className
       )}
@@ -101,10 +101,16 @@ export function MoodZone({ valence, energy, theme = 'dark', className }: MoodZon
       />
 
       {/* Mood label */}
-      <div className="absolute bottom-2 inset-x-0 flex justify-center">
+      <div 
+        className="absolute z-20 pointer-events-none whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300"
+        style={{ left: `${moodX}%`, top: `${moodY}%` }}
+      >
         <span className={cn(
-          "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
-          isDark ? "text-white/50 bg-black/40" : "text-black/50 bg-white/60 shadow-sm"
+          "absolute left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shadow-xl backdrop-blur-xl border transition-all duration-500 scale-90 group-hover:scale-100",
+          moodY > 50 ? "-translate-y-7" : "translate-y-3",
+          isDark 
+            ? "text-white bg-[#1DB954]/90 border-white/20" 
+            : "text-white bg-[#1DB954]/90 border-black/10"
         )}>
           {moodLabel}
         </span>

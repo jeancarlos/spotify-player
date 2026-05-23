@@ -27,7 +27,7 @@ export function ArcCarousel({
   inverted = false,
 }: ArcCarouselProps) {
   const uid = useId()
-  const positions = calcArcPositions(items.length, radius, arcDeg, offsetDeg)
+  const positions = calcArcPositions(items.length, radius + 70, arcDeg, offsetDeg)
 
   // Arc text path — top arc (normal) or bottom arc (inverted)
   const cx = radius
@@ -52,7 +52,7 @@ export function ArcCarousel({
 
             // Normal: cards fly upward (pos.y is negative)
             // Inverted: cards hang downward (negate pos.y)
-            const animY = inverted ? -pos.y + 60 : pos.y - 60
+            const animY = inverted ? -pos.y + 60 : pos.y + 40
 
             return (
               <motion.div

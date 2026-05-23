@@ -18,10 +18,10 @@ export function MusicalProfileCharts({ features: f, theme = 'dark' }: MusicalPro
   const dark = theme === 'dark'
 
   const labelColor = dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)'
-  const gridColor  = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
-  const textColor  = dark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.30)'
-  const bgBar      = dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
-  const tooltipBg  = dark ? 'rgba(10,10,10,0.95)' : 'rgba(255,255,255,0.98)'
+  const gridColor = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
+  const textColor = dark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.30)'
+  const bgBar = dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+  const tooltipBg = dark ? 'rgba(10,10,10,0.95)' : 'rgba(255,255,255,0.98)'
   const tooltipBorder = dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
   const tooltipText = dark ? '#fff' : '#000'
 
@@ -31,20 +31,20 @@ export function MusicalProfileCharts({ features: f, theme = 'dark' }: MusicalPro
 
   const radarData = [
     { label: t('artistDetail.danceability'), v: Math.round(f.danceability * 100) },
-    { label: t('artistDetail.energy'),       v: Math.round(f.energy * 100) },
-    { label: t('artistDetail.valence'),      v: Math.round(f.valence * 100) },
+    { label: t('artistDetail.energy'), v: Math.round(f.energy * 100) },
+    { label: t('artistDetail.valence'), v: Math.round(f.valence * 100) },
     { label: t('artistDetail.acousticness'), v: Math.round(f.acousticness * 100) },
-    { label: t('artistDetail.liveness'),     v: Math.round(f.liveness * 100) },
+    { label: t('artistDetail.liveness'), v: Math.round(f.liveness * 100) },
   ]
 
   const featureBars = [
-    { key: 'danceability',     value: f.danceability,     color: '#1DB954', label: t('artistDetail.danceability') },
-    { key: 'energy',           value: f.energy,           color: '#f97316', label: t('artistDetail.energy') },
-    { key: 'valence',          value: f.valence,          color: '#fbbf24', label: t('track.valence') },
-    { key: 'acousticness',     value: f.acousticness,     color: '#60a5fa', label: t('artistDetail.acousticness') },
-    { key: 'speechiness',      value: f.speechiness,      color: '#a78bfa', label: t('track.speechiness') },
+    { key: 'danceability', value: f.danceability, color: '#1DB954', label: t('artistDetail.danceability') },
+    { key: 'energy', value: f.energy, color: '#f97316', label: t('artistDetail.energy') },
+    { key: 'valence', value: f.valence, color: '#fbbf24', label: t('track.valence') },
+    { key: 'acousticness', value: f.acousticness, color: '#60a5fa', label: t('artistDetail.acousticness') },
+    { key: 'speechiness', value: f.speechiness, color: '#a78bfa', label: t('track.speechiness') },
     { key: 'instrumentalness', value: f.instrumentalness, color: '#34d399', label: t('track.instrumentalness') },
-    { key: 'liveness',         value: f.liveness,         color: '#fb7185', label: t('artistDetail.liveness') },
+    { key: 'liveness', value: f.liveness, color: '#fb7185', label: t('artistDetail.liveness') },
   ]
 
   return (

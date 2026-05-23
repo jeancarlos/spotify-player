@@ -74,12 +74,13 @@ export function TrackTable({
                     <Play size={11} className="fill-black text-black" />
                   </button>
                 </td>
-                <td className="py-2 px-3">
+                <td className="py-2 px-3 w-10">
                   {albumImage && (
                     <img
                       src={albumImage}
                       alt=""
-                      className="w-8 h-8 rounded-md object-cover"
+                      className="w-8 h-8 rounded-md object-cover shrink-0"
+                      style={{ minWidth: 32, minHeight: 32 }}
                     />
                   )}
                 </td>
