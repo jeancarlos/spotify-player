@@ -23,12 +23,6 @@ export function Favorites() {
   const buttonRef  = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const close = useCallback(() => {
-    setOpen(false)
-    setSearchQuery('')
-    reset()
-  }, []) // reset added below after useForm
-
   const searchSchema = useMemo(() => z.object({
     query: z.string().min(2, t('favorites.minQuery')),
   }), [t])
@@ -39,6 +33,12 @@ export function Favorites() {
     resolver: zodResolver(searchSchema),
     defaultValues: { query: '' },
   })
+
+  const close = useCallback(() => {
+    setOpen(false)
+    setSearchQuery('')
+    reset()
+  }, [reset])
 
   const searchResults = useSearchTracks(searchQuery, searchQuery.length >= 2)
 

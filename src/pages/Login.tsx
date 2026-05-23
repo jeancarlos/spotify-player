@@ -22,7 +22,14 @@ export function Login() {
   }
 
   return (
-    <div className="h-screen bg-white flex flex-col items-center justify-center gap-6 overflow-hidden relative pb-52">
+    <div className="h-screen flex flex-col items-center justify-center gap-6 overflow-hidden relative pb-52">
+      {/* Background blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+      </div>
+
       {/* Language switcher */}
       <motion.div
         initial={{ opacity: 0 }}

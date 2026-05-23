@@ -51,7 +51,7 @@ export async function fetchLyrics({ artist, title, album, durationMs }: FetchLyr
   }
 }
 
-export interface UseLyricsParams extends FetchLyricsParams {}
+export type UseLyricsParams = FetchLyricsParams
 
 export function useLyrics(params: UseLyricsParams) {
   const cleanedTitle = cleanTitle(params.title)

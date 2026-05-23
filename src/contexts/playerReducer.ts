@@ -74,10 +74,11 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       return { ...state, palette: action.payload }
     case 'SET_QUEUE':
       return { ...state, queue: action.payload }
-    case 'TICK_PROGRESS':
+    case 'TICK_PROGRESS': {
       if (state.duration === 0) return state
       const increment = action.payload ?? 1000
       return { ...state, progress: Math.min(state.progress + increment, state.duration) }
+    }
     default:
       return state
   }

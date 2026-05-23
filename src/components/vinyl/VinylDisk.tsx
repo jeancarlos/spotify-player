@@ -40,7 +40,7 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             className="relative rounded-full overflow-hidden border-0 border-white/30"
-            style={{ width: '27%', height: '27%' }}
+            style={{ width: '26%', height: '26%' }}
           >
             <motion.img
               src={albumArt}
@@ -53,7 +53,7 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
               className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2"
               style={{ width: '10%', height: '10%' }}
             >
-              <div className="w-full h-full bg-white/20 backdrop-blur-sm rounded-full border-black/20" />
+              <div className="w-full h-full bg-white/50 backdrop-blur-sm rounded-full border-black/20" />
             </div>
           </div>
         </div>

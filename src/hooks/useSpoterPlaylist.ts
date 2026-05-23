@@ -104,7 +104,7 @@ export function useSpoterPlaylist() {
     // Se o ID salvo não existe mais nas playlists do usuário → resetar
     const existing = playlists.data?.items.find(p => p.id === playlistId)
     if (!existing) {
-      resetStalePlaylist(userId)
+      setTimeout(() => resetStalePlaylist(userId), 0)
       return
     }
 
@@ -119,7 +119,7 @@ export function useSpoterPlaylist() {
         onError:   () => { coverUploaded.current = false },
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [playlists.isSuccess, playlistId, userId, displayName, playlistName, playlists.data, updatePlaylist, uploadCover])
 
   const tracksQuery = usePlaylistTracks(playlistId, !!playlistId, 1, 50)
