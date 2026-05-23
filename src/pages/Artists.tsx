@@ -6,7 +6,6 @@ import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
 import { useSearchPlaylists } from '@/hooks/queries/useSearchPlaylists'
 import { Play } from 'lucide-react'
 import { ArtistCard } from '@/components/shared/ArtistCard'
-import { usePlayContext } from '@/hooks/usePlayContext'
 import { CardSkeleton } from '@/components/shared/CardSkeleton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { Pagination } from '@/components/shared/Pagination'
@@ -31,7 +30,6 @@ export function Artists() {
   const albums = useSearchAlbums(tab === 'album' ? query : '', page)
   const playlists = useSearchPlaylists(tab === 'playlist' ? query : '', page)
 
-  const playContext = usePlayContext()
   const isArtist = tab === 'artista'
   const isPlaylist = tab === 'playlist'
   const data = isArtist ? artists.data : isPlaylist ? playlists.data : albums.data
@@ -102,8 +100,8 @@ export function Artists() {
                 className="cursor-pointer focus:outline-none group"
                 role="button"
                 tabIndex={0}
-                onClick={() => playContext(album.uri)}
-                onKeyDown={e => e.key === 'Enter' && playContext(album.uri)}
+                onClick={() => navigate(`/albums/${album.id}`)}
+                onKeyDown={e => e.key === 'Enter' && navigate(`/albums/${album.id}`)}
               >
                 <div className="relative aspect-square overflow-hidden rounded-[14px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
                   <img
@@ -139,8 +137,8 @@ export function Artists() {
                 className="cursor-pointer focus:outline-none group"
                 role="button"
                 tabIndex={0}
-                onClick={() => playContext(playlist.uri)}
-                onKeyDown={e => e.key === 'Enter' && playContext(playlist.uri)}
+                onClick={() => navigate(`/playlists/${playlist.id}`)}
+                onKeyDown={e => e.key === 'Enter' && navigate(`/playlists/${playlist.id}`)}
               >
                 <div className="relative aspect-square overflow-hidden rounded-[14px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
                   {playlist.images[0]?.url ? (
