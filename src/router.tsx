@@ -7,6 +7,8 @@ import { OAuthCallback } from '@/pages/OAuthCallback'
 import { Home } from '@/pages/Home'
 import { Artists } from '@/pages/Artists'
 import { ArtistDetail } from '@/pages/ArtistDetail'
+import { AlbumDetail } from '@/pages/AlbumDetail'
+import { PlaylistDetail } from '@/pages/PlaylistDetail'
 import { Favorites } from '@/pages/Favorites'
 import { Profile } from '@/pages/Profile'
 
@@ -32,6 +34,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'artists', element: <Artists /> },
       { path: 'artists/:id', element: <ArtistDetail /> },
+      { path: 'albums/:id', element: <AlbumDetail /> },
+      { path: 'playlists/:id', element: <PlaylistDetail /> },
       { path: 'favorites', element: <Favorites /> },
       { path: 'profile', element: <Profile /> },
     ],
