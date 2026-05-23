@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
+import { AppRoot } from '@/components/layout/AppRoot'
 import { AppShell } from '@/components/layout/AppShell'
 import { PlayerView } from '@/components/layout/PlayerView'
 import { Login } from '@/pages/Login'
@@ -13,31 +14,36 @@ import { Favorites } from '@/pages/Favorites'
 import { Profile } from '@/pages/Profile'
 
 export const router = createBrowserRouter([
-  { path: '/login', element: <Login /> },
-  { path: '/callback', element: <OAuthCallback /> },
   {
-    path: '/player',
-    element: (
-      <ProtectedRoute>
-        <PlayerView />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <AppShell />
-      </ProtectedRoute>
-    ),
+    element: <AppRoot />,
     children: [
-      { index: true, element: <Home /> },
-      { path: 'artists', element: <Artists /> },
-      { path: 'artists/:id', element: <ArtistDetail /> },
-      { path: 'albums/:id', element: <AlbumDetail /> },
-      { path: 'playlists/:id', element: <PlaylistDetail /> },
-      { path: 'favorites', element: <Favorites /> },
-      { path: 'profile', element: <Profile /> },
+      { path: '/login', element: <Login /> },
+      { path: '/callback', element: <OAuthCallback /> },
+      {
+        path: '/player',
+        element: (
+          <ProtectedRoute>
+            <PlayerView />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <AppShell />
+          </ProtectedRoute>
+        ),
+        children: [
+          { index: true, element: <Home /> },
+          { path: 'artists', element: <Artists /> },
+          { path: 'artists/:id', element: <ArtistDetail /> },
+          { path: 'albums/:id', element: <AlbumDetail /> },
+          { path: 'playlists/:id', element: <PlaylistDetail /> },
+          { path: 'favorites', element: <Favorites /> },
+          { path: 'profile', element: <Profile /> },
+        ],
+      },
     ],
   },
 ])

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
-import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher'
 
 export function Login() {
@@ -22,7 +21,7 @@ export function Login() {
   }
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center gap-6 overflow-hidden relative pb-52">
+    <div className="h-screen flex flex-col items-center justify-center gap-6 overflow-hidden relative">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
         <div className="blob blob-1" />
@@ -69,9 +68,6 @@ export function Login() {
         {t('login.button')}
       </motion.button>
 
-      <div className="absolute z-0 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-        <VinylDisk size="xl" isPlaying={false} />
-      </div>
     </div>
   )
 }

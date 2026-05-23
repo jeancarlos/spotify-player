@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRecentlyPlayed } from '@/hooks/queries/useRecentlyPlayed'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
 import { SearchBar } from '@/components/shared/SearchBar'
@@ -60,8 +59,6 @@ export function Home() {
     if (query.trim()) navigate(`/artists?q=${encodeURIComponent(query)}&tab=${tab}`)
   }, [navigate])
 
-  const albumArt = state.currentTrack?.album.images[0]?.url
-
   return (
     <div className="h-screen overflow-hidden relative">
       {/* SearchBar */}
@@ -106,23 +103,9 @@ export function Home() {
         </>
       )}
 
-      {/* Fixed vinyl + arc */}
+      {/* Fixed arc carousel — disk is rendered by PersistentVinylDisk at root level */}
       <div className="fixed inset-0 pointer-events-none z-[5]">
-        {/* VinylDisk — rendered first so carousel SVG text paints above it */}
-        <div
-          className="absolute bottom-0 left-1/2"
-          style={{ transform: `translateX(-50%) translateY(${translateY}px)` }}
-        >
-          <motion.div
-            initial={{ scale: 0.7, y: 60, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
-          >
-            <VinylDisk size="xl" isPlaying={state.isPlaying} albumArt={albumArt} />
-          </motion.div>
-        </div>
-
-        {/* Arc Carousel — rendered after disk so it (and its SVG title) paints above */}
+        {/* Arc Carousel */}
         <div
           className="absolute left-1/2 pointer-events-auto"
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
