@@ -16,7 +16,23 @@ export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProp
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
   const [translateY, setTranslateY] = useState(0)
+  const [paddingH, setPaddingH] = useState(0)
 
+  // Mede o container e atualiza paddingH. ResizeObserver garante atualização em rotação de tela.
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const measure = () => {
+      const h = container.clientHeight
+      if (h > 0) setPaddingH(h / 2)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [])
+
+  // Centraliza a linha ativa sempre que ela ou o paddingH mudarem.
   useLayoutEffect(() => {
     const container = containerRef.current
     const el = activeRef.current
@@ -24,16 +40,18 @@ export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProp
     const center = container.clientHeight / 2
     const elMid = el.offsetTop + el.clientHeight / 2
     setTranslateY(center - elMid)
-  }, [activeIndex])
-
+  }, [activeIndex, paddingH])
 
   return (
     <div ref={containerRef} className="flex-1 overflow-hidden relative">
       <motion.div
-        className="absolute inset-x-0 flex flex-col items-center gap-5 px-8 pt-[40%] pb-[40%]"
+        className="absolute inset-x-0 flex flex-col items-center gap-5 px-8"
         animate={{ y: translateY }}
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       >
+        {/* Spacer superior — igual à meia altura do container, centraliza a primeira linha */}
+        <div style={{ height: paddingH, flexShrink: 0 }} />
+
         {lines.map((line, i) => {
           const dist = Math.abs(i - activeIndex)
           const isActive = i === activeIndex
@@ -55,6 +73,9 @@ export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProp
             </motion.div>
           )
         })}
+
+        {/* Spacer inferior — permite que a última linha também chegue ao centro */}
+        <div style={{ height: paddingH, flexShrink: 0 }} />
       </motion.div>
     </div>
   )
