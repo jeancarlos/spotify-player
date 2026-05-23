@@ -35,11 +35,11 @@ export function Home() {
   const navigate = useNavigate()
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
-  const recentlyPlayed = useRecentlyPlayed(5)
+  const recentlyPlayed = useRecentlyPlayed(20)
   const { translateY, arcRadius, arcBottom } = useDiskLayout()
 
   const tracks: SpotifyTrack[] = recentlyPlayed.data
-    ? [...new Map(recentlyPlayed.data.map(i => [i.track.id, i.track])).values()]
+    ? [...new Map(recentlyPlayed.data.map(i => [i.track.id, i.track])).values()].slice(0, 5)
     : []
 
   const handleSearch = useCallback((query: string, tab: SearchTab) => {
