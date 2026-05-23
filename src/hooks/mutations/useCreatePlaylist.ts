@@ -12,8 +12,8 @@ interface CreatePlaylistVars {
 export function useCreatePlaylist() {
   const qc = useQueryClient()
   return useMutation<SpotifyPlaylist, Error, CreatePlaylistVars>({
-    mutationFn: async ({ userId, name, isPublic = false, description = '' }) => {
-      const { data } = await api.post<SpotifyPlaylist>(`/users/${userId}/playlists`, {
+    mutationFn: async ({ name, isPublic = false, description = '' }) => {
+      const { data } = await api.post<SpotifyPlaylist>('/me/playlists', {
         name,
         public: isPublic,
         description,

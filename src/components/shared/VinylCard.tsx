@@ -1,3 +1,4 @@
+import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
@@ -16,11 +17,11 @@ export function VinylCard({
   size = 'md',
 }: VinylCardProps) {
   const { t } = useTranslation()
-  const dim = size === 'sm' ? 80 : 104
+  const dim = size === 'sm' ? 84 : 112
 
   return (
     <div
-      className="cursor-pointer flex flex-col items-center gap-1 focus:outline-none"
+      className="cursor-pointer shrink-0 focus:outline-none group"
       style={{ width: dim }}
       onClick={() => onPlay?.(track)}
       role="button"
@@ -30,25 +31,59 @@ export function VinylCard({
     >
       <div
         className={cn(
-          'glass-card overflow-hidden shrink-0 transition-transform hover:scale-105 active:scale-95',
-          isActive && 'ring-2 ring-black/30 scale-105'
+          'relative overflow-hidden transition-all duration-200',
+          'shadow-lg group-hover:shadow-xl',
+          'group-hover:scale-105 group-active:scale-95',
+          isActive
+            ? 'ring-2 ring-[#1DB954] scale-105 shadow-[0_0_18px_rgba(29,185,84,0.45)]'
+            : 'ring-1 ring-white/10',
         )}
         style={{ width: dim, height: dim, borderRadius: 14 }}
       >
+        {/* Album art */}
         <img
           src={track.album.images[0]?.url ?? ''}
           alt={track.album.name}
           className="w-full h-full object-cover"
           draggable={false}
         />
-      </div>
-      <div className="w-full mt-1 bg-white/70 backdrop-blur-sm rounded-lg px-1.5 py-1">
-        <p className="text-[9px] font-semibold truncate text-center text-black/80">
-          {track.name}
-        </p>
-        <p className="text-[8px] truncate text-center text-black/50">
-          {track.artists.map(a => a.name).join(', ')}
-        </p>
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+        {/* Play icon on hover */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+            <Play size={14} className="text-white fill-white ml-0.5" />
+          </div>
+        </div>
+
+        {/* Active sound bars */}
+        {isActive && (
+          <div className="absolute top-2 right-2 flex items-end gap-[2px] h-3">
+            {[0, 150, 300].map(delay => (
+              <span
+                key={delay}
+                className="w-[3px] rounded-full bg-[#1DB954]"
+                style={{
+                  height: '100%',
+                  animation: `soundBar 0.8s ease-in-out infinite alternate`,
+                  animationDelay: `${delay}ms`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Text at bottom */}
+        <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
+          <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">
+            {track.name}
+          </p>
+          <p className="text-[8px] text-white/60 truncate leading-tight">
+            {track.artists.map(a => a.name).join(', ')}
+          </p>
+        </div>
       </div>
     </div>
   )

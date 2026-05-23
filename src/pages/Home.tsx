@@ -67,7 +67,7 @@ export function Home() {
           <button
             onClick={() => setOffset(o => Math.max(0, o - 1))}
             disabled={!canPrev}
-            className="md:hidden fixed left-0 top-[58%] -translate-y-1/2 z-10 w-10 h-20 rounded-r-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pl-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
+            className="md:hidden fixed left-0 bottom-24 z-10 w-10 h-20 rounded-r-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pl-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
             aria-label={t('artists.previous')}
           >
             <ChevronLeft size={18} />
@@ -75,7 +75,7 @@ export function Home() {
           <button
             onClick={() => setOffset(o => o + 1)}
             disabled={!canNext}
-            className="md:hidden fixed right-0 top-[58%] -translate-y-1/2 z-10 w-10 h-20 rounded-l-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pr-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
+            className="md:hidden fixed right-0 bottom-24 z-10 w-10 h-20 rounded-l-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pr-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
             aria-label={t('artists.next')}
           >
             <ChevronRight size={18} />
@@ -112,7 +112,7 @@ export function Home() {
                   <button
                     onClick={() => setOffset(o => Math.max(0, o - 1))}
                     disabled={!canPrev}
-                    className="hidden md:flex absolute top-1/2 -translate-y-1/2 -left-14 p-2.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
+                    className="hidden md:flex absolute bottom-10 -left-10 p-2 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
                     aria-label={t('artists.previous')}
                   >
                     <ChevronLeft size={18} />
@@ -120,7 +120,7 @@ export function Home() {
                   <button
                     onClick={() => setOffset(o => o + 1)}
                     disabled={!canNext}
-                    className="hidden md:flex absolute top-1/2 -translate-y-1/2 -right-14 p-2.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
+                    className="hidden md:flex absolute bottom-10 -right-10 p-2 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
                     aria-label={t('artists.next')}
                   >
                     <ChevronRight size={18} />

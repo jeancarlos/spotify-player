@@ -15,3 +15,9 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+
+@keyframes soundBar {
+  from { transform: scaleY(0.3); }
+  to   { transform: scaleY(1); }
+}

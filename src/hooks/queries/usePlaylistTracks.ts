@@ -8,7 +8,7 @@ export function usePlaylistTracks(playlistId: string, enabled = true) {
     enabled: enabled && playlistId.length > 0,
     queryFn: async () => {
       const { data } = await api.get<PlaylistTracksResponse>(
-        `/playlists/${playlistId}/tracks`,
+        `/playlists/${playlistId}/items`,
         { params: { limit: 50 } }
       )
       return data

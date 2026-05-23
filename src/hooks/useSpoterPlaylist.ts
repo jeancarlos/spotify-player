@@ -69,7 +69,7 @@ export function useSpoterPlaylist() {
 
   return {
     playlistId,
-    tracks: tracks.data?.items.map(i => i.track) ?? [],
+    tracks: tracks.data?.items.map(i => i.item) ?? [],
     addTrack,
     removeTrack,
     isLoading: !playlistId || tracks.isLoading,

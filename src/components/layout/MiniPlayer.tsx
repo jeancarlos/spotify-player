@@ -115,7 +115,7 @@ export function MiniPlayer() {
 
         {/* Track info + waveform */}
         <div
-          className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer group/track"
+          className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden cursor-pointer group/track"
           onClick={() => currentTrack && navigate('/player')}
         >
           {currentTrack ? (
@@ -125,7 +125,7 @@ export function MiniPlayer() {
                 albumArt={currentTrack.album.images[0]?.url}
                 isPlaying={isPlaying}
               />
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 overflow-hidden">
                 <p className="text-xs font-bold text-black truncate group-hover/track:underline">
                   {currentTrack.name}
                 </p>
@@ -133,7 +133,9 @@ export function MiniPlayer() {
                   {currentTrack.artists.map(a => a.name).join(', ')}
                 </p>
               </div>
-              <WaveformBars isPlaying={isPlaying} />
+              <div className="shrink-0 hidden sm:block">
+                <WaveformBars isPlaying={isPlaying} />
+              </div>
             </>
           ) : (
             <p className="text-xs text-black/30">{t('player.noTrack')}</p>
