@@ -12,6 +12,7 @@ export interface PlayerState {
   repeat: 'off' | 'track' | 'context'
   isFullscreen: boolean
   palette: [string, string] | null
+  lastSeekTime: number // Timestamp local do último seek manual
 }
 
 export type PlayerAction =
@@ -19,7 +20,7 @@ export type PlayerAction =
   | { type: 'TOGGLE_PLAY' }
   | { type: 'SET_PLAYING'; payload: boolean }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_PROGRESS'; payload: number }
+  | { type: 'SET_PROGRESS'; payload: number; isManual?: boolean }
   | { type: 'SET_VOLUME'; payload: number }
   | { type: 'TOGGLE_SHUFFLE' }
   | { type: 'SET_SHUFFLE'; payload: boolean }
@@ -41,6 +42,7 @@ export const initialPlayerState: PlayerState = {
   repeat: 'off',
   isFullscreen: false,
   palette: null,
+  lastSeekTime: 0,
 }
 
 export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
@@ -59,7 +61,11 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload }
     case 'SET_PROGRESS':
-      return { ...state, progress: action.payload }
+      return { 
+        ...state, 
+        progress: action.payload,
+        lastSeekTime: action.isManual ? Date.now() : state.lastSeekTime
+      }
     case 'SET_VOLUME':
       return { ...state, volume: Math.min(1, Math.max(0, action.payload)) }
     case 'TOGGLE_SHUFFLE':

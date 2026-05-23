@@ -8,6 +8,8 @@ import { formatDuration } from '@/utils/formatDuration'
 import { formatDate } from '@/utils/formatDate'
 import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
+import { StatCard } from '@/components/shared/StatCard'
+import { MoodZone } from '@/components/shared/MoodZone'
 
 const GENRE_POOL = [
   'pop', 'rock', 'indie', 'electronic', 'r&b', 'hip-hop', 'alternative',
@@ -64,17 +66,6 @@ export function TrackInfoPanel({ track }: Props) {
     ? artist.data.genres.slice(0, 5)
     : fakeGenres(track.artists[0]?.id ?? track.id)
 
-  // Mood quadrant: x=valence (0=sad→1=happy), y=energy (0=chill→1=intense)
-  const moodX = f.valence * 100   // % from left
-  const moodY = (1 - f.energy) * 100 // % from top (inverted: high energy = top)
-
-  const moodLabel = (() => {
-    if (f.energy >= 0.5 && f.valence >= 0.5) return t('track.mood.happyEnergetic')
-    if (f.energy >= 0.5 && f.valence < 0.5) return t('track.mood.darkEnergetic')
-    if (f.energy < 0.5 && f.valence >= 0.5) return t('track.mood.happyChill')
-    return t('track.mood.darkChill')
-  })()
-
   return (
     <div>
       <div className="flex flex-col items-center gap-6 px-5 py-4">
@@ -115,6 +106,12 @@ export function TrackInfoPanel({ track }: Props) {
           <p className="text-white/35 text-xs">{track.album.name}</p>
         </div>
 
+        {/* Lançamento + Duração */}
+        <div className="flex justify-center gap-2.5 w-full max-w-sm">
+          <StatCard label={t('track.releaseDate')} value={formatDate(track.album.release_date)} />
+          <StatCard label={t('track.duration')} value={formatDuration(track.duration_ms)} />
+        </div>
+
         {wikipedia.data && (
           <Section label={t('track.aboutTrack')}>
             <div className="w-full max-w-sm">
@@ -150,12 +147,6 @@ export function TrackInfoPanel({ track }: Props) {
           </div>
         </div>
 
-        {/* Lançamento + Duração */}
-        <div className="grid grid-cols-2 gap-2.5 w-full max-w-sm">
-          <StatCard label={t('track.releaseDate')} value={formatDate(track.album.release_date)} />
-          <StatCard label={t('track.duration')} value={formatDuration(track.duration_ms)} />
-        </div>
-
         {/* Genre tags */}
         <div className="flex flex-wrap justify-center gap-1.5">
           {genres.map(g => (
@@ -170,49 +161,7 @@ export function TrackInfoPanel({ track }: Props) {
 
         {/* Mood quadrant */}
         <Section label={t('track.moodZone')}>
-          <div className="relative w-full aspect-square max-w-[220px] mx-auto rounded-2xl overflow-hidden border border-white/5"
-            style={{ background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 70%)' }}
-          >
-            {/* Quadrant lines */}
-            <div className="absolute inset-0 flex">
-              <div className="flex-1 border-r border-white/10" />
-              <div className="flex-1" />
-            </div>
-            <div className="absolute inset-0 flex flex-col">
-              <div className="flex-1 border-b border-white/10" />
-              <div className="flex-1" />
-            </div>
-
-            {/* Axis labels */}
-            <span className="absolute top-1.5 left-1/2 -translate-x-1/2 text-[8px] text-white/25 font-semibold uppercase tracking-wider">{t('track.intense')}</span>
-            <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[8px] text-white/25 font-semibold uppercase tracking-wider">{t('track.chill')}</span>
-            <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[8px] text-white/25 font-semibold uppercase tracking-wider [writing-mode:vertical-rl] rotate-180">{t('track.sad')}</span>
-            <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[8px] text-white/25 font-semibold uppercase tracking-wider [writing-mode:vertical-rl]">{t('track.happy')}</span>
-
-            {/* Mood dot */}
-            <motion.div
-              className="absolute w-4 h-4 rounded-full -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${moodX}%`, top: `${moodY}%`, background: '#1DB954', boxShadow: '0 0 12px rgba(29,185,84,0.7)' }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.4 }}
-            />
-            {/* Dot crosshair */}
-            <motion.div
-              className="absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#1DB954]/30"
-              style={{ left: `${moodX}%`, top: `${moodY}%` }}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-            />
-
-            {/* Mood label */}
-            <div className="absolute bottom-2 inset-x-0 flex justify-center">
-              <span className="text-[9px] font-bold text-white/50 uppercase tracking-wider bg-black/40 px-2 py-0.5 rounded-full">
-                {moodLabel}
-              </span>
-            </div>
-          </div>
+          <MoodZone valence={f.valence} energy={f.energy} theme="dark" />
         </Section>
       </div>
     </div>

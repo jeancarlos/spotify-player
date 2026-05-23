@@ -8,15 +8,16 @@ interface NowPlayingResponse {
   item: SpotifyTrack | null
   shuffle_state: boolean
   repeat_state: 'off' | 'track' | 'context'
+  timestamp: number
 }
 
 export function useNowPlaying(enabled = true) {
   return useQuery<NowPlayingResponse | null>({
     queryKey: ['now-playing'],
     enabled,
-    refetchInterval: 5000,
+    refetchInterval: 3000,
     refetchIntervalInBackground: false,
-    staleTime: 4000,
+    staleTime: 2000,
     queryFn: async () => {
       const { data, status } = await api.get<NowPlayingResponse>('/me/player', {
         validateStatus: s => s === 200 || s === 204,

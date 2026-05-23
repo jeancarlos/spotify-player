@@ -10,7 +10,8 @@ interface LyricsViewProps {
 }
 
 export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
-  const activeIndex = lines.reduce((acc, line, i) => line.time <= progress ? i : acc, 0)
+  const foundIndex = lines.findLastIndex(line => line.time <= progress)
+  const activeIndex = foundIndex === -1 ? 0 : foundIndex
   const containerRef = useRef<HTMLDivElement>(null)
   const isFirstRef = useRef(true)
 
@@ -23,7 +24,10 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
     if (!container) return
 
     const active = container.querySelector<HTMLElement>('[data-active="true"]')
-    if (!active) return
+    if (!active) {
+      container.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
 
     // getBoundingClientRect é viewport-relativo, sempre correto independente do offsetParent
     const containerRect = container.getBoundingClientRect()

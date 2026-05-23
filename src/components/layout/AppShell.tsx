@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom'
 import { HamburgerMenu } from './HamburgerMenu'
-import { PlayerSync } from './PlayerSync'
 import { LyricsPreloader } from './LyricsPreloader'
 import { QueryErrorHandler } from './QueryErrorHandler'
 import { ReloadPrompt } from './ReloadPrompt'
@@ -11,7 +10,6 @@ export function AppShell() {
   return (
     <>
       <SkipLink />
-      <PlayerSync />
       <LyricsPreloader />
       <QueryErrorHandler />
       <ReloadPrompt />
