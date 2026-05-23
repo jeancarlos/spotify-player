@@ -1,5 +1,6 @@
 // src/components/layout/MiniPlayer.tsx
 import { useCallback } from 'react'
+import { motion } from 'framer-motion'
 import {
   SkipBack, Play, Pause, SkipForward,
   Shuffle, Repeat, Repeat1, ListMusic, Heart,
@@ -86,7 +87,13 @@ export function MiniPlayer() {
   const isPlayerPage = location.pathname === '/player'
 
   return (
-    <div className="relative rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1">
+    <motion.div
+      initial={{ y: '130%' }}
+      animate={{ y: 0 }}
+      exit={{ y: '130%' }}
+      transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+      className="rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
+    >
       {/* Backdrop separado dos filhos animados — filhos com transform/animation quebram backdrop-filter no pai */}
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 
@@ -121,29 +128,26 @@ export function MiniPlayer() {
                 albumArt={currentTrack.album.images[0]?.url}
                 isPlaying={isPlaying}
               />
-              <div className="min-w-0 flex-1 overflow-hidden">
-                <p className="text-xs font-bold text-black truncate group-hover/track:underline">
+              <div className="min-w-0 flex-1 overflow-hidden justify-center items-center">
+                <p className="text-xs font-bold text-black truncate hover:underline ">
                   {currentTrack.name}
                 </p>
-                <div className="flex gap-1 overflow-hidden truncate">
+                <p className="flex gap-1">
                   {currentTrack.artists.map((a, i) => (
-                    <span key={a.id} className="flex-shrink-0">
-                      <span
-                        role="link"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          navigate(`/artists/${a.id}`)
-                        }}
-                        className="text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors"
-                      >
-                        {a.name}
-                      </span>
-                      {i < currentTrack.artists.length - 1 && (
-                        <span className="text-[11px] text-black/30">, </span>
-                      )}
+                    <span
+                      key={a.id}
+                      role="link"
+                      className="overflow-hidden truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/artists/${a.id}`)
+                      }}
+                    >
+                      {a.name}
+                      {i < currentTrack.artists.length - 1 ? ', ' : ''}
                     </span>
                   ))}
-                </div>
+                </p>
               </div>
 
               <div className="flex flex-col gap-1/2">
@@ -266,6 +270,6 @@ export function MiniPlayer() {
           </div>
         )}
       </div>
-    </div>
+    </motion.div >
   )
 }

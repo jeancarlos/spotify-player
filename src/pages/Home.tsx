@@ -44,7 +44,7 @@ export function Home() {
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
-  const { translateY, arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
+  const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
   const [offset, setOffset] = useState(0)
 
   const allTracks: SpotifyTrack[] = recentlyPlayed.data

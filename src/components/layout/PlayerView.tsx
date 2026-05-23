@@ -8,7 +8,6 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useLyrics } from '@/hooks/queries/useLyrics'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
-import { MiniPlayer } from '@/components/layout/MiniPlayer'
 import { PlayerSync } from '@/components/layout/PlayerSync'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
@@ -91,7 +90,7 @@ export function PlayerView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
               transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col overflow-hidden"
+              className="flex-1 flex flex-col min-h-0"
             >
               {currentTrack && <TrackInfoPanel track={currentTrack} />}
             </motion.div>
@@ -118,7 +117,6 @@ export function PlayerView() {
       </div>
 
       <PlayerSync />
-      <MiniPlayer />
     </div>
   )
 }

@@ -48,7 +48,7 @@ export function AlbumDetail() {
 
   const handlePlay = useCallback(() => {
     if (album.data?.uri) playContext(album.data.uri)
-  }, [album.data?.uri, playContext])
+  }, [album.data, playContext])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)

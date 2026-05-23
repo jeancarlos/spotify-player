@@ -50,8 +50,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const challenge = await generateCodeChallenge(verifier)
     const stateParam = generateState()
 
-    sessionStorage.setItem('pkce_verifier', verifier)
-    sessionStorage.setItem('pkce_state', stateParam)
+    // localStorage is shared with the popup window; sessionStorage is tab-isolated
+    localStorage.setItem('pkce_verifier', verifier)
+    localStorage.setItem('pkce_state', stateParam)
 
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
@@ -63,12 +64,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       state: stateParam,
     })
 
-    window.location.href = `https://accounts.spotify.com/authorize?${params}`
+    const authUrl = `https://accounts.spotify.com/authorize?${params}`
+    const w = 500, h = 700
+    const left = Math.round(screen.width / 2 - w / 2)
+    const top = Math.round(screen.height / 2 - h / 2)
+    const popup = window.open(authUrl, 'spotify_login', `width=${w},height=${h},left=${left},top=${top}`)
+
+    if (!popup) {
+      // Popup blocked — fallback to same-tab redirect
+      window.location.href = authUrl
+      return
+    }
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return
+      if (event.data?.type !== 'SPOTIFY_AUTH_TOKENS') return
+      window.removeEventListener('message', onMessage)
+      const { accessToken, refreshToken } = event.data as { type: string; accessToken: string; refreshToken: string }
+      sessionStorage.setItem('access_token', accessToken)
+      localStorage.setItem('refresh_token', refreshToken)
+      localStorage.removeItem('pkce_verifier')
+      localStorage.removeItem('pkce_state')
+      dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
+    }
+
+    window.addEventListener('message', onMessage)
   }, [])
 
   const handleCallback = useCallback(async (code: string, receivedState: string) => {
-    const savedState = sessionStorage.getItem('pkce_state')
-    const verifier = sessionStorage.getItem('pkce_verifier')
+    // PKCE stored in localStorage so popup window can access it
+    const savedState = localStorage.getItem('pkce_state')
+    const verifier = localStorage.getItem('pkce_verifier')
 
     if (receivedState !== savedState || !verifier) {
       throw new Error(i18n.t('auth.invalidState'))
@@ -92,11 +118,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = (await res.json()) as { access_token: string; refresh_token: string }
 
+    localStorage.removeItem('pkce_verifier')
+    localStorage.removeItem('pkce_state')
+
+    if (window.opener) {
+      // Popup mode: hand tokens to the main window and close
+      window.opener.postMessage(
+        { type: 'SPOTIFY_AUTH_TOKENS', accessToken: data.access_token, refreshToken: data.refresh_token },
+        window.location.origin,
+      )
+      window.close()
+      return
+    }
+
+    // Same-tab fallback
     sessionStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
-    sessionStorage.removeItem('pkce_verifier')
-    sessionStorage.removeItem('pkce_state')
-
     dispatch({ type: 'SET_TOKENS', payload: { accessToken: data.access_token, refreshToken: data.refresh_token } })
   }, [])
 

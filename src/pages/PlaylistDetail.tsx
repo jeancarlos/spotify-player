@@ -38,7 +38,7 @@ export function PlaylistDetail() {
 
   const handlePlay = useCallback(() => {
     if (playlist.data?.uri) playContext(playlist.data.uri)
-  }, [playlist.data?.uri, playContext])
+  }, [playlist.data, playContext])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)

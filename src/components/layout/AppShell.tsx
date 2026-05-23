@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom'
 import { HamburgerMenu } from './HamburgerMenu'
-import { MiniPlayer } from './MiniPlayer'
 import { PlayerSync } from './PlayerSync'
 import { LyricsPreloader } from './LyricsPreloader'
 import { QueryErrorHandler } from './QueryErrorHandler'
@@ -24,7 +23,6 @@ export function AppShell() {
       <main className="relative z-[1] h-full overflow-y-auto">
         <Outlet />
       </main>
-      <MiniPlayer />
     </>
   )
 }

@@ -138,7 +138,7 @@ export function Favorites() {
                         <input
                           {...register('query')}
                           autoFocus
-                          placeholder={`${t('favorites.title')} ou artista...`}
+                          placeholder={t('favorites.searchAddPlaceholder')}
                           className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors"
                         />
                         {errors.query && (
