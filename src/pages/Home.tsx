@@ -27,7 +27,7 @@ function useDiskLayout() {
   const translateY = Math.round(diskPx * 0.28)
   const arcRadius = Math.max(130, Math.round(diskPx * 0.45))
   const arcBottom = Math.max(80, diskPx - translateY - arcRadius - 20)
-  const arcDeg = vw < 768 ? 120 : 90
+  const arcDeg = vw < 768 ? 105 : 75
 
   // Cards do carousel voam acima do container via transform (card central: y = -arcRadius - 60)
   const carouselContainerTop = vh - arcBottom - (arcRadius + 70)

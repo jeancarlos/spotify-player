@@ -68,23 +68,23 @@ export function MiniPlayer() {
   }, [dispatch])
 
   const handlePrev = useCallback(async () => {
-    try { await api.post('/me/player/previous') } catch { /* silent */ }
+    try { await api.post('/me/player/previous', null, { responseType: 'text' }) } catch { /* silent */ }
   }, [])
 
   const handleNext = useCallback(async () => {
     dispatch({ type: 'SET_PROGRESS', payload: 0 })
-    try { await api.post('/me/player/next') } catch { /* silent */ }
+    try { await api.post('/me/player/next', null, { responseType: 'text' }) } catch { /* silent */ }
   }, [dispatch])
 
   const toggleShuffle = useCallback(async () => {
     dispatch({ type: 'TOGGLE_SHUFFLE' })
-    try { await api.put('/me/player/shuffle', null, { params: { state: !shuffle } }) } catch { /* silent */ }
+    try { await api.put('/me/player/shuffle', null, { params: { state: !shuffle }, responseType: 'text' }) } catch { /* silent */ }
   }, [dispatch, shuffle])
 
   const cycleRepeat = useCallback(async () => {
     const next = repeat === 'off' ? 'context' : repeat === 'context' ? 'track' : 'off'
     dispatch({ type: 'SET_REPEAT', payload: next })
-    try { await api.put('/me/player/repeat', null, { params: { state: next } }) } catch { /* silent */ }
+    try { await api.put('/me/player/repeat', null, { params: { state: next }, responseType: 'text' }) } catch { /* silent */ }
   }, [dispatch, repeat])
 
   const { tracks, addTrack, removeTrack } = useSpoterPlaylist()
