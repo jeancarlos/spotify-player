@@ -24,34 +24,44 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-10 overflow-hidden">
+    <div className="min-h-screen bg-white flex flex-col items-center pt-24 overflow-hidden relative">
       <motion.h1
         initial={{ opacity: 0, y: -24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.5 }}
-        className="text-6xl font-black tracking-tighter text-black"
+        className="text-6xl font-black tracking-tighter text-black mb-4"
       >
         Spoter
       </motion.h1>
 
-      <motion.div
-        animate={controls}
-        initial={{ y: 80, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.25, duration: 0.5 }}
+        className="text-sm text-black/50 text-center max-w-xs leading-relaxed mb-8 font-mono"
       >
-        <VinylDisk size="lg" isPlaying={false} />
-      </motion.div>
+        {t('login.hint')}
+      </motion.p>
 
       <motion.button
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
+        transition={{ delay: 0.35, duration: 0.5 }}
         onClick={handleLogin}
-        className="px-10 py-3.5 bg-[#1DB954] text-black font-bold text-sm rounded-full hover:bg-[#1ed760] transition-colors shadow-lg shadow-[#1DB954]/20"
+        className="px-10 py-3.5 border border-black text-black font-mono text-sm rounded-full hover:bg-black hover:text-white transition-colors"
       >
         {t('login.button')}
       </motion.button>
+
+      <motion.div
+        animate={controls}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.6, ease: 'easeOut' }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
+      >
+        <VinylDisk size="lg" isPlaying={false} />
+      </motion.div>
     </div>
   )
 }

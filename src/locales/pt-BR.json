@@ -9,7 +9,8 @@
   "login": {
     "title": "Spoter",
     "subtitle": "Sua experiência musical imersiva",
-    "button": "Entrar com Spotify"
+    "button": "Entrar com Spotify",
+    "hint": "Abra o Spotify no celular e mantenha aberto enquanto usa o Spoter"
   },
   "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada", "noActiveDevice": "Nenhum dispositivo ativo", "lyrics": "Letra", "queue": "Fila de reprodução", "closeQueue": "Fechar fila" },
   "common": { "loading": "Carregando...", "error": "Algo deu errado", "retry": "Tentar novamente" },

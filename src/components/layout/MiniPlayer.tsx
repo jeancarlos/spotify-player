@@ -104,14 +104,19 @@ export function MiniPlayer() {
         <button onClick={handlePrev} className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors">
           <SkipBack size={18} className="fill-current" />
         </button>
-        <button
-          onClick={handlePlayPause}
-          className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
-        >
-          {isPlaying
-            ? <Pause size={14} className="fill-white text-white" />
-            : <Play size={14} className="fill-white text-white ml-0.5" />}
-        </button>
+        <div className="relative group/play">
+          <button
+            onClick={handlePlayPause}
+            className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
+          >
+            {isPlaying
+              ? <Pause size={14} className="fill-white text-white" />
+              : <Play size={14} className="fill-white text-white ml-0.5" />}
+          </button>
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug">
+            {t('login.hint')}
+          </div>
+        </div>
         <button onClick={handleNext} className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors">
           <SkipForward size={18} className="fill-current" />
         </button>
