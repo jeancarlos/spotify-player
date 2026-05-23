@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Heart, LogOut, Menu, X } from 'lucide-react'
+import { ArrowLeft, Heart, LogOut, Menu, X, Home } from 'lucide-react'
 import { useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -118,6 +118,15 @@ export function HamburgerMenu() {
 
               {/* Nav items */}
               <div className="flex flex-col py-1.5">
+                <button
+                  role="menuitem"
+                  onClick={() => handleNav('/')}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
+                >
+                  <Home size={16} className="text-black/50 flex-shrink-0" />
+                  <span className="text-sm text-black/70">{t('nav.home')}</span>
+                </button>
+
                 <button
                   role="menuitem"
                   onClick={() => handleNav('/favorites')}

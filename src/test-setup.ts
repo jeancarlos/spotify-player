@@ -17,7 +17,7 @@ vi.mock('react-i18next', async (importOriginal) => {
         }
         
         let val = translations[key] || key
-        if (options?.name) val = val.replace('{{name}}', options.name)
+        if ((options as Record<string, unknown>)?.name) val = val.replace('{{name}}', (options as Record<string, unknown>).name as string)
         return val
       },
       i18n: { 

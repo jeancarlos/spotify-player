@@ -9,11 +9,12 @@ import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { Tooltip } from '@/components/shared/Tooltip'
 import type { SpotifyTrack } from '@/types/spotify'
 
 export function Favorites() {
   const { t } = useTranslation()
-  const { tracks, addTrack, removeTrack, isLoading } = useSpoterPlaylist()
+  const { tracks, addTrack, removeTrack, isLoading, playlistId } = useSpoterPlaylist()
   const playTrack = usePlayTrack()
   const [searchQuery, setSearchQuery] = useState('')
   const [showForm, setShowForm] = useState(false)
@@ -53,7 +54,25 @@ export function Favorites() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-6">
-          <h1 className="text-2xl font-black text-black">{t('playlist.defaultName')}</h1>
+          <div>
+            <h1 className="text-2xl font-black text-black">{t('nav.favorites')}</h1>
+            <div className="mt-0.5">
+              {playlistId ? (
+                <Tooltip content={t('favorites.viewOnSpotify')}>
+                  <a
+                    href={`https://open.spotify.com/playlist/${playlistId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-black/40 font-medium hover:text-black/70 hover:underline transition-colors"
+                  >
+                    {t('playlist.defaultName')}
+                  </a>
+                </Tooltip>
+              ) : (
+                <span className="text-sm text-black/40 font-medium">{t('playlist.defaultName')}</span>
+              )}
+            </div>
+          </div>
           <button
             onClick={() => setShowForm(v => !v)}
             className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"

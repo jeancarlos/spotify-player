@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useArtists } from '@/hooks/queries/useArtists'
@@ -19,16 +19,13 @@ export function Artists() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const saved = loadLastSearch()
-  const initialQuery = searchParams.get('q') ?? saved?.q ?? ''
-  const initialTab = (searchParams.get('tab') as SearchTab) ?? saved?.tab ?? 'artista'
+  const query = searchParams.get('q') ?? saved?.q ?? ''
+  const tab = (searchParams.get('tab') as SearchTab) ?? saved?.tab ?? 'artista'
+  const page = Number(searchParams.get('page') ?? '1')
 
   useEffect(() => {
-    if (!initialQuery.trim()) navigate('/', { replace: true })
-  }, [initialQuery, navigate])
-
-  const [query, setQuery] = useState(initialQuery)
-  const [tab, setTab] = useState<SearchTab>(initialTab)
-  const [page, setPage] = useState(1)
+    if (!query.trim()) navigate('/', { replace: true })
+  }, [query, navigate])
 
   const artists = useArtists(tab === 'artista' ? query : '', page)
   const albums = useSearchAlbums(tab === 'album' ? query : '', page)
@@ -39,15 +36,17 @@ export function Artists() {
   const isPlaylist = tab === 'playlist'
   const data = isArtist ? artists.data : isPlaylist ? playlists.data : albums.data
   const isLoading = isArtist ? artists.isPending : isPlaylist ? playlists.isPending : albums.isPending
-  const hasNext = data ? (data.offset + data.limit) < data.total : false
+  const hasNext = data ? (data.offset + data.items.length) < data.total : false
 
   const handleSearch = useCallback((q: string, t: SearchTab) => {
     if (!q.trim()) { navigate('/', { replace: true }); return }
-    setQuery(q)
-    setTab(t)
-    setPage(1)
-    setSearchParams({ q, tab: t })
+    setSearchParams({ q, tab: t, page: '1' }, { replace: true })
   }, [navigate, setSearchParams])
+
+  const handlePageChange = (newPage: number) => {
+    setSearchParams({ q: query, tab, page: String(newPage) }, { replace: true })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const headerLabel = isArtist
     ? t('artists.searchArtists')
@@ -79,7 +78,7 @@ export function Artists() {
         {/* Loading */}
         {isLoading && (
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {Array.from({ length: 14 }).map((_, i) => (
+            {Array.from({ length: 21 }).map((_, i) => (
               <CardSkeleton key={i} />
             ))}
           </div>
@@ -134,7 +133,7 @@ export function Artists() {
         {/* Playlist grid */}
         {!isLoading && isPlaylist && playlists.data && (
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {playlists.data.items.filter(Boolean).map(playlist => (
+            {playlists.data.items.filter((p): p is NonNullable<typeof p> => !!p).map(playlist => (
               <div
                 key={playlist.id}
                 className="cursor-pointer focus:outline-none group"
@@ -180,8 +179,8 @@ export function Artists() {
           <Pagination
             page={page}
             hasNext={hasNext}
-            onPrev={() => setPage(p => Math.max(1, p - 1))}
-            onNext={() => setPage(p => p + 1)}
+            onPrev={() => handlePageChange(Math.max(1, page - 1))}
+            onNext={() => handlePageChange(page + 1)}
             className="mt-12"
           />
         )}

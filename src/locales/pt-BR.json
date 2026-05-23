@@ -89,7 +89,8 @@
     "artistRequired": "Artista é obrigatório",
     "minQuery": "Digite pelo menos 2 caracteres",
     "close": "Fechar",
-    "addTrack": "+ Adicionar"
+    "addTrack": "+ Adicionar",
+    "viewOnSpotify": "Ver no Spotify"
   },
   "lyrics": {
     "searching": "Buscando letra...",

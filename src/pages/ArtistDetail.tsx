@@ -1,148 +1,160 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts'
+import { motion } from 'framer-motion'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
-import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
+import { usePlayContext } from '@/hooks/usePlayContext'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
+import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { VinylCard } from '@/components/shared/VinylCard'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { Pagination } from '@/components/shared/Pagination'
 import { usePlayer } from '@/hooks/usePlayer'
+
+const DELAY = 0.3
+
+function useArtistLayout() {
+  const [vw, setVw] = useState(() => window.innerWidth)
+  useEffect(() => {
+    const fn = () => setVw(window.innerWidth)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+
+  const diskPx = Math.min(720, vw)
+  const translateY = Math.round(diskPx * 0.28)
+  const arcRadius = Math.max(130, Math.round(diskPx * 0.36))
+  const arcDeg = vw < 768 ? 130 : 90
+  const arcContainerTop = Math.max(80, diskPx - translateY - arcRadius - 20)
+  // deepest card = arcContainerTop + arcRadius + 60; add 80px breathing room
+  const fixedZoneHeight = arcContainerTop + arcRadius + 60 + 80
+
+  return { diskPx, translateY, arcRadius, arcDeg, arcContainerTop, fixedZoneHeight }
+}
 
 export function ArtistDetail() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
+  const playContext = usePlayContext()
   const [albumPage, setAlbumPage] = useState(1)
+  const { diskPx, translateY, arcRadius, arcDeg, arcContainerTop, fixedZoneHeight } = useArtistLayout()
 
   const artist = useArtist(id)
   const topTracks = useArtistTopTracks(id)
   const albums = useArtistAlbums(id, albumPage, 10)
 
-  const topIds = topTracks.data?.slice(0, 5).map(t => t.id) ?? []
-  const audioFeatures = useAudioFeatures(topIds)
-
-  const radarData = audioFeatures.data
-    ? [
-        { subject: t('artistDetail.danceability'), A: Math.round((audioFeatures.data[0]?.danceability ?? 0) * 100) },
-        { subject: t('artistDetail.energy'), A: Math.round((audioFeatures.data[0]?.energy ?? 0) * 100) },
-        { subject: t('artistDetail.valence'), A: Math.round((audioFeatures.data[0]?.valence ?? 0) * 100) },
-        { subject: t('artistDetail.acousticness'), A: Math.round((audioFeatures.data[0]?.acousticness ?? 0) * 100) },
-        { subject: t('artistDetail.liveness'), A: Math.round((audioFeatures.data[0]?.liveness ?? 0) * 100) },
-      ]
-    : []
-
   const hasNextAlbums = albums.data
     ? (albums.data.offset + albums.data.limit) < albums.data.total
     : false
 
+  const artistImage = artist.data?.images[0]?.url
+  // Visible disk height from top of viewport
+  const visibleDiskHeight = diskPx - translateY
+
   return (
-    <div className="min-h-screen pb-24">
-      {/* Artist hero */}
-      <div className="relative h-64 overflow-hidden">
-        {artist.data?.images[0]?.url && (
-          <img
-            src={artist.data.images[0].url}
-            alt={artist.data.name}
-            className="w-full h-full object-cover object-top"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white" />
-        <div className="absolute bottom-4 left-6">
-          <h1 className="text-4xl font-black text-black">{artist.data?.name}</h1>
-          <p className="text-sm text-black/50 mt-1">
-            {artist.data?.followers?.total.toLocaleString()} {t('artists.followers')}
-          </p>
+    <div className="min-h-screen">
+      {/* Fixed visual zone: disk + inverted carousel */}
+      <div className="fixed inset-0 pointer-events-none z-[5]">
+        {/* Disk at top, partially hidden above viewport */}
+        <div
+          className="absolute top-0 left-1/2"
+          style={{ transform: `translateX(-50%) translateY(-${translateY}px)` }}
+        >
+          <motion.div
+            initial={{ scale: 0.7, y: 80, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
+          >
+            <VinylDisk size="xl" isPlaying albumArt={artistImage} />
+          </motion.div>
         </div>
-      </div>
 
-      {/* Top Tracks Arc */}
-      <div className="px-6 pt-4">
-        <h2 className="text-base font-bold text-black/60 mb-2 text-center">{t('artistDetail.topTracks')}</h2>
+        {/* Artist name — centered in the visible disk band */}
+        <motion.div
+          className="absolute left-0 right-0 flex flex-col items-center justify-center pointer-events-none"
+          style={{ top: 0, height: visibleDiskHeight * 0.55 }}
+          initial={{ opacity: 0, y: -40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <h1 className="text-3xl font-black text-white drop-shadow-lg tracking-tight">
+            {artist.data?.name}
+          </h1>
+          {artist.data?.followers?.total != null && (
+            <p className="text-xs text-white/50 mt-1">
+              {artist.data.followers.total.toLocaleString()} {t('artists.followers')}
+            </p>
+          )}
+        </motion.div>
 
-        {topTracks.data && topTracks.data.length > 0 && (
-          <div className="flex justify-center">
+        {/* Inverted arc carousel — cards hang DOWN from disk */}
+        <div
+          className="absolute left-1/2 pointer-events-auto"
+          style={{ top: arcContainerTop, transform: 'translateX(-50%)' }}
+        >
+          {topTracks.data && topTracks.data.length > 0 && (
             <ArcCarousel
               items={topTracks.data.slice(0, 5).map((track, i) => ({
                 id: track.id,
                 content: (
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-xs font-bold text-black/40">{String(i + 1).padStart(2, '0')}</span>
                     <VinylCard
                       track={track}
                       isActive={state.currentTrack?.id === track.id}
                       onPlay={playTrack}
-                      size="md"
+                      size="sm"
                     />
+                    <span className="text-[10px] font-bold text-black/40 tabular-nums">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
                   </div>
-                )
+                ),
               }))}
-              radius={220}
-              arcDeg={120}
+              radius={arcRadius}
+              arcDeg={arcDeg}
+              baseDelay={DELAY}
+              title={t('artistDetail.topTracks')}
+              inverted
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Full top tracks list */}
-      <div className="px-4 mb-8">
-        {topTracks.data?.map((track, i) => (
-          <TrackRow
-            key={track.id}
-            track={track}
-            index={i}
-            isActive={state.currentTrack?.id === track.id}
-            onPlay={playTrack}
-          />
-        ))}
-      </div>
-
-      {/* Charts + Albums */}
-      <div className="px-6 flex flex-col lg:flex-row gap-8">
-        {/* Radar chart */}
-        {radarData.length > 0 && (
-          <div className="glass-card p-5 lg:w-80 shrink-0">
-            <p className="text-sm font-bold text-black mb-3">
-              {t('artistDetail.audioProfile')}
-            </p>
-            <ResponsiveContainer width="100%" height={200}>
-              <RadarChart data={radarData}>
-                <PolarGrid stroke="rgba(0,0,0,0.1)" />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{ fill: 'rgba(0,0,0,0.5)', fontSize: 11 }}
-                />
-                <Radar
-                  dataKey="A"
-                  stroke="#111"
-                  fill="#111"
-                  fillOpacity={0.15}
-                  strokeWidth={1.5}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: 'rgba(255,255,255,0.9)',
-                    border: '1px solid rgba(0,0,0,0.1)',
-                    borderRadius: 8,
-                    fontSize: 12,
-                  }}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
+      {/* Scrollable content below fixed zone */}
+      <div style={{ paddingTop: fixedZoneHeight }} className="px-4 pb-32">
+        {/* Top tracks list */}
+        {topTracks.data && topTracks.data.length > 0 && (
+          <div className="mb-8">
+            {topTracks.data.map((track, i) => (
+              <TrackRow
+                key={track.id}
+                track={track}
+                index={i}
+                isActive={state.currentTrack?.id === track.id}
+                onPlay={playTrack}
+              />
+            ))}
           </div>
         )}
 
-        {/* Albums table */}
-        <div className="flex-1">
-          <h3 className="text-sm font-bold text-black/60 mb-3">{t('artistDetail.albums')}</h3>
-          <div className="space-y-2">
+        {/* Albums */}
+        <div>
+          <h3 className="text-sm font-bold text-black/50 mb-3 px-2">{t('artistDetail.albums')}</h3>
+          <div className="space-y-1">
             {albums.data?.items.map(album => (
-              <div key={album.id} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors">
+              <div
+                key={album.id}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group"
+                onClick={() => playContext(album.uri)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && playContext(album.uri)}
+              >
                 <img
                   src={album.images[0]?.url}
                   alt={album.name}

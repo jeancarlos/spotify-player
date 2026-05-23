@@ -51,4 +51,4 @@ export default defineConfig({
     exclude: ['node_modules', '.claude/**', 'tests-e2e/**'],
     coverage: { provider: 'v8', include: ['src/**/*.{ts,tsx}'] },
   },
-})
+} as any)

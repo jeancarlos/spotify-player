@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts'
 import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
@@ -53,12 +54,13 @@ interface Props { track: SpotifyTrack }
 
 export function TrackInfoPanel({ track }: Props) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const features = useAudioFeatures([track.id])
   const artist = useArtist(track.artists[0]?.id)
 
   const f: AudioFeatures = features.data?.[0] ?? fakeFeatures(track.id)
-  const genres: string[] = (artist.data?.genres?.length ?? 0) > 0
-    ? artist.data!.genres.slice(0, 5)
+  const genres: string[] = artist.data?.genres
+    ? artist.data.genres.slice(0, 5)
     : fakeGenres(track.artists[0]?.id ?? track.id)
 
   const keyLabel = f.key >= 0
@@ -116,7 +118,22 @@ export function TrackInfoPanel({ track }: Props) {
               <span className="text-[9px] font-black text-black bg-white/80 rounded px-1 py-0.5 shrink-0">E</span>
             )}
           </div>
-          <p className="text-white/70 text-sm font-medium">{track.artists.map(a => a.name).join(', ')}</p>
+          <div className="flex flex-wrap justify-center gap-1">
+            {track.artists.map((a, i) => (
+              <span key={a.id} className="flex items-center">
+                <span
+                  role="link"
+                  onClick={() => navigate(`/artists/${a.id}`)}
+                  className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors"
+                >
+                  {a.name}
+                </span>
+                {i < track.artists.length - 1 && (
+                  <span className="text-white/30 text-sm font-medium ml-1">, </span>
+                )}
+              </span>
+            ))}
+          </div>
           <p className="text-white/35 text-xs">{track.album.name}</p>
         </div>
 

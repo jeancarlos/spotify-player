@@ -14,6 +14,7 @@ interface ArcCarouselProps {
   offsetDeg?: number
   baseDelay?: number
   title?: string
+  inverted?: boolean
 }
 
 export function ArcCarousel({
@@ -23,20 +24,23 @@ export function ArcCarousel({
   offsetDeg = 0,
   baseDelay = 0,
   title,
+  inverted = false,
 }: ArcCarouselProps) {
   const uid = useId()
   const positions = calcArcPositions(items.length, radius, arcDeg, offsetDeg)
 
-  // Arc text path logic
+  // Arc text path — top arc (normal) or bottom arc (inverted)
   const cx = radius
-  const cy = radius + 70
   const tR = radius + 46
   const halfRad = ((arcDeg / 2) * Math.PI) / 180
   const x1 = cx - tR * Math.sin(halfRad)
-  const y1 = cy - tR * Math.cos(halfRad)
   const x2 = cx + tR * Math.sin(halfRad)
-  const y2 = y1
-  const arcPath = `M ${x1} ${y1} A ${tR} ${tR} 0 0 1 ${x2} ${y2}`
+
+  // Normal: arc curves upward above the container (cy = R+70, text at cy - tR*cos)
+  // Inverted: arc curves downward below the container (cy = 0, text at cy + tR*cos)
+  const arcPath = inverted
+    ? `M ${x1} ${tR * Math.cos(halfRad)} A ${tR} ${tR} 0 0 0 ${x2} ${tR * Math.cos(halfRad)}`
+    : `M ${x1} ${(radius + 70) - tR * Math.cos(halfRad)} A ${tR} ${tR} 0 0 1 ${x2} ${(radius + 70) - tR * Math.cos(halfRad)}`
 
   return (
     <div className="relative" style={{ width: radius * 2, height: radius + 70 }}>
@@ -46,17 +50,16 @@ export function ArcCarousel({
             const pos = positions[i]
             if (!pos) return null
 
+            // Normal: cards fly upward (pos.y is negative)
+            // Inverted: cards hang downward (negate pos.y)
+            const animY = inverted ? -pos.y + 60 : pos.y - 60
+
             return (
               <motion.div
                 key={item.id}
                 className="absolute"
                 initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
-                animate={{
-                  x: pos.x,
-                  y: pos.y - 60,
-                  opacity: 1,
-                  scale: 1,
-                }}
+                animate={{ x: pos.x, y: animY, opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.7, transition: { duration: 0.2 } }}
                 transition={{
                   type: 'spring',
@@ -64,7 +67,7 @@ export function ArcCarousel({
                   damping: 22,
                   delay: baseDelay + i * 0.06,
                 }}
-                style={{ rotate: pos.tilt }}
+                style={{ rotate: inverted ? -pos.tilt : pos.tilt }}
               >
                 {item.content}
               </motion.div>
@@ -75,7 +78,7 @@ export function ArcCarousel({
 
       {title && (
         <motion.svg
-          className="absolute top-[-120px] inset-0 pointer-events-none"
+          className={inverted ? 'absolute bottom-[-120px] inset-x-0 pointer-events-none' : 'absolute top-[-120px] inset-0 pointer-events-none'}
           width={radius * 2}
           height={radius + 120}
           style={{ overflow: 'visible' }}
@@ -100,6 +103,6 @@ export function ArcCarousel({
           </text>
         </motion.svg>
       )}
-    </div >
+    </div>
   )
 }

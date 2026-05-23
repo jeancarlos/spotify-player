@@ -25,7 +25,7 @@ describe('authReducer', () => {
         email: 'jean@test.com',
         images: [],
         product: 'premium',
-        followers: { total: 0 },
+        followers: { total: 0, href: null },
         country: 'BR',
       },
     })

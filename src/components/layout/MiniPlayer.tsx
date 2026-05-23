@@ -119,9 +119,25 @@ export function MiniPlayer() {
                   <p className="text-xs font-bold text-black truncate group-hover/track:underline">
                     {currentTrack.name}
                   </p>
-                  <p className="text-[11px] text-black/50 truncate">
-                    {currentTrack.artists.map(a => a.name).join(', ')}
-                  </p>
+                  <div className="flex gap-1 overflow-hidden truncate">
+                    {currentTrack.artists.map((a, i) => (
+                      <span key={a.id} className="flex-shrink-0">
+                        <span
+                          role="link"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/artists/${a.id}`)
+                          }}
+                          className="text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors"
+                        >
+                          {a.name}
+                        </span>
+                        {i < currentTrack.artists.length - 1 && (
+                          <span className="text-[11px] text-black/30">, </span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <div className="shrink-0 hidden sm:block">
                   <WaveformBars isPlaying={isPlaying} />

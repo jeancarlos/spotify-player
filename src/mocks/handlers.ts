@@ -14,7 +14,7 @@ const track: SpotifyTrack = {
 }
 const artist: SpotifyArtist = {
   id: 'a1', name: 'Mock Artist', images: [{ url: 'https://picsum.photos/300', width: 300, height: 300 }],
-  genres: ['pop', 'rock'], followers: { total: 150000 }, popularity: 75,
+  genres: ['pop', 'rock'], followers: { total: 150000, href: null }, popularity: 75,
   uri: 'spotify:artist:a1', type: 'artist',
 }
 const pagingWrapper = <T>(items: T[]) => ({ items, limit: 20, offset: 0, total: items.length, next: null, previous: null })
