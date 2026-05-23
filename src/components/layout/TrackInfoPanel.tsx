@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import { useArtist } from '@/hooks/queries/useArtist'
+import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
 import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
@@ -57,6 +58,7 @@ export function TrackInfoPanel({ track }: Props) {
   const navigate = useNavigate()
   const features = useAudioFeatures([track.id])
   const artist = useArtist(track.artists[0]?.id)
+  const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
 
   const f: AudioFeatures = features.data?.[0] ?? fakeFeatures(track.id)
   const genres: string[] = artist.data?.genres
@@ -204,6 +206,22 @@ export function TrackInfoPanel({ track }: Props) {
             </div>
           </div>
         </Section>
+
+        {wikipedia.data && (
+          <Section label={t('track.aboutTrack')}>
+            <div className="w-full max-w-sm">
+              <p className="text-xs text-white/60 leading-relaxed">{wikipedia.data.extract}</p>
+              <a
+                href={wikipedia.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-white/35 hover:text-white/60 underline mt-2 inline-block transition-colors"
+              >
+                {t('track.readMore')} →
+              </a>
+            </div>
+          </Section>
+        )}
 
       </div>
     </div>
