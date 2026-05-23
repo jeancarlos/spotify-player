@@ -25,10 +25,9 @@ const mockTrack: SpotifyTrack = {
 }
 
 describe('playerReducer', () => {
-  it('SET_TRACK atualiza currentTrack e reseta progress', () => {
+  it('SET_TRACK atualiza currentTrack e duration', () => {
     const state = playerReducer(initialPlayerState, { type: 'SET_TRACK', payload: mockTrack })
     expect(state.currentTrack?.id).toBe('t1')
-    expect(state.progress).toBe(0)
     expect(state.duration).toBe(210000)
   })
 
@@ -69,30 +68,15 @@ describe('playerReducer', () => {
   it('SET_SHUFFLE define shuffle diretamente sem toggle', () => {
     const s1 = playerReducer(initialPlayerState, { type: 'SET_SHUFFLE', payload: true })
     expect(s1.shuffle).toBe(true)
-    // idempotente — não togla se já está true
     const s2 = playerReducer(s1, { type: 'SET_SHUFFLE', payload: true })
     expect(s2.shuffle).toBe(true)
     const s3 = playerReducer(s2, { type: 'SET_SHUFFLE', payload: false })
     expect(s3.shuffle).toBe(false)
   })
 
-  describe('TICK_PROGRESS', () => {
-    it('incrementa progress em 1000ms quando abaixo do duration', () => {
-      const state = { ...initialPlayerState, progress: 5000, duration: 30000, isPlaying: true }
-      const next = playerReducer(state, { type: 'TICK_PROGRESS' })
-      expect(next.progress).toBe(6000)
-    })
-
-    it('não ultrapassa duration', () => {
-      const state = { ...initialPlayerState, progress: 29500, duration: 30000, isPlaying: true }
-      const next = playerReducer(state, { type: 'TICK_PROGRESS' })
-      expect(next.progress).toBe(30000)
-    })
-
-    it('não avança quando duration é 0', () => {
-      const state = { ...initialPlayerState, progress: 0, duration: 0 }
-      const next = playerReducer(state, { type: 'TICK_PROGRESS' })
-      expect(next.progress).toBe(0)
-    })
+  it('SET_SEEK_TIME atualiza timestamp do último seek', () => {
+    const now = Date.now()
+    const state = playerReducer(initialPlayerState, { type: 'SET_SEEK_TIME', payload: now })
+    expect(state.lastSeekTime).toBe(now)
   })
 })

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'
+import { useProgressEngine } from '@/hooks/useProgressEngine'
 import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
@@ -24,9 +25,42 @@ function Tip({ label }: { label: string }) {
   )
 }
 
+interface ProgressBarProps {
+  progress: number
+  duration: number
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function ProgressBar({ progress, duration, onChange }: ProgressBarProps) {
+  const { t } = useTranslation()
+  const percentage = duration ? Math.round((progress / duration) * 100) : 0
+  const background = `linear-gradient(to right, #1DB954 ${percentage}%, #d4d4d8 ${percentage}%)`
+
+  return (
+    <div className="flex flex-col items-center gap-1 absolute top-[-1px] left-0 right-0 w-full z-10 px-8">
+      <input
+        type="range"
+        min={0}
+        max={duration || 1}
+        value={progress}
+        onChange={onChange}
+        aria-label={t('player.seek')}
+        aria-valuetext={`${formatDuration(progress)} de ${formatDuration(duration)}`}
+        className="w-full h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
+        style={{ background }}
+      />
+    </div>
+  )
+}
+
 export function MiniPlayer() {
   const { state, dispatch } = usePlayer()
-  const { currentTrack, isPlaying, shuffle, repeat, progress, duration } = state
+  const { currentTrack, isPlaying, shuffle, repeat } = state
+  const { currentProgress, seekTo: engineSeekTo } = useProgressEngine()
+  
+  const duration = currentTrack?.duration_ms || 0
+  const progress = currentProgress
+  
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
@@ -41,7 +75,6 @@ export function MiniPlayer() {
     navigate(from)
   }
 
-  // Helper para eventos de teclado em elementos com role="button"
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
@@ -63,18 +96,19 @@ export function MiniPlayer() {
 
   const handleSeek = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const ms = Number(e.target.value)
-    dispatch({ type: 'SET_PROGRESS', payload: ms, isManual: true })
+    engineSeekTo(ms)
+    dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
     try { await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' }) } catch { /* silent */ }
-  }, [dispatch])
+  }, [dispatch, engineSeekTo])
 
   const handlePrev = useCallback(async () => {
     try { await api.post('/me/player/previous', null, { responseType: 'text' }) } catch { /* silent */ }
   }, [])
 
   const handleNext = useCallback(async () => {
-    dispatch({ type: 'SET_PROGRESS', payload: 0 })
+    engineSeekTo(0)
     try { await api.post('/me/player/next', null, { responseType: 'text' }) } catch { /* silent */ }
-  }, [dispatch])
+  }, [engineSeekTo])
 
   const toggleShuffle = useCallback(async () => {
     dispatch({ type: 'TOGGLE_SHUFFLE' })
@@ -116,25 +150,14 @@ export function MiniPlayer() {
       className="rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
       aria-label={t('lyrics.nowPlaying', 'Tocando agora')}
     >
-      {/* Backdrop separado dos filhos animados */}
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 
       {currentTrack && (
-        <div className="flex flex-col items-center gap-1 absolute top-[-1px] left-0 right-0 w-full z-10 px-8">
-          <input
-            type="range"
-            min={0}
-            max={duration || 1}
-            value={progress}
-            onChange={handleSeek}
-            aria-label={t('player.seek')}
-            aria-valuetext={`${formatDuration(progress)} de ${formatDuration(duration)}`}
-            className="w-full h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
-            style={{
-              background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, #d4d4d8 ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
-            }}
-          />
-        </div>
+        <ProgressBar
+          progress={progress}
+          duration={duration}
+          onChange={handleSeek}
+        />
       )}
 
       {/* Controles */}
@@ -163,25 +186,9 @@ export function MiniPlayer() {
                 albumName={currentTrack.album.name}
               />
               <div className="min-w-0 flex-1 overflow-hidden flex flex-col justify-center">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-xs font-bold text-black truncate group-hover/track:underline">
-                    {currentTrack.name}
-                  </span>
-                  <span className="text-black/20 text-[10px] shrink-0">·</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
-                    }}
-                    onKeyDown={(e) => {
-                      e.stopPropagation()
-                      handleKeyDown(e, () => navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } }))
-                    }}
-                    className="text-[10px] font-medium text-black/40 hover:text-black hover:underline truncate outline-none"
-                  >
-                    {currentTrack.album.name}
-                  </button>
-                </div>
+                <span className="text-xs font-bold text-black truncate group-hover/track:underline">
+                  {currentTrack.name}
+                </span>
                 <div className="flex gap-1 overflow-hidden">
                   {currentTrack.artists.map((a, i) => (
                     <button
@@ -201,6 +208,19 @@ export function MiniPlayer() {
                     </button>
                   ))}
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+                  }}
+                  onKeyDown={(e) => {
+                    e.stopPropagation()
+                    handleKeyDown(e, () => navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } }))
+                  }}
+                  className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
+                >
+                  {currentTrack.album.name}
+                </button>
               </div>
 
               <div className="flex flex-col gap-0.5" aria-hidden="true">
@@ -243,7 +263,7 @@ export function MiniPlayer() {
         {/* Controles */}
         {currentTrack && (
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Shuffle — oculto em telas pequenas */}
+            {/* Shuffle */}
             <div className="relative group hidden sm:block">
               <button
                 onClick={toggleShuffle}
@@ -255,7 +275,7 @@ export function MiniPlayer() {
               <Tip label={t('player.shuffle')} />
             </div>
 
-            {/* Anterior — oculto em telas muito pequenas */}
+            {/* Anterior */}
             <div className="relative group hidden min-[400px]:block">
               <button
                 onClick={handlePrev}
@@ -283,7 +303,7 @@ export function MiniPlayer() {
               </div>
             </div>
 
-            {/* Próximo — oculto em telas muito pequenas */}
+            {/* Próximo */}
             <div className="relative group hidden min-[400px]:block">
               <button
                 onClick={handleNext}
@@ -295,7 +315,7 @@ export function MiniPlayer() {
               <Tip label={t('player.next')} />
             </div>
 
-            {/* Repetir — oculto em telas pequenas */}
+            {/* Repetir */}
             <div className="relative group hidden sm:block">
               <button
                 onClick={cycleRepeat}
@@ -307,7 +327,7 @@ export function MiniPlayer() {
               <Tip label={t('player.repeat')} />
             </div>
 
-            {/* Detalhes — Lógica 3 estágios: Letra -> Detalhes -> Fechar */}
+            {/* Detalhes */}
             <div className="relative group hidden sm:block">
               <button
                 onClick={() => {

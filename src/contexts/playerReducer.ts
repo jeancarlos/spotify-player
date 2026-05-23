@@ -5,7 +5,6 @@ export interface PlayerState {
   queue: SpotifyTrack[]
   isPlaying: boolean
   isLoading: boolean
-  progress: number
   duration: number
   volume: number
   shuffle: boolean
@@ -20,7 +19,6 @@ export type PlayerAction =
   | { type: 'TOGGLE_PLAY' }
   | { type: 'SET_PLAYING'; payload: boolean }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_PROGRESS'; payload: number; isManual?: boolean }
   | { type: 'SET_VOLUME'; payload: number }
   | { type: 'TOGGLE_SHUFFLE' }
   | { type: 'SET_SHUFFLE'; payload: boolean }
@@ -28,14 +26,13 @@ export type PlayerAction =
   | { type: 'TOGGLE_FULLSCREEN' }
   | { type: 'SET_PALETTE'; payload: [string, string] }
   | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
-  | { type: 'TICK_PROGRESS'; payload?: number }
+  | { type: 'SET_SEEK_TIME'; payload: number }
 
 export const initialPlayerState: PlayerState = {
   currentTrack: null,
   queue: [],
   isPlaying: false,
   isLoading: false,
-  progress: 0,
   duration: 0,
   volume: 0.8,
   shuffle: false,
@@ -52,7 +49,6 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
         ...state,
         currentTrack: action.payload,
         duration: action.payload.duration_ms,
-        progress: 0,
       }
     case 'TOGGLE_PLAY':
       return { ...state, isPlaying: !state.isPlaying }
@@ -60,12 +56,6 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       return { ...state, isPlaying: action.payload }
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload }
-    case 'SET_PROGRESS':
-      return { 
-        ...state, 
-        progress: action.payload,
-        lastSeekTime: action.isManual ? Date.now() : state.lastSeekTime
-      }
     case 'SET_VOLUME':
       return { ...state, volume: Math.min(1, Math.max(0, action.payload)) }
     case 'TOGGLE_SHUFFLE':
@@ -80,11 +70,8 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       return { ...state, palette: action.payload }
     case 'SET_QUEUE':
       return { ...state, queue: action.payload }
-    case 'TICK_PROGRESS': {
-      if (state.duration === 0) return state
-      const increment = action.payload ?? 1000
-      return { ...state, progress: Math.min(state.progress + increment, state.duration) }
-    }
+    case 'SET_SEEK_TIME':
+      return { ...state, lastSeekTime: action.payload }
     default:
       return state
   }

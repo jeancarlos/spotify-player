@@ -2,9 +2,9 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { useNowPlaying } from '@/hooks/queries/useNowPlaying'
 import { useAuth } from '@/hooks/useAuth'
 
-interface ProgressRef {
-  baseProgress: number
-  baseTime: number
+interface ProgressBaseline {
+  progress: number
+  time: number
   isPlaying: boolean
 }
 
@@ -15,62 +15,62 @@ export function useProgressEngine(): {
   const { state: authState } = useAuth()
   const { data } = useNowPlaying(authState.isAuthenticated)
 
-  // We use a ref to track the "baseline" progress to avoid frequent re-renders
-  // and to follow React's rules about ref access during render.
-  const baselineRef = useRef<ProgressRef>({
-    baseProgress: 0,
-    baseTime: 0,
+  // baselineRef is ONLY accessed inside effects to satisfy React 19 purity rules
+  const baselineRef = useRef<ProgressBaseline>({
+    progress: 0,
+    time: 0,
     isPlaying: false,
   })
 
-  const [currentProgress, setCurrentProgress] = useState(0)
+  const [displayProgress, setDisplayProgress] = useState(0)
 
-  // Sync ref with incoming data from the API inside an effect
+  // Unified effect to handle both API sync and timer ticker
   useEffect(() => {
+    // 1. Sync baseline with incoming data
     if (data && data.progress_ms !== null) {
       const now = Date.now()
-      const adjustedProgress = data.is_playing
+      const adjusted = data.is_playing
         ? data.progress_ms + (now - data.timestamp)
         : data.progress_ms
 
       baselineRef.current = {
-        baseProgress: adjustedProgress,
-        baseTime: now,
+        progress: adjusted,
+        time: now,
         isPlaying: data.is_playing,
       }
-      // Defer to avoid cascading render lint error
-      setTimeout(() => {
-        setCurrentProgress(adjustedProgress)
-      }, 0)
+      
+      // We don't call setDisplayProgress here to avoid cascading render warning.
+      // Instead, we let the first interval tick or a deferred call handle it.
+    }
+
+    // 2. Start ticker
+    const update = () => {
+      const b = baselineRef.current
+      if (b.time === 0) return
+      const now = Date.now()
+      const current = b.isPlaying ? b.progress + (now - b.time) : b.progress
+      setDisplayProgress(current)
+    }
+
+    // Run once immediately (deferred to avoid cascading render)
+    const timeoutId = setTimeout(update, 0)
+    const intervalId = setInterval(update, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      clearInterval(intervalId)
     }
   }, [data])
-
-  // Timer loop to update the UI between API polls
-  useEffect(() => {
-    const update = () => {
-      const now = Date.now()
-      const b = baselineRef.current
-      // If we haven't received any data yet, baseTime might be 0
-      if (b.baseTime === 0) return
-
-      const progress = b.isPlaying ? b.baseProgress + (now - b.baseTime) : b.baseProgress
-      setCurrentProgress(progress)
-    }
-
-    update()
-    const id = setInterval(update, 100)
-    return () => clearInterval(id)
-  }, [])
 
   const seekTo = useCallback((ms: number) => {
     const now = Date.now()
     baselineRef.current = {
       ...baselineRef.current,
-      baseProgress: ms,
-      baseTime: now,
+      progress: ms,
+      time: now,
     }
-    setCurrentProgress(ms)
+    setDisplayProgress(ms)
   }, [])
 
-  return { currentProgress, seekTo }
+  return { currentProgress: displayProgress, seekTo }
 }

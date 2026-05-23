@@ -13,17 +13,6 @@ export function usePlayerSync() {
   const { data } = useNowPlaying(authState.isAuthenticated)
   const lastTrackIdRef = useRef<string | null>(null)
   
-  // Timer local: incrementa progress a cada 100ms enquanto tocando
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (state.isPlaying) {
-        dispatch({ type: 'TICK_PROGRESS', payload: 100 })
-      }
-    }, 100)
-    
-    return () => clearInterval(interval)
-  }, [dispatch, state.isPlaying])
-
   // Sincronizar com API Spotify
   useEffect(() => {
     if (!data) return
@@ -40,25 +29,6 @@ export function usePlayerSync() {
     // Estado de play/pause
     if (data.is_playing !== state.isPlaying) {
       dispatch({ type: 'SET_PLAYING', payload: data.is_playing })
-    }
-
-    // Progresso e Drift
-    if (data.progress_ms !== null) {
-      // Ignorar se houve seek manual recente (2s)
-      const isRecentlySeeked = Date.now() - state.lastSeekTime < 2000
-      
-      if (!isRecentlySeeked) {
-        const adjustedProgress = data.is_playing 
-          ? data.progress_ms + (Date.now() - data.timestamp)
-          : data.progress_ms
-
-        const drift = Math.abs(adjustedProgress - state.progress)
-        
-        // Sync se drift > 1s
-        if (drift > 1000) {
-          dispatch({ type: 'SET_PROGRESS', payload: adjustedProgress })
-        }
-      }
     }
 
     // Shuffle / Repeat

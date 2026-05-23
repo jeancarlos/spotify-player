@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRecentlyPlayed } from '@/hooks/queries/useRecentlyPlayed'
-import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
@@ -41,7 +40,6 @@ function useDiskLayout() {
 export function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { state } = usePlayer()
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
@@ -139,7 +137,6 @@ export function Home() {
                   content: (
                     <VinylCard
                       track={track}
-                      isActive={state.currentTrack?.id === track.id}
                       onPlay={playTrack}
                       size="sm"
                     />

@@ -12,8 +12,14 @@ import { useNowPlaying } from '@/hooks/queries/useNowPlaying'
 import { useProgressEngine } from '../useProgressEngine'
 
 describe('useProgressEngine', () => {
-  beforeEach(() => vi.useFakeTimers())
-  afterEach(() => vi.useRealTimers())
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
 
   it('returns 0 when no API data', () => {
     vi.mocked(useNowPlaying).mockReturnValue({ data: null } as ReturnType<typeof useNowPlaying>)
@@ -27,7 +33,14 @@ describe('useProgressEngine', () => {
     vi.mocked(useNowPlaying).mockReturnValue({
       data: { is_playing: false, progress_ms: 5000, timestamp: now },
     } as ReturnType<typeof useNowPlaying>)
+    
     const { result } = renderHook(() => useProgressEngine())
+    
+    act(() => {
+      // Execute the setTimeout(update, 0)
+      vi.advanceTimersByTime(1)
+    })
+
     expect(result.current.currentProgress).toBe(5000)
   })
 
@@ -37,8 +50,16 @@ describe('useProgressEngine', () => {
     vi.mocked(useNowPlaying).mockReturnValue({
       data: { is_playing: true, progress_ms: 5000, timestamp: now },
     } as ReturnType<typeof useNowPlaying>)
+    
     const { result } = renderHook(() => useProgressEngine())
-    act(() => { vi.advanceTimersByTime(2000) })
+    
+    act(() => {
+      // First, trigger the initialization
+      vi.advanceTimersByTime(1)
+      // Then advance 2 seconds
+      vi.advanceTimersByTime(2000)
+    })
+
     expect(result.current.currentProgress).toBeGreaterThanOrEqual(7000)
   })
 
@@ -48,8 +69,13 @@ describe('useProgressEngine', () => {
     vi.mocked(useNowPlaying).mockReturnValue({
       data: { is_playing: false, progress_ms: 5000, timestamp: now },
     } as ReturnType<typeof useNowPlaying>)
+    
     const { result } = renderHook(() => useProgressEngine())
-    act(() => { result.current.seekTo(30000) })
+    
+    act(() => {
+      result.current.seekTo(30000)
+    })
+    
     expect(result.current.currentProgress).toBe(30000)
   })
 })

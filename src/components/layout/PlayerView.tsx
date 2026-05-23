@@ -45,7 +45,7 @@ export function PlayerView() {
   }, [noLyrics, activeTab, setSearchParams])
 
   const handleSeek = useCallback(async (ms: number) => {
-    dispatch({ type: 'SET_PROGRESS', payload: ms, isManual: true })
+    dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
     seekTo(ms)
     try {
       await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' })

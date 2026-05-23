@@ -39,9 +39,10 @@ export function AlbumDetail() {
   const audioFeatures = useAudioFeatures(trackIds)
   const fullTracks = useTracks(trackIds)
 
-  const avgFeatures = audioFeatures.data && audioFeatures.data.length > 0
-    ? averageAudioFeatures(audioFeatures.data)
-    : null
+  const avgFeatures = (() => {
+    if (!audioFeatures.data || audioFeatures.data.length === 0) return null
+    return averageAudioFeatures(audioFeatures.data)
+  })()
 
   const handlePlay = useCallback(() => {
     if (album.data?.uri) playContext(album.data.uri)
