@@ -76,7 +76,7 @@ export function MiniPlayer() {
       {/* Seek bar — mostrada quando há faixa tocando */}
       {currentTrack && (
         <div className="px-3 flex items-center gap-2">
-          <span className="text-[9px] text-black/60 w-7 text-right font-mono shrink-0">
+          <span className="text-[10px] text-black font-semibold w-7 text-right font-mono shrink-0">
             {formatDuration(progress)}
           </span>
           <input
@@ -91,7 +91,7 @@ export function MiniPlayer() {
               background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, #d4d4d8 ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
             }}
           />
-          <span className="text-[9px] text-black/60 w-7 font-mono shrink-0">
+          <span className="text-[10px] text-black font-semibold w-7 font-mono shrink-0">
             {formatDuration(duration)}
           </span>
         </div>
