@@ -1,156 +1,121 @@
-import { useState, useMemo } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search } from 'lucide-react'
 import { useArtists } from '@/hooks/queries/useArtists'
 import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
-import { useDebounce } from '@/hooks/useDebounce'
 import { ArtistCard } from '@/components/shared/ArtistCard'
-import { AlbumCard } from '@/components/shared/AlbumCard'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
+import { SearchBar } from '@/components/shared/SearchBar'
+import { Pagination } from '@/components/shared/Pagination'
+import type { SearchTab } from '@/components/shared/SearchBar'
 
 export function Artists() {
   const { t } = useTranslation()
-  const [query, setQuery] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const initialQuery = searchParams.get('q') ?? ''
+  const initialTab = (searchParams.get('tab') as SearchTab) ?? 'artista'
+
+  const [query, setQuery] = useState(initialQuery)
+  const [tab, setTab] = useState<SearchTab>(initialTab)
   const [page, setPage] = useState(1)
-  const [mode, setMode] = useState<'artist' | 'album'>('artist')
-  const [activeGenre, setActiveGenre] = useState<string | null>(null)
 
-  const debouncedQuery = useDebounce(query, 400)
+  const artists = useArtists(tab === 'artista' ? query : '', page)
+  const albums = useSearchAlbums(tab === 'album' ? query : '', page)
 
-  const artists = useArtists(debouncedQuery, page)
-  const albums = useSearchAlbums(debouncedQuery, page)
+  const isArtist = tab === 'artista'
+  const data = isArtist ? artists.data : albums.data
+  const isLoading = isArtist ? artists.isPending : albums.isPending
+  const hasNext = data ? (data.offset + data.limit) < data.total : false
 
-  const genres = useMemo(() => {
-    if (!artists.data) return []
-    const all = artists.data.items.flatMap(a => a.genres)
-    return [...new Set(all)].slice(0, 12)
-  }, [artists.data])
-
-  const filteredArtists = useMemo(() => {
-    if (!artists.data) return []
-    if (!activeGenre) return artists.data.items
-    return artists.data.items.filter(a => a.genres.includes(activeGenre))
-  }, [artists.data, activeGenre])
-
-  const isLoading = mode === 'artist' ? artists.isPending : albums.isPending
-  const isEmpty = debouncedQuery.trim() === ''
-
-  function handleQueryChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setQuery(e.target.value)
+  const handleSearch = useCallback((q: string, t: SearchTab) => {
+    setQuery(q)
+    setTab(t)
     setPage(1)
-    setActiveGenre(null)
-  }
+    setSearchParams({ q, tab: t })
+  }, [setSearchParams])
 
-  function switchMode(next: 'artist' | 'album') {
-    setMode(next)
+  useEffect(() => {
     setPage(1)
-    setActiveGenre(null)
-  }
+  }, [query, tab])
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Search bar + mode toggle */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-lg">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-          <input
-            type="text"
-            value={query}
-            onChange={handleQueryChange}
-            placeholder={t('artists.searchPlaceholder')}
-            className="glass-input w-full pl-9 pr-4 py-2.5 text-sm rounded-xl text-white placeholder:text-white/30"
-          />
-        </div>
-        <div className="flex glass-card-md rounded-xl overflow-hidden">
-          <button
-            onClick={() => switchMode('artist')}
-            className={cn('px-3 py-2 text-xs transition-colors', mode === 'artist' ? 'bg-white/15 text-white' : 'text-white/40 hover:text-white')}
-          >
-            {t('artists.searchArtists')}
-          </button>
-          <button
-            onClick={() => switchMode('album')}
-            className={cn('px-3 py-2 text-xs transition-colors', mode === 'album' ? 'bg-white/15 text-white' : 'text-white/40 hover:text-white')}
-          >
-            {t('artists.searchAlbums')}
-          </button>
-        </div>
+    <div className="min-h-screen bg-white">
+      {/* SearchBar */}
+      <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
+        <SearchBar onSearch={handleSearch} defaultTab={tab} className="shadow-sm" />
       </div>
 
-      {/* Genre filter chips (only in artist mode) */}
-      {mode === 'artist' && genres.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          <Badge
-            variant="outline"
-            onClick={() => setActiveGenre(null)}
-            className={cn('cursor-pointer text-xs', !activeGenre && 'bg-white/15')}
-          >
-            {t('artists.all')}
-          </Badge>
-          {genres.map(g => (
-            <Badge
-              key={g}
-              variant="outline"
-              onClick={() => setActiveGenre(g === activeGenre ? null : g)}
-              className={cn('cursor-pointer text-xs capitalize', activeGenre === g && 'bg-white/15')}
-            >
-              {g}
-            </Badge>
-          ))}
-        </div>
-      )}
+      <div className="pt-36 px-6 pb-24">
+        {/* Results header */}
+        {query && (
+          <p className="text-sm text-black/40 mb-4">
+            {isArtist ? t('artists.searchArtists') : t('artists.searchAlbums')}
+            {data && ` — ${data.total} resultados`}
+          </p>
+        )}
 
-      {/* Results */}
-      {isEmpty ? (
-        <p className="text-white/40 text-sm text-center py-16">{t('artists.searchPrompt')}</p>
-      ) : isLoading ? (
-        <div className="flex flex-wrap gap-4">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="w-44 h-64 rounded-2xl" />
-          ))}
-        </div>
-      ) : mode === 'artist' ? (
-        <>
-          {filteredArtists.length === 0 ? (
-            <p className="text-white/40 text-sm text-center py-16">{t('artists.noResults')}</p>
-          ) : (
-            <div className="flex flex-wrap gap-4">
-              {filteredArtists.map(artist => (
-                <ArtistCard key={artist.id} artist={artist} />
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="flex flex-wrap gap-4">
-          {(albums.data?.items ?? []).map(album => (
-            <AlbumCard key={album.id} album={album} />
-          ))}
-        </div>
-      )}
+        {/* Empty state */}
+        {!query && (
+          <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>
+        )}
 
-      {/* Pagination */}
-      {!isEmpty && !isLoading && (
-        <div className="flex items-center justify-center gap-2 pt-4">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage(p => p - 1)}
-            className="px-4 py-1.5 glass-button rounded-lg text-sm disabled:opacity-30"
-          >
-            ← {t('artists.previous')}
-          </button>
-          <span className="text-sm text-white/50">{page}</span>
-          <button
-            disabled={mode === 'artist' ? !artists.data?.next : !albums.data?.next}
-            onClick={() => setPage(p => p + 1)}
-            className="px-4 py-1.5 glass-button rounded-lg text-sm disabled:opacity-30"
-          >
-            {t('artists.next')} →
-          </button>
-        </div>
-      )}
+        {/* Loading */}
+        {isLoading && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="glass-card aspect-square animate-pulse" />
+            ))}
+          </div>
+        )}
+
+        {/* Artist grid */}
+        {!isLoading && isArtist && artists.data && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {artists.data.items.map(artist => (
+              <ArtistCard key={artist.id} artist={artist} />
+            ))}
+          </div>
+        )}
+
+        {/* Album grid */}
+        {!isLoading && !isArtist && albums.data && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {albums.data.items.map(album => (
+              <div key={album.id} className="glass-card overflow-hidden cursor-pointer group">
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={album.images[0]?.url}
+                    alt={album.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-bold text-black truncate">{album.name}</p>
+                  <p className="text-xs text-black/50 truncate">
+                    {album.artists.map((a: { name: string }) => a.name).join(', ')}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* No results */}
+        {!isLoading && query && data?.items.length === 0 && (
+          <p className="text-center text-black/30 mt-20">{t('artists.noResults')}</p>
+        )}
+
+        {/* Pagination */}
+        {data && data.items.length > 0 && (
+          <Pagination
+            page={page}
+            hasNext={hasNext}
+            onPrev={() => setPage(p => Math.max(1, p - 1))}
+            onNext={() => setPage(p => p + 1)}
+            className="mt-8"
+          />
+        )}
+      </div>
     </div>
   )
 }
