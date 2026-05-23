@@ -10,9 +10,14 @@ export function AppShell() {
     <>
       <PlayerSync />
       <QueryErrorHandler />
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+      </div>
       <HamburgerMenu />
       <LanguageSwitcher className="fixed top-4 right-4 z-40" />
-      <main className="min-h-screen bg-white">
+      <main className="relative z-[1] min-h-screen">
         <Outlet />
         <MiniPlayer />
       </main>

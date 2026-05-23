@@ -40,7 +40,7 @@ export function VinylCard({
           draggable={false}
         />
       </div>
-      <div className="w-full px-0.5">
+      <div className="w-full mt-1 bg-white/70 backdrop-blur-sm rounded-lg px-1.5 py-1">
         <p className="text-[9px] font-semibold truncate text-center text-black/80">
           {track.name}
         </p>

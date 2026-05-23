@@ -42,7 +42,7 @@ export function ArtistDetail() {
     : false
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen pb-24">
       {/* Artist hero */}
       <div className="relative h-64 overflow-hidden">
         {artist.data?.images[0]?.url && (

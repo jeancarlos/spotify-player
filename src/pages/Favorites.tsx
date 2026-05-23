@@ -44,7 +44,7 @@ export function Favorites() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-16 px-4 pb-24">
+    <div className="min-h-screen pt-16 px-4 pb-24">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 pt-6">

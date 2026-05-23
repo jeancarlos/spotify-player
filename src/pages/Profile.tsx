@@ -9,7 +9,7 @@ export function Profile() {
   if (!profile) return null
 
   return (
-    <div className="min-h-screen bg-white pt-16 px-6 pb-24">
+    <div className="min-h-screen pt-16 px-6 pb-24">
       <div className="max-w-lg mx-auto pt-8">
         <div className="glass-card p-8 flex flex-col items-center gap-4">
           {profile.images[0]?.url ? (

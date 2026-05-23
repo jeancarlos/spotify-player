@@ -39,7 +39,7 @@ export function Artists() {
   }, [query, tab])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} defaultTab={tab} className="shadow-sm" />

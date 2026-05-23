@@ -47,14 +47,7 @@ export function Home() {
   const albumArt = state.currentTrack?.album.images[0]?.url
 
   return (
-    <div className="h-screen bg-white overflow-hidden relative">
-      {/* Ambient blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="blob blob-1" />
-        <div className="blob blob-2" />
-        <div className="blob blob-3" />
-      </div>
-
+    <div className="h-screen overflow-hidden relative">
       {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
