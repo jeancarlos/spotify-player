@@ -46,6 +46,7 @@ export function Home() {
   const tracks = allTracks.slice(offset, offset + 5)
   const canPrev = offset > 0
   const canNext = offset + 5 < allTracks.length
+  const hasNav = allTracks.length > 5
 
   const handleSearch = useCallback((query: string, tab: SearchTab) => {
     if (query.trim()) navigate(`/artists?q=${encodeURIComponent(query)}&tab=${tab}`)
@@ -59,6 +60,28 @@ export function Home() {
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
+
+      {/* Mobile semi-circle nav buttons — fixed to screen edges */}
+      {hasNav && (
+        <>
+          <button
+            onClick={() => setOffset(o => Math.max(0, o - 1))}
+            disabled={!canPrev}
+            className="md:hidden fixed left-0 top-[58%] -translate-y-1/2 z-10 w-10 h-20 rounded-r-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pl-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
+            aria-label={t('artists.previous')}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => setOffset(o => o + 1)}
+            disabled={!canNext}
+            className="md:hidden fixed right-0 top-[58%] -translate-y-1/2 z-10 w-10 h-20 rounded-l-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pr-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
+            aria-label={t('artists.next')}
+          >
+            <ChevronRight size={18} />
+          </button>
+        </>
+      )}
 
       {/* Fixed vinyl + arc */}
       <div className="fixed inset-0 pointer-events-none z-[5]">
@@ -82,7 +105,28 @@ export function Home() {
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
         >
           {tracks.length > 0 && (
-            <div className="flex flex-col items-center gap-2">
+            <div className="relative">
+              {/* Desktop side buttons */}
+              {hasNav && (
+                <>
+                  <button
+                    onClick={() => setOffset(o => Math.max(0, o - 1))}
+                    disabled={!canPrev}
+                    className="hidden md:flex absolute top-1/2 -translate-y-1/2 -left-14 p-2.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
+                    aria-label={t('artists.previous')}
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    onClick={() => setOffset(o => o + 1)}
+                    disabled={!canNext}
+                    className="hidden md:flex absolute top-1/2 -translate-y-1/2 -right-14 p-2.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
+                    aria-label={t('artists.next')}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
               <ArcCarousel
                 items={tracks.map(track => ({
                   id: track.id,
@@ -100,24 +144,6 @@ export function Home() {
                 baseDelay={DISK_DONE_DELAY}
                 title={t('home.recentlyPlayed')}
               />
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setOffset(o => Math.max(0, o - 1))}
-                  disabled={!canPrev}
-                  className="p-1.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity"
-                  aria-label={t('artists.previous')}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  onClick={() => setOffset(o => o + 1)}
-                  disabled={!canNext}
-                  className="p-1.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity"
-                  aria-label={t('artists.next')}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
             </div>
           )}
         </div>
