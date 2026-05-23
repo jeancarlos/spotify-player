@@ -18,7 +18,9 @@ export function TrackRow({ track, index, isActive = false, onPlay }: TrackRowPro
         isActive && 'bg-black/8'
       )}
       onClick={() => onPlay?.(track)}
-      role="row"
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && onPlay?.(track)}
     >
       {index !== undefined && (
         <span className="w-6 text-xs text-black/30 text-right shrink-0 group-hover:hidden">
