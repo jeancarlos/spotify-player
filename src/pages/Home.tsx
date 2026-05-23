@@ -60,17 +60,23 @@ export function Home() {
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
 
-      {/* "Recently Played" label — floats above the arc */}
-      <div
-        className="fixed left-0 right-0 text-center pointer-events-none z-10"
-        style={{ bottom: arcBottom + arcRadius + 96 }}
-      >
-        <h2 className="text-sm font-bold text-black/50">{t('home.recentlyPlayed')}</h2>
-      </div>
-
       {/* Fixed vinyl + arc */}
       <div className="fixed inset-0 pointer-events-none z-[5]">
-        {/* Arc Carousel */}
+        {/* VinylDisk — rendered first so carousel SVG text paints above it */}
+        <div
+          className="absolute bottom-0 left-1/2"
+          style={{ transform: `translateX(-50%) translateY(${translateY}px)` }}
+        >
+          <motion.div
+            initial={{ scale: 0.7, y: 60, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
+          >
+            <VinylDisk size="xl" isPlaying={state.isPlaying} albumArt={albumArt} />
+          </motion.div>
+        </div>
+
+        {/* Arc Carousel — rendered after disk so it (and its SVG title) paints above */}
         <div
           className="absolute left-1/2 pointer-events-auto"
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
@@ -89,22 +95,9 @@ export function Home() {
               radius={arcRadius}
               arcDeg={90}
               baseDelay={DISK_DONE_DELAY}
+              title={t('home.recentlyPlayed')}
             />
           )}
-        </div>
-
-        {/* VinylDisk */}
-        <div
-          className="absolute bottom-0 left-1/2"
-          style={{ transform: `translateX(-50%) translateY(${translateY}px)` }}
-        >
-          <motion.div
-            initial={{ scale: 0.7, y: 60, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
-          >
-            <VinylDisk size="xl" isPlaying={state.isPlaying} albumArt={albumArt} />
-          </motion.div>
         </div>
       </div>
     </div>

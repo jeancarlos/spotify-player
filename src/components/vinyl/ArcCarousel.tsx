@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export interface ArcPosition {
@@ -35,6 +36,7 @@ interface ArcCarouselProps {
   arcDeg?: number
   offsetDeg?: number
   baseDelay?: number
+  title?: string
 }
 
 export function ArcCarousel({
@@ -43,8 +45,22 @@ export function ArcCarousel({
   arcDeg = 150,
   offsetDeg = 0,
   baseDelay = 0,
+  title,
 }: ArcCarouselProps) {
+  const uid = useId()
   const positions = calcArcPositions(items.length, radius, arcDeg, offsetDeg)
+
+  // Arc text path: circle origin at bottom-center of container
+  // tR sits above the card arc so the label floats over the items
+  const cx = radius
+  const cy = radius + 120
+  const tR = radius + 72
+  const halfRad = ((arcDeg / 2) * Math.PI) / 180
+  const x1 = cx - tR * Math.sin(halfRad)
+  const y1 = cy - tR * Math.cos(halfRad)
+  const x2 = cx + tR * Math.sin(halfRad)
+  const y2 = y1
+  const arcPath = `M ${x1} ${y1} A ${tR} ${tR} 0 0 1 ${x2} ${y2}`
 
   return (
     <div className="relative" style={{ width: radius * 2, height: radius + 120 }}>
@@ -78,6 +94,31 @@ export function ArcCarousel({
           })}
         </AnimatePresence>
       </div>
+
+      {title && (
+        <svg
+          className="absolute inset-0 pointer-events-none"
+          width={radius * 2}
+          height={radius + 120}
+          style={{ overflow: 'visible' }}
+          overflow="visible"
+        >
+          <defs>
+            <path id={`arc-${uid}`} d={arcPath} />
+          </defs>
+          <text
+            fontSize="11"
+            fill="rgba(0,0,0,0.4)"
+            fontWeight="600"
+            letterSpacing="1.5"
+            fontFamily="monospace"
+          >
+            <textPath href={`#arc-${uid}`} startOffset="50%" textAnchor="middle">
+              {title.toUpperCase()}
+            </textPath>
+          </text>
+        </svg>
+      )}
     </div>
   )
 }
