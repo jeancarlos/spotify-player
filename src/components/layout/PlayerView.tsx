@@ -8,6 +8,7 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useLyrics } from '@/hooks/queries/useLyrics'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { MiniPlayer } from '@/components/layout/MiniPlayer'
+import { PlayerSync } from '@/components/layout/PlayerSync'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
@@ -127,7 +128,7 @@ export function PlayerView() {
         </AnimatePresence>
       </div>
 
-      {/* MiniPlayer fixo ao fundo */}
+      <PlayerSync />
       <MiniPlayer />
     </div>
   )
