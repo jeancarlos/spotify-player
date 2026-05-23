@@ -4,38 +4,40 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
 import { extractPalette } from '@/lib/colorThief'
 
-/**
- * PlayerSync — mounts inside AppShell (authenticated zone).
- * Polls GET /me/player every 5 s and syncs remote state → PlayerContext.
- * Also triggers palette extraction whenever currentTrack changes.
- * Renders nothing.
- */
 export function PlayerSync() {
   const { state: authState } = useAuth()
   const { state, dispatch } = usePlayer()
   const { data } = useNowPlaying(authState.isAuthenticated)
-
-  // Track last synced track id to avoid redundant palette extractions
   const lastTrackIdRef = useRef<string | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  // Timer local: incrementa progress a cada 1s enquanto tocando
+  useEffect(() => {
+    if (state.isPlaying && state.duration > 0) {
+      timerRef.current = setInterval(() => {
+        dispatch({ type: 'TICK_PROGRESS' })
+      }, 1000)
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [state.isPlaying, state.duration, dispatch])
+
+  // Sincronizar com API Spotify (corrige drift)
   useEffect(() => {
     if (!data) return
 
     const remote = data.item
     const localId = state.currentTrack?.id
-    const remoteId = remote?.id
 
-    // Sync track
-    if (remote && remoteId !== localId) {
+    if (remote && remote.id !== localId) {
       dispatch({ type: 'SET_TRACK', payload: remote })
     }
 
-    // Sync play state
     if (data.is_playing !== state.isPlaying) {
       dispatch({ type: 'SET_PLAYING', payload: data.is_playing })
     }
 
-    // Sync progress (only if drift > 3 s to avoid jitter with local timer)
     if (data.progress_ms !== null) {
       const drift = Math.abs(data.progress_ms - state.progress)
       if (drift > 3000) {
@@ -43,18 +45,16 @@ export function PlayerSync() {
       }
     }
 
-    // Sync shuffle — SET_SHUFFLE is deterministic; avoids double-toggle from stale closure
     if (data.shuffle_state !== state.shuffle) {
       dispatch({ type: 'SET_SHUFFLE', payload: data.shuffle_state })
     }
 
-    // Sync repeat
     if (data.repeat_state !== state.repeat) {
       dispatch({ type: 'SET_REPEAT', payload: data.repeat_state })
     }
   }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Palette extraction: runs whenever currentTrack changes (centralized)
+  // Extração de paleta (mantida para compatibilidade)
   useEffect(() => {
     const track = state.currentTrack
     if (!track || track.id === lastTrackIdRef.current) return
