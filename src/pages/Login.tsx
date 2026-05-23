@@ -70,13 +70,7 @@ export function Login() {
       </motion.button>
 
       <div className="absolute z-0 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: loggingIn ? 0 : 1 }}
-          transition={{ delay: loggingIn ? 0 : 0.3, duration: 0.5, ease: 'easeOut' }}
-        >
-          <VinylDisk size="xl" isPlaying={false} />
-        </motion.div>
+        <VinylDisk size="xl" isPlaying={false} />
       </div>
     </div>
   )
