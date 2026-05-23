@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { LyricLine } from '@/types/lyrics'
+import type { LyricLine } from '@/types/lyrics'
 import { parseLRC, parsePlainLyrics } from '@/utils/lrcParser'
 
 export function cleanTitle(title: string): string {

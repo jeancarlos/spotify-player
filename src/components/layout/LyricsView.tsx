@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { LyricLine } from '@/types/lyrics'
+import type { LyricLine } from '@/types/lyrics'
 
 interface LyricsViewProps {
   lines: LyricLine[]
@@ -9,7 +9,7 @@ interface LyricsViewProps {
   onSeek?: (ms: number) => void
 }
 
-export function LyricsView({ lines, progress, duration, onSeek }: LyricsViewProps) {
+export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
   // findLastIndex ensures we get the most recent line that has already started
   const activeIndex = lines.reduce((acc, line, i) => {
     if (line.time <= progress) return i

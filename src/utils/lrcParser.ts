@@ -1,4 +1,4 @@
-import { LyricLine } from '@/types/lyrics'
+import type { LyricLine } from '@/types/lyrics'
 
 /**
  * Parses a string in LRC format into an array of LyricLine objects.
