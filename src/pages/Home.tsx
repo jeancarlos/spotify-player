@@ -14,8 +14,6 @@ import type { SpotifyTrack } from '@/types/spotify'
 
 const DISK_DONE_DELAY = 0.75
 
-// All layout values are proportional to the actual rendered disk size
-// so the carousel and translate stay visually aligned on every screen width.
 function useDiskLayout() {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
@@ -27,7 +25,6 @@ function useDiskLayout() {
   const diskPx = Math.min(720, vw)
   const translateY = Math.round(diskPx * 0.28)
   const arcRadius = Math.max(130, Math.round(diskPx * 0.36))
-  // Position carousel so its lowest items land just above the visible disk top
   const arcBottom = Math.max(80, diskPx - translateY - arcRadius - 20)
 
   return { translateY, arcRadius, arcBottom }
@@ -38,7 +35,7 @@ export function Home() {
   const navigate = useNavigate()
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
-  const recentlyPlayed = useRecentlyPlayed(4)
+  const recentlyPlayed = useRecentlyPlayed(5)
   const { translateY, arcRadius, arcBottom } = useDiskLayout()
 
   const tracks: SpotifyTrack[] = recentlyPlayed.data?.map(i => i.track) ?? []
@@ -50,7 +47,7 @@ export function Home() {
   const albumArt = state.currentTrack?.album.images[0]?.url
 
   return (
-    <div className="relative min-h-screen bg-white overflow-x-hidden">
+    <div className="h-screen bg-white overflow-hidden relative">
       {/* Ambient blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="blob blob-1" />
@@ -58,7 +55,20 @@ export function Home() {
         <div className="blob blob-3" />
       </div>
 
-      {/* Fixed vinyl + arc — pinned to viewport bottom */}
+      {/* SearchBar */}
+      <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
+        <SearchBar onSearch={handleSearch} className="shadow-sm" />
+      </div>
+
+      {/* "Recently Played" label — floats above the arc */}
+      <div
+        className="fixed left-0 right-0 text-center pointer-events-none z-10"
+        style={{ bottom: arcBottom + arcRadius + 96 }}
+      >
+        <h2 className="text-sm font-bold text-black/50">{t('home.recentlyPlayed')}</h2>
+      </div>
+
+      {/* Fixed vinyl + arc */}
       <div className="fixed inset-0 pointer-events-none z-[5]">
         {/* Arc Carousel */}
         <div
@@ -95,19 +105,6 @@ export function Home() {
           >
             <VinylDisk size="xl" isPlaying={state.isPlaying} albumArt={albumArt} />
           </motion.div>
-        </div>
-      </div>
-
-      {/* Scrollable content — sits above the vinyl layer */}
-      <div className="relative z-10">
-        {/* SearchBar */}
-        <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
-          <SearchBar onSearch={handleSearch} className="shadow-sm" />
-        </div>
-
-        {/* Title */}
-        <div className="pt-36 text-center px-4">
-          <h2 className="text-lg font-bold text-black/60">{t('home.recentlyPlayed')}</h2>
         </div>
       </div>
     </div>

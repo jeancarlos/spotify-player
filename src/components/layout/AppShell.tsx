@@ -12,7 +12,7 @@ export function AppShell() {
       <QueryErrorHandler />
       <HamburgerMenu />
       <LanguageSwitcher className="fixed top-4 right-4 z-40" />
-      <main className="min-h-screen bg-white pb-20">
+      <main className="min-h-screen bg-white">
         <Outlet />
         <MiniPlayer />
       </main>

@@ -25,7 +25,13 @@
     "noActiveDevice": "Nenhum dispositivo ativo",
     "lyrics": "Letra",
     "queue": "Fila de reprodução",
-    "closeQueue": "Fechar fila"
+    "closeQueue": "Fechar fila",
+    "shuffle": "Aleatório",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "repeat": "Repetir",
+    "play": "Reproduzir",
+    "pause": "Pausar"
   },
   "common": {
     "loading": "Carregando...",

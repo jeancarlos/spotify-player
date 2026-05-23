@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import {
   SkipBack, Play, Pause, SkipForward,
-  Shuffle, Repeat, Repeat1, ListMusic, Search,
+  Shuffle, Repeat, Repeat1, ListMusic, Home,
 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'
@@ -13,6 +13,14 @@ import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 import type { AxiosError } from 'axios'
 
+function Tip({ label }: { label: string }) {
+  return (
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 text-[10px] bg-black/80 text-white rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+      {label}
+    </span>
+  )
+}
+
 export function MiniPlayer() {
   const { state, dispatch } = usePlayer()
   const { currentTrack, isPlaying, shuffle, repeat } = state
@@ -21,7 +29,6 @@ export function MiniPlayer() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  // Oculto na rota /player
   if (location.pathname === '/player') return null
 
   const handlePlayPause = useCallback(async () => {
@@ -30,7 +37,7 @@ export function MiniPlayer() {
     try {
       await api.put(next ? '/me/player/play' : '/me/player/pause')
     } catch (err) {
-      dispatch({ type: 'SET_PLAYING', payload: isPlaying }) // revert
+      dispatch({ type: 'SET_PLAYING', payload: isPlaying })
       const status = (err as AxiosError).response?.status
       if (status === 404 || status === 403) toast(t('player.noActiveDevice'), 'info')
     }
@@ -57,19 +64,22 @@ export function MiniPlayer() {
   }, [dispatch, repeat])
 
   return (
-    <div className="fixed max-w-[800px] mx-auto bottom-2 left-2 right-2 z-30 glass border-t border-white/40 px-4 py-3 flex items-center gap-3">
-      {/* Busca */}
-      <button
-        onClick={() => navigate('/artists')}
-        className="p-2 rounded-xl hover:bg-black/5 transition-colors shrink-0"
-        aria-label="Buscar artistas"
-      >
-        <Search size={18} className="text-black/40" />
-      </button>
+    <div className="fixed rounded-full max-w-[600px] mx-auto bottom-2 left-2 right-2 z-30 glass border-t border-white/40 px-4 py-3 flex items-center gap-3">
+      {/* Home */}
+      <div className="relative group shrink-0">
+        <button
+          onClick={() => navigate('/')}
+          className="p-2 rounded-xl hover:bg-black/5 transition-colors"
+          aria-label={t('nav.home')}
+        >
+          <Home size={18} className="text-black/40" />
+        </button>
+        <Tip label={t('nav.home')} />
+      </div>
 
       {/* Track info + waveform */}
       <div
-        className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer group"
+        className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer group/track"
         onClick={() => currentTrack && navigate('/player')}
       >
         {currentTrack ? (
@@ -80,7 +90,7 @@ export function MiniPlayer() {
               isPlaying={isPlaying}
             />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-black truncate group-hover:underline">
+              <p className="text-xs font-bold text-black truncate group-hover/track:underline">
                 {currentTrack.name}
               </p>
               <p className="text-[11px] text-black/50 truncate">
@@ -94,47 +104,86 @@ export function MiniPlayer() {
         )}
       </div>
 
-      {/* Controles — só visíveis com device ativo */}
-      {currentTrack && <div className="flex items-center gap-2 shrink-0">
-        <button
-          onClick={toggleShuffle}
-          className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}
-        >
-          <Shuffle size={15} />
-        </button>
-        <button onClick={handlePrev} className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors">
-          <SkipBack size={18} className="fill-current" />
-        </button>
-        <div className="relative group/play">
-          <button
-            onClick={handlePlayPause}
-            className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
-          >
-            {isPlaying
-              ? <Pause size={14} className="fill-white text-white" />
-              : <Play size={14} className="fill-white text-white ml-0.5" />}
-          </button>
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug">
-            {t('login.hint')}
+      {/* Controles */}
+      {currentTrack && (
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Shuffle — oculto em telas pequenas */}
+          <div className="relative group hidden sm:block">
+            <button
+              onClick={toggleShuffle}
+              aria-label={t('player.shuffle')}
+              className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}
+            >
+              <Shuffle size={15} />
+            </button>
+            <Tip label={t('player.shuffle')} />
+          </div>
+
+          {/* Anterior */}
+          <div className="relative group">
+            <button
+              onClick={handlePrev}
+              aria-label={t('player.previous')}
+              className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
+            >
+              <SkipBack size={18} className="fill-current" />
+            </button>
+            <Tip label={t('player.previous')} />
+          </div>
+
+          {/* Play / Pause */}
+          <div className="relative group/play">
+            <button
+              onClick={handlePlayPause}
+              aria-label={isPlaying ? t('player.pause') : t('player.play')}
+              className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              {isPlaying
+                ? <Pause size={14} className="fill-white text-white" />
+                : <Play size={14} className="fill-white text-white ml-0.5" />}
+            </button>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
+              {t('login.hint')}
+            </div>
+          </div>
+
+          {/* Próximo */}
+          <div className="relative group">
+            <button
+              onClick={handleNext}
+              aria-label={t('player.next')}
+              className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
+            >
+              <SkipForward size={18} className="fill-current" />
+            </button>
+            <Tip label={t('player.next')} />
+          </div>
+
+          {/* Repetir — oculto em telas pequenas */}
+          <div className="relative group hidden sm:block">
+            <button
+              onClick={cycleRepeat}
+              aria-label={t('player.repeat')}
+              className={cn('p-1.5 rounded-lg transition-colors', repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60')}
+            >
+              {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
+            </button>
+            <Tip label={t('player.repeat')} />
+          </div>
+
+          {/* Fila — oculto em telas pequenas */}
+          <div className="relative group hidden sm:block">
+            <button
+              onClick={() => navigate('/player')}
+              aria-label={t('player.queue')}
+              className="p-1.5 rounded-lg text-black/30 hover:text-black transition-colors"
+            >
+              <ListMusic size={15} />
+            </button>
+            <Tip label={t('player.queue')} />
           </div>
         </div>
-        <button onClick={handleNext} className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors">
-          <SkipForward size={18} className="fill-current" />
-        </button>
-        <button
-          onClick={cycleRepeat}
-          className={cn('p-1.5 rounded-lg transition-colors', repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60')}
-        >
-          {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
-        </button>
-        <button
-          onClick={() => navigate('/player')}
-          className="p-1.5 rounded-lg text-black/30 hover:text-black transition-colors"
-          aria-label={t('player.queue')}
-        >
-          <ListMusic size={15} />
-        </button>
-      </div>}
+      )}
     </div>
   )
 }
