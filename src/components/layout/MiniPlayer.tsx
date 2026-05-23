@@ -8,6 +8,7 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
 import { WaveformBars } from '@/components/shared/WaveformBars'
+import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 import type { AxiosError } from 'axios'
@@ -73,10 +74,10 @@ export function MiniPlayer() {
       >
         {currentTrack ? (
           <>
-            <img
-              src={currentTrack.album.images[0]?.url}
-              alt={currentTrack.album.name}
-              className="w-9 h-9 rounded-lg object-cover shrink-0"
+            <VinylDisk
+              size="xs"
+              albumArt={currentTrack.album.images[0]?.url}
+              isPlaying={isPlaying}
             />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-black truncate group-hover:underline">

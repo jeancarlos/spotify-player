@@ -2,13 +2,13 @@ import { motion } from 'framer-motion'
 import vinylWebp from '@/assets/vinyl.webp'
 
 interface VinylDiskProps {
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
   albumArt?: string
   isPlaying?: boolean
   className?: string
 }
 
-const SIZE_MAP = { sm: 180, md: 360, lg: 560 } as const
+const SIZE_MAP = { xs: 44, sm: 180, md: 360, lg: 560 } as const
 
 export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className }: VinylDiskProps) {
   const px = SIZE_MAP[size]
