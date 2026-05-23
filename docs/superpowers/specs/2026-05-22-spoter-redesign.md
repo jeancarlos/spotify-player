@@ -274,7 +274,37 @@ Não usar `vinil.jpg` (original 478KB, resolução excessiva para web).
 
 ---
 
-## 12. O que NÃO está no escopo
+## 12. Bugs conhecidos do player (a corrigir antes do redesign visual)
+
+### Bug 1 — Progress bar congelada (crítico)
+`PlayerSync` só poleia a cada 5s. Entre polls, `progress` não avança.
+**Fix:** adicionar `setInterval(1000)` em `PlayerSync` que dispara `SET_PROGRESS` incrementando +1000ms quando `isPlaying === true` e `progress < duration`. Cancela o interval ao fazer cleanup ou ao receber poll com novo valor.
+
+### Bug 2 — `PUT /me/player/play` sem device ativo
+Quando não há dispositivo ativo, a API retorna 404 e a chamada falha silenciosamente. O estado local togglea (isPlaying = true) mas o Spotify não reproduz nada. No próximo poll (5s), `PlayerSync` sincroniza `is_playing: false` do remote, revertendo — causando flip visual.
+**Fix:** no catch do `handlePlayPause`, se status === 404 ou 403, dispatch `SET_PLAYING` de volta para o estado anterior + mostrar toast "Nenhum dispositivo ativo".
+
+### Bug 3 — `SET_TRACK` via card não inicia playback no Spotify
+Clicar num TrackCard dispara `SET_TRACK` e `SET_PLAYING: true` no contexto local, mas nunca chama `PUT /me/player/play` com o `uris` da faixa. O player local fica em estado "tocando" sem o Spotify realmente tocar.
+**Fix:** ao SET_TRACK via card, chamar `PUT /me/player/play` com body `{ uris: [track.uri] }`. Fallback: se 404 (sem device), mostrar toast.
+
+### MiniPlayer — redesign visual (wireframe)
+
+Layout esperado (barra única frosted glass, branco):
+```
+[ 🔍 ] [ capa ] [ nome — artista  ~~~waveform~~~ ] [ ◄ ▶ ► ⟳ ✕ ♥ ▤ ]
+```
+
+- `.glass` como background
+- Ícone 🔍 à esquerda navega para `/artists`
+- Waveform: 5-7 barras SVG animadas (framer-motion) quando `isPlaying`
+- Controles: prev, play/pause, next, shuffle, repeat, ♥ (add to Spoter List), queue
+- Clicar no título/capa navega para `/player`
+- Sem slider de volume inline (mantém limpo)
+
+---
+
+## 14. O que NÃO está no escopo
 
 - Testes E2E (playwright) — já existe plano separado `2026-05-22-e2e-tests.md`
 - Dark mode — fundo branco fixo
