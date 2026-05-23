@@ -85,7 +85,7 @@ export function TrackInfoPanel({ track }: Props) {
         {/* Track metadata */}
         <div className="text-center space-y-1">
           <div className="flex items-center justify-center gap-2">
-            <h2 className="text-xl font-bold text-white tracking-tight">{track.name}</h2>
+            <h2 className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>{track.name}</h2>
             {track.explicit && (
               <span className="text-[9px] font-black text-black bg-white/80 rounded px-1 py-0.5 shrink-0">E</span>
             )}

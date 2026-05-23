@@ -12,8 +12,10 @@ import { ListTableSwitch, type ViewMode } from '@/components/shared/ListTableSwi
 import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackTable } from '@/components/shared/TrackTable'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
+import { TrackPopularityChart } from '@/components/shared/TrackPopularityChart'
 import { Pagination } from '@/components/shared/Pagination'
 import { averageAudioFeatures } from '@/utils/audioFeatures'
+import { useTracks } from '@/hooks/queries/useTracks'
 import { formatDate } from '@/utils/formatDate'
 import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
@@ -35,6 +37,7 @@ export function AlbumDetail() {
 
   const trackIds = (tracks.data?.items ?? []).map(t => t.id)
   const audioFeatures = useAudioFeatures(trackIds)
+  const fullTracks = useTracks(trackIds)
 
   const avgFeatures = audioFeatures.data && audioFeatures.data.length > 0
     ? averageAudioFeatures(audioFeatures.data)
@@ -135,6 +138,19 @@ export function AlbumDetail() {
             />
           )}
         </div>
+
+        {/* Popularity chart */}
+        {fullTracks.data && fullTracks.data.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-base font-bold text-black/80 mb-4">
+              {t('albumDetail.popularity', 'Popularidade das faixas')}
+            </h2>
+            <TrackPopularityChart
+              tracks={fullTracks.data}
+              activeTrackId={playerState?.currentTrack?.id}
+            />
+          </div>
+        )}
 
         {/* Musical profile section */}
         {avgFeatures && (
