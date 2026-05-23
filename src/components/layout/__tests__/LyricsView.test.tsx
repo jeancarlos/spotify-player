@@ -1,44 +1,48 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { LyricsView } from '../LyricsView'
 import type { LyricLine } from '@/types/lyrics'
 
-beforeEach(() => {
-  // jsdom não implementa scrollIntoView — mock necessário
-  Element.prototype.scrollIntoView = vi.fn()
-})
+const manyLines: LyricLine[] = Array.from({ length: 20 }, (_, i) => ({
+  time: i * 5000,
+  text: `Linha ${i}`,
+}))
+
+const fewLines: LyricLine[] = [
+  { time: 0, text: 'Primeira' },
+  { time: 10000, text: 'Segunda' },
+  { time: 20000, text: 'Terceira' },
+]
 
 describe('LyricsView', () => {
-  const lines: LyricLine[] = [
-    { time: 0, text: 'Primeira linha' },
-    { time: 10000, text: 'Segunda linha' },
-    { time: 20000, text: 'Terceira linha' }
-  ]
-
-  it('renderiza todas as linhas fornecidas', () => {
-    render(<LyricsView lines={lines} progress={0} duration={30000} />)
-    expect(screen.getByText('Primeira linha')).toBeInTheDocument()
-    expect(screen.getByText('Segunda linha')).toBeInTheDocument()
-    expect(screen.getByText('Terceira linha')).toBeInTheDocument()
+  it('shows empty state message when lines is empty', () => {
+    render(<LyricsView lines={[]} progress={0} />)
+    expect(screen.getByText('Sem letra disponível')).toBeInTheDocument()
   })
 
-  it('a primeira linha é ativa quando progress=0', () => {
-    render(<LyricsView lines={lines} progress={0} duration={30000} />)
-    expect(screen.getByText('Primeira linha')).toHaveClass('font-bold')
+  it('active slot (slot 4) always has font-bold', () => {
+    render(<LyricsView lines={manyLines} progress={0} />)
+    expect(screen.getByText('Linha 0')).toHaveClass('font-bold')
   })
 
-  it('destaca a linha correta com font-bold com base no progresso', () => {
-    render(<LyricsView lines={lines} progress={10000} duration={30000} />)
-    expect(screen.getByText('Segunda linha')).toHaveClass('font-bold')
+  it('highlights the correct line based on progress', () => {
+    // progress=25000ms → activeIndex=5 (time: 5*5000=25000)
+    render(<LyricsView lines={manyLines} progress={25000} />)
+    expect(screen.getByText('Linha 5')).toHaveClass('font-bold')
   })
 
-  it('a última linha é ativa ao fim da música', () => {
-    render(<LyricsView lines={lines} progress={30000} duration={30000} />)
-    expect(screen.getByText('Terceira linha')).toHaveClass('font-bold')
+  it('does not render lines outside the 9-slot window', () => {
+    // activeIndex=10 → window shows lines 6-14; line 0 not in DOM
+    render(<LyricsView lines={manyLines} progress={50000} />)
+    expect(screen.getByText('Linha 10')).toBeInTheDocument()
+    expect(screen.queryByText('Linha 0')).not.toBeInTheDocument()
   })
 
-  it('renderiza container mesmo com array vazio', () => {
-    const { container } = render(<LyricsView lines={[]} progress={0} duration={30000} />)
-    expect(container.firstChild).toBeInTheDocument()
+  it('renders ghost slots when near the start', () => {
+    // activeIndex=0 → slots 0-3 are ghost; lines 0-4 are in slots 4-8
+    render(<LyricsView lines={fewLines} progress={0} />)
+    expect(screen.getByText('Primeira')).toBeInTheDocument()
+    // line beyond window should not appear
+    expect(screen.queryByText('Linha 5')).not.toBeInTheDocument()
   })
 })

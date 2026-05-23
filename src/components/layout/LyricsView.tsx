@@ -1,52 +1,17 @@
-import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import type { LyricLine } from '@/types/lyrics'
+
+const WINDOW = 4
+const SLOT_OPACITY = [0.05, 0.10, 0.18, 0.35, 1.00, 0.35, 0.18, 0.10, 0.05]
+const SLOT_BLUR    = [4, 3, 2, 1, 0, 1, 2, 3, 4]
 
 interface LyricsViewProps {
   lines: LyricLine[]
   progress: number
-  duration: number
   onSeek?: (ms: number) => void
 }
 
 export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
-  const foundIndex = lines.findLastIndex(line => line.time <= progress)
-  const activeIndex = foundIndex === -1 ? 0 : foundIndex
-  const containerRef = useRef<HTMLDivElement>(null)
-  const isFirstRef = useRef(true)
-
-  useEffect(() => {
-    isFirstRef.current = true
-  }, [lines])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const active = container.querySelector<HTMLElement>('[data-active="true"]')
-    if (!active) {
-      container.scrollTo({ top: 0, behavior: 'smooth' })
-      return
-    }
-
-    // getBoundingClientRect é viewport-relativo, sempre correto independente do offsetParent
-    const containerRect = container.getBoundingClientRect()
-    const activeRect = active.getBoundingClientRect()
-    const targetScrollTop =
-      container.scrollTop +
-      activeRect.top -
-      containerRect.top -
-      container.clientHeight / 2 +
-      active.clientHeight / 2
-
-    if (isFirstRef.current) {
-      container.scrollTop = targetScrollTop
-      isFirstRef.current = false
-    } else {
-      container.scrollTo({ top: targetScrollTop, behavior: 'smooth' })
-    }
-  }, [activeIndex])
-
   if (lines.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -55,38 +20,39 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
     )
   }
 
-  return (
-    <div ref={containerRef} className="h-full overflow-y-auto no-scrollbar">
-      <div
-        className="flex flex-col items-center gap-8"
-        style={{ paddingTop: '50vh', paddingBottom: '50vh' }}
-      >
-        {lines.map((line, i) => {
-          const isActive = i === activeIndex
-          const dist = Math.abs(i - activeIndex)
+  const foundIndex = lines.findLastIndex(line => line.time <= progress)
+  const activeIndex = Math.max(0, foundIndex)
 
-          return (
-            <motion.div
-              key={`${i}-${line.time}`}
-              data-active={isActive ? 'true' : undefined}
-              animate={{
-                opacity: isActive ? 1 : Math.max(0.1, 1 - dist * 0.25),
-                scale: isActive ? 1.05 : 1,
-                filter: isActive ? 'blur(0px)' : `blur(${Math.min(dist * 0.5, 2)}px)`,
-              }}
-              transition={{ duration: 0.4 }}
-              onClick={() => onSeek?.(line.time)}
-              className={`w-full max-w-lg px-8 font-sans text-center leading-tight select-none ${
-                isActive
-                  ? 'text-white font-bold text-2xl md:text-3xl'
-                  : 'text-white/40 text-lg md:text-xl font-medium'
-              } ${onSeek ? 'cursor-pointer hover:text-white/60' : ''}`}
-            >
-              {line.text}
-            </motion.div>
-          )
-        })}
-      </div>
+  const slots = Array.from({ length: WINDOW * 2 + 1 }, (_, i) => {
+    const lineIdx = activeIndex - WINDOW + i
+    if (lineIdx < 0 || lineIdx >= lines.length) return null
+    return lines[lineIdx]
+  })
+
+  return (
+    <div className="h-full flex flex-col justify-center gap-6 px-8">
+      {slots.map((line, i) => {
+        const isActive = i === WINDOW
+
+        return (
+          <motion.div
+            key={i}
+            animate={{
+              opacity: SLOT_OPACITY[i],
+              filter: `blur(${SLOT_BLUR[i]}px)`,
+            }}
+            transition={{ duration: 0.3 }}
+            onClick={line && onSeek ? () => onSeek(line.time) : undefined}
+            className={`text-center leading-tight select-none line-clamp-2 ${
+              isActive
+                ? 'text-white font-bold text-2xl md:text-3xl'
+                : 'text-white text-lg md:text-xl'
+            } ${line && onSeek ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+          >
+            {line?.text ?? ''}
+          </motion.div>
+        )
+      })}
     </div>
   )
 }
