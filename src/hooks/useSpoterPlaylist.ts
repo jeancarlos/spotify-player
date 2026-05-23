@@ -122,7 +122,7 @@ export function useSpoterPlaylist() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playlists.isSuccess, playlistId, userId, displayName, playlistName, playlists.data, updatePlaylist, uploadCover])
 
-  const tracksQuery = usePlaylistTracks(playlistId, !!playlistId)
+  const tracksQuery = usePlaylistTracks(playlistId, !!playlistId, 1, 50)
 
   useEffect(() => {
     if (tracksQuery.isError && (tracksQuery.error as AxiosError).response?.status === 404) {
