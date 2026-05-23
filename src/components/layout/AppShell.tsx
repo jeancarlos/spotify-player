@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { HamburgerMenu } from './HamburgerMenu'
 import { MiniPlayer } from './MiniPlayer'
 import { PlayerSync } from './PlayerSync'
+import { LyricsPreloader } from './LyricsPreloader'
 import { QueryErrorHandler } from './QueryErrorHandler'
 import { ReloadPrompt } from './ReloadPrompt'
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher'
@@ -10,6 +11,7 @@ export function AppShell() {
   return (
     <>
       <PlayerSync />
+      <LyricsPreloader />
       <QueryErrorHandler />
       <ReloadPrompt />
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
