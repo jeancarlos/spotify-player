@@ -57,7 +57,7 @@ export function MiniPlayer() {
   }, [dispatch, repeat])
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-white/40 px-4 py-3 flex items-center gap-3">
+    <div className="fixed max-w-[800px] mx-auto bottom-2 left-2 right-2 z-30 glass border-t border-white/40 px-4 py-3 flex items-center gap-3">
       {/* Busca */}
       <button
         onClick={() => navigate('/artists')}
@@ -94,8 +94,8 @@ export function MiniPlayer() {
         )}
       </div>
 
-      {/* Controles */}
-      <div className="flex items-center gap-2 shrink-0">
+      {/* Controles — só visíveis com device ativo */}
+      {currentTrack && <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={toggleShuffle}
           className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}
@@ -134,7 +134,7 @@ export function MiniPlayer() {
         >
           <ListMusic size={15} />
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

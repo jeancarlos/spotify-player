@@ -1,5 +1,12 @@
 {
-  "nav": { "home": "Início", "artists": "Artistas", "profile": "Perfil", "favorites": "Favoritos", "collapse": "Recolher", "logout": "Sair" },
+  "nav": {
+    "home": "Início",
+    "artists": "Artistas",
+    "profile": "Perfil",
+    "favorites": "Favoritos",
+    "collapse": "Recolher",
+    "logout": "Sair"
+  },
   "home": {
     "recentlyPlayed": "Tocadas Recentemente",
     "newReleases": "Novos Lançamentos",
@@ -10,10 +17,21 @@
     "title": "Spoter",
     "subtitle": "Sua experiência musical imersiva",
     "button": "Entrar com Spotify",
-    "hint": "Abra o Spotify no celular e mantenha aberto enquanto usa o Spoter"
+    "hint": "Essa é uma experiencia interativa, abra o Spotify no celular, de play e mantenha aberto enquanto usa o Spoter"
   },
-  "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada", "noActiveDevice": "Nenhum dispositivo ativo", "lyrics": "Letra", "queue": "Fila de reprodução", "closeQueue": "Fechar fila" },
-  "common": { "loading": "Carregando...", "error": "Algo deu errado", "retry": "Tentar novamente" },
+  "player": {
+    "nowPlaying": "Tocando agora",
+    "noTrack": "Nenhuma música selecionada",
+    "noActiveDevice": "Nenhum dispositivo ativo",
+    "lyrics": "Letra",
+    "queue": "Fila de reprodução",
+    "closeQueue": "Fechar fila"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Algo deu errado",
+    "retry": "Tentar novamente"
+  },
   "artists": {
     "searchPlaceholder": "Buscar artistas...",
     "searchAlbums": "Buscar álbuns",

@@ -15,6 +15,10 @@ export function Login() {
     if (state.isAuthenticated) navigate('/')
   }, [state.isAuthenticated, navigate])
 
+  useEffect(() => {
+    controls.start({ opacity: 1, transition: { delay: 0.3, duration: 0.6, ease: 'easeOut' } })
+  }, [controls])
+
   const handleLogin = async () => {
     await controls.start({
       y: '-110vh',
@@ -53,15 +57,11 @@ export function Login() {
         {t('login.button')}
       </motion.button>
 
-      <motion.div
-        animate={controls}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.6, ease: 'easeOut' }}
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
-      >
-        <VinylDisk size="lg" isPlaying={false} />
-      </motion.div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+        <motion.div animate={controls} initial={{ opacity: 0 }}>
+          <VinylDisk size="lg" isPlaying={false} />
+        </motion.div>
+      </div>
     </div>
   )
 }

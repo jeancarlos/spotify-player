@@ -10,7 +10,7 @@
     "title": "Spoter",
     "subtitle": "Your immersive music experience",
     "button": "Sign in with Spotify",
-    "hint": "Open Spotify on your phone and keep it open while using Spoter"
+    "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
   },
   "player": { "nowPlaying": "Now playing", "noTrack": "No track selected", "noActiveDevice": "No active device", "lyrics": "Lyrics", "queue": "Play queue", "closeQueue": "Close queue" },
   "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Try again" },

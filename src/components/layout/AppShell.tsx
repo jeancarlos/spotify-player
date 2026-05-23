@@ -12,8 +12,8 @@ export function AppShell() {
       <HamburgerMenu />
       <main className="min-h-screen bg-white pb-20">
         <Outlet />
+        <MiniPlayer />
       </main>
-      <MiniPlayer />
     </>
   )
 }
