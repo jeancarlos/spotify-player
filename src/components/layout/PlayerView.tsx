@@ -23,7 +23,7 @@ export function PlayerView() {
 
   const artistName = currentTrack?.artists[0]?.name ?? ''
   const trackName = currentTrack?.name ?? ''
-  const lyrics = useLyrics(artistName, trackName, panel === 'lyrics')
+  const lyrics = useLyrics(artistName, trackName)
 
   const handlePlayPause = useCallback(async () => {
     const next = !isPlaying
@@ -150,9 +150,9 @@ export function PlayerView() {
                   {panel === 'lyrics' && (
                     lyrics.isPending ? (
                       <p className="text-white/30 text-sm p-4">{t('lyrics.searching')}</p>
-                    ) : lyrics.data ? (
+                    ) : lyrics.data && lyrics.data.length > 0 ? (
                       <pre className="font-sans text-sm text-white/80 leading-relaxed whitespace-pre-wrap p-2">
-                        {lyrics.data}
+                        {lyrics.data.join('\n')}
                       </pre>
                     ) : (
                       <p className="text-white/30 text-sm p-4">{t('lyrics.notFound')}</p>
