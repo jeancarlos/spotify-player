@@ -20,6 +20,7 @@ const SCOPES = [
   'user-library-read', 'user-follow-read',
   'user-read-playback-state', 'user-modify-playback-state',
   'streaming', 'playlist-read-private',
+  'playlist-modify-private', 'playlist-modify-public',
 ].join(' ')
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
