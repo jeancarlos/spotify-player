@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import type { AxiosError } from 'axios'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserPlaylists } from '@/hooks/queries/useUserPlaylists'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
@@ -43,6 +44,16 @@ export function useSpoterPlaylist() {
     }
   }, [playlists.data, playlistId, userId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ID salvo pode estar desatualizado (playlist deletada no Spotify)
+  useEffect(() => {
+    if (!tracks.isError || !playlistId) return
+    const status = (tracks.error as AxiosError).response?.status
+    if (status === 404) {
+      setPlaylistId('')
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  }, [tracks.isError, tracks.error, playlistId])
+
   const addTrack = (uri: string) => {
     if (playlistId) addMutation.mutate({ playlistId, uris: [uri] })
   }
@@ -56,6 +67,6 @@ export function useSpoterPlaylist() {
     tracks: tracks.data?.items.map(i => i.track) ?? [],
     addTrack,
     removeTrack,
-    isLoading: !playlistId || !tracks.data,
+    isLoading: !playlistId || tracks.isLoading,
   }
 }
