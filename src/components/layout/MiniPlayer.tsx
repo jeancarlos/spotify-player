@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next'
 import { WaveformBars } from '@/components/shared/WaveformBars'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { cn } from '@/lib/utils'
-import { formatDuration } from '@/utils/formatDuration'
 import api from '@/lib/axios'
 import type { AxiosError } from 'axios'
 
@@ -25,7 +24,7 @@ function Tip({ label }: { label: string }) {
 
 export function MiniPlayer() {
   const { state, dispatch } = usePlayer()
-  const { currentTrack, isPlaying, shuffle, repeat, progress, duration } = state
+  const { currentTrack, isPlaying, shuffle, repeat } = state
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
@@ -52,13 +51,7 @@ export function MiniPlayer() {
     try { await api.post('/me/player/next') } catch { /* silent */ }
   }, [dispatch])
 
-  const handleSeek = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const ms = Number(e.target.value)
-    dispatch({ type: 'SET_PROGRESS', payload: ms })
-    try { await api.put('/me/player/seek', null, { params: { position_ms: ms } }) } catch { /* silent */ }
-  }, [dispatch])
-
-  const toggleShuffle = useCallback(async () => {
+const toggleShuffle = useCallback(async () => {
     dispatch({ type: 'TOGGLE_SHUFFLE' })
     try { await api.put('/me/player/shuffle', null, { params: { state: !shuffle } }) } catch { /* silent */ }
   }, [dispatch, shuffle])
@@ -74,29 +67,6 @@ export function MiniPlayer() {
   return (
     <div className="fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto">
       <div className="glass rounded-3xl overflow-hidden shadow-xl">
-        {/* Seek bar */}
-        {currentTrack && (
-          <div className="px-4 pt-3 pb-1 flex items-center gap-2">
-            <span className="text-[10px] text-black/50 w-7 text-right font-mono shrink-0 tabular-nums">
-              {formatDuration(progress)}
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={duration || 1}
-              value={progress}
-              onChange={handleSeek}
-              aria-label={t('player.seek')}
-              className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
-              style={{
-                background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, rgba(0,0,0,0.12) ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
-              }}
-            />
-            <span className="text-[10px] text-black/50 w-7 font-mono shrink-0 tabular-nums">
-              {formatDuration(duration)}
-            </span>
-          </div>
-        )}
 
         {/* Controles */}
         <div className="px-4 py-3 flex items-center gap-3">
