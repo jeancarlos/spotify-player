@@ -46,4 +46,16 @@ describe('Página Home', () => {
     renderHome()
     expect(await screen.findByText('Mock Track 1')).toBeInTheDocument()
   })
+
+  it('não renderiza botão de navegação "Anterior"', async () => {
+    renderHome()
+    await screen.findByText('Mock Track 1')
+    expect(screen.queryByRole('button', { name: /anterior/i })).not.toBeInTheDocument()
+  })
+
+  it('não renderiza botão de navegação "Próximo"', async () => {
+    renderHome()
+    await screen.findByText('Mock Track 1')
+    expect(screen.queryByRole('button', { name: /próximo/i })).not.toBeInTheDocument()
+  })
 })
