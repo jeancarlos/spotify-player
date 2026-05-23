@@ -211,7 +211,10 @@ src/assets/vinyl.webp   800×800px, 28KB, disco preto com label rosa
   - Fallback: localStorage `spoter_playlist` se API falhar
 - Lista vertical de tracks da playlist
 - Botão ♥/🗑 em cada track para remover
-- Formulário "Adicionar manualmente" (React Hook Form + Zod): título, artista, URI opcional → salva no localStorage (satisfaz requisito da disciplina)
+- Formulário "Adicionar música" (React Hook Form + Zod): campos título + artista → dispara `GET /search?type=track` ao submeter
+  - Resultados encontrados: exibe lista para o usuário selecionar → adiciona à Spoter List
+  - Nenhum resultado: erro visual inline ("Nenhuma música encontrada no Spotify")
+  - Fallback offline: se API indisponível, salva no localStorage com dados do form
 - HamburgerMenu, MiniPlayer
 
 ### PlayerView (`/player`)
