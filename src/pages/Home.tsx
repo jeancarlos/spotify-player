@@ -17,8 +17,9 @@ const DISK_DONE_DELAY = 0.75
 
 function useDiskLayout() {
   const [vw, setVw] = useState(() => window.innerWidth)
+  const [vh, setVh] = useState(() => window.innerHeight)
   useEffect(() => {
-    const fn = () => setVw(window.innerWidth)
+    const fn = () => { setVw(window.innerWidth); setVh(window.innerHeight) }
     window.addEventListener('resize', fn)
     return () => window.removeEventListener('resize', fn)
   }, [])
@@ -29,7 +30,12 @@ function useDiskLayout() {
   const arcBottom = Math.max(80, diskPx - translateY - arcRadius - 20)
   const arcDeg = vw < 768 ? 130 : 90
 
-  return { translateY, arcRadius, arcBottom, arcDeg }
+  // Espaço disponível entre searchbar (~110px) e o início do carousel
+  const carouselTop = vh - arcBottom - (arcRadius + 70)
+  const hintSpace = carouselTop - 120  // 120px = searchbar bottom estimado
+  const showHint = hintSpace >= 80     // só exibe se sobrar ao menos 80px
+
+  return { translateY, arcRadius, arcBottom, arcDeg, showHint, hintTop: 120 + hintSpace / 2 }
 }
 
 export function Home() {
@@ -38,7 +44,7 @@ export function Home() {
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
-  const { translateY, arcRadius, arcBottom, arcDeg } = useDiskLayout()
+  const { translateY, arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
   const [offset, setOffset] = useState(0)
 
   const allTracks: SpotifyTrack[] = recentlyPlayed.data
@@ -62,17 +68,20 @@ export function Home() {
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
 
-      {/* Hint text — abaixo da searchbar, visível quando há espaço */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.9, duration: 0.7 }}
-        className="fixed top-28 left-0 right-0 z-[4] flex justify-center px-8 pointer-events-none"
-      >
-        <p className="text-center text-[11px] text-black/30 leading-relaxed max-w-xs">
-          {t('login.hint')}
-        </p>
-      </motion.div>
+      {/* Hint text — centralizado no espaço entre searchbar e carousel */}
+      {showHint && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.7 }}
+          className="fixed left-0 right-0 z-[4] flex justify-center px-8 pointer-events-none"
+          style={{ top: hintTop }}
+        >
+          <p className="text-center text-[11px] text-black/30 leading-relaxed max-w-xs -translate-y-1/2">
+            {t('login.hint')}
+          </p>
+        </motion.div>
+      )}
 
       {/* Mobile semi-circle nav buttons — fixed to screen edges */}
       {hasNav && (
