@@ -1,9 +1,13 @@
 import type { AudioFeatures } from '@/types/spotify'
 
+type NumericAudioFeatureKey =
+  | 'danceability' | 'energy' | 'valence' | 'acousticness'
+  | 'speechiness' | 'instrumentalness' | 'liveness' | 'loudness' | 'tempo'
+
 export function averageAudioFeatures(features: AudioFeatures[]): AudioFeatures | null {
   if (features.length === 0) return null
   const n = features.length
-  const avg = (key: keyof AudioFeatures): number =>
+  const avg = (key: NumericAudioFeatureKey): number =>
     features.reduce((sum, f) => sum + (f[key] as number), 0) / n
   return {
     ...features[0],
