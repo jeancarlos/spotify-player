@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Home", "artists": "Artists", "profile": "Profile", "favorites": "Favorites", "collapse": "Collapse" },
+  "nav": { "home": "Home", "artists": "Artists", "profile": "Profile", "favorites": "Favorites", "collapse": "Collapse", "logout": "Sign out" },
   "home": {
     "recentlyPlayed": "Recently Played",
     "newReleases": "New Releases",

@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Início", "artists": "Artistas", "profile": "Perfil", "favorites": "Favoritos", "collapse": "Recolher" },
+  "nav": { "home": "Início", "artists": "Artistas", "profile": "Perfil", "favorites": "Favoritos", "collapse": "Recolher", "logout": "Sair" },
   "home": {
     "recentlyPlayed": "Tocadas Recentemente",
     "newReleases": "Novos Lançamentos",
