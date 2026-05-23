@@ -61,7 +61,9 @@ export function TrackInfoPanel({ track }: Props) {
   const artist = useArtist(track.artists[0]?.id)
   const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
 
-  const f: AudioFeatures = features.data?.[0] ?? fakeFeatures(track.id)
+  const realFeatures = features.data?.[0] ?? null
+  const f: AudioFeatures = realFeatures ?? fakeFeatures(track.id)
+  const hasRealFeatures = realFeatures !== null
   const genres: string[] = artist.data?.genres
     ? artist.data.genres.slice(0, 5)
     : fakeGenres(track.artists[0]?.id ?? track.id)
@@ -72,11 +74,11 @@ export function TrackInfoPanel({ track }: Props) {
 
         {/* Album art */}
         <div className="relative group">
-          <div className="absolute -inset-4 bg-white/5 rounded-[2.5rem] blur-2xl transition-all duration-500 group-hover:bg-white/10" />
+          <div className="absolute -inset-4 bg-white/5 rounded-lg blur-2xl transition-all duration-500 group-hover:bg-white/10" />
           <img
             src={track.album.images[0]?.url}
             alt={track.album.name}
-            className="relative w-44 h-44 rounded-3xl object-cover shadow-2xl transition-transform duration-500 group-hover:scale-105"
+            className="relative w-44 h-44 rounded-lg object-cover shadow-2xl transition-transform duration-500 group-hover:scale-105"
           />
         </div>
 
@@ -157,12 +159,14 @@ export function TrackInfoPanel({ track }: Props) {
         </div>
 
         {/* Radar + Feature bars */}
-        <MusicalProfileCharts features={f} theme="dark" />
+        {hasRealFeatures && <MusicalProfileCharts features={f} theme="dark" />}
 
         {/* Mood quadrant */}
-        <Section label={t('track.moodZone')}>
-          <MoodZone valence={f.valence} energy={f.energy} theme="dark" />
-        </Section>
+        {hasRealFeatures && (
+          <Section label={t('track.moodZone')}>
+            <MoodZone valence={f.valence} energy={f.energy} theme="dark" />
+          </Section>
+        )}
       </div>
     </div>
   )

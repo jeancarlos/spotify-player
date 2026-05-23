@@ -5,6 +5,7 @@ import { ArrowLeft, Info, Music2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useLyrics } from '@/hooks/queries/useLyrics'
+import { useProgressEngine } from '@/hooks/useProgressEngine'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { cn } from '@/lib/utils'
@@ -14,12 +15,13 @@ type PlayerTab = 'lyrics' | 'info'
 
 export function PlayerView() {
   const { state, dispatch } = usePlayer()
-  const { currentTrack, progress, duration } = state
+  const { currentTrack, duration } = state
+  const { currentProgress, seekTo } = useProgressEngine()
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const { t } = useTranslation()
-  
+
   // Sincroniza estado com a URL (Single source of truth)
   const activeTab = (searchParams.get('tab') as PlayerTab) || 'lyrics'
 
@@ -44,10 +46,11 @@ export function PlayerView() {
 
   const handleSeek = useCallback(async (ms: number) => {
     dispatch({ type: 'SET_PROGRESS', payload: ms, isManual: true })
-    try { 
-      await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' }) 
+    seekTo(ms)
+    try {
+      await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' })
     } catch { /* silent */ }
-  }, [dispatch])
+  }, [dispatch, seekTo])
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
@@ -78,7 +81,7 @@ export function PlayerView() {
         >
           <ArrowLeft size={20} className="text-white" />
         </button>
-        
+
         <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
           {!noLyrics && (
             <button
@@ -135,8 +138,7 @@ export function PlayerView() {
               ) : (
                 <LyricsView
                   lines={lyrics.data ?? []}
-                  progress={progress}
-                  duration={duration}
+                  progress={currentProgress}
                   onSeek={handleSeek}
                 />
               )}
