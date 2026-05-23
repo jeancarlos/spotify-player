@@ -37,7 +37,7 @@ export default defineConfig({
         ],
       },
     }),
-  ] as any,
+  ],
   server: {
     host: '127.0.0.1',
   },
@@ -48,7 +48,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test-setup.ts',
-    exclude: ['node_modules', '.claude/**'],
+    exclude: ['node_modules', '.claude/**', 'tests-e2e/**'],
     coverage: { provider: 'v8', include: ['src/**/*.{ts,tsx}'] },
   },
 })

@@ -56,7 +56,7 @@ export function ArtistDetail() {
         <div className="absolute bottom-4 left-6">
           <h1 className="text-4xl font-black text-black">{artist.data?.name}</h1>
           <p className="text-sm text-black/50 mt-1">
-            {artist.data?.followers.total.toLocaleString()} {t('artists.followers')}
+            {artist.data?.followers?.total.toLocaleString()} {t('artists.followers')}
           </p>
         </div>
       </div>

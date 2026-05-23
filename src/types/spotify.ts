@@ -72,9 +72,9 @@ export interface SpotifyArtist {
   id: string
   name: string
   images: SpotifyImage[]
-  genres: string[]
-  followers: { href: string | null; total: number }
-  popularity: number
+  genres?: string[]
+  followers?: { href: string | null; total: number }
+  popularity?: number
   uri: string
   type: 'artist'
   href?: string
@@ -166,11 +166,15 @@ export interface SearchAlbumsResponse {
   albums: PagingObject<SpotifyAlbumSimple>
 }
 
+export interface SearchPlaylistsResponse {
+  playlists: PagingObject<SpotifyPlaylist | null>
+}
+
 export interface ArtistTopTracksResponse {
   tracks: SpotifyTrack[]
 }
 
-export interface ArtistAlbumsResponse extends PagingObject<SpotifyAlbumSimple> {}
+export type ArtistAlbumsResponse = PagingObject<SpotifyAlbumSimple>
 
 export interface SpotifyDevice {
   id: string | null
@@ -216,7 +220,7 @@ export interface SpotifyPlayerState {
   actions?: { disallows: SpotifyDisallows }
 }
 
-export interface TopItemsResponse<T> extends PagingObject<T> {}
+export type TopItemsResponse<T> = PagingObject<T>
 
 export interface SpotifyPlaylist {
   id: string

@@ -1,11 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, Heart, LogOut, Menu, X } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useUI } from '@/hooks/useUI'
-import i18n from '@/lib/i18n'
 
 export function HamburgerMenu() {
   const { state: uiState, dispatch: uiDispatch } = useUI()
@@ -19,7 +18,7 @@ export function HamburgerMenu() {
   const isOpen = uiState.sidebarOpen
   const isHome = location.pathname === '/'
   const toggle = () => uiDispatch({ type: isOpen ? 'CLOSE_SIDEBAR' : 'OPEN_SIDEBAR' })
-  const close = () => uiDispatch({ type: 'CLOSE_SIDEBAR' })
+  const close = useCallback(() => uiDispatch({ type: 'CLOSE_SIDEBAR' }), [uiDispatch])
 
   // Close on outside click
   useEffect(() => {
@@ -36,7 +35,7 @@ export function HamburgerMenu() {
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [isOpen])
+  }, [isOpen, close])
 
   // Close on Escape
   useEffect(() => {
@@ -44,14 +43,10 @@ export function HamburgerMenu() {
     const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
-  }, [isOpen])
+  }, [isOpen, close])
 
   const handleNav = (path: string) => { close(); navigate(path) }
   const handleLogout = () => { close(); logout(); navigate('/login') }
-  const toggleLang = () => {
-    const next = i18n.language.startsWith('pt') ? 'en-US' : 'pt-BR'
-    i18n.changeLanguage(next)
-  }
 
   const avatar = authState.profile?.images[0]?.url
 

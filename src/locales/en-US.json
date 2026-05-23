@@ -44,12 +44,16 @@
     "back": "Back"
   },
   "artists": {
-    "searchPlaceholder": "Search artists...",
+    "searchPlaceholder": "Search...",
     "searchAlbums": "Search albums",
     "searchArtists": "Search artists",
+    "searchPlaylists": "Search playlists",
+    "tabArtist": "Artist",
+    "tabAlbum": "Album",
+    "tabPlaylist": "Playlist",
     "filterByGenre": "Filter by genre",
     "noResults": "No results found",
-    "searchPrompt": "Type to search artists",
+    "searchPrompt": "Type to search",
     "previous": "Previous",
     "next": "Next",
     "all": "All",

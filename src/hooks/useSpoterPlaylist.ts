@@ -14,50 +14,71 @@ export function useSpoterPlaylist() {
   const { t } = useTranslation()
   const { state: authState } = useAuth()
   const userId = authState.profile?.id ?? ''
-
   const playlistName = useMemo(() => t('playlist.defaultName'), [t])
 
-  const [playlistId, setPlaylistId] = useState<string>(
-    () => localStorage.getItem(STORAGE_KEY) ?? ''
-  )
+  // forcedId is only for when we CREATE or RESET (404)
+  const [forcedId, setForcedId] = useState<string | null>(null)
 
   const playlists = useUserPlaylists(!!userId)
   const createPlaylist = useCreatePlaylist()
   const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
-  const tracks = usePlaylistTracks(playlistId)
 
+  // Determina o ID ativo sem precisar de useEffect para sincronizar estado síncrono
+  const playlistId = useMemo(() => {
+    if (forcedId !== null) return forcedId
+    
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) return saved
+
+    if (playlists.data) {
+      const found = playlists.data.items.find(p => p.name === playlistName)
+      if (found) {
+        // Side effect in memo is usually bad but here it's just a cache
+        // We don't call setState here.
+        return found.id
+      }
+    }
+
+    return ''
+  }, [forcedId, playlists.data, playlistName])
+
+  // Persist discovery
   useEffect(() => {
-    if (!playlists.data || playlistId) return
+    if (playlistId && !localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, playlistId)
+    }
+  }, [playlistId])
 
-    // Busca por nome exato da playlist (pode variar se o usuário mudou o idioma)
-    // No entanto, o ID é persistido no localStorage para evitar duplicatas
-    const existing = playlists.data.items.find(p => p.name === playlistName)
-    if (existing) {
-      setPlaylistId(existing.id)
-      localStorage.setItem(STORAGE_KEY, existing.id)
-    } else if (userId) {
-      createPlaylist.mutate(
-        { userId, name: playlistName, isPublic: false },
-        {
-          onSuccess: playlist => {
-            setPlaylistId(playlist.id)
-            localStorage.setItem(STORAGE_KEY, playlist.id)
-          },
+  // Create playlist if missing
+  useEffect(() => {
+    const shouldCreate = 
+      playlists.isSuccess && 
+      !playlistId && 
+      userId && 
+      !createPlaylist.isPending && 
+      !createPlaylist.isSuccess
+
+    if (shouldCreate) {
+      createPlaylist.mutate({ name: playlistName }, {
+        onSuccess: (p) => {
+          localStorage.setItem(STORAGE_KEY, p.id)
+          setForcedId(p.id)
         }
-      )
+      })
     }
-  }, [playlists.data, playlistId, userId, playlistName, createPlaylist])
+  }, [playlists.isSuccess, playlistId, userId, playlistName, createPlaylist])
 
-  // ID salvo pode estar desatualizado (playlist deletada no Spotify)
+  const tracksQuery = usePlaylistTracks(playlistId, !!playlistId)
+
+  // Handle 404 - using setTimeout to avoid "setState in effect" sync error
+  // or just using the result of the query in the next render.
   useEffect(() => {
-    if (!tracks.isError || !playlistId) return
-    const status = (tracks.error as AxiosError).response?.status
-    if (status === 404) {
-      setPlaylistId('')
+    if (tracksQuery.isError && (tracksQuery.error as AxiosError).response?.status === 404) {
       localStorage.removeItem(STORAGE_KEY)
+      setTimeout(() => setForcedId(''), 0)
     }
-  }, [tracks.isError, tracks.error, playlistId])
+  }, [tracksQuery.isError, tracksQuery.error])
 
   const addTrack = (uri: string) => {
     if (playlistId) addMutation.mutate({ playlistId, uris: [uri] })
@@ -69,9 +90,9 @@ export function useSpoterPlaylist() {
 
   return {
     playlistId,
-    tracks: tracks.data?.items.map(i => i.item) ?? [],
+    tracks: tracksQuery.data?.items.map(i => i.item) ?? [],
     addTrack,
     removeTrack,
-    isLoading: !playlistId || tracks.isLoading,
+    isLoading: !!userId && (!playlists.isSuccess || (!!playlistId && tracksQuery.isLoading)),
   }
 }

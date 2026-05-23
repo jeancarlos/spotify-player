@@ -44,12 +44,16 @@
     "back": "Voltar"
   },
   "artists": {
-    "searchPlaceholder": "Buscar artistas...",
+    "searchPlaceholder": "Buscar...",
     "searchAlbums": "Buscar álbuns",
     "searchArtists": "Buscar artistas",
+    "searchPlaylists": "Buscar playlists",
+    "tabArtist": "Artista",
+    "tabAlbum": "Álbum",
+    "tabPlaylist": "Playlist",
     "filterByGenre": "Filtrar por gênero",
     "noResults": "Nenhum resultado encontrado",
-    "searchPrompt": "Digite para buscar artistas",
+    "searchPrompt": "Digite para buscar",
     "previous": "Anterior",
     "next": "Próxima",
     "all": "Todos",

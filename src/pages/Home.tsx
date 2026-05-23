@@ -10,7 +10,7 @@ import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
 import { SearchBar } from '@/components/shared/SearchBar'
-import type { SearchTab } from '@/components/shared/SearchBar'
+import type { SearchTab } from '@/utils/search'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const DISK_DONE_DELAY = 0.75

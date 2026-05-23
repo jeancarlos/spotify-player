@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 import type { SpotifyArtist } from '@/types/spotify'
 
 interface ArtistCardProps {
@@ -13,34 +14,46 @@ export function ArtistCard({ artist }: ArtistCardProps) {
 
   return (
     <div
-      className="glass-card cursor-pointer overflow-hidden group"
+      className="cursor-pointer focus:outline-none group"
       onClick={() => navigate(`/artists/${artist.id}`)}
       role="button"
       tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && navigate(`/artists/${artist.id}`)}
       aria-label={`Ver artista ${artist.name}`}
     >
-      <div className="aspect-square overflow-hidden bg-black/5">
+      <div
+        className={cn(
+          'relative aspect-square overflow-hidden transition-all duration-200',
+          'rounded-[14px] shadow-lg group-hover:shadow-xl',
+          'ring-1 ring-white/10',
+          'group-hover:scale-105 group-active:scale-95',
+        )}
+      >
         {image ? (
           <img
             src={image}
             alt={artist.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover"
+            draggable={false}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-4xl text-black/20">
+          <div className="w-full h-full bg-black/20 flex items-center justify-center text-4xl text-white/20">
             ♪
           </div>
         )}
-      </div>
-      <div className="p-3">
-        <p className="font-bold text-sm text-black truncate">{artist.name}</p>
-        <p className="text-xs text-black/50 mt-0.5">
-          {artist.followers.total.toLocaleString()} {t('artists.followers')}
-        </p>
-        {artist.genres[0] && (
-          <p className="text-[11px] text-black/40 mt-0.5 truncate">{artist.genres[0]}</p>
-        )}
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+        <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
+          <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">
+            {artist.name}
+          </p>
+          {artist.followers?.total != null && (
+            <p className="text-[8px] text-white/60 truncate leading-tight">
+              {artist.followers.total.toLocaleString()} {t('artists.followers')}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -2,7 +2,7 @@
 import { useCallback } from 'react'
 import {
   SkipBack, Play, Pause, SkipForward,
-  Shuffle, Repeat, Repeat1, ListMusic, Home,
+  Shuffle, Repeat, Repeat1, ListMusic,
 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'

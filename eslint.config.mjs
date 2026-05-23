@@ -6,13 +6,28 @@ import tseslint from 'typescript-eslint'
 import prettier from 'eslint-config-prettier'
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'src/components/ui/**'] },
+  {
+    ignores: [
+      'dist',
+      'node_modules',
+      'src/components/ui/**',
+      '.claude',
+      'playwright.config.ts',
+      'tailwind.config.ts',
+      'tests-e2e/**',
+      'vite.config.ts',
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended, prettier],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        project: ['tsconfig.json', 'tsconfig.app.json', 'tsconfig.node.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
     rules: {

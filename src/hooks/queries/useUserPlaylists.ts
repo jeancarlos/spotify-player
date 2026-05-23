@@ -1,9 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
+import type { UseQueryOptions } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import type { UserPlaylistsResponse } from '@/types/spotify'
 
-export function useUserPlaylists(enabled = true) {
-  return useQuery<UserPlaylistsResponse>({
+export function useUserPlaylists(
+  enabled = true,
+  options?: Partial<UseQueryOptions<UserPlaylistsResponse, Error>>
+) {
+  return useQuery<UserPlaylistsResponse, Error>({
+    ...options,
     queryKey: ['user-playlists'],
     enabled,
     queryFn: async () => {

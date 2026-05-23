@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calcArcPositions } from '../ArcCarousel'
+import { calcArcPositions } from '@/utils/arcAngles'
 
 describe('calcArcPositions', () => {
   it('retorna posições vazias para 0 items', () => {
