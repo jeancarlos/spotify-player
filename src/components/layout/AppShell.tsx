@@ -21,8 +21,8 @@ export function AppShell() {
       <LanguageSwitcher className="fixed top-4 right-4 z-40" />
       <main className="relative z-[1] min-h-screen">
         <Outlet />
-        <MiniPlayer />
       </main>
+      <MiniPlayer />
     </>
   )
 }
