@@ -1,4 +1,5 @@
 import { List, Table2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
 export type ViewMode = 'list' | 'table'
@@ -10,6 +11,8 @@ interface ListTableSwitchProps {
 }
 
 export function ListTableSwitch({ view, onChange, className }: ListTableSwitchProps) {
+  const { t } = useTranslation()
+
   return (
     <div className={cn('inline-flex items-center gap-0.5 p-1 bg-black/5 rounded-xl', className)}>
       <button
@@ -23,7 +26,7 @@ export function ListTableSwitch({ view, onChange, className }: ListTableSwitchPr
         )}
       >
         <List size={13} />
-        Lista
+        {t('common.list')}
       </button>
       <button
         onClick={() => onChange('table')}
@@ -36,7 +39,7 @@ export function ListTableSwitch({ view, onChange, className }: ListTableSwitchPr
         )}
       >
         <Table2 size={13} />
-        Tabela
+        {t('common.table')}
       </button>
     </div>
   )

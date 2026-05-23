@@ -114,8 +114,8 @@ export function MusicalProfileCharts({ features: f, theme = 'dark' }: MusicalPro
           ))}
         </div>
 
-        {/* BPM + Tonalidade como stat pills extras */}
-        <div className="grid grid-cols-2 gap-2 mt-4">
+        {/* BPM + Tonalidade + Compasso */}
+        <div className="grid grid-cols-3 gap-2 mt-4">
           <div className="flex flex-col p-2.5 rounded-xl" style={{ background: bgBar }}>
             <span className="text-[8px] uppercase tracking-widest font-bold mb-0.5" style={{ color: textColor }}>BPM</span>
             <span className="text-sm font-bold" style={{ color: dark ? '#fff' : '#000' }}>
@@ -126,6 +126,12 @@ export function MusicalProfileCharts({ features: f, theme = 'dark' }: MusicalPro
             <span className="text-[8px] uppercase tracking-widest font-bold mb-0.5" style={{ color: textColor }}>{t('track.key')}</span>
             <span className="text-sm font-bold" style={{ color: dark ? '#fff' : '#000' }}>
               {keyLabel ?? '—'}
+            </span>
+          </div>
+          <div className="flex flex-col p-2.5 rounded-xl" style={{ background: bgBar }}>
+            <span className="text-[8px] uppercase tracking-widest font-bold mb-0.5" style={{ color: textColor }}>{t('track.timeSignature')}</span>
+            <span className="text-sm font-bold" style={{ color: dark ? '#fff' : '#000' }}>
+              {f.time_signature}/4
             </span>
           </div>
         </div>

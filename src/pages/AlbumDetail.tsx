@@ -14,6 +14,7 @@ import { TrackTable } from '@/components/shared/TrackTable'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 import { Pagination } from '@/components/shared/Pagination'
 import { averageAudioFeatures } from '@/utils/audioFeatures'
+import { formatDate } from '@/utils/formatDate'
 import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
 const LIMIT = 20
@@ -78,7 +79,7 @@ export function AlbumDetail() {
     : false
 
   const albumYear = album.data?.release_date
-    ? album.data.release_date.slice(0, 4)
+    ? formatDate(album.data.release_date, 'year')
     : undefined
 
   const albumSubtitle = album.data
@@ -115,7 +116,7 @@ export function AlbumDetail() {
                   key={track.id}
                   track={track}
                   index={(page - 1) * LIMIT + i}
-                  isActive={playerState?.track?.id === track.id}
+                  isActive={playerState?.currentTrack?.id === track.id}
                   onPlay={t => playTrack(t, enrichedTracks)}
                 />
               ))}
@@ -125,7 +126,7 @@ export function AlbumDetail() {
               tracks={albumItems}
               audioFeatures={audioFeatures.data}
               showAlbumColumn={false}
-              activeTrackId={playerState?.track?.id}
+              activeTrackId={playerState?.currentTrack?.id}
               onPlay={(track) => {
                 const enriched = enrichTrack(track as SpotifyAlbumTrack)
                 playTrack(enriched, enrichedTracks)

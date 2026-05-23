@@ -5,13 +5,14 @@ import vinylWebp from '@/assets/vinyl.webp'
 interface VinylDiskProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   albumArt?: string
+  albumName?: string
   isPlaying?: boolean
   className?: string
 }
 
 const SIZE_MAP = { xs: 44, sm: 180, md: 360, lg: 560, xl: 720 } as const
 
-export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className }: VinylDiskProps) {
+export function VinylDisk({ size = 'md', albumArt, albumName, isPlaying = false, className }: VinylDiskProps) {
   const px = SIZE_MAP[size]
   const { t } = useTranslation()
 
@@ -30,7 +31,7 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
     >
       <motion.img
         src={vinylWebp}
-        alt="vinyl disk"
+        alt=""
         draggable={false}
         className="w-full h-full object-cover rounded-full"
         animate={animation}
@@ -43,7 +44,7 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
         >
           <motion.img
             src={albumArt ?? '/favicon.svg'}
-            alt={t('favorites.album')}
+            alt={albumName ? `${t('favorites.album')}: ${albumName}` : ""}
             className="w-full h-full object-cover"
             animate={animation}
             transition={transition}

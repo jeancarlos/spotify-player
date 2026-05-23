@@ -32,6 +32,14 @@ export function MiniPlayer() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
+  // Helper para eventos de teclado em elementos com role="button"
+  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      action()
+    }
+  }
+
   const handlePlayPause = useCallback(async () => {
     const next = !isPlaying
     dispatch({ type: 'SET_PLAYING', payload: next })
@@ -87,14 +95,15 @@ export function MiniPlayer() {
   const isPlayerPage = location.pathname === '/player'
 
   return (
-    <motion.div
-      initial={{ y: '130%' }}
+    <motion.aside
+      initial={{ y: 300 }}
       animate={{ y: 0 }}
-      exit={{ y: '130%' }}
-      transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+      exit={{ y: 300 }}
+      transition={{ type: 'spring', stiffness: 240, damping: 26 }}
       className="rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
+      aria-label={t('lyrics.nowPlaying', 'Tocando agora')}
     >
-      {/* Backdrop separado dos filhos animados — filhos com transform/animation quebram backdrop-filter no pai */}
+      {/* Backdrop separado dos filhos animados */}
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 
       {currentTrack && (
@@ -106,6 +115,7 @@ export function MiniPlayer() {
             value={progress}
             onChange={handleSeek}
             aria-label={t('player.seek')}
+            aria-valuetext={`${formatDuration(progress)} de ${formatDuration(duration)}`}
             className="w-full h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
             style={{
               background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, #d4d4d8 ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
@@ -120,6 +130,10 @@ export function MiniPlayer() {
         <div
           className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden cursor-pointer group/track"
           onClick={() => currentTrack && navigate('/player')}
+          role="button"
+          tabIndex={currentTrack ? 0 : -1}
+          onKeyDown={(e) => currentTrack && handleKeyDown(e, () => navigate('/player'))}
+          aria-label={currentTrack ? `${t('player.viewTrack')}: ${currentTrack.name}` : undefined}
         >
           {currentTrack ? (
             <>
@@ -127,30 +141,34 @@ export function MiniPlayer() {
                 size="xs"
                 albumArt={currentTrack.album.images[0]?.url}
                 isPlaying={isPlaying}
+                albumName={currentTrack.album.name}
               />
               <div className="min-w-0 flex-1 overflow-hidden justify-center items-center">
-                <p className="text-xs font-bold text-black truncate hover:underline ">
+                <p className="text-xs font-bold text-black truncate group-hover/track:underline ">
                   {currentTrack.name}
                 </p>
-                <p className="flex gap-1">
+                <div className="flex gap-1 overflow-hidden">
                   {currentTrack.artists.map((a, i) => (
-                    <span
+                    <button
                       key={a.id}
-                      role="link"
-                      className="overflow-hidden truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors"
+                      className="overflow-hidden truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none focus:text-black focus:underline"
                       onClick={(e) => {
                         e.stopPropagation()
                         navigate(`/artists/${a.id}`)
                       }}
+                      onKeyDown={(e) => {
+                        e.stopPropagation()
+                        handleKeyDown(e, () => navigate(`/artists/${a.id}`))
+                      }}
                     >
                       {a.name}
                       {i < currentTrack.artists.length - 1 ? ', ' : ''}
-                    </span>
+                    </button>
                   ))}
-                </p>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-1/2">
+              <div className="flex flex-col gap-0.5" aria-hidden="true">
                 <span className="text-[10px] font-mono shrink-0 tabular-nums">
                   {formatDuration(progress)}
                 </span>
@@ -163,7 +181,7 @@ export function MiniPlayer() {
             <div className="flex items-center gap-2 w-full cursor-default">
               <VinylDisk
                 size="xs"
-                albumArt={null}
+                albumArt={undefined}
               />
               <p className="text-xs text-black/70">{t('player.noTrack')}</p>
             </div>
@@ -270,6 +288,6 @@ export function MiniPlayer() {
           </div>
         )}
       </div>
-    </motion.div >
+    </motion.aside>
   )
 }

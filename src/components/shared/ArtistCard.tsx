@@ -24,7 +24,12 @@ export function ArtistCard({ artist, onNavigate }: ArtistCardProps) {
       onClick={handleClick}
       role="button"
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && handleClick()}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleClick()
+        }
+      }}
       aria-label={`Ver artista ${artist.name}`}
     >
       <div

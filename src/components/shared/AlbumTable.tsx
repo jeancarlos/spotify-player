@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { formatDate } from '@/utils/formatDate'
 import type { SpotifyAlbumSimple } from '@/types/spotify'
 
 interface AlbumTableProps {
@@ -39,7 +40,7 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
               </td>
               <td className="py-2 px-3 text-black/50 capitalize">{album.album_type}</td>
               <td className="py-2 px-3 text-right text-black/40 tabular-nums">
-                {album.release_date?.slice(0, 4)}
+                {album.release_date ? formatDate(album.release_date, 'year') : ''}
               </td>
               <td className={cn('py-2 px-3 text-right text-black/40 tabular-nums')}>
                 {album.total_tracks ?? '—'}

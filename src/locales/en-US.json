@@ -41,7 +41,10 @@
     "loading": "Loading...",
     "error": "Something went wrong",
     "retry": "Try again",
-    "back": "Back"
+    "back": "Back",
+    "skipToContent": "Skip to main content",
+    "list": "List",
+    "table": "Table"
   },
   "artists": {
     "searchPlaceholder": "Search...",
@@ -77,9 +80,7 @@
     "relatedArtists": "Similar Artists",
     "loadMore": "Load more",
     "topTracksRanked": "Most played",
-    "musicalProfile": "Musical Profile",
-    "list": "List",
-    "table": "Table"
+    "musicalProfile": "Musical Profile"
   },
   "albumDetail": {
     "playAlbum": "Play album",

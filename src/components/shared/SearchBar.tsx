@@ -35,17 +35,23 @@ export function SearchBar({ onSearch, defaultTab = 'artista', defaultQuery = '',
   return (
     <div className={cn('glass flex items-center gap-2 px-4 py-2.5 rounded-full max-w-lg w-full', className)}>
       <Search size={15} className="text-black/40 shrink-0" />
+      <label htmlFor="global-search" className="sr-only">
+        {t('artists.searchPlaceholder')}
+      </label>
       <input
+        id="global-search"
         value={query}
         onChange={e => setQuery(e.target.value)}
         placeholder={t('artists.searchPlaceholder')}
         className="flex-1 bg-transparent text-sm outline-none text-black placeholder:text-black/30 min-w-0"
       />
-      <div className="flex gap-1 shrink-0">
+      <div className="flex gap-1 shrink-0" role="tablist">
         {tabs.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => setTab(key)}
+            role="tab"
+            aria-selected={tab === key}
             className={cn(
               'text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
               tab === key

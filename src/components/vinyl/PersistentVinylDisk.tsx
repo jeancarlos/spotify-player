@@ -29,6 +29,7 @@ export function PersistentVinylDisk() {
   if (!isLogin && !isHome) return null
 
   const albumArt = state.currentTrack?.album.images[0]?.url
+  const albumName = state.currentTrack?.album.name
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[3] pointer-events-none flex justify-center">
@@ -41,6 +42,7 @@ export function PersistentVinylDisk() {
           size="xl"
           isPlaying={isHome && state.isPlaying}
           albumArt={isHome ? albumArt : undefined}
+          albumName={isHome ? albumName : undefined}
         />
       </motion.div>
     </div>

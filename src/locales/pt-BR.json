@@ -41,7 +41,10 @@
     "loading": "Carregando...",
     "error": "Algo deu errado",
     "retry": "Tentar novamente",
-    "back": "Voltar"
+    "back": "Voltar",
+    "skipToContent": "Pular para o conteúdo principal",
+    "list": "Lista",
+    "table": "Tabela"
   },
   "artists": {
     "searchPlaceholder": "Buscar...",
@@ -77,9 +80,7 @@
     "relatedArtists": "Artistas Similares",
     "loadMore": "Carregar mais",
     "topTracksRanked": "Mais ouvidas",
-    "musicalProfile": "Perfil Musical",
-    "list": "Lista",
-    "table": "Tabela"
+    "musicalProfile": "Perfil Musical"
   },
   "albumDetail": {
     "playAlbum": "Tocar álbum",

@@ -5,10 +5,9 @@ import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
+import { formatDate } from '@/utils/formatDate'
 import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
-
-const KEY_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A♭', 'B']
 
 const GENRE_POOL = [
   'pop', 'rock', 'indie', 'electronic', 'r&b', 'hip-hop', 'alternative',
@@ -28,19 +27,19 @@ function fakeFeatures(id: string): AudioFeatures {
     uri: `spotify:track:${id}`,
     track_href: '',
     analysis_url: '',
-    danceability:     0.25 + h(id, 0) * 0.65,
-    energy:           0.25 + h(id, 1) * 0.65,
-    valence:          0.15 + h(id, 2) * 0.70,
-    acousticness:     h(id, 3) * 0.85,
-    speechiness:      h(id, 4) * 0.25,
+    danceability: 0.25 + h(id, 0) * 0.65,
+    energy: 0.25 + h(id, 1) * 0.65,
+    valence: 0.15 + h(id, 2) * 0.70,
+    acousticness: h(id, 3) * 0.85,
+    speechiness: h(id, 4) * 0.25,
     instrumentalness: h(id, 5) * 0.60,
-    liveness:         0.05 + h(id, 6) * 0.35,
-    loudness:         -18 + h(id, 7) * 14,
-    tempo:            70 + h(id, 8) * 110,
-    duration_ms:      0,
-    key:              Math.floor(h(id, 9) * 12),
-    mode:             h(id, 10) > 0.45 ? 1 : 0,
-    time_signature:   h(id, 11) > 0.25 ? 4 : 3,
+    liveness: 0.05 + h(id, 6) * 0.35,
+    loudness: -18 + h(id, 7) * 14,
+    tempo: 70 + h(id, 8) * 110,
+    duration_ms: 0,
+    key: Math.floor(h(id, 9) * 12),
+    mode: h(id, 10) > 0.45 ? 1 : 0,
+    time_signature: h(id, 11) > 0.25 ? 4 : 3,
   }
 }
 
@@ -65,24 +64,20 @@ export function TrackInfoPanel({ track }: Props) {
     ? artist.data.genres.slice(0, 5)
     : fakeGenres(track.artists[0]?.id ?? track.id)
 
-  const keyLabel = f.key >= 0
-    ? `${KEY_NAMES[f.key]} ${f.mode === 1 ? t('track.major') : t('track.minor')}`
-    : null
-
   // Mood quadrant: x=valence (0=sad→1=happy), y=energy (0=chill→1=intense)
   const moodX = f.valence * 100   // % from left
   const moodY = (1 - f.energy) * 100 // % from top (inverted: high energy = top)
 
   const moodLabel = (() => {
     if (f.energy >= 0.5 && f.valence >= 0.5) return t('track.mood.happyEnergetic')
-    if (f.energy >= 0.5 && f.valence <  0.5) return t('track.mood.darkEnergetic')
-    if (f.energy <  0.5 && f.valence >= 0.5) return t('track.mood.happyChill')
+    if (f.energy >= 0.5 && f.valence < 0.5) return t('track.mood.darkEnergetic')
+    if (f.energy < 0.5 && f.valence >= 0.5) return t('track.mood.happyChill')
     return t('track.mood.darkChill')
   })()
 
   return (
-    <div className="flex-1 overflow-y-auto no-scrollbar">
-      <div className="flex flex-col items-center gap-6 px-5 py-8 pb-16">
+    <div>
+      <div className="flex flex-col items-center gap-6 px-5 py-4">
 
         {/* Album art */}
         <div className="relative group">
@@ -105,13 +100,12 @@ export function TrackInfoPanel({ track }: Props) {
           <div className="flex flex-wrap justify-center gap-1">
             {track.artists.map((a, i) => (
               <span key={a.id} className="flex items-center">
-                <span
-                  role="link"
+                <button
                   onClick={() => navigate(`/artists/${a.id}`)}
-                  className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors"
+                  className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors outline-none focus:text-white focus:underline"
                 >
                   {a.name}
-                </span>
+                </button>
                 {i < track.artists.length - 1 && (
                   <span className="text-white/30 text-sm font-medium ml-1">, </span>
                 )}
@@ -120,6 +114,22 @@ export function TrackInfoPanel({ track }: Props) {
           </div>
           <p className="text-white/35 text-xs">{track.album.name}</p>
         </div>
+
+        {wikipedia.data && (
+          <Section label={t('track.aboutTrack')}>
+            <div className="w-full max-w-sm">
+              <p className="text-xs text-white/60 leading-relaxed">{wikipedia.data.extract}</p>
+              <a
+                href={wikipedia.data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-white/35 hover:text-white/60 underline mt-2 inline-block transition-colors"
+              >
+                {t('track.readMore')} →
+              </a>
+            </div>
+          </Section>
+        )}
 
         {/* Popularity */}
         <div className="w-full max-w-sm space-y-1.5">
@@ -140,11 +150,9 @@ export function TrackInfoPanel({ track }: Props) {
           </div>
         </div>
 
-        {/* Stat pills */}
+        {/* Lançamento + Duração */}
         <div className="grid grid-cols-2 gap-2.5 w-full max-w-sm">
-          <StatCard label="BPM" value={Math.round(f.tempo).toString()} />
-          <StatCard label={t('track.key')} value={keyLabel ?? '—'} />
-          <StatCard label={t('track.timeSignature')} value={`${f.time_signature}/4`} />
+          <StatCard label={t('track.releaseDate')} value={formatDate(track.album.release_date)} />
           <StatCard label={t('track.duration')} value={formatDuration(track.duration_ms)} />
         </div>
 
@@ -206,23 +214,6 @@ export function TrackInfoPanel({ track }: Props) {
             </div>
           </div>
         </Section>
-
-        {wikipedia.data && (
-          <Section label={t('track.aboutTrack')}>
-            <div className="w-full max-w-sm">
-              <p className="text-xs text-white/60 leading-relaxed">{wikipedia.data.extract}</p>
-              <a
-                href={wikipedia.data.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] text-white/35 hover:text-white/60 underline mt-2 inline-block transition-colors"
-              >
-                {t('track.readMore')} →
-              </a>
-            </div>
-          </Section>
-        )}
-
       </div>
     </div>
   )
@@ -233,15 +224,6 @@ function Section({ label, children }: { label: string; children: React.ReactNode
     <div className="w-full max-w-sm">
       <p className="text-[9px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">{label}</p>
       {children}
-    </div>
-  )
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col p-3 rounded-xl bg-white/[0.04] border border-white/[0.05]">
-      <span className="text-[8px] text-white/30 uppercase tracking-widest font-bold mb-1">{label}</span>
-      <span className="text-sm font-bold text-white truncate">{value}</span>
     </div>
   )
 }

@@ -154,13 +154,13 @@ export function Favorites() {
                     </form>
 
                     {searchResults.isPending && searchQuery && (
-                      <p className="text-xs text-black/40 text-center py-3">{t('common.loading')}</p>
+                      <p className="text-xs text-black/40 text-center py-3" aria-live="polite">{t('common.loading')}</p>
                     )}
                     {searchResults.data?.length === 0 && searchQuery && (
-                      <p className="text-xs text-red-500 text-center py-3">{t('favorites.notFound')}</p>
+                      <p className="text-xs text-red-500 text-center py-3" aria-live="polite">{t('favorites.notFound')}</p>
                     )}
                     {searchResults.data && searchResults.data.length > 0 && (
-                      <div className="space-y-0.5 max-h-64 overflow-y-auto">
+                      <div className="space-y-0.5 max-h-64 overflow-y-auto" aria-live="polite">
                         {searchResults.data.map(track => (
                           <div
                             key={track.id}

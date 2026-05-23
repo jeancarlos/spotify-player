@@ -16,6 +16,7 @@ import { AlbumTable } from '@/components/shared/AlbumTable'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 import { Pagination } from '@/components/shared/Pagination'
 import { averageAudioFeatures } from '@/utils/audioFeatures'
+import { formatDate } from '@/utils/formatDate'
 import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
 
 export function ArtistDetail() {
@@ -83,11 +84,16 @@ export function ArtistDetail() {
               {topTracks.data.slice(0, 5).map((track, i) => (
                 <div
                   key={track.id}
-                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group"
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group focus:outline-none focus:bg-black/5"
                   onClick={() => artist.data?.uri && playContext(artist.data.uri)}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={e => e.key === 'Enter' && artist.data?.uri && playContext(artist.data.uri)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      if (artist.data?.uri) playContext(artist.data.uri)
+                    }
+                  }}
                 >
                   <span className="text-xs font-bold text-black/30 tabular-nums w-6 shrink-0 text-right">
                     {String(i + 1).padStart(2, '0')}
@@ -126,11 +132,16 @@ export function ArtistDetail() {
               {albums.data?.items.map(album => (
                 <div
                   key={album.id}
-                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group"
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group focus:outline-none focus:bg-black/5"
                   onClick={() => handleAlbumClick(album)}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={e => e.key === 'Enter' && handleAlbumClick(album)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      handleAlbumClick(album)
+                    }
+                  }}
                 >
                   <img
                     src={album.images[0]?.url}
@@ -139,7 +150,7 @@ export function ArtistDetail() {
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-black truncate">{album.name}</p>
-                    <p className="text-xs text-black/40">{album.release_date?.slice(0, 4)}</p>
+                    <p className="text-xs text-black/40">{album.release_date ? formatDate(album.release_date, 'year') : ''}</p>
                   </div>
                   <span className="text-xs text-black/30 shrink-0 capitalize">{album.album_type}</span>
                 </div>

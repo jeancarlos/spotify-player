@@ -83,7 +83,7 @@ export function PlaylistDetail() {
                   key={track.id}
                   track={track}
                   index={(page - 1) * LIMIT + i}
-                  isActive={playerState?.track?.id === track.id}
+                  isActive={playerState?.currentTrack?.id === track.id}
                   onPlay={tr => playTrack(tr, playlistTracks)}
                 />
               ))}
@@ -92,7 +92,7 @@ export function PlaylistDetail() {
             <TrackTable
               tracks={playlistTracks}
               showAlbumColumn={true}
-              activeTrackId={playerState?.track?.id}
+              activeTrackId={playerState?.currentTrack?.id}
               onPlay={(track) => {
                 playTrack(track as SpotifyTrack, playlistTracks)
               }}

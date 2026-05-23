@@ -1,4 +1,3 @@
-// src/components/layout/PlayerView.tsx
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -22,12 +21,7 @@ export function PlayerView() {
   const artistName = currentTrack?.artists[0]?.name ?? ''
   const trackName = currentTrack?.name ?? ''
   const albumName = currentTrack?.album.name
-  const lyrics = useLyrics({ 
-    artist: artistName, 
-    title: trackName, 
-    album: albumName, 
-    durationMs: duration 
-  })
+  const lyrics = useLyrics({ artist: artistName, title: trackName, album: albumName, durationMs: duration })
   const albumArt = currentTrack?.album.images[0]?.url
 
   const handleSeek = useCallback(async (ms: number) => {
@@ -39,11 +33,11 @@ export function PlayerView() {
   const isShowingInfo = showInfo || noLyrics
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden flex flex-col">
+    <div className="relative h-screen bg-black overflow-hidden">
       {/* Background blur */}
       {albumArt && (
         <div
-          className="absolute inset-0 opacity-50"
+          className="absolute inset-0 opacity-50 pointer-events-none"
           style={{
             backgroundImage: `url(${albumArt})`,
             backgroundSize: 'cover',
@@ -53,68 +47,73 @@ export function PlayerView() {
           }}
         />
       )}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/60 pointer-events-none" />
 
-      {/* Conteúdo relativo */}
-      <div className="relative flex flex-col flex-1 pb-28">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6">
+      {/* Header — fixo sobre o conteúdo */}
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-xl glass"
+          aria-label={t('player.back')}
+        >
+          <ArrowLeft size={18} className="text-white" />
+        </button>
+        <p className="text-xs text-white/40 uppercase tracking-widest">
+          {t('lyrics.nowPlaying')}
+        </p>
+        {!noLyrics ? (
           <button
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-xl glass"
-            aria-label={t('player.back')}
+            onClick={() => setShowInfo(v => !v)}
+            className={cn('p-2 rounded-xl glass', showInfo && 'bg-white/20')}
+            aria-label={t('player.trackInfo')}
           >
-            <ArrowLeft size={18} className="text-white" />
+            <FileText size={18} className="text-white" />
           </button>
-          <p className="text-xs text-white/40 uppercase tracking-widest">
-            {t('lyrics.nowPlaying')}
-          </p>
-          {!noLyrics && (
-            <button
-              onClick={() => setShowInfo(v => !v)}
-              className={cn('p-2 rounded-xl glass', showInfo && 'bg-white/20')}
-              aria-label={t('player.trackInfo')}
-            >
-              <FileText size={18} className="text-white" />
-            </button>
-          )}
-          {noLyrics && <div className="w-10" />}
-        </div>
+        ) : (
+          <div className="w-10" />
+        )}
+      </div>
 
-        {/* Área principal */}
-        <AnimatePresence mode="wait">
-          {isShowingInfo ? (
-            <motion.div
-              key="info"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col min-h-0"
-            >
-              {currentTrack && <TrackInfoPanel track={currentTrack} />}
-            </motion.div>
-          ) : lyrics.isPending ? (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex items-center justify-center"
-            >
-              <p className="text-white/30 text-sm">{t('lyrics.searching')}</p>
-            </motion.div>
-          ) : (
+      {/* Conteúdo principal — absolute inset-0 garante dimensões concretas para overflow-y-auto */}
+      <AnimatePresence mode="wait">
+        {isShowingInfo ? (
+          <motion.div
+            key="info"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 overflow-y-auto pt-20 pb-36"
+          >
+            {currentTrack && <TrackInfoPanel track={currentTrack} />}
+          </motion.div>
+        ) : lyrics.isPending ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <p className="text-white/30 text-sm">{t('lyrics.searching')}</p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="lyrics"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 pt-20 pb-32"
+          >
             <LyricsView
-              key="lyrics"
               lines={lyrics.data ?? []}
               progress={progress}
               duration={duration}
               onSeek={handleSeek}
             />
-          )}
-        </AnimatePresence>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <PlayerSync />
     </div>

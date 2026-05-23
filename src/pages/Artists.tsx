@@ -62,7 +62,7 @@ export function Artists() {
       <div className="pt-36 px-6 pb-32">
         {/* Results header */}
         {query && (
-          <p className="text-sm text-black/40 mb-6">
+          <p className="text-sm text-black/40 mb-6" aria-live="polite">
             {headerLabel}
             {data && ` — ${data.total} resultados`}
           </p>
@@ -101,7 +101,12 @@ export function Artists() {
                 role="button"
                 tabIndex={0}
                 onClick={() => navigate(`/albums/${album.id}`)}
-                onKeyDown={e => e.key === 'Enter' && navigate(`/albums/${album.id}`)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    navigate(`/albums/${album.id}`)
+                  }
+                }}
               >
                 <div className="relative aspect-square overflow-hidden rounded-[14px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
                   <img
@@ -138,7 +143,12 @@ export function Artists() {
                 role="button"
                 tabIndex={0}
                 onClick={() => navigate(`/playlists/${playlist.id}`)}
-                onKeyDown={e => e.key === 'Enter' && navigate(`/playlists/${playlist.id}`)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    navigate(`/playlists/${playlist.id}`)
+                  }
+                }}
               >
                 <div className="relative aspect-square overflow-hidden rounded-[14px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
                   {playlist.images[0]?.url ? (
