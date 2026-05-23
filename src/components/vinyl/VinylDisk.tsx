@@ -36,28 +36,26 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
         animate={animation}
         transition={transition}
       />
-      {albumArt && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div
+          className="relative rounded-full overflow-hidden border-0 border-white/30"
+          style={{ width: '26%', height: '26%' }}
+        >
+          <motion.img
+            src={albumArt ?? '/favicon.svg'}
+            alt={t('favorites.album')}
+            className="w-full h-full object-cover"
+            animate={animation}
+            transition={transition}
+          />
           <div
-            className="relative rounded-full overflow-hidden border-0 border-white/30"
-            style={{ width: '26%', height: '26%' }}
+            className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2"
+            style={{ width: '10%', height: '10%' }}
           >
-            <motion.img
-              src={albumArt}
-              alt={t('favorites.album')}
-              className="w-full h-full object-cover"
-              animate={animation}
-              transition={transition}
-            />
-            <div
-              className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2"
-              style={{ width: '10%', height: '10%' }}
-            >
-              <div className="w-full h-full bg-white/50 backdrop-blur-sm rounded-full border-black/20" />
-            </div>
+            <div className="w-full h-full bg-white/50 backdrop-blur-sm rounded-full border-black/20" />
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
