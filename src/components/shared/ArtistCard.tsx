@@ -1,48 +1,47 @@
 import { useNavigate } from 'react-router-dom'
-import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { GlassCard } from './GlassCard'
-import { formatNumber } from '@/utils/formatNumber'
 import type { SpotifyArtist } from '@/types/spotify'
 
 interface ArtistCardProps {
   artist: SpotifyArtist
-  onPlay?: (artist: SpotifyArtist) => void
 }
 
-export function ArtistCard({ artist, onPlay }: ArtistCardProps) {
+export function ArtistCard({ artist }: ArtistCardProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const image = artist.images[0]?.url
 
   return (
-    <GlassCard className="w-44 flex flex-col gap-2 group" onClick={() => navigate(`/artists/${artist.id}`)}>
-      <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+    <div
+      className="glass-card cursor-pointer overflow-hidden group"
+      onClick={() => navigate(`/artists/${artist.id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && navigate(`/artists/${artist.id}`)}
+      aria-label={`Ver artista ${artist.name}`}
+    >
+      <div className="aspect-square overflow-hidden bg-black/5">
         {image ? (
-          <img src={image} alt={artist.name} className="w-full h-full object-cover" />
+          <img
+            src={image}
+            alt={artist.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
         ) : (
-          <div className="w-full h-full bg-white/10 flex items-center justify-center">
-            <span className="text-3xl text-white/30">{artist.name[0]}</span>
+          <div className="w-full h-full flex items-center justify-center text-4xl text-black/20">
+            ♪
           </div>
         )}
-        <div
-          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity flex items-center justify-center"
-          onClick={e => {
-            e.stopPropagation()
-            if (onPlay) onPlay(artist)
-            else navigate(`/artists/${artist.id}`)
-          }}
-        >
-          <Play size={28} className="text-white fill-white" />
-        </div>
       </div>
-      <div className="overflow-hidden">
-        <p className="text-xs font-bold truncate">{artist.name}</p>
-        <p className="text-xs text-white/40 truncate">
-          {artist.genres.slice(0, 2).join(', ') || t('artists.unknownGenre')}
+      <div className="p-3">
+        <p className="font-bold text-sm text-black truncate">{artist.name}</p>
+        <p className="text-xs text-black/50 mt-0.5">
+          {artist.followers.total.toLocaleString()} {t('artists.followers')}
         </p>
-        <p className="text-xs text-white/30 mt-1">{formatNumber(artist.followers.total)} {t('artists.followers')}</p>
+        {artist.genres[0] && (
+          <p className="text-[11px] text-black/40 mt-0.5 truncate">{artist.genres[0]}</p>
+        )}
       </div>
-    </GlassCard>
+    </div>
   )
 }
