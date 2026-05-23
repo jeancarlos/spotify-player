@@ -21,7 +21,7 @@ export function AppShell() {
       </div>
       <HamburgerMenu />
       <LanguageSwitcher className="fixed top-4 right-4 z-40" />
-      <main className="relative z-[1] min-h-screen">
+      <main className="relative z-[1] h-full overflow-y-auto">
         <Outlet />
       </main>
       <MiniPlayer />

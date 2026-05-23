@@ -43,7 +43,7 @@ export function Artists() {
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({ q: query, tab, page: String(newPage) }, { replace: true })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const headerLabel = isArtist

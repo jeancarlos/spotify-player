@@ -23,7 +23,7 @@
   },
   "player": {
     "nowPlaying": "Tocando agora",
-    "noTrack": "Nenhuma música selecionada",
+    "noTrack": "Inicir uma música no seu dispositivo",
     "noActiveDevice": "Nenhum dispositivo ativo",
     "lyrics": "Letra",
     "queue": "Fila de reprodução",
