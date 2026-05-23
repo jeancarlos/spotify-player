@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useLyrics } from '@/hooks/queries/useLyrics'
 import { LyricsView } from '@/components/layout/LyricsView'
+import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { MiniPlayer } from '@/components/layout/MiniPlayer'
 import { PlayerSync } from '@/components/layout/PlayerSync'
-import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 
@@ -85,26 +85,9 @@ export function PlayerView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
               transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col items-center justify-center gap-6 px-8"
+              className="flex-1 flex flex-col overflow-hidden"
             >
-              {albumArt && (
-                <motion.img
-                  key={currentTrack?.id}
-                  src={albumArt}
-                  alt={currentTrack?.album.name}
-                  className="w-56 h-56 rounded-2xl object-cover shadow-2xl"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                />
-              )}
-              <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">{currentTrack?.name}</h2>
-                <p className="text-white/60">
-                  {currentTrack?.artists.map(a => a.name).join(', ')}
-                </p>
-                <p className="text-white/30 text-sm">{currentTrack?.album.name}</p>
-                <p className="text-white/30 text-sm">{formatDuration(duration)}</p>
-              </div>
+              {currentTrack && <TrackInfoPanel track={currentTrack} />}
             </motion.div>
           ) : lyrics.isPending ? (
             <motion.div

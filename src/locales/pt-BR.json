@@ -34,8 +34,8 @@
     "repeat": "Repetir",
     "play": "Reproduzir",
     "pause": "Pausar",
-    "trackInfo": "Informações da faixa",
-    "back": "Voltar"
+    "seek": "Buscar",
+    "playTrack": "Tocar {{name}}"
   },
   "common": {
     "loading": "Carregando...",
@@ -113,9 +113,26 @@
     "plan": "Plano"
   },
   "auth": {
-    "authenticating": "Autenticando..."
+    "authenticating": "Autenticando...",
+    "invalidState": "Estado OAuth inválido ou verifier ausente",
+    "tokenExchangeFailed": "Troca de token falhou"
+  },
+  "track": {
+    "popularity": "Popularidade",
+    "key": "Tonalidade",
+    "timeSignature": "Compasso",
+    "duration": "Duração",
+    "instrumental": "Instrumental",
+    "major": "Maior",
+    "minor": "Menor"
   },
   "playlist": {
     "defaultName": "Spoter List"
+  },
+  "pwa": {
+    "readyOffline": "O app está pronto para funcionar offline",
+    "updateAvailable": "Atualização disponível",
+    "newVersion": "Uma nova versão do Spoter está disponível. Recarregue para atualizar.",
+    "reload": "Recarregar e Atualizar"
   }
 }
