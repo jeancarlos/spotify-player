@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { LyricLine } from '@/types/lyrics'
 
 interface LyricsViewProps {
@@ -10,7 +10,7 @@ interface LyricsViewProps {
 }
 
 export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
-  // findLastIndex ensures we get the most recent line that has already started
+  // Encontra o índice da linha ativa com base no progresso atual
   const activeIndex = lines.reduce((acc, line, i) => {
     if (line.time <= progress) return i
     return acc
@@ -19,77 +19,87 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef<HTMLDivElement>(null)
   const [translateY, setTranslateY] = useState(0)
-  const [paddingH, setPaddingH] = useState(0)
+  const [containerHeight, setContainerHeight] = useState(0)
 
-  // Mede o container e atualiza paddingH. ResizeObserver garante atualização em rotação de tela.
+  // Monitora o tamanho do container para saber onde é o centro
   useLayoutEffect(() => {
     const container = containerRef.current
     if (!container) return
-    const measure = () => {
-      const h = container.clientHeight
-      if (h > 0) setPaddingH(h / 2)
+
+    const updateSize = () => {
+      setContainerHeight(container.clientHeight)
     }
-    measure()
-    const ro = new ResizeObserver(measure)
+
+    updateSize()
+    const ro = new ResizeObserver(updateSize)
     ro.observe(container)
     return () => ro.disconnect()
   }, [])
 
-  // Centraliza a linha ativa sempre que ela, o paddingH ou as linhas mudarem.
+  // Calcula o deslocamento necessário para centralizar a linha ativa
   useLayoutEffect(() => {
     const container = containerRef.current
-    const el = activeRef.current
-    if (!container || !el || container.clientHeight === 0) return
-    
-    // Pequeno delay para garantir que o DOM estabilizou
-    const timeout = setTimeout(() => {
-      const center = container.clientHeight / 2
-      const elMid = el.offsetTop + el.clientHeight / 2
-      setTranslateY(center - elMid)
-    }, 50)
+    const activeEl = activeRef.current
 
-    return () => clearTimeout(timeout)
-  }, [activeIndex, paddingH, lines])
+    if (!container || !activeEl || containerHeight === 0) return
+
+    // O offsetTop é relativo ao motion.div (que é o offsetParent por ser absolute)
+    // Queremos que (translateY + activeEl.offsetTop + activeEl.height/2) === containerHeight / 2
+    const center = containerHeight / 2
+    const activeMid = activeEl.offsetTop + activeEl.clientHeight / 2
+    
+    setTranslateY(center - activeMid)
+  }, [activeIndex, containerHeight, lines])
+
+  if (lines.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-white/20 text-sm">Sem letra disponível</p>
+      </div>
+    )
+  }
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-hidden relative">
+    <div ref={containerRef} className="flex-1 overflow-hidden relative w-full">
       <motion.div
-        className="absolute inset-x-0 flex flex-col items-center gap-6 px-8"
+        className="absolute top-0 inset-x-0 flex flex-col items-center gap-8"
+        style={{ 
+          paddingTop: containerHeight / 2, 
+          paddingBottom: containerHeight / 2 
+        }}
         animate={{ y: translateY }}
         transition={{ 
           type: 'spring',
-          damping: 30,
-          stiffness: 150,
-          mass: 0.8
+          damping: 25,
+          stiffness: 120,
+          mass: 1
         }}
       >
-        {/* Spacer superior — igual à meia altura do container, centraliza a primeira linha */}
-        <div style={{ height: paddingH, flexShrink: 0 }} />
-
         {lines.map((line, i) => {
-          const dist = Math.abs(i - activeIndex)
           const isActive = i === activeIndex
+          const dist = Math.abs(i - activeIndex)
+          
           return (
             <motion.div
               key={`${i}-${line.time}`}
               ref={isActive ? activeRef : undefined}
               animate={{
-                opacity: isActive ? 1 : Math.max(0.12, 1 - dist * 0.22),
-                scale: isActive ? 1.04 : 1,
+                opacity: isActive ? 1 : Math.max(0.1, 1 - dist * 0.25),
+                scale: isActive ? 1.05 : 1,
+                filter: isActive ? 'blur(0px)' : `blur(${Math.min(dist * 0.5, 2)}px)`,
               }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
+              transition={{ duration: 0.4 }}
               onClick={() => onSeek?.(line.time)}
-              className={`font-sans text-center leading-relaxed select-none transition-colors duration-300 ${
-                isActive ? 'text-white font-bold text-xl' : 'text-white/60 text-base font-normal hover:text-white/90'
-              } ${onSeek ? 'cursor-pointer' : ''}`}
+              className={`w-full max-w-lg px-8 font-sans text-center leading-tight select-none transition-colors duration-500 ${
+                isActive 
+                  ? 'text-white font-bold text-2xl md:text-3xl' 
+                  : 'text-white/40 text-lg md:text-xl font-medium'
+              } ${onSeek ? 'cursor-pointer hover:text-white/60' : ''}`}
             >
               {line.text}
             </motion.div>
           )
         })}
-
-        {/* Spacer inferior — permite que a última linha também chegue ao centro */}
-        <div style={{ height: paddingH, flexShrink: 0 }} />
       </motion.div>
     </div>
   )
