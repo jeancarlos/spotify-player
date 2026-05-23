@@ -5,20 +5,26 @@ import type { SpotifyArtist } from '@/types/spotify'
 
 interface ArtistCardProps {
   artist: SpotifyArtist
+  onNavigate?: (id: string) => void
 }
 
-export function ArtistCard({ artist }: ArtistCardProps) {
+export function ArtistCard({ artist, onNavigate }: ArtistCardProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const image = artist.images[0]?.url
 
+  const handleClick = () => {
+    if (onNavigate) onNavigate(artist.id)
+    else navigate(`/artists/${artist.id}`)
+  }
+
   return (
     <div
       className="cursor-pointer focus:outline-none group"
-      onClick={() => navigate(`/artists/${artist.id}`)}
+      onClick={handleClick}
       role="button"
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && navigate(`/artists/${artist.id}`)}
+      onKeyDown={e => e.key === 'Enter' && handleClick()}
       aria-label={`Ver artista ${artist.name}`}
     >
       <div
