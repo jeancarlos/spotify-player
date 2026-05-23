@@ -76,15 +76,17 @@ export function Home() {
         >
           {tracks.length > 0 && (
             <ArcCarousel
-              items={tracks.map(track => (
-                <VinylCard
-                  key={track.id}
-                  track={track}
-                  isActive={state.currentTrack?.id === track.id}
-                  onPlay={playTrack}
-                  size="sm"
-                />
-              ))}
+              items={tracks.map(track => ({
+                id: track.id,
+                content: (
+                  <VinylCard
+                    track={track}
+                    isActive={state.currentTrack?.id === track.id}
+                    onPlay={playTrack}
+                    size="sm"
+                  />
+                ),
+              }))}
               radius={arcRadius}
               arcDeg={90}
               baseDelay={DISK_DONE_DELAY}

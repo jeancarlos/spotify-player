@@ -16,6 +16,7 @@ export function calcArcPositions(
   if (count === 0) return []
 
   const half = arcDeg / 2
+  // Evita divisão por zero se count === 1
   const step = count > 1 ? arcDeg / (count - 1) : 0
   const startDeg = count > 1 ? -half : 0
 
@@ -30,8 +31,13 @@ export function calcArcPositions(
   })
 }
 
+interface ArcItem {
+  id: string
+  content: React.ReactNode
+}
+
 interface ArcCarouselProps {
-  items: React.ReactNode[]
+  items: ArcItem[]
   radius?: number
   arcDeg?: number
   offsetDeg?: number
@@ -50,8 +56,7 @@ export function ArcCarousel({
   const uid = useId()
   const positions = calcArcPositions(items.length, radius, arcDeg, offsetDeg)
 
-  // Arc text path: circle origin at bottom-center of container
-  // tR sits above the card arc so the label floats over the items
+  // Arc text path logic
   const cx = radius
   const cy = radius + 120
   const tR = radius + 72
@@ -65,12 +70,14 @@ export function ArcCarousel({
   return (
     <div className="relative" style={{ width: radius * 2, height: radius + 120 }}>
       <div className="absolute inset-0 flex items-end justify-center">
-        <AnimatePresence mode="sync">
+        <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
             const pos = positions[i]
+            if (!pos) return null
+            
             return (
               <motion.div
-                key={i}
+                key={item.id}
                 className="absolute"
                 initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
                 animate={{
@@ -79,7 +86,7 @@ export function ArcCarousel({
                   opacity: 1,
                   scale: 1,
                 }}
-                exit={{ opacity: 0, scale: 0.7 }}
+                exit={{ opacity: 0, scale: 0.7, transition: { duration: 0.2 } }}
                 transition={{
                   type: 'spring',
                   stiffness: 220,
@@ -88,7 +95,7 @@ export function ArcCarousel({
                 }}
                 style={{ rotate: pos.tilt }}
               >
-                {item}
+                {item.content}
               </motion.div>
             )
           })}
@@ -96,12 +103,15 @@ export function ArcCarousel({
       </div>
 
       {title && (
-        <svg
-          className="absolute inset-0 pointer-events-none"
+        <motion.svg
+          className="absolute top-[-130px] inset-0 pointer-events-none"
           width={radius * 2}
           height={radius + 120}
           style={{ overflow: 'visible' }}
           overflow="visible"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: baseDelay + items.length * 0.06 + 0.3, duration: 0.6, ease: 'easeOut' }}
         >
           <defs>
             <path id={`arc-${uid}`} d={arcPath} />
@@ -117,8 +127,8 @@ export function ArcCarousel({
               {title.toUpperCase()}
             </textPath>
           </text>
-        </svg>
+        </motion.svg>
       )}
-    </div>
+    </div >
   )
 }

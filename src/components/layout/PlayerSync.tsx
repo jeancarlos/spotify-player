@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useNowPlaying } from '@/hooks/queries/useNowPlaying'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
@@ -7,21 +8,26 @@ import { extractPalette } from '@/lib/colorThief'
 export function PlayerSync() {
   const { state: authState } = useAuth()
   const { state, dispatch } = usePlayer()
+  const queryClient = useQueryClient()
   const { data } = useNowPlaying(authState.isAuthenticated)
   const lastTrackIdRef = useRef<string | null>(null)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  
+  // Usar ref para evitar que o setInterval seja reiniciado constantemente
+  const isPlayingRef = useRef(state.isPlaying)
+  useEffect(() => {
+    isPlayingRef.current = state.isPlaying
+  }, [state.isPlaying])
 
   // Timer local: incrementa progress a cada 1s enquanto tocando
   useEffect(() => {
-    if (state.isPlaying && state.duration > 0) {
-      timerRef.current = setInterval(() => {
+    const interval = setInterval(() => {
+      if (isPlayingRef.current) {
         dispatch({ type: 'TICK_PROGRESS' })
-      }, 1000)
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [state.isPlaying, state.duration, dispatch])
+      }
+    }, 1000)
+    
+    return () => clearInterval(interval)
+  }, [dispatch])
 
   // Sincronizar com API Spotify (corrige drift)
   useEffect(() => {
@@ -32,6 +38,7 @@ export function PlayerSync() {
 
     if (remote && remote.id !== localId) {
       dispatch({ type: 'SET_TRACK', payload: remote })
+      queryClient.invalidateQueries({ queryKey: ['recently-played'] })
     }
 
     if (data.is_playing !== state.isPlaying) {
@@ -40,7 +47,8 @@ export function PlayerSync() {
 
     if (data.progress_ms !== null) {
       const drift = Math.abs(data.progress_ms - state.progress)
-      if (drift > 3000) {
+      // Reduzimos o drift aceitável para sincronizar mais frequentemente se necessário
+      if (drift > 2000) {
         dispatch({ type: 'SET_PROGRESS', payload: data.progress_ms })
       }
     }
@@ -54,7 +62,7 @@ export function PlayerSync() {
     }
   }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Extração de paleta (mantida para compatibilidade)
+  // Extração de paleta
   useEffect(() => {
     const track = state.currentTrack
     if (!track || track.id === lastTrackIdRef.current) return
