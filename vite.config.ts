@@ -16,6 +16,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test-setup.ts',
+    exclude: ['node_modules', '.claude/**'],
     coverage: { provider: 'v8', include: ['src/**/*.{ts,tsx}'] },
   },
 })

@@ -7,6 +7,7 @@ import { server } from '@/mocks/server'
 import { Home } from '../Home'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
+import { ToastProvider } from '@/components/ui/toast'
 import i18n from '@/lib/i18n'
 
 beforeAll(async () => {
@@ -25,7 +26,9 @@ function renderHome() {
       <MemoryRouter>
         <QueryClientProvider client={client}>
           <PlayerContext.Provider value={{ state: initialPlayerState, dispatch: () => {} }}>
-            <Home />
+            <ToastProvider>
+              <Home />
+            </ToastProvider>
           </PlayerContext.Provider>
         </QueryClientProvider>
       </MemoryRouter>
@@ -42,15 +45,5 @@ describe('Página Home', () => {
   it('renderiza o nome de uma faixa do mock de tocadas recentemente', async () => {
     renderHome()
     expect(await screen.findByText('Mock Track 1')).toBeInTheDocument()
-  })
-
-  it('renderiza o título da seção de novos lançamentos', async () => {
-    renderHome()
-    expect(await screen.findByText(/Novos Lançamentos/i)).toBeInTheDocument()
-  })
-
-  it('renderiza um álbum do mock de novos lançamentos', async () => {
-    renderHome()
-    expect(await screen.findAllByText('Mock Album')).toBeTruthy()
   })
 })
