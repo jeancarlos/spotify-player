@@ -30,7 +30,7 @@ export function Home() {
   const albumArt = state.currentTrack?.album.images[0]?.url
 
   return (
-    <div className="relative min-h-screen bg-white overflow-hidden">
+    <div className="relative min-h-screen bg-white overflow-x-hidden">
       {/* Ambient blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="blob blob-1" />
@@ -38,20 +38,10 @@ export function Home() {
         <div className="blob blob-3" />
       </div>
 
-      {/* SearchBar */}
-      <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
-        <SearchBar onSearch={handleSearch} className="shadow-sm" />
-      </div>
-
-      {/* Title */}
-      <div className="pt-36 text-center px-4">
-        <h2 className="text-lg font-bold text-black/60">{t('home.recentlyPlayed')}</h2>
-      </div>
-
-      {/* Vinyl + Arc Carousel */}
-      <div className="relative flex justify-center mt-4 h-[580px]" >
-        {/* Arc Carousel — centered above the vinyl */}
-        <div className="absolute bottom-[260px] left-1/2 -translate-x-1/2">
+      {/* Fixed vinyl + arc — pinned to viewport bottom */}
+      <div className="fixed inset-0 pointer-events-none z-[5]">
+        {/* Arc Carousel */}
+        <div className="absolute bottom-[260px] left-1/2 -translate-x-1/2 pointer-events-auto">
           {tracks.length > 0 && (
             <ArcCarousel
               items={tracks.map(track => (
@@ -63,14 +53,14 @@ export function Home() {
                   size="sm"
                 />
               ))}
-              radius={220}
-              arcDeg={110}
+              radius={260}
+              arcDeg={120}
               baseDelay={DISK_DONE_DELAY}
             />
           )}
         </div>
 
-        {/* VinylDisk — static centering wrapper + animated entrance */}
+        {/* VinylDisk */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[200px]">
           <motion.div
             initial={{ scale: 0.7, y: 60, opacity: 0 }}
@@ -79,6 +69,19 @@ export function Home() {
           >
             <VinylDisk size="xl" isPlaying={state.isPlaying} albumArt={albumArt} />
           </motion.div>
+        </div>
+      </div>
+
+      {/* Scrollable content — sits above the vinyl layer */}
+      <div className="relative z-10">
+        {/* SearchBar */}
+        <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
+          <SearchBar onSearch={handleSearch} className="shadow-sm" />
+        </div>
+
+        {/* Title */}
+        <div className="pt-36 text-center px-4">
+          <h2 className="text-lg font-bold text-black/60">{t('home.recentlyPlayed')}</h2>
         </div>
       </div>
     </div>

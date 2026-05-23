@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Search, Plus, Trash2, X } from 'lucide-react'
+import { Search, Plus, Trash2, X, Music } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { TrackRow } from '@/components/shared/TrackRow'
+import { EmptyState } from '@/components/shared/EmptyState'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const SearchSchema = z.object({
@@ -128,9 +129,7 @@ export function Favorites() {
         )}
 
         {!isLoading && tracks.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-black/30">{t('favorites.emptyList')}</p>
-          </div>
+          <EmptyState message={t('favorites.emptyList')} icon={<Music size={32} />} />
         )}
 
         {!isLoading && tracks.length > 0 && (

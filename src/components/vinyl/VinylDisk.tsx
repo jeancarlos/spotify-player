@@ -12,8 +12,6 @@ const SIZE_MAP = { xs: 44, sm: 180, md: 360, lg: 560, xl: 720 } as const
 
 export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className }: VinylDiskProps) {
   const px = SIZE_MAP[size]
-  const labelPx = Math.round(px * 0.27)
-  const labelCenterPx = Math.round(labelPx * 0.1)
 
   const transition = isPlaying
     ? { duration: 8, ease: 'linear', repeat: Infinity }
@@ -26,7 +24,7 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
   return (
     <div
       className={`relative select-none shrink-0 ${className ?? ''}`}
-      style={{ width: px, height: px, }}
+      style={{ width: px, height: px, maxWidth: '100vw', maxHeight: '100vw' }}
     >
       <motion.img
         src={vinylWebp}
@@ -39,8 +37,8 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
       {albumArt && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
-            className="rounded-full overflow-hidden border-0 border-white/30"
-            style={{ width: labelPx, height: labelPx }}
+            className="relative rounded-full overflow-hidden border-0 border-white/30"
+            style={{ width: '27%', height: '27%' }}
           >
             <motion.img
               src={albumArt}
@@ -48,11 +46,10 @@ export function VinylDisk({ size = 'md', albumArt, isPlaying = false, className 
               className="w-full h-full object-cover"
               animate={animation}
               transition={transition}
-
             />
             <div
               className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2"
-              style={{ width: labelCenterPx, height: labelCenterPx }}
+              style={{ width: '10%', height: '10%' }}
             >
               <div className="w-full h-full bg-white/20 backdrop-blur-sm rounded-full border-black/20" />
             </div>
