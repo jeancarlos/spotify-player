@@ -74,7 +74,7 @@ export function ArcCarousel({
           {items.map((item, i) => {
             const pos = positions[i]
             if (!pos) return null
-            
+
             return (
               <motion.div
                 key={item.id}
@@ -104,9 +104,9 @@ export function ArcCarousel({
 
       {title && (
         <motion.svg
-          className="absolute top-[-70px] inset-0 pointer-events-none"
+          className="absolute top-[-120px] inset-0 pointer-events-none"
           width={radius * 2}
-          height={radius + 70}
+          height={radius + 120}
           style={{ overflow: 'visible' }}
           overflow="visible"
           initial={{ opacity: 0 }}

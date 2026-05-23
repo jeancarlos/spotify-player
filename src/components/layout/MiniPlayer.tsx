@@ -58,7 +58,7 @@ export function MiniPlayer() {
     try { await api.post('/me/player/next') } catch { /* silent */ }
   }, [dispatch])
 
-const toggleShuffle = useCallback(async () => {
+  const toggleShuffle = useCallback(async () => {
     dispatch({ type: 'TOGGLE_SHUFFLE' })
     try { await api.put('/me/player/shuffle', null, { params: { state: !shuffle } }) } catch { /* silent */ }
   }, [dispatch, shuffle])
@@ -97,137 +97,123 @@ const toggleShuffle = useCallback(async () => {
         </div>
       )}
 
-      <div className="relative rounded-3xl shadow-xl">
+      <div className="relative rounded-full glass shadow-xl">
         {/* Backdrop separado dos filhos animados — filhos com transform/animation quebram backdrop-filter no pai */}
-        <div className="absolute inset-0 glass rounded-3xl pointer-events-none" />
+        <div className="absolute inset-0  rounded-full pointer-events-none" />
 
         {/* Controles */}
         <div className="relative px-4 py-3 flex items-center gap-3">
-        {/* Home — oculto na própria página do player */}
-        {!isPlayerPage && (
-          <div className="relative group shrink-0">
-            <button
-              onClick={() => navigate('/')}
-              className="p-2 rounded-xl hover:bg-black/5 transition-colors"
-              aria-label={t('nav.home')}
-            >
-              <Home size={18} className="text-black/40" />
-            </button>
-            <Tip label={t('nav.home')} />
-          </div>
-        )}
-
-        {/* Track info + waveform */}
-        <div
-          className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden cursor-pointer group/track"
-          onClick={() => currentTrack && navigate('/player')}
-        >
-          {currentTrack ? (
-            <>
-              <VinylDisk
-                size="xs"
-                albumArt={currentTrack.album.images[0]?.url}
-                isPlaying={isPlaying}
-              />
-              <div className="min-w-0 flex-1 overflow-hidden">
-                <p className="text-xs font-bold text-black truncate group-hover/track:underline">
-                  {currentTrack.name}
-                </p>
-                <p className="text-[11px] text-black/50 truncate">
-                  {currentTrack.artists.map(a => a.name).join(', ')}
-                </p>
-              </div>
-              <div className="shrink-0 hidden sm:block">
-                <WaveformBars isPlaying={isPlaying} />
-              </div>
-            </>
-          ) : (
-            <p className="text-xs text-black/30">{t('player.noTrack')}</p>
-          )}
-        </div>
-
-        {/* Controles */}
-        {currentTrack && (
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Shuffle — oculto em telas pequenas */}
-            <div className="relative group hidden sm:block">
-              <button
-                onClick={toggleShuffle}
-                aria-label={t('player.shuffle')}
-                className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}
-              >
-                <Shuffle size={15} />
-              </button>
-              <Tip label={t('player.shuffle')} />
-            </div>
-
-            {/* Anterior — oculto em telas muito pequenas */}
-            <div className="relative group hidden min-[400px]:block">
-              <button
-                onClick={handlePrev}
-                aria-label={t('player.previous')}
-                className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
-              >
-                <SkipBack size={18} className="fill-current" />
-              </button>
-              <Tip label={t('player.previous')} />
-            </div>
-
-            {/* Play / Pause */}
-            <div className="relative group/play">
-              <button
-                onClick={handlePlayPause}
-                aria-label={isPlaying ? t('player.pause') : t('player.play')}
-                className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
-              >
-                {isPlaying
-                  ? <Pause size={14} className="fill-white text-white" />
-                  : <Play size={14} className="fill-white text-white ml-0.5" />}
-              </button>
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
-                {t('login.hint')}
-              </div>
-            </div>
-
-            {/* Próximo — oculto em telas muito pequenas */}
-            <div className="relative group hidden min-[400px]:block">
-              <button
-                onClick={handleNext}
-                aria-label={t('player.next')}
-                className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
-              >
-                <SkipForward size={18} className="fill-current" />
-              </button>
-              <Tip label={t('player.next')} />
-            </div>
-
-            {/* Repetir — oculto em telas pequenas */}
-            <div className="relative group hidden sm:block">
-              <button
-                onClick={cycleRepeat}
-                aria-label={t('player.repeat')}
-                className={cn('p-1.5 rounded-lg transition-colors', repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60')}
-              >
-                {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
-              </button>
-              <Tip label={t('player.repeat')} />
-            </div>
-
-            {/* Fila — oculto em telas pequenas e na página do player */}
-            {!isPlayerPage && (
-              <div className="relative group hidden sm:block">
-                <button
-                  onClick={() => navigate('/player')}
-                  aria-label={t('player.queue')}
-                  className="p-1.5 rounded-lg text-black/30 hover:text-black transition-colors"
-                >
-                  <ListMusic size={15} />
-                </button>
-                <Tip label={t('player.queue')} />
-              </div>
+          {/* Track info + waveform */}
+          <div
+            className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden cursor-pointer group/track"
+            onClick={() => currentTrack && navigate('/player')}
+          >
+            {currentTrack ? (
+              <>
+                <VinylDisk
+                  size="xs"
+                  albumArt={currentTrack.album.images[0]?.url}
+                  isPlaying={isPlaying}
+                />
+                <div className="min-w-0 flex-1 overflow-hidden">
+                  <p className="text-xs font-bold text-black truncate group-hover/track:underline">
+                    {currentTrack.name}
+                  </p>
+                  <p className="text-[11px] text-black/50 truncate">
+                    {currentTrack.artists.map(a => a.name).join(', ')}
+                  </p>
+                </div>
+                <div className="shrink-0 hidden sm:block">
+                  <WaveformBars isPlaying={isPlaying} />
+                </div>
+              </>
+            ) : (
+              <p className="text-xs text-black/30">{t('player.noTrack')}</p>
             )}
           </div>
-        )}
+
+          {/* Controles */}
+          {currentTrack && (
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Shuffle — oculto em telas pequenas */}
+              <div className="relative group hidden sm:block">
+                <button
+                  onClick={toggleShuffle}
+                  aria-label={t('player.shuffle')}
+                  className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}
+                >
+                  <Shuffle size={15} />
+                </button>
+                <Tip label={t('player.shuffle')} />
+              </div>
+
+              {/* Anterior — oculto em telas muito pequenas */}
+              <div className="relative group hidden min-[400px]:block">
+                <button
+                  onClick={handlePrev}
+                  aria-label={t('player.previous')}
+                  className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
+                >
+                  <SkipBack size={18} className="fill-current" />
+                </button>
+                <Tip label={t('player.previous')} />
+              </div>
+
+              {/* Play / Pause */}
+              <div className="relative group/play">
+                <button
+                  onClick={handlePlayPause}
+                  aria-label={isPlaying ? t('player.pause') : t('player.play')}
+                  className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
+                >
+                  {isPlaying
+                    ? <Pause size={14} className="fill-white text-white" />
+                    : <Play size={14} className="fill-white text-white ml-0.5" />}
+                </button>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
+                  {t('login.hint')}
+                </div>
+              </div>
+
+              {/* Próximo — oculto em telas muito pequenas */}
+              <div className="relative group hidden min-[400px]:block">
+                <button
+                  onClick={handleNext}
+                  aria-label={t('player.next')}
+                  className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
+                >
+                  <SkipForward size={18} className="fill-current" />
+                </button>
+                <Tip label={t('player.next')} />
+              </div>
+
+              {/* Repetir — oculto em telas pequenas */}
+              <div className="relative group hidden sm:block">
+                <button
+                  onClick={cycleRepeat}
+                  aria-label={t('player.repeat')}
+                  className={cn('p-1.5 rounded-lg transition-colors', repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60')}
+                >
+                  {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
+                </button>
+                <Tip label={t('player.repeat')} />
+              </div>
+
+              {/* Fila — oculto em telas pequenas e na página do player */}
+              {!isPlayerPage && (
+                <div className="relative group hidden sm:block">
+                  <button
+                    onClick={() => navigate('/player')}
+                    aria-label={t('player.queue')}
+                    className="p-1.5 rounded-lg text-black/30 hover:text-black transition-colors"
+                  >
+                    <ListMusic size={15} />
+                  </button>
+                  <Tip label={t('player.queue')} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
