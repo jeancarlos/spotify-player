@@ -13,9 +13,7 @@
     "recentlyPlayed": "Recently Played",
     "newReleases": "New Releases",
     "recommendations": "Recommended for You",
-    "seeMore": "See more",
-    "interactiveHint": "Tap covers to play",
-    "navHint": "Use arrows to navigate"
+    "seeMore": "See more"
   },
   "login": {
     "title": "Spoter",

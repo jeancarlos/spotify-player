@@ -62,15 +62,16 @@ export function Home() {
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
 
-      {/* Hint text — visível apenas no mobile, espaço entre searchbar e disco */}
+      {/* Hint text — abaixo da searchbar, visível quando há espaço */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="md:hidden fixed bottom-[42%] left-0 right-0 z-[4] flex flex-col items-center gap-1 pointer-events-none"
+        transition={{ delay: 0.9, duration: 0.7 }}
+        className="fixed top-28 left-0 right-0 z-[4] flex justify-center px-8 pointer-events-none"
       >
-        <p className="text-[11px] text-black/25 tracking-widest uppercase">{t('home.interactiveHint')}</p>
-        {hasNav && <p className="text-[10px] text-black/18 tracking-wider">{t('home.navHint')}</p>}
+        <p className="text-center text-[11px] text-black/30 leading-relaxed max-w-xs">
+          {t('login.hint')}
+        </p>
       </motion.div>
 
       {/* Mobile semi-circle nav buttons — fixed to screen edges */}
