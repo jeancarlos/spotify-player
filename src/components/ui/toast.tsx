@@ -75,7 +75,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 60, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 glass-card border ${borders[t.variant]} rounded-2xl max-w-sm shadow-xl`}
+              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl max-w-sm shadow-xl border ${borders[t.variant]}`}
+              style={{ background: 'rgba(20,20,20,0.88)', backdropFilter: 'blur(16px)' }}
             >
               {icons[t.variant]}
               <p className="text-sm text-white/80 flex-1">{t.message}</p>

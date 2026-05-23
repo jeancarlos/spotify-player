@@ -1,6 +1,17 @@
-/* Estilos do Spoter estão em:
- *   src/styles/globals.css  — tokens, reset, body, scrollbar
- *   src/styles/glass.css    — utilitários glassmorphism
- *
- * Ambos são importados em src/main.tsx
- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './styles/globals.css';
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: #ffffff;
+    color: #111111;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
