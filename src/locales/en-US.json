@@ -11,7 +11,7 @@
     "subtitle": "Your immersive music experience",
     "button": "Sign in with Spotify"
   },
-  "player": { "nowPlaying": "Now playing", "noTrack": "No track selected", "noActiveDevice": "No active device", "queue": "Play queue", "closeQueue": "Close queue" },
+  "player": { "nowPlaying": "Now playing", "noTrack": "No track selected", "noActiveDevice": "No active device", "lyrics": "Lyrics", "queue": "Play queue", "closeQueue": "Close queue" },
   "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Try again" },
   "artists": {
     "searchPlaceholder": "Search artists...",

@@ -11,7 +11,7 @@
     "subtitle": "Sua experiência musical imersiva",
     "button": "Entrar com Spotify"
   },
-  "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada", "noActiveDevice": "Nenhum dispositivo ativo", "queue": "Fila de reprodução", "closeQueue": "Fechar fila" },
+  "player": { "nowPlaying": "Tocando agora", "noTrack": "Nenhuma música selecionada", "noActiveDevice": "Nenhum dispositivo ativo", "lyrics": "Letra", "queue": "Fila de reprodução", "closeQueue": "Fechar fila" },
   "common": { "loading": "Carregando...", "error": "Algo deu errado", "retry": "Tentar novamente" },
   "artists": {
     "searchPlaceholder": "Buscar artistas...",
