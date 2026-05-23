@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
 import { WaveformBars } from '@/components/shared/WaveformBars'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
+import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 import type { AxiosError } from 'axios'
@@ -24,7 +25,7 @@ function Tip({ label }: { label: string }) {
 
 export function MiniPlayer() {
   const { state, dispatch } = usePlayer()
-  const { currentTrack, isPlaying, shuffle, repeat } = state
+  const { currentTrack, isPlaying, shuffle, repeat, progress, duration } = state
   const navigate = useNavigate()
   const location = useLocation()
   const { toast } = useToast()
@@ -41,6 +42,12 @@ export function MiniPlayer() {
       if (status === 404 || status === 403) toast(t('player.noActiveDevice'), 'info')
     }
   }, [dispatch, isPlaying, toast, t])
+
+  const handleSeek = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const ms = Number(e.target.value)
+    dispatch({ type: 'SET_PROGRESS', payload: ms })
+    try { await api.put('/me/player/seek', null, { params: { position_ms: ms } }) } catch { /* silent */ }
+  }, [dispatch])
 
   const handlePrev = useCallback(async () => {
     try { await api.post('/me/player/previous') } catch { /* silent */ }
@@ -65,7 +72,31 @@ const toggleShuffle = useCallback(async () => {
   const isPlayerPage = location.pathname === '/player'
 
   return (
-    <div className="fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto">
+    <div className="fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1">
+      {/* Seek bar — fora do glass */}
+      {currentTrack && (
+        <div className="px-3 flex items-center gap-2">
+          <span className="text-[10px] text-white font-semibold w-7 text-right font-mono shrink-0 tabular-nums [mix-blend-mode:difference]">
+            {formatDuration(progress)}
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={duration || 1}
+            value={progress}
+            onChange={handleSeek}
+            aria-label={t('player.seek')}
+            className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
+            style={{
+              background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, #d4d4d8 ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
+            }}
+          />
+          <span className="text-[10px] text-white font-semibold w-7 font-mono shrink-0 tabular-nums [mix-blend-mode:difference]">
+            {formatDuration(duration)}
+          </span>
+        </div>
+      )}
+
       <div className="glass rounded-3xl overflow-hidden shadow-xl">
 
         {/* Controles */}
