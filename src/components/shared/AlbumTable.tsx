@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
+import { useTranslation } from 'react-i18next'
 import type { SpotifyAlbumSimple } from '@/types/spotify'
 
 interface AlbumTableProps {
@@ -8,17 +9,19 @@ interface AlbumTableProps {
 }
 
 export function AlbumTable({ albums, onClick }: AlbumTableProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs border-collapse" style={{ minWidth: 500 }}>
         <thead>
           <tr className="border-b border-black/8">
             <th className="text-left py-2 px-3 text-black/30 font-semibold w-10"></th>
-            <th className="text-left py-2 px-3 text-black/30 font-semibold">Nome</th>
-            <th className="text-left py-2 px-3 text-black/30 font-semibold">Tipo</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">Ano</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">Faixas</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">Pop.</th>
+            <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('common.name')}</th>
+            <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('track.type')}</th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('track.releaseYear')}</th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('track.trackCount')}</th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('common.popularity')}</th>
           </tr>
         </thead>
         <tbody>

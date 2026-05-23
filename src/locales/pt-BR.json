@@ -44,7 +44,9 @@
     "back": "Voltar",
     "skipToContent": "Pular para o conteúdo principal",
     "list": "Lista",
-    "table": "Tabela"
+    "table": "Tabela",
+    "popularity": "Pop.",
+    "name": "Nome"
   },
   "artists": {
     "searchPlaceholder": "Buscar...",
@@ -56,12 +58,15 @@
     "tabPlaylist": "Playlist",
     "filterByGenre": "Filtrar por gênero",
     "noResults": "Nenhum resultado encontrado",
+    "result_one": "{{count}} resultado",
+    "result_other": "{{count}} resultados",
     "searchPrompt": "Digite para buscar",
     "previous": "Anterior",
     "next": "Próxima",
     "all": "Todos",
     "unknownGenre": "Gênero desconhecido",
-    "followers": "seguidores"
+    "followers_one": "{{count}} seguidor",
+    "followers_other": "{{count}} seguidores"
   },
   "artistDetail": {
     "topTracks": "Top Tracks",
@@ -131,7 +136,10 @@
     "popularity": "Popularidade"
   },
   "profile": {
-    "followers": "seguidores",
+    "followers_one": "{{count}} seguidor",
+    "followers_other": "{{count}} seguidores",
+    "followers_label_one": "seguidor",
+    "followers_label_other": "seguidores",
     "topArtists": "Artistas Mais Ouvidos",
     "topTracks": "Faixas Favoritas",
     "audioProfile": "Perfil Musical",
@@ -139,7 +147,10 @@
     "sixMonths": "6 meses",
     "allTime": "Longo prazo",
     "mostPlayedAlbums": "Álbuns Mais Ouvidos",
-    "tracks": "faixas",
+    "tracks_one": "{{count}} faixa",
+    "tracks_other": "{{count}} faixas",
+    "tracks_label_one": "faixa",
+    "tracks_label_other": "faixas",
     "listenMore": "Ouça mais músicas para ver seu perfil",
     "plan": "Plano"
   },

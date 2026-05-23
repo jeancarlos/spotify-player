@@ -31,7 +31,9 @@ export function Profile() {
           <div className="flex gap-6 mt-2">
             <div className="text-center">
               <p className="text-lg font-bold text-black">{profile.followers.total}</p>
-              <p className="text-xs text-black/40">{t('artists.followers')}</p>
+              <p className="text-xs text-black/40">
+                {t('profile.followers_label', { count: profile.followers.total })}
+              </p>
             </div>
             <div className="text-center">
               <p className="text-lg font-bold text-black capitalize">{profile.product}</p>

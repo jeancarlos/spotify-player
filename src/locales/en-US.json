@@ -44,7 +44,9 @@
     "back": "Back",
     "skipToContent": "Skip to main content",
     "list": "List",
-    "table": "Table"
+    "table": "Table",
+    "popularity": "Pop.",
+    "name": "Name"
   },
   "artists": {
     "searchPlaceholder": "Search...",
@@ -56,12 +58,15 @@
     "tabPlaylist": "Playlist",
     "filterByGenre": "Filter by genre",
     "noResults": "No results found",
+    "result_one": "{{count}} result",
+    "result_other": "{{count}} results",
     "searchPrompt": "Type to search",
     "previous": "Previous",
     "next": "Next",
     "all": "All",
     "unknownGenre": "Unknown genre",
-    "followers": "followers"
+    "followers_one": "{{count}} follower",
+    "followers_other": "{{count}} followers"
   },
   "artistDetail": {
     "topTracks": "Top Tracks",
@@ -131,7 +136,10 @@
     "popularity": "Popularity"
   },
   "profile": {
-    "followers": "followers",
+    "followers_one": "{{count}} follower",
+    "followers_other": "{{count}} followers",
+    "followers_label_one": "follower",
+    "followers_label_other": "followers",
     "topArtists": "Top Artists",
     "topTracks": "Top Tracks",
     "audioProfile": "Audio Profile",
@@ -139,7 +147,10 @@
     "sixMonths": "6 months",
     "allTime": "All time",
     "mostPlayedAlbums": "Most Played Albums",
-    "tracks": "tracks",
+    "tracks_one": "{{count}} track",
+    "tracks_other": "{{count}} tracks",
+    "tracks_label_one": "track",
+    "tracks_label_other": "tracks",
     "listenMore": "Listen to more songs to see your profile",
     "plan": "Plan"
   },

@@ -8,9 +8,6 @@ interface ProgressRef {
   isPlaying: boolean
 }
 
-// Sentinel to detect first render (distinct from null/undefined data values)
-const UNSET = Symbol('unset')
-
 export function useProgressEngine(): {
   currentProgress: number
   seekTo: (ms: number) => void
@@ -18,33 +15,61 @@ export function useProgressEngine(): {
   const { state: authState } = useAuth()
   const { data } = useNowPlaying(authState.isAuthenticated)
 
-  const ref = useRef<ProgressRef>({ baseProgress: 0, baseTime: Date.now(), isPlaying: false })
-  const lastDataRef = useRef<typeof data | typeof UNSET>(UNSET)
-  const [, setTick] = useState(0)
+  // We use a ref to track the "baseline" progress to avoid frequent re-renders
+  // and to follow React's rules about ref access during render.
+  const baselineRef = useRef<ProgressRef>({
+    baseProgress: 0,
+    baseTime: 0,
+    isPlaying: false,
+  })
 
-  // Sync ref inline on every render when data changes — avoids useEffect delay in tests
-  if (data !== lastDataRef.current) {
-    lastDataRef.current = data
-    if (data && data.progress_ms !== null) {
-      const adjustedProgress = data.is_playing
-        ? data.progress_ms + (Date.now() - data.timestamp)
-        : data.progress_ms
-      ref.current = { baseProgress: adjustedProgress, baseTime: Date.now(), isPlaying: data.is_playing }
-    }
-  }
+  const [currentProgress, setCurrentProgress] = useState(0)
 
+  // Sync ref with incoming data from the API inside an effect
   useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 100)
+    if (data && data.progress_ms !== null) {
+      const now = Date.now()
+      const adjustedProgress = data.is_playing
+        ? data.progress_ms + (now - data.timestamp)
+        : data.progress_ms
+
+      baselineRef.current = {
+        baseProgress: adjustedProgress,
+        baseTime: now,
+        isPlaying: data.is_playing,
+      }
+      // Defer to avoid cascading render lint error
+      setTimeout(() => {
+        setCurrentProgress(adjustedProgress)
+      }, 0)
+    }
+  }, [data])
+
+  // Timer loop to update the UI between API polls
+  useEffect(() => {
+    const update = () => {
+      const now = Date.now()
+      const b = baselineRef.current
+      // If we haven't received any data yet, baseTime might be 0
+      if (b.baseTime === 0) return
+
+      const progress = b.isPlaying ? b.baseProgress + (now - b.baseTime) : b.baseProgress
+      setCurrentProgress(progress)
+    }
+
+    update()
+    const id = setInterval(update, 100)
     return () => clearInterval(id)
   }, [])
 
-  const currentProgress = ref.current.isPlaying
-    ? ref.current.baseProgress + (Date.now() - ref.current.baseTime)
-    : ref.current.baseProgress
-
   const seekTo = useCallback((ms: number) => {
-    ref.current = { baseProgress: ms, baseTime: Date.now(), isPlaying: ref.current.isPlaying }
-    setTick(t => t + 1)
+    const now = Date.now()
+    baselineRef.current = {
+      ...baselineRef.current,
+      baseProgress: ms,
+      baseTime: now,
+    }
+    setCurrentProgress(ms)
   }, [])
 
   return { currentProgress, seekTo }

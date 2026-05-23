@@ -82,7 +82,13 @@ export function MiniPlayer() {
   }, [dispatch, shuffle])
 
   const cycleRepeat = useCallback(async () => {
-    const next = repeat === 'off' ? 'context' : repeat === 'context' ? 'track' : 'off'
+    const nextRepeatState: Record<string, 'off' | 'context' | 'track'> = {
+      off: 'context',
+      context: 'track',
+      track: 'off'
+    }
+    const next = nextRepeatState[repeat] || 'off'
+    
     dispatch({ type: 'SET_REPEAT', payload: next })
     try { await api.put('/me/player/repeat', null, { params: { state: next }, responseType: 'text' }) } catch { /* silent */ }
   }, [dispatch, repeat])

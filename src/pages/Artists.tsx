@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useArtists } from '@/hooks/queries/useArtists'
 import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
 import { useSearchPlaylists } from '@/hooks/queries/useSearchPlaylists'
-import { Play } from 'lucide-react'
-import { ArtistCard } from '@/components/shared/ArtistCard'
+import { MediaCard } from '@/components/shared/MediaCard'
 import { CardSkeleton } from '@/components/shared/CardSkeleton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { Pagination } from '@/components/shared/Pagination'
@@ -32,8 +31,15 @@ export function Artists() {
 
   const isArtist = tab === 'artista'
   const isPlaylist = tab === 'playlist'
-  const data = isArtist ? artists.data : isPlaylist ? playlists.data : albums.data
-  const isLoading = isArtist ? artists.isPending : isPlaylist ? playlists.isPending : albums.isPending
+  
+  // Refactor nested ternaries into clearer derivations
+  const getSearchData = () => {
+    if (isArtist) return artists
+    if (isPlaylist) return playlists
+    return albums
+  }
+
+  const { data, isPending: isLoading } = getSearchData()
   const hasNext = data ? (data.offset + data.items.length) < data.total : false
 
   const handleSearch = useCallback((q: string, t: SearchTab) => {
@@ -46,11 +52,13 @@ export function Artists() {
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const headerLabel = isArtist
-    ? t('artists.searchArtists')
-    : isPlaylist
-    ? t('artists.searchPlaylists')
-    : t('artists.searchAlbums')
+  const getHeaderLabel = () => {
+    if (isArtist) return t('artists.searchArtists')
+    if (isPlaylist) return t('artists.searchPlaylists')
+    return t('artists.searchAlbums')
+  }
+
+  const headerLabel = getHeaderLabel()
 
   return (
     <div className="min-h-screen">
@@ -64,7 +72,7 @@ export function Artists() {
         {query && (
           <p className="text-sm text-black/40 mb-6" aria-live="polite">
             {headerLabel}
-            {data && ` — ${data.total} resultados`}
+            {data && ` — ${t('artists.result', { count: data.total })}`}
           </p>
         )}
 
@@ -82,97 +90,37 @@ export function Artists() {
           </div>
         )}
 
-        {/* Artist grid */}
-        {!isLoading && isArtist && artists.data && (
+        {/* Results grid */}
+        {!isLoading && data && (
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {artists.data.items.map(artist => (
-              <ArtistCard key={artist.id} artist={artist} />
+            {isArtist && artists.data?.items.map(artist => (
+              <MediaCard
+                key={artist.id}
+                title={artist.name}
+                imageUrl={artist.images[0]?.url}
+                subtitle={artist.followers?.total != null ? t('artists.followers', { count: artist.followers.total }) : undefined}
+                onClick={() => navigate(`/artists/${artist.id}`)}
+              />
             ))}
-          </div>
-        )}
 
-        {/* Album grid */}
-        {!isLoading && tab === 'album' && albums.data && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {albums.data.items.map(album => (
-              <div
+            {tab === 'album' && albums.data?.items.map(album => (
+              <MediaCard
                 key={album.id}
-                className="cursor-pointer focus:outline-none group"
-                role="button"
-                tabIndex={0}
+                title={album.name}
+                imageUrl={album.images[0]?.url}
+                subtitle={album.artists.map((a: { name: string }) => a.name).join(', ')}
                 onClick={() => navigate(`/albums/${album.id}`)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    navigate(`/albums/${album.id}`)
-                  }
-                }}
-              >
-                <div className="relative aspect-square overflow-hidden rounded-[14px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
-                  <img
-                    src={album.images[0]?.url}
-                    alt={album.name}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                      <Play size={14} className="text-white fill-white ml-0.5" />
-                    </div>
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
-                    <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">{album.name}</p>
-                    <p className="text-[8px] text-white/60 truncate leading-tight">
-                      {album.artists.map((a: { name: string }) => a.name).join(', ')}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              />
             ))}
-          </div>
-        )}
 
-        {/* Playlist grid */}
-        {!isLoading && isPlaylist && playlists.data && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {playlists.data.items.filter((p): p is NonNullable<typeof p> => !!p).map(playlist => (
-              <div
+            {isPlaylist && playlists.data?.items.filter((p): p is NonNullable<typeof p> => !!p).map(playlist => (
+              <MediaCard
                 key={playlist.id}
-                className="cursor-pointer focus:outline-none group"
-                role="button"
-                tabIndex={0}
+                title={playlist.name}
+                imageUrl={playlist.images[0]?.url}
+                subtitle={playlist.owner.display_name}
                 onClick={() => navigate(`/playlists/${playlist.id}`)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    navigate(`/playlists/${playlist.id}`)
-                  }
-                }}
-              >
-                <div className="relative aspect-square overflow-hidden rounded-[14px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
-                  {playlist.images[0]?.url ? (
-                    <img
-                      src={playlist.images[0].url}
-                      alt={playlist.name}
-                      className="w-full h-full object-cover"
-                      draggable={false}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-black/20 flex items-center justify-center text-white/20 text-4xl">♫</div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                      <Play size={14} className="text-white fill-white ml-0.5" />
-                    </div>
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
-                    <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">{playlist.name}</p>
-                    <p className="text-[8px] text-white/60 truncate leading-tight">{playlist.owner.display_name}</p>
-                  </div>
-                </div>
-              </div>
+              />
             ))}
           </div>
         )}
