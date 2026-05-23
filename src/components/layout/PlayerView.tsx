@@ -22,6 +22,8 @@ export function PlayerView() {
   const trackName = currentTrack?.name ?? ''
   const lyrics = useLyrics(artistName, trackName)
   const albumArt = currentTrack?.album.images[0]?.url
+  const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
+  const isShowingInfo = showInfo || noLyrics
 
   return (
     <div className="relative min-h-screen bg-black overflow-hidden flex flex-col">
@@ -54,18 +56,21 @@ export function PlayerView() {
           <p className="text-xs text-white/40 uppercase tracking-widest">
             {t('lyrics.nowPlaying')}
           </p>
-          <button
-            onClick={() => setShowInfo(v => !v)}
-            className={cn('p-2 rounded-xl glass', showInfo && 'bg-white/20')}
-            aria-label={t('player.trackInfo')}
-          >
-            <FileText size={18} className="text-white" />
-          </button>
+          {!noLyrics && (
+            <button
+              onClick={() => setShowInfo(v => !v)}
+              className={cn('p-2 rounded-xl glass', showInfo && 'bg-white/20')}
+              aria-label={t('player.trackInfo')}
+            >
+              <FileText size={18} className="text-white" />
+            </button>
+          )}
+          {noLyrics && <div className="w-10" />}
         </div>
 
         {/* Área principal */}
         <AnimatePresence mode="wait">
-          {showInfo ? (
+          {isShowingInfo ? (
             <motion.div
               key="info"
               initial={{ opacity: 0, y: 16 }}
@@ -103,30 +108,13 @@ export function PlayerView() {
             >
               <p className="text-white/30 text-sm">{t('lyrics.searching')}</p>
             </motion.div>
-          ) : lyrics.data && lyrics.data.length > 0 ? (
+          ) : (
             <LyricsView
               key="lyrics"
-              lines={lyrics.data}
+              lines={lyrics.data ?? []}
               progress={progress}
               duration={duration}
             />
-          ) : (
-            <motion.div
-              key="notfound"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center gap-6 px-8"
-            >
-              {albumArt && (
-                <img
-                  src={albumArt}
-                  alt={currentTrack?.album.name}
-                  className="w-56 h-56 rounded-2xl object-cover shadow-2xl opacity-70"
-                />
-              )}
-              <p className="text-white/30 text-sm">{t('lyrics.notFound')}</p>
-            </motion.div>
           )}
         </AnimatePresence>
       </div>
