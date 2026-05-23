@@ -130,24 +130,6 @@ export function TrackInfoPanel({ track }: Props) {
           </Section>
         )}
 
-        {/* Popularity */}
-        <div className="w-full max-w-sm space-y-1.5">
-          <div className="flex justify-between items-end px-0.5">
-            <span className="text-[9px] text-white/40 uppercase tracking-widest font-bold">{t('track.popularity')}</span>
-            <span className="text-base font-black text-white leading-none">
-              {track.popularity}<span className="text-[9px] text-white/30 ml-0.5">/100</span>
-            </span>
-          </div>
-          <div className="h-2.5 rounded-full bg-white/5 p-[2px] border border-white/10 overflow-hidden">
-            <motion.div
-              className="h-full rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${track.popularity}%` }}
-              transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-              style={{ background: 'linear-gradient(90deg, #1DB954, #1ed760)', boxShadow: '0 0 10px rgba(29,185,84,0.4)' }}
-            />
-          </div>
-        </div>
 
         {/* Genre tags */}
         <div className="flex flex-wrap justify-center gap-1.5">
