@@ -34,7 +34,7 @@ export function PlayerView() {
   const isShowingInfo = showInfo || noLyrics
 
   return (
-    <div className="relative h-screen bg-black overflow-hidden flex flex-col">
+    <div className="relative min-h-screen bg-black overflow-hidden flex flex-col">
       {/* Background blur */}
       {albumArt && (
         <div
