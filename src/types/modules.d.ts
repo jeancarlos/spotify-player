@@ -4,3 +4,8 @@ declare module 'color-thief-ts' {
     getPalette(img: HTMLImageElement, colorCount?: number, quality?: number): number[][]
   }
 }
+
+declare module '*.webp' {
+  const content: string
+  export default content
+}
