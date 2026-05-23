@@ -72,33 +72,34 @@ export function MiniPlayer() {
   const isPlayerPage = location.pathname === '/player'
 
   return (
-    <div className="fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-0.5">
-      {/* Seek bar — mostrada quando há faixa tocando */}
-      {currentTrack && (
-        <div className="px-3 flex items-center gap-2">
-          <span className="text-[10px] text-black font-semibold w-7 text-right font-mono shrink-0">
-            {formatDuration(progress)}
-          </span>
-          <input
-            type="range"
-            min={0}
-            max={duration || 1}
-            value={progress}
-            onChange={handleSeek}
-            aria-label={t('player.seek')}
-            className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
-            style={{
-              background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, #d4d4d8 ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
-            }}
-          />
-          <span className="text-[10px] text-black font-semibold w-7 font-mono shrink-0">
-            {formatDuration(duration)}
-          </span>
-        </div>
-      )}
+    <div className="fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto">
+      <div className={`glass border-t border-white/40 px-4 pb-3 flex flex-col gap-1.5 ${currentTrack ? 'rounded-[28px] pt-2.5' : 'rounded-full pt-3'}`}>
+        {/* Seek bar — dentro do glass para contraste garantido */}
+        {currentTrack && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-black/70 w-7 text-right font-mono shrink-0">
+              {formatDuration(progress)}
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={duration || 1}
+              value={progress}
+              onChange={handleSeek}
+              aria-label={t('player.seek')}
+              className="flex-1 h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
+              style={{
+                background: `linear-gradient(to right, #1DB954 ${duration ? Math.round((progress / duration) * 100) : 0}%, #d4d4d8 ${duration ? Math.round((progress / duration) * 100) : 0}%)`,
+              }}
+            />
+            <span className="text-[10px] text-black/70 w-7 font-mono shrink-0">
+              {formatDuration(duration)}
+            </span>
+          </div>
+        )}
 
-      {/* Pill principal */}
-      <div className="rounded-full glass border-t border-white/40 px-4 py-3 flex items-center gap-3">
+        {/* Controles */}
+        <div className="flex items-center gap-3">
         {/* Home — oculto na própria página do player */}
         {!isPlayerPage && (
           <div className="relative group shrink-0">
@@ -222,6 +223,7 @@ export function MiniPlayer() {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   )
