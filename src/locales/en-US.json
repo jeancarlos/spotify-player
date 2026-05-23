@@ -1,5 +1,14 @@
 {
-  "nav": { "home": "Home", "artists": "Artists", "profile": "Profile", "favorites": "Favorites", "collapse": "Collapse", "logout": "Sign out" },
+  "nav": {
+    "home": "Home",
+    "artists": "Artists",
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "collapse": "Collapse",
+    "logout": "Sign out",
+    "openMenu": "Open menu",
+    "languageSwitcher": "Language switcher"
+  },
   "home": {
     "recentlyPlayed": "Recently Played",
     "newReleases": "New Releases",
@@ -12,8 +21,28 @@
     "button": "Sign in with Spotify",
     "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
   },
-  "player": { "nowPlaying": "Now playing", "noTrack": "No track selected", "noActiveDevice": "No active device", "lyrics": "Lyrics", "queue": "Play queue", "closeQueue": "Close queue", "shuffle": "Shuffle", "previous": "Previous", "next": "Next", "repeat": "Repeat", "play": "Play", "pause": "Pause" },
-  "common": { "loading": "Loading...", "error": "Something went wrong", "retry": "Try again" },
+  "player": {
+    "nowPlaying": "Now playing",
+    "noTrack": "No track selected",
+    "noActiveDevice": "No active device",
+    "lyrics": "Lyrics",
+    "queue": "Play queue",
+    "closeQueue": "Close queue",
+    "shuffle": "Shuffle",
+    "previous": "Previous",
+    "next": "Next",
+    "repeat": "Repeat",
+    "play": "Play",
+    "pause": "Pause",
+    "trackInfo": "Track info",
+    "back": "Back"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "back": "Back"
+  },
   "artists": {
     "searchPlaceholder": "Search artists...",
     "searchAlbums": "Search albums",
@@ -33,7 +62,12 @@
     "popularity": "Popularity",
     "previous": "Previous",
     "next": "Next",
-    "audioProfile": "Audio Profile"
+    "audioProfile": "Audio Profile",
+    "danceability": "Danceability",
+    "energy": "Energy",
+    "valence": "Valence",
+    "acousticness": "Acousticness",
+    "liveness": "Liveness"
   },
   "favorites": {
     "title": "Title",
@@ -48,7 +82,10 @@
     "removeConfirm": "Remove",
     "cancel": "Cancel",
     "titleRequired": "Title is required",
-    "artistRequired": "Artist is required"
+    "artistRequired": "Artist is required",
+    "minQuery": "Type at least 2 characters",
+    "close": "Close",
+    "addTrack": "+ Add"
   },
   "lyrics": {
     "searching": "Searching lyrics...",
@@ -72,6 +109,13 @@
     "allTime": "All time",
     "mostPlayedAlbums": "Most Played Albums",
     "tracks": "tracks",
-    "listenMore": "Listen to more songs to see your profile"
+    "listenMore": "Listen to more songs to see your profile",
+    "plan": "Plan"
+  },
+  "auth": {
+    "authenticating": "Authenticating..."
+  },
+  "playlist": {
+    "defaultName": "Spoter List"
   }
 }

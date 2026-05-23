@@ -5,7 +5,9 @@
     "profile": "Perfil",
     "favorites": "Favoritos",
     "collapse": "Recolher",
-    "logout": "Sair"
+    "logout": "Sair",
+    "openMenu": "Abrir menu",
+    "languageSwitcher": "Seletor de idioma"
   },
   "home": {
     "recentlyPlayed": "Tocadas Recentemente",
@@ -31,12 +33,15 @@
     "next": "Próximo",
     "repeat": "Repetir",
     "play": "Reproduzir",
-    "pause": "Pausar"
+    "pause": "Pausar",
+    "trackInfo": "Informações da faixa",
+    "back": "Voltar"
   },
   "common": {
     "loading": "Carregando...",
     "error": "Algo deu errado",
-    "retry": "Tentar novamente"
+    "retry": "Tentar novamente",
+    "back": "Voltar"
   },
   "artists": {
     "searchPlaceholder": "Buscar artistas...",
@@ -57,7 +62,12 @@
     "popularity": "Popularidade",
     "previous": "Anterior",
     "next": "Próxima",
-    "audioProfile": "Perfil de Áudio"
+    "audioProfile": "Perfil de Áudio",
+    "danceability": "Dança",
+    "energy": "Energia",
+    "valence": "Valência",
+    "acousticness": "Acústica",
+    "liveness": "Ao Vivo"
   },
   "favorites": {
     "title": "Título",
@@ -72,7 +82,10 @@
     "removeConfirm": "Remover",
     "cancel": "Cancelar",
     "titleRequired": "Título é obrigatório",
-    "artistRequired": "Artista é obrigatório"
+    "artistRequired": "Artista é obrigatório",
+    "minQuery": "Digite pelo menos 2 caracteres",
+    "close": "Fechar",
+    "addTrack": "+ Adicionar"
   },
   "lyrics": {
     "searching": "Buscando letra...",
@@ -96,6 +109,13 @@
     "allTime": "Longo prazo",
     "mostPlayedAlbums": "Álbuns Mais Ouvidos",
     "tracks": "faixas",
-    "listenMore": "Ouça mais músicas para ver seu perfil"
+    "listenMore": "Ouça mais músicas para ver seu perfil",
+    "plan": "Plano"
+  },
+  "auth": {
+    "authenticating": "Autenticando..."
+  },
+  "playlist": {
+    "defaultName": "Spoter List"
   }
 }
