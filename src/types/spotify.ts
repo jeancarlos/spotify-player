@@ -129,3 +129,39 @@ export interface SpotifyPlayerState {
 }
 
 export interface TopItemsResponse<T> extends PagingObject<T> {}
+
+export interface SpotifyPlaylist {
+  id: string
+  name: string
+  description: string | null
+  images: SpotifyImage[]
+  owner: { id: string; display_name: string }
+  tracks: { total: number; href: string }
+  uri: string
+  public: boolean | null
+}
+
+export interface SpotifyPlaylistTrack {
+  added_at: string
+  track: SpotifyTrack
+}
+
+export interface UserPlaylistsResponse {
+  items: SpotifyPlaylist[]
+  total: number
+  limit: number
+  offset: number
+  next: string | null
+}
+
+export interface PlaylistTracksResponse {
+  items: SpotifyPlaylistTrack[]
+  total: number
+  limit: number
+  offset: number
+  next: string | null
+}
+
+export interface SearchTracksResponse {
+  tracks: PagingObject<SpotifyTrack>
+}
