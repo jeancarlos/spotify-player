@@ -289,3 +289,33 @@ export interface SpotifyRecommendationsResponse {
   }>
   tracks: SpotifyTrack[]
 }
+
+export interface SpotifyAlbumTrack {
+  id: string
+  name: string
+  duration_ms: number
+  explicit: boolean
+  track_number: number
+  disc_number: number
+  uri: string
+  type: 'track'
+  artists: SpotifyArtistSimple[]
+  preview_url: string | null
+  is_playable?: boolean
+  href?: string
+  external_urls?: SpotifyExternalUrls
+}
+
+export interface SpotifyAlbumFull extends SpotifyAlbumSimple {
+  label?: string
+  genres?: string[]
+  popularity?: number
+  copyrights?: Array<{ text: string; type: 'C' | 'P' }>
+  external_ids?: { upc?: string; ean?: string }
+}
+
+export interface RelatedArtistsResponse {
+  artists: SpotifyArtist[]
+}
+
+export type AlbumTracksResponse = PagingObject<SpotifyAlbumTrack>
