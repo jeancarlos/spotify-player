@@ -43,7 +43,7 @@ export function VinylDisk({ size = 'md', albumArt, albumName, isPlaying = false,
           style={{ width: '26%', height: '26%' }}
         >
           <motion.img
-            src={albumArt ?? '/favicon.svg'}
+            src={albumArt ?? '/spoter-logo-cor-small.svg'}
             alt={albumName ? `${t('favorites.album')}: ${albumName}` : ""}
             className="w-full h-full object-cover"
             animate={animation}
