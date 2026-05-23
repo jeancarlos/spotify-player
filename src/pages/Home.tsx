@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRecentlyPlayed } from '@/hooks/queries/useRecentlyPlayed'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
@@ -35,12 +36,16 @@ export function Home() {
   const navigate = useNavigate()
   const { state } = usePlayer()
   const playTrack = usePlayTrack()
-  const recentlyPlayed = useRecentlyPlayed(20)
+  const recentlyPlayed = useRecentlyPlayed(50)
   const { translateY, arcRadius, arcBottom } = useDiskLayout()
+  const [offset, setOffset] = useState(0)
 
-  const tracks: SpotifyTrack[] = recentlyPlayed.data
-    ? [...new Map(recentlyPlayed.data.map(i => [i.track.id, i.track])).values()].slice(0, 5)
+  const allTracks: SpotifyTrack[] = recentlyPlayed.data
+    ? [...new Map(recentlyPlayed.data.map(i => [i.track.id, i.track])).values()]
     : []
+  const tracks = allTracks.slice(offset, offset + 5)
+  const canPrev = offset > 0
+  const canNext = offset + 5 < allTracks.length
 
   const handleSearch = useCallback((query: string, tab: SearchTab) => {
     if (query.trim()) navigate(`/artists?q=${encodeURIComponent(query)}&tab=${tab}`)
@@ -77,23 +82,43 @@ export function Home() {
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
         >
           {tracks.length > 0 && (
-            <ArcCarousel
-              items={tracks.map(track => ({
-                id: track.id,
-                content: (
-                  <VinylCard
-                    track={track}
-                    isActive={state.currentTrack?.id === track.id}
-                    onPlay={playTrack}
-                    size="sm"
-                  />
-                ),
-              }))}
-              radius={arcRadius}
-              arcDeg={90}
-              baseDelay={DISK_DONE_DELAY}
-              title={t('home.recentlyPlayed')}
-            />
+            <div className="flex flex-col items-center gap-2">
+              <ArcCarousel
+                items={tracks.map(track => ({
+                  id: track.id,
+                  content: (
+                    <VinylCard
+                      track={track}
+                      isActive={state.currentTrack?.id === track.id}
+                      onPlay={playTrack}
+                      size="sm"
+                    />
+                  ),
+                }))}
+                radius={arcRadius}
+                arcDeg={90}
+                baseDelay={DISK_DONE_DELAY}
+                title={t('home.recentlyPlayed')}
+              />
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setOffset(o => Math.max(0, o - 1))}
+                  disabled={!canPrev}
+                  className="p-1.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity"
+                  aria-label={t('artists.previous')}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  onClick={() => setOffset(o => o + 1)}
+                  disabled={!canNext}
+                  className="p-1.5 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity"
+                  aria-label={t('artists.next')}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
