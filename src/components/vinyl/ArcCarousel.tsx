@@ -34,6 +34,7 @@ interface ArcCarouselProps {
   radius?: number
   arcDeg?: number
   offsetDeg?: number
+  baseDelay?: number
 }
 
 export function ArcCarousel({
@@ -41,6 +42,7 @@ export function ArcCarousel({
   radius = 300,
   arcDeg = 150,
   offsetDeg = 0,
+  baseDelay = 0,
 }: ArcCarouselProps) {
   const positions = calcArcPositions(items.length, radius, arcDeg, offsetDeg)
 
@@ -54,15 +56,20 @@ export function ArcCarousel({
               <motion.div
                 key={i}
                 className="absolute"
-                initial={{ opacity: 0, scale: 0.7 }}
+                initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
                 animate={{
-                  opacity: 1,
-                  scale: 1,
                   x: pos.x,
                   y: pos.y - 60,
+                  opacity: 1,
+                  scale: 1,
                 }}
                 exit={{ opacity: 0, scale: 0.7 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 24, delay: i * 0.04 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 220,
+                  damping: 22,
+                  delay: baseDelay + i * 0.06,
+                }}
                 style={{ rotate: pos.tilt }}
               >
                 {item}
