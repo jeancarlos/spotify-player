@@ -175,6 +175,26 @@ onClick={() => navigate(`/albums/${album.id}`, { state: { from: location.pathnam
 
 ---
 
+## TrackInfoPanel: bio da música via Wikipedia
+
+Nova seção opcional no `TrackInfoPanel` (detalhes da música no player).
+
+### Hook: `useTrackWikipedia(trackName, artistName)`
+
+1. `OpenSearch` — `GET https://en.wikipedia.org/w/api.php?action=opensearch&search={trackName}+{artistName}+song&limit=3`
+2. Pega o primeiro resultado cujo título contenha o nome da faixa
+3. Fetch `GET https://en.wikipedia.org/api/rest_v1/page/summary/{title}`
+4. Retorna `{ extract, url }` ou `null` se não encontrar
+
+### Renderização
+
+- Seção "Sobre a música" abaixo dos gráficos de audio features
+- Exibe `extract` truncado em ~400 caracteres com link "Ler mais" para o artigo completo
+- Seção completamente oculta se `useTrackWikipedia` retornar `null`
+- Cobertura esperada: ~10–20% das faixas (hits populares e clássicos)
+
+---
+
 ## Issues relacionados
 
 - `spotify-player-wnd` — Busca: trocar filtros deve usar replace em vez de push no histórico (P3, separado)
