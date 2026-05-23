@@ -41,7 +41,7 @@ export function VinylCard({
         />
       </div>
       <div className="w-full px-0.5">
-        <p className="text-[9px] font-semibold truncate text-center leading-tight text-black/80">
+        <p className="text-[9px] font-semibold truncate text-center text-black/80">
           {track.name}
         </p>
         <p className="text-[8px] truncate text-center text-black/50">
