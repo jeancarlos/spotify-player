@@ -71,7 +71,27 @@
     "energy": "Energy",
     "valence": "Valence",
     "acousticness": "Acousticness",
-    "liveness": "Liveness"
+    "liveness": "Liveness",
+    "discography": "Discography",
+    "bio": "About the artist",
+    "relatedArtists": "Similar Artists",
+    "loadMore": "Load more",
+    "topTracksRanked": "Most played",
+    "musicalProfile": "Musical Profile",
+    "list": "List",
+    "table": "Table"
+  },
+  "albumDetail": {
+    "playAlbum": "Play album",
+    "tracks": "Tracks",
+    "by": "by",
+    "musicalProfile": "Musical Profile"
+  },
+  "playlistDetail": {
+    "playPlaylist": "Play playlist",
+    "tracks": "Tracks",
+    "by": "by",
+    "owner": "by {{name}}"
   },
   "favorites": {
     "title": "Title",
@@ -150,7 +170,18 @@
       "darkEnergetic": "Intense & Dark",
       "happyChill": "Light & Joyful",
       "darkChill": "Introspective"
-    }
+    },
+    "bpm": "BPM",
+    "keyLabel": "Key",
+    "explicit": "Explicit",
+    "trackNumber": "#",
+    "albumCol": "Album",
+    "artistCol": "Artist",
+    "releaseYear": "Year",
+    "trackCount": "Tracks",
+    "type": "Type",
+    "aboutTrack": "About this track",
+    "readMore": "Read more on Wikipedia"
   },
   "playlist": {
     "defaultName": "Spoter List"

@@ -71,7 +71,27 @@
     "energy": "Energia",
     "valence": "Valência",
     "acousticness": "Acústica",
-    "liveness": "Ao Vivo"
+    "liveness": "Ao Vivo",
+    "discography": "Discografia",
+    "bio": "Sobre o artista",
+    "relatedArtists": "Artistas Similares",
+    "loadMore": "Carregar mais",
+    "topTracksRanked": "Mais ouvidas",
+    "musicalProfile": "Perfil Musical",
+    "list": "Lista",
+    "table": "Tabela"
+  },
+  "albumDetail": {
+    "playAlbum": "Tocar álbum",
+    "tracks": "Faixas",
+    "by": "por",
+    "musicalProfile": "Perfil Musical"
+  },
+  "playlistDetail": {
+    "playPlaylist": "Tocar playlist",
+    "tracks": "Faixas",
+    "by": "por",
+    "owner": "por {{name}}"
   },
   "favorites": {
     "title": "Título",
@@ -150,7 +170,18 @@
       "darkEnergetic": "Intenso & Sombrio",
       "happyChill": "Leve & Alegre",
       "darkChill": "Introspectivo"
-    }
+    },
+    "bpm": "BPM",
+    "keyLabel": "Tom",
+    "explicit": "Explícito",
+    "trackNumber": "Nº",
+    "albumCol": "Álbum",
+    "artistCol": "Artista",
+    "releaseYear": "Ano",
+    "trackCount": "Faixas",
+    "type": "Tipo",
+    "aboutTrack": "Sobre a música",
+    "readMore": "Ler mais na Wikipedia"
   },
   "playlist": {
     "defaultName": "Spoter List"
