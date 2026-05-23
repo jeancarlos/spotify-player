@@ -46,7 +46,7 @@ export function MiniPlayer() {
   const handleSeek = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const ms = Number(e.target.value)
     dispatch({ type: 'SET_PROGRESS', payload: ms })
-    try { await api.put('/me/player/seek', null, { params: { position_ms: ms } }) } catch { /* silent */ }
+    try { await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' }) } catch { /* silent */ }
   }, [dispatch])
 
   const handlePrev = useCallback(async () => {

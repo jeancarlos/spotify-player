@@ -30,12 +30,13 @@ function useDiskLayout() {
   const arcBottom = Math.max(80, diskPx - translateY - arcRadius - 20)
   const arcDeg = vw < 768 ? 130 : 90
 
-  // Espaço disponível entre searchbar (~110px) e o início do carousel
-  const carouselTop = vh - arcBottom - (arcRadius + 70)
-  const hintSpace = carouselTop - 120  // 120px = searchbar bottom estimado
-  const showHint = hintSpace >= 80     // só exibe se sobrar ao menos 80px
+  // Cards do carousel voam acima do container via transform (card central: y = -arcRadius - 60)
+  const carouselContainerTop = vh - arcBottom - (arcRadius + 70)
+  const carouselVisualTop = carouselContainerTop - (arcRadius + 60)
+  const hintSpace = carouselVisualTop - 120  // 120px = searchbar bottom estimado
+  const showHint = hintSpace >= 80
 
-  return { translateY, arcRadius, arcBottom, arcDeg, showHint, hintTop: 120 + hintSpace / 2 }
+  return { translateY, arcRadius, arcBottom, arcDeg, showHint, hintTop: 120 + Math.max(0, hintSpace) / 2 }
 }
 
 export function Home() {

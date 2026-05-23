@@ -27,7 +27,7 @@ export function PlayerView() {
 
   const handleSeek = useCallback(async (ms: number) => {
     dispatch({ type: 'SET_PROGRESS', payload: ms })
-    try { await api.put('/me/player/seek', null, { params: { position_ms: ms } }) } catch { /* silent */ }
+    try { await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' }) } catch { /* silent */ }
   }, [dispatch])
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
