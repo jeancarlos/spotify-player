@@ -97,7 +97,7 @@ const toggleShuffle = useCallback(async () => {
         </div>
       )}
 
-      <div className="glass rounded-3xl overflow-hidden shadow-xl">
+      <div className="glass rounded-3xl shadow-xl">
 
         {/* Controles */}
         <div className="px-4 py-3 flex items-center gap-3">
