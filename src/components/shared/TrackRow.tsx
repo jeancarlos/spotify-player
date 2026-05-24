@@ -132,7 +132,7 @@ export function TrackRow({
   }
 
   return (
-    <div className={s.row} role="button" tabIndex={0} onKeyDown={handleKeyDown}>
+    <div className={s.row}>
       <PlayCell
         trackName={track.name}
         index={index}
@@ -142,8 +142,11 @@ export function TrackRow({
       />
 
       <div
-        className="flex-1 min-w-0 flex items-center gap-3"
+        className="flex-1 min-w-0 flex items-center gap-3 cursor-pointer"
         onClick={() => onPlay?.(track)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
       >
         {albumImage && (
           <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
@@ -155,8 +158,7 @@ export function TrackRow({
 
       {onRemove && (
         <button
-          onClick={(e) => {
-            e.stopPropagation()
+          onClick={() => {
             onRemove(track.uri)
           }}
           aria-label={t('favorites.removeConfirm')}
