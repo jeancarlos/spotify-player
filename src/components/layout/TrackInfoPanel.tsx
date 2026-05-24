@@ -1,69 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
 import { formatDate } from '@/utils/formatDate'
-import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
-import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
+import type { SpotifyTrack } from '@/types/spotify'
 import { StatCard } from '@/components/shared/StatCard'
-import { MoodZone } from '@/components/shared/MoodZone'
 import { TiltCover } from '@/components/shared/TiltCover'
-
-const GENRE_POOL = [
-  'pop',
-  'rock',
-  'indie',
-  'electronic',
-  'r&b',
-  'hip-hop',
-  'alternative',
-  'soul',
-  'folk',
-  'jazz',
-  'classical',
-  'metal',
-  'punk',
-  'blues',
-  'country',
-]
-
-function h(s: string, offset: number): number {
-  let v = offset * 2654435761
-  for (let i = 0; i < s.length; i++) v = Math.imul(v ^ s.charCodeAt(i), 2246822519)
-  return ((v >>> 0) % 1000) / 1000
-}
-
-function fakeFeatures(id: string): AudioFeatures {
-  return {
-    id,
-    type: 'audio_features',
-    uri: `spotify:track:${id}`,
-    track_href: '',
-    analysis_url: '',
-    danceability: 0.25 + h(id, 0) * 0.65,
-    energy: 0.25 + h(id, 1) * 0.65,
-    valence: 0.15 + h(id, 2) * 0.7,
-    acousticness: h(id, 3) * 0.85,
-    speechiness: h(id, 4) * 0.25,
-    instrumentalness: h(id, 5) * 0.6,
-    liveness: 0.05 + h(id, 6) * 0.35,
-    loudness: -18 + h(id, 7) * 14,
-    tempo: 70 + h(id, 8) * 110,
-    duration_ms: 0,
-    key: Math.floor(h(id, 9) * 12),
-    mode: h(id, 10) > 0.45 ? 1 : 0,
-    time_signature: h(id, 11) > 0.25 ? 4 : 3,
-  }
-}
-
-function fakeGenres(artistId: string): string[] {
-  const a = Math.floor(h(artistId, 20) * GENRE_POOL.length)
-  const b = Math.floor(h(artistId, 21) * GENRE_POOL.length)
-  const c = Math.floor(h(artistId, 22) * GENRE_POOL.length)
-  return [...new Set([GENRE_POOL[a], GENRE_POOL[b], GENRE_POOL[c]])].slice(0, 3)
-}
 
 interface Props {
   track: SpotifyTrack
@@ -72,16 +15,10 @@ interface Props {
 export function TrackInfoPanel({ track }: Props) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const features = useAudioFeatures([track.id])
   const artist = useArtist(track.artists[0]?.id)
   const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
 
-  const realFeatures = features.data?.[0] ?? null
-  const f: AudioFeatures = realFeatures ?? fakeFeatures(track.id)
-  const hasRealFeatures = realFeatures !== null
-  const genres: string[] = artist.data?.genres
-    ? artist.data.genres.slice(0, 5)
-    : fakeGenres(track.artists[0]?.id ?? track.id)
+  const genres: string[] = artist.data?.genres?.slice(0, 5) ?? []
 
   return (
     <div>
@@ -108,7 +45,7 @@ export function TrackInfoPanel({ track }: Props) {
             {track.artists.map((a, i) => (
               <span key={a.id} className="flex items-center">
                 <button
-                  onClick={() => navigate(`/artists/${a.id}`)}
+                  onClick={() => { navigate(`/artists/${a.id}`); }}
                   className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors outline-none focus:text-white focus:underline"
                 >
                   {a.name}
@@ -155,16 +92,6 @@ export function TrackInfoPanel({ track }: Props) {
             </span>
           ))}
         </div>
-
-        {/* Radar + Feature bars */}
-        {hasRealFeatures && <MusicalProfileCharts features={f} theme="dark" />}
-
-        {/* Mood quadrant */}
-        {hasRealFeatures && (
-          <Section label={t('track.moodZone')}>
-            <MoodZone valence={f.valence} energy={f.energy} theme="dark" />
-          </Section>
-        )}
       </div>
     </div>
   )

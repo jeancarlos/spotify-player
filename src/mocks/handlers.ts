@@ -92,35 +92,13 @@ export const handlers = [
     return HttpResponse.json({ albums: pagingWrapper([album]) })
   }),
   http.get('https://api.spotify.com/v1/artists/:id', ({ params }) =>
-    HttpResponse.json({ ...artist, id: params['id'] as string })
+    HttpResponse.json({ ...artist, id: params.id as string })
   ),
   http.get('https://api.spotify.com/v1/artists/:id/top-tracks', () =>
     HttpResponse.json({ tracks: [track] })
   ),
   http.get('https://api.spotify.com/v1/artists/:id/albums', () =>
     HttpResponse.json(pagingWrapper([album]))
-  ),
-  http.get('https://api.spotify.com/v1/audio-features', () =>
-    HttpResponse.json({
-      audio_features: [
-        {
-          id: 't1',
-          danceability: 0.7,
-          energy: 0.8,
-          valence: 0.6,
-          acousticness: 0.1,
-          speechiness: 0.05,
-          instrumentalness: 0,
-          liveness: 0.1,
-          loudness: -5,
-          tempo: 120,
-          duration_ms: 210000,
-          key: 5,
-          mode: 1,
-          time_signature: 4,
-        },
-      ],
-    })
   ),
   http.get('https://api.spotify.com/v1/me/player', () =>
     HttpResponse.json({

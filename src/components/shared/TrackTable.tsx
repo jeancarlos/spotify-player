@@ -1,13 +1,10 @@
 import { Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
-import type { SpotifyTrack, SpotifyAlbumTrack, AudioFeatures } from '@/types/spotify'
-
-const KEY_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A♭', 'B']
+import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
 interface TrackTableProps {
   tracks: (SpotifyTrack | SpotifyAlbumTrack)[]
-  audioFeatures?: AudioFeatures[]
   showAlbumColumn?: boolean
   activeTrackId?: string
   onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
@@ -16,17 +13,14 @@ interface TrackTableProps {
 
 export function TrackTable({
   tracks,
-  audioFeatures,
   showAlbumColumn = true,
   activeTrackId,
   onPlay,
   onAlbumClick,
 }: TrackTableProps) {
-  const featureMap = audioFeatures ? Object.fromEntries(audioFeatures.map((f) => [f.id, f])) : {}
-
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-xs border-collapse" style={{ minWidth: 640 }}>
+      <table className="w-full text-xs border-collapse" style={{ minWidth: 560 }}>
         <thead>
           <tr className="border-b border-black/8">
             <th className="text-left py-2 px-3 text-black/30 font-semibold w-8">#</th>
@@ -38,16 +32,11 @@ export function TrackTable({
             )}
             <th className="text-right py-2 px-3 text-black/30 font-semibold">Duração</th>
             <th className="text-right py-2 px-3 text-black/30 font-semibold">Pop.</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">BPM</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">Tom</th>
             <th className="text-center py-2 px-3 text-black/30 font-semibold">E</th>
           </tr>
         </thead>
         <tbody>
           {tracks.map((track, i) => {
-            const f = featureMap[track.id]
-            const keyLabel =
-              f && f.key >= 0 ? `${KEY_NAMES[f.key]} ${f.mode === 1 ? 'M' : 'm'}` : null
             const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
             const albumId = 'album' in track ? track.album.id : undefined
             const isActive = track.id === activeTrackId
@@ -112,12 +101,6 @@ export function TrackTable({
                 </td>
                 <td className="py-2 px-3 text-right text-black/40 tabular-nums">
                   {'popularity' in track ? track.popularity : '—'}
-                </td>
-                <td className="py-2 px-3 text-right text-black/40 tabular-nums">
-                  {f ? Math.round(f.tempo) : '—'}
-                </td>
-                <td className="py-2 px-3 text-right text-black/40 whitespace-nowrap">
-                  {keyLabel ?? '—'}
                 </td>
                 <td className="py-2 px-3 text-center">
                   {track.explicit && (
