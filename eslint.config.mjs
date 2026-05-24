@@ -15,7 +15,6 @@ export default tseslint.config(
       'playwright.config.ts',
       'tailwind.config.ts',
       'vite.config.ts',
-      'tests-e2e/**',
     ],
   },
   {
@@ -26,6 +25,7 @@ export default tseslint.config(
       prettier,
     ],
     files: ['**/*.{ts,tsx}'],
+    ignores: ['tests-e2e/**'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -109,6 +109,7 @@ export default tseslint.config(
     files: [
       '**/*.test.{ts,tsx}',
       '**/*.spec.{ts,tsx}',
+      'tests-e2e/**',
       'src/test-setup.ts',
       'src/mocks/**',
     ],
@@ -125,6 +126,15 @@ export default tseslint.config(
       '@typescript-eslint/unbound-method': 'off',
       'no-console': 'off',
       complexity: 'off',
+    },
+  },
+  // Disable type-aware parsing for E2E tests (not in tsconfig)
+  {
+    files: ['tests-e2e/**'],
+    languageOptions: {
+      parserOptions: {
+        project: false,
+      },
     },
   },
 )
