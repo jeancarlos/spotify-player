@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
-import { readLocalTracks } from '@/utils/favStorage'
+import { useIsTrackFavorite } from '@/hooks/useIsTrackFavorite'
 
 // bottom-2 gap (8px) + player height (~68px) + peek above player (~60px)
 const PLAYER_CLEARANCE = 136
@@ -38,10 +38,7 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
 
   // Identifica se a faixa atual está nos favoritos locais do usuário
   const userId = authState.profile?.id ?? ''
-  const isFavorite =
-    !!state.currentTrack &&
-    !!userId &&
-    readLocalTracks(userId).some((t) => t.uri === state.currentTrack!.uri)
+  const isFavorite = useIsTrackFavorite(state.currentTrack?.uri, userId)
 
   const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'

@@ -15,6 +15,7 @@ export function readLocalTracks(userId: string): SpotifyTrack[] {
 export function writeLocalTracks(userId: string, tracks: SpotifyTrack[]): void {
   try {
     localStorage.setItem(tracksKey(userId), JSON.stringify(tracks))
+    window.dispatchEvent(new CustomEvent('spoter:favorites-changed', { detail: { userId } }))
   } catch { /* quota exceeded */ }
 }
 
