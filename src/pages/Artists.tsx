@@ -1,70 +1,29 @@
-import { useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSearchParams, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import { useArtists } from '@/hooks/queries/useArtists'
-import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
-import { useSearchPlaylists } from '@/hooks/queries/useSearchPlaylists'
 import { CardSkeleton } from '@/components/shared/CardSkeleton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { Pagination } from '@/components/shared/Pagination'
 import { SearchResultsGrid } from '@/components/search/SearchResultsGrid'
-import { loadLastSearch, type SearchTab } from '@/utils/search'
+import { useArtistsPage } from '@/hooks/useArtistsPage'
+import { useTranslation } from 'react-i18next'
 
 export function Artists() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const {
+    query,
+    tab,
+    page,
+    data,
+    isLoading,
+    hasNext,
+    headerLabel,
+    artists,
+    albums,
+    playlists,
+    handleSearch,
+    handlePageChange,
+  } = useArtistsPage()
 
-  const saved = loadLastSearch()
-  const query = searchParams.get('q') ?? saved?.q ?? ''
-  const tab = (searchParams.get('tab') as SearchTab | null) ?? saved?.tab ?? 'artist'
-  const page = Number(searchParams.get('page') ?? '1')
-
-  const isArtist = tab === 'artist'
-  const isAlbum = tab === 'album'
-  const isPlaylist = tab === 'playlist'
-
-  useEffect(() => {
-    if (!query.trim()) navigate('/', { replace: true })
-  }, [query, navigate])
-
-  // Todos os hooks são chamados incondicionalmente — query vazia desabilita o fetch via `enabled`
-  const artists = useArtists(isArtist ? query : '', page)
-  const albums = useSearchAlbums(isAlbum ? query : '', page)
-  const playlists = useSearchPlaylists(isPlaylist ? query : '', page)
-
-  const activeQuery = {
-    artist: artists,
-    playlist: playlists,
-    album: albums,
-  }[tab]
-  const { data, isPending: isLoading } = activeQuery
-  const hasNext = data ? data.offset + data.items.length < data.total : false
-
-  const headerLabel = {
-    artist: t('artists.searchArtists'),
-    playlist: t('artists.searchPlaylists'),
-    album: t('artists.searchAlbums'),
-  }[tab]
-
-  const handleSearch = useCallback(
-    (q: string, nextTab: SearchTab) => {
-      if (!q.trim()) {
-        navigate('/', { replace: true })
-        return
-      }
-      setSearchParams({ q, tab: nextTab, page: '1' }, { replace: true })
-    },
-    [navigate, setSearchParams]
-  )
-
-  const handlePageChange = (newPage: number) => {
-    setSearchParams({ q: query, tab, page: String(newPage) }, { replace: true })
-    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const renderResults = () => {
+  function renderResults() {
     if (isLoading) {
       return (
         <motion.div
