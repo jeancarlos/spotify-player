@@ -1,17 +1,18 @@
 import { useCallback, useEffect } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Info, Music2 } from 'lucide-react'
+import { ArrowLeft, Info, Music2, ListMusic } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useLyrics } from '@/hooks/queries/useLyrics'
 import { useProgressEngine } from '@/hooks/useProgressEngine'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
+import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 
-type PlayerTab = 'lyrics' | 'info'
+type PlayerTab = 'lyrics' | 'info' | 'queue'
 
 export function PlayerView() {
   const { state, dispatch } = usePlayer()
@@ -22,7 +23,6 @@ export function PlayerView() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { t } = useTranslation()
 
-  // Sincroniza estado com a URL (Single source of truth)
   const activeTab = (searchParams.get('tab') as PlayerTab) || 'lyrics'
 
   const handleTabChange = (tab: PlayerTab) => {
@@ -42,7 +42,6 @@ export function PlayerView() {
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
 
-  // Se não tem letra e estamos na aba de letra, força ida para info na URL
   useEffect(() => {
     if (noLyrics && activeTab === 'lyrics') {
       setSearchParams({ tab: 'info' }, { replace: true })
@@ -67,7 +66,6 @@ export function PlayerView() {
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
-      {/* Background blur */}
       {albumArt && (
         <div
           className="absolute inset-0 opacity-40 pointer-events-none z-0"
@@ -82,7 +80,6 @@ export function PlayerView() {
       )}
       <div className="absolute inset-0 bg-black/70 pointer-events-none z-0" />
 
-      {/* Header */}
       <header className="relative z-20 flex items-center justify-between p-6 shrink-0">
         <button
           onClick={() => {
@@ -100,27 +97,39 @@ export function PlayerView() {
             <button
               onClick={() => handleTabChange('lyrics')}
               className={cn(
-                'flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none',
+                'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
                 activeTab === 'lyrics'
                   ? 'bg-white text-black shadow-lg'
                   : 'text-white/40 hover:text-white/70'
               )}
             >
-              <Music2 size={14} />
-              {t('player.lyrics')}
+              <Music2 size={14} className="shrink-0" />
+              <span className="hidden min-[400px]:inline">{t('player.lyrics')}</span>
             </button>
           )}
           <button
             onClick={() => handleTabChange('info')}
             className={cn(
-              'flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none',
+              'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
               activeTab === 'info'
                 ? 'bg-white text-black shadow-lg'
                 : 'text-white/40 hover:text-white/70'
             )}
           >
-            <Info size={14} />
-            {t('track.songDetails')}
+            <Info size={14} className="shrink-0" />
+            <span className="hidden min-[400px]:inline">{t('track.songDetails')}</span>
+          </button>
+          <button
+            onClick={() => handleTabChange('queue')}
+            className={cn(
+              'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
+              activeTab === 'queue'
+                ? 'bg-white text-black shadow-lg'
+                : 'text-white/40 hover:text-white/70'
+            )}
+          >
+            <ListMusic size={14} className="shrink-0" />
+            <span className="hidden min-[400px]:inline">{t('player.queue')}</span>
           </button>
         </div>
 
@@ -139,6 +148,16 @@ export function PlayerView() {
               className="h-full overflow-y-auto pt-4 pb-12"
             >
               {currentTrack && <TrackInfoPanel track={currentTrack} />}
+            </motion.div>
+          ) : activeTab === 'queue' ? (
+            <motion.div
+              key="queue"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="h-full"
+            >
+              <PlayerQueue />
             </motion.div>
           ) : (
             <motion.div
@@ -165,7 +184,7 @@ export function PlayerView() {
       </main>
 
       {/* Footer spacing for MiniPlayer (which is in AppRoot) */}
-      <div className="h-28 shrink-0" />
+      <div className="h-27 shrink-0" />
     </div>
   )
 }

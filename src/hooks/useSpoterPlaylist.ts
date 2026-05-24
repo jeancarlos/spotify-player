@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserPlaylists } from '@/hooks/queries/useUserPlaylists'
+import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
 import { useCreatePlaylist } from '@/hooks/mutations/useCreatePlaylist'
 import { useUpdatePlaylist } from '@/hooks/mutations/useUpdatePlaylist'
 import { useAddToPlaylist } from '@/hooks/mutations/useAddToPlaylist'
@@ -58,6 +59,14 @@ export function useSpoterPlaylist() {
     setLocalNotes(readLocalNotes(userId))
   }, [userId])
 
+  // Keep multiple hook instances in sync when another instance writes to localStorage
+  useEffect(() => {
+    if (!userId) return
+    const handler = () => setLocalTracks(readLocalTracks(userId))
+    window.addEventListener('spoter:favorites-changed', handler)
+    return () => window.removeEventListener('spoter:favorites-changed', handler)
+  }, [userId])
+
   const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
   const coverUploaded = useRef(false)
@@ -93,6 +102,13 @@ export function useSpoterPlaylist() {
     }
     return ''
   }, [forcedId, userId, playlists.data, playlistName])
+
+  const seedQuery = usePlaylistTracks(
+    playlistId,
+    playlistId.length > 0 && localTracks.length === 0 && playlists.isSuccess,
+    1,
+    50
+  )
 
   useEffect(() => {
     if (!userId || !playlistId) return
@@ -176,6 +192,20 @@ export function useSpoterPlaylist() {
       setIsHydrating(false)
     })
   }, [userId])
+
+  // Seed local tracks from Spotify playlist when localStorage and cookie are both empty.
+  // writeLocalTracks dispatches spoter:favorites-changed; the sync handler above picks it up.
+  useEffect(() => {
+    if (!seedQuery.isSuccess || !seedQuery.data || !userId || localTracks.length > 0) return
+    const fetched = seedQuery.data.items
+      .map((item) => item.track ?? item.item)
+      .filter((t): t is SpotifyTrack => t != null)
+    if (fetched.length === 0) return
+    const id = setTimeout(() => {
+      if (readLocalTracks(userId).length === 0) writeLocalTracks(userId, fetched)
+    }, 0)
+    return () => clearTimeout(id)
+  }, [seedQuery.isSuccess, seedQuery.data, userId, localTracks.length])
 
   const addTrack = useCallback(
     (track: SpotifyTrack, note?: string) => {

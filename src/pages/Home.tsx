@@ -52,6 +52,10 @@ export function Home() {
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
+  
+  const isLoading = recentlyPlayed.isPending
+  const isError = recentlyPlayed.isError
+
   const allTracks: SpotifyTrack[] = recentlyPlayed.data
     ? [...new Map(recentlyPlayed.data.map((i) => [i.track.id, i.track])).values()]
     : []
@@ -72,7 +76,7 @@ export function Home() {
       </div>
 
       {/* Hint text — centralizado no espaço entre searchbar e carousel */}
-      {showHint && (
+      {showHint && !isLoading && tracks.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -93,6 +97,20 @@ export function Home() {
           className="absolute left-1/2 pointer-events-auto"
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
         >
+          {isLoading && (
+            <div className="flex items-center justify-center mb-12">
+               <div className="w-6 h-6 border-2 border-black/10 rounded-full border-t-black/30 animate-spin" />
+            </div>
+          )}
+
+          {isError && (
+             <p className="text-center text-xs text-black/20 mb-12">{t('common.error')}</p>
+          )}
+
+          {!isLoading && !isError && tracks.length === 0 && (
+             <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
+          )}
+
           {tracks.length > 0 && (
             <div className="relative">
               <ArcCarousel

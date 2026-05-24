@@ -85,7 +85,7 @@ export function TrackInfoPanel({ track }: Props) {
 
   return (
     <div>
-      <div className="flex flex-col items-center gap-6 px-5 py-4">
+      <div className="flex flex-col items-center gap-6 px-5 py-4 pb-20">
         {/* Album art */}
         <TiltCover imageUrl={track.album.images[0]?.url} size={176} name={track.album.name} />
 

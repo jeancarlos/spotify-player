@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNowPlaying } from '@/hooks/queries/useNowPlaying'
+import { useQueue } from '@/hooks/queries/useQueue'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
 import { extractPalette } from '@/lib/colorThief'
@@ -15,16 +16,24 @@ export function usePlayerSync() {
   const { state: authState } = useAuth()
   const { state, dispatch } = usePlayer()
   const queryClient = useQueryClient()
+  
   const { data } = useNowPlaying(authState.isAuthenticated)
+  const { data: queueData } = useQueue(authState.isAuthenticated)
+  
   const lastTrackIdRef = useRef<string | null>(null)
 
   const stateRef = useRef(state)
   useEffect(() => { stateRef.current = state })
 
   useEffect(() => {
-    if (!data) return
-
     const s = stateRef.current
+
+    // Se o player estiver inativo (204), apenas limpamos o estado de reprodução
+    if (!data) {
+      if (s.isPlaying) dispatch({ type: 'SET_PLAYING', payload: false })
+      return
+    }
+
     const remote = data.item
     const localId = s.currentTrack?.id
 
@@ -52,6 +61,13 @@ export function usePlayerSync() {
       dispatch({ type: 'SET_REPEAT', payload: data.repeat_state })
     }
   }, [data, dispatch, queryClient])
+
+  // Sincroniza a fila (queue)
+  useEffect(() => {
+    if (queueData?.queue) {
+      dispatch({ type: 'SET_QUEUE', payload: queueData.queue })
+    }
+  }, [queueData, dispatch])
 
   useEffect(() => {
     const track = state.currentTrack

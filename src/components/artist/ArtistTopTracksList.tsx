@@ -1,15 +1,18 @@
 import { useTranslation } from 'react-i18next'
+import { Play } from 'lucide-react'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface ArtistTopTracksListProps {
   tracks: SpotifyTrack[]
   artistUri?: string
+  onPlayTrack: (track: SpotifyTrack) => void
   onPlayContext: (uri: string) => void
 }
 
 export function ArtistTopTracksList({
   tracks,
   artistUri,
+  onPlayTrack,
   onPlayContext,
 }: ArtistTopTracksListProps) {
   const { t } = useTranslation()
@@ -26,19 +29,23 @@ export function ArtistTopTracksList({
           <div
             key={track.id}
             className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group focus:outline-none focus:bg-black/5"
-            onClick={() => artistUri && onPlayContext(artistUri)}
+            onClick={() => onPlayTrack(track)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                if (artistUri) onPlayContext(artistUri)
+                onPlayTrack(track)
               }
             }}
           >
-            <span className="text-xs font-bold text-black/30 tabular-nums w-6 shrink-0 text-right">
-              {String(i + 1).padStart(2, '0')}
-            </span>
+            <div className="w-6 shrink-0 flex items-center justify-center">
+              <span className="text-xs font-bold text-black/30 tabular-nums group-hover:hidden">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <Play size={12} className="hidden group-hover:block fill-black text-black" />
+            </div>
+            
             {track.album?.images?.[0]?.url && (
               <img
                 src={track.album.images[0].url}
@@ -55,6 +62,15 @@ export function ArtistTopTracksList({
             </div>
           </div>
         ))}
+        
+        {artistUri && (
+           <button 
+             onClick={() => onPlayContext(artistUri)}
+             className="text-[10px] font-bold text-black/40 hover:text-black uppercase tracking-wider px-2 pt-2 transition-colors outline-none"
+           >
+             {t('player.play')} {t('artistDetail.topTracks')}
+           </button>
+        )}
       </div>
     </section>
   )

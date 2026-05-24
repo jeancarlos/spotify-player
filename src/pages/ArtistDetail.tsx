@@ -79,6 +79,7 @@ export function ArtistDetail() {
         <ArtistTopTracksList
           tracks={topTracks.data ?? []}
           artistUri={artist.data?.uri}
+          onPlayTrack={(t) => playTrack(t, topTracks.data ?? [])}
           onPlayContext={playContext}
         />
 

@@ -33,7 +33,7 @@ export function PlaybackControls() {
   const [searchParams] = useSearchParams()
 
   const isPlayerPage = location.pathname === '/player'
-  const activeTab = (searchParams.get('tab') as 'lyrics' | 'info') || 'lyrics'
+  const activeTab = (searchParams.get('tab') as 'lyrics' | 'info' | 'queue') || 'lyrics'
 
   const handlePlayPause = useCallback(async () => {
     const next = !isPlaying
@@ -140,7 +140,7 @@ export function PlaybackControls() {
         >
           <ListMusic size={15} />
         </button>
-        <ControlTip label={isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')} />
+        <ControlTip label={isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')} />
       </div>
     </div>
   )
