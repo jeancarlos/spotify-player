@@ -46,6 +46,15 @@ export function useSpoterPlaylist() {
   useEffect(() => { tracksRef.current = localTracks }, [localTracks])
   useEffect(() => { notesRef.current = localNotes }, [localNotes])
 
+  // Carrega do localStorage quando userId se torna disponível (auth pode carregar depois da montagem)
+  const prevUserId = useRef('')
+  useEffect(() => {
+    if (!userId || userId === prevUserId.current) return
+    prevUserId.current = userId
+    setLocalTracks(readLocalTracks(userId))
+    setLocalNotes(readLocalNotes(userId))
+  }, [userId])
+
   // ── Gerenciamento da playlist Spotify ─────────────────────────────────────
   const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
