@@ -67,6 +67,36 @@ export function Home() {
     [navigate]
   )
 
+  const renderCarouselContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center mb-12">
+          <div className="w-6 h-6 border-2 border-black/10 rounded-full border-t-black/30 animate-spin" />
+        </div>
+      )
+    }
+    if (isError) {
+      return <p className="text-center text-xs text-black/20 mb-12">{t('common.error')}</p>
+    }
+    if (tracks.length === 0) {
+      return <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
+    }
+    return (
+      <div className="relative">
+        <ArcCarousel
+          items={tracks.map((track) => ({
+            id: track.id,
+            content: <VinylCard track={track} onPlay={playTrack} size="sm" />,
+          }))}
+          radius={arcRadius}
+          arcDeg={arcDeg}
+          baseDelay={DISK_DONE_DELAY}
+          title={t('home.recentlyPlayed')}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="h-screen overflow-hidden relative">
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
@@ -92,34 +122,7 @@ export function Home() {
           className="absolute left-1/2 pointer-events-auto"
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
         >
-          {isLoading && (
-            <div className="flex items-center justify-center mb-12">
-              <div className="w-6 h-6 border-2 border-black/10 rounded-full border-t-black/30 animate-spin" />
-            </div>
-          )}
-
-          {isError && (
-            <p className="text-center text-xs text-black/20 mb-12">{t('common.error')}</p>
-          )}
-
-          {!isLoading && !isError && tracks.length === 0 && (
-            <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
-          )}
-
-          {tracks.length > 0 && (
-            <div className="relative">
-              <ArcCarousel
-                items={tracks.map((track) => ({
-                  id: track.id,
-                  content: <VinylCard track={track} onPlay={playTrack} size="sm" />,
-                }))}
-                radius={arcRadius}
-                arcDeg={arcDeg}
-                baseDelay={DISK_DONE_DELAY}
-                title={t('home.recentlyPlayed')}
-              />
-            </div>
-          )}
+          {renderCarouselContent()}
         </div>
       </div>
     </div>

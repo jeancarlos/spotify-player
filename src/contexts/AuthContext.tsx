@@ -33,6 +33,68 @@ const SCOPES = [
   'ugc-image-upload',
 ].join(' ')
 
+async function requestPkceFromOpener(
+  opener: Window,
+  openerOrigin: string
+): Promise<{ nonce: string | null; verifier: string | null }> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      window.removeEventListener('message', handler)
+      resolve({ nonce: null, verifier: null })
+    }, 3000)
+
+    const handler = (ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>) => {
+      if (ev.data.type !== 'PKCE_DATA') return
+      clearTimeout(timer)
+      window.removeEventListener('message', handler)
+      resolve({ nonce: ev.data.nonce ?? null, verifier: ev.data.verifier ?? null })
+    }
+
+    window.addEventListener('message', handler)
+    opener.postMessage({ type: 'REQUEST_PKCE_DATA' }, openerOrigin)
+  })
+}
+
+function parseReceivedState(receivedState: string): { nonce: string; openerOrigin: string } {
+  let nonce = receivedState
+  let openerOrigin = window.location.origin
+  try {
+    const decoded = JSON.parse(atob(receivedState)) as { n?: string; o?: string }
+    if (decoded.n && decoded.o) {
+      nonce = decoded.n
+      openerOrigin = ALLOWED_OPENER_ORIGINS.has(decoded.o) ? decoded.o : window.location.origin
+    }
+  } catch {
+    /* plain state — same-tab flow */
+  }
+  return { nonce, openerOrigin }
+}
+
+async function exchangeCodeForTokens(
+  code: string,
+  verifier: string
+): Promise<{ access_token: string; refresh_token: string }> {
+  const params = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string,
+    client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
+    code_verifier: verifier,
+  })
+
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params,
+  })
+
+  if (!res.ok) {
+    throw Object.assign(new Error(i18n.t('auth.tokenExchangeFailed')), { code: 'token_error' })
+  }
+
+  return res.json() as Promise<{ access_token: string; refresh_token: string }>
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialAuthState, () => {
     const accessToken = sessionStorage.getItem('access_token')
@@ -151,43 +213,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const handleCallback = useCallback(async (code: string, receivedState: string) => {
-    let nonce = receivedState
-    let openerOrigin = window.location.origin
-    try {
-      const decoded = JSON.parse(atob(receivedState)) as { n?: string; o?: string }
-      if (decoded.n && decoded.o) {
-        nonce = decoded.n
-        openerOrigin = ALLOWED_OPENER_ORIGINS.has(decoded.o) ? decoded.o : window.location.origin
-      }
-    } catch {
-      /* plain state — same-tab flow */
-    }
+    const { nonce, openerOrigin } = parseReceivedState(receivedState)
 
     let savedNonce = localStorage.getItem('pkce_state')
     let verifier = localStorage.getItem('pkce_verifier')
 
     if (window.opener && (!savedNonce || !verifier)) {
-      const pkce = await new Promise<{ nonce: string | null; verifier: string | null }>(
-        (resolve) => {
-          // FIX (LOW): removeEventListener também no path de timeout
-          const timer = setTimeout(() => {
-            window.removeEventListener('message', handler)
-            resolve({ nonce: null, verifier: null })
-          }, 3000)
-
-          const handler = (ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>) => {
-            if (ev.data.type !== 'PKCE_DATA') return
-            clearTimeout(timer)
-            window.removeEventListener('message', handler)
-            resolve({
-              nonce: ev.data.nonce ?? null,
-              verifier: ev.data.verifier ?? null,
-            })
-          }
-          window.addEventListener('message', handler)
-          ;(window.opener as Window).postMessage({ type: 'REQUEST_PKCE_DATA' }, openerOrigin)
-        }
-      )
+      const pkce = await requestPkceFromOpener(window.opener as Window, openerOrigin)
       savedNonce = pkce.nonce
       verifier = pkce.verifier
     }
@@ -196,25 +228,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw Object.assign(new Error(i18n.t('auth.invalidState')), { code: 'state_mismatch' })
     }
 
-    const params = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string,
-      client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
-      code_verifier: verifier,
-    })
-
-    const res = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params,
-    })
-
-    if (!res.ok) {
-      throw Object.assign(new Error(i18n.t('auth.tokenExchangeFailed')), { code: 'token_error' })
-    }
-
-    const data = (await res.json()) as { access_token: string; refresh_token: string }
+    const data = await exchangeCodeForTokens(code, verifier)
 
     localStorage.removeItem('pkce_verifier')
     localStorage.removeItem('pkce_state')

@@ -42,14 +42,37 @@ export const initialPlayerState: PlayerState = {
   lastSeekTime: 0,
 }
 
-export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
+type QueueAction =
+  | { type: 'SET_TRACK'; payload: SpotifyTrack }
+  | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
+  | { type: 'SET_SEEK_TIME'; payload: number }
+
+type PlaybackAction =
+  | { type: 'TOGGLE_PLAY' }
+  | { type: 'SET_PLAYING'; payload: boolean }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_VOLUME'; payload: number }
+  | { type: 'TOGGLE_SHUFFLE' }
+  | { type: 'SET_SHUFFLE'; payload: boolean }
+  | { type: 'SET_REPEAT'; payload: 'off' | 'track' | 'context' }
+
+type UiAction =
+  | { type: 'TOGGLE_FULLSCREEN' }
+  | { type: 'SET_PALETTE'; payload: [string, string] }
+
+function queueReducer(state: PlayerState, action: QueueAction): PlayerState {
   switch (action.type) {
     case 'SET_TRACK':
-      return {
-        ...state,
-        currentTrack: action.payload,
-        duration: action.payload.duration_ms,
-      }
+      return { ...state, currentTrack: action.payload, duration: action.payload.duration_ms }
+    case 'SET_QUEUE':
+      return { ...state, queue: action.payload }
+    case 'SET_SEEK_TIME':
+      return { ...state, lastSeekTime: action.payload }
+  }
+}
+
+function playbackReducer(state: PlayerState, action: PlaybackAction): PlayerState {
+  switch (action.type) {
     case 'TOGGLE_PLAY':
       return { ...state, isPlaying: !state.isPlaying }
     case 'SET_PLAYING':
@@ -64,15 +87,21 @@ export function playerReducer(state: PlayerState, action: PlayerAction): PlayerS
       return { ...state, shuffle: action.payload }
     case 'SET_REPEAT':
       return { ...state, repeat: action.payload }
+  }
+}
+
+function uiReducer(state: PlayerState, action: UiAction): PlayerState {
+  switch (action.type) {
     case 'TOGGLE_FULLSCREEN':
       return { ...state, isFullscreen: !state.isFullscreen }
     case 'SET_PALETTE':
       return { ...state, palette: action.payload }
-    case 'SET_QUEUE':
-      return { ...state, queue: action.payload }
-    case 'SET_SEEK_TIME':
-      return { ...state, lastSeekTime: action.payload }
-    default:
-      return state
   }
+}
+
+export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
+  return uiReducer(
+    playbackReducer(queueReducer(state, action as QueueAction), action as PlaybackAction),
+    action as UiAction
+  )
 }

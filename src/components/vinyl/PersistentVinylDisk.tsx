@@ -6,8 +6,42 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
 import { useIsTrackFavorite } from '@/hooks/useIsTrackFavorite'
 import { readLocalNotes } from '@/utils/favStorage'
+import type { SpotifyTrack } from '@/types/spotify'
 
 const PLAYER_CLEARANCE = 136
+
+interface VinylDiskDisplayProps {
+  albumArt?: string
+  albumName?: string
+  favoriteLabel?: string
+}
+
+function getVinylDiskProps(
+  track: SpotifyTrack | null,
+  notes: Record<string, string>,
+  isFavorite: boolean,
+  isLogin: boolean
+): VinylDiskDisplayProps {
+  if (isLogin || !track) return {}
+  const albumArt = track.album.images[0]?.url
+  const albumName = track.album.name
+  const currentNote = notes[track.uri]
+  const favoriteLabel = isFavorite && currentNote ? currentNote : undefined
+  return { albumArt, albumName, favoriteLabel }
+}
+
+interface VinylPositions {
+  loginY: number
+  homeY: number
+  otherY: number
+}
+
+function getVinylY(isLogin: boolean, isHome: boolean, playerHovered: boolean, pos: VinylPositions): number {
+  if (isLogin) return pos.loginY
+  if (isHome) return pos.homeY
+  if (playerHovered) return pos.homeY
+  return pos.otherY
+}
 
 function useVinylY() {
   const [vw, setVw] = useState(() => window.innerWidth)
@@ -49,18 +83,8 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'
 
-  const albumArt = state.currentTrack?.album.images[0]?.url
-  const albumName = state.currentTrack?.album.name
-  const currentNote = state.currentTrack?.uri ? notes[state.currentTrack.uri] : undefined
-
-  const getY = () => {
-    if (isLogin) return loginY
-    if (isHome) return homeY
-    if (playerHovered) return homeY
-    return otherY
-  }
-
-  const y = getY()
+  const y = getVinylY(isLogin, isHome, playerHovered, { loginY, homeY, otherY })
+  const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite, isLogin)
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[15] pointer-events-none flex justify-center">
@@ -69,13 +93,7 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         initial={false}
       >
-        <VinylDisk
-          size="xl"
-          isPlaying={state.isPlaying}
-          albumArt={isLogin ? undefined : albumArt}
-          albumName={isLogin ? undefined : albumName}
-          favoriteLabel={isFavorite && !isLogin && currentNote ? currentNote : undefined}
-        />
+        <VinylDisk size="xl" isPlaying={state.isPlaying} {...diskProps} />
       </motion.div>
     </div>
   )
