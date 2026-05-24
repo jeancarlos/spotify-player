@@ -12,9 +12,9 @@ const PLAYER_CLEARANCE = 136
 function useVinylY() {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
-    const fn = () => setVw(window.innerWidth)
+    const fn = () => { setVw(window.innerWidth); }
     window.addEventListener('resize', fn)
-    return () => window.removeEventListener('resize', fn)
+    return () => { window.removeEventListener('resize', fn); }
   }, [])
   const diskPx = Math.min(720, vw)
   return {
@@ -40,10 +40,10 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const [notes, setNotes] = useState<Record<string, string>>({})
   useEffect(() => {
     if (!userId) return
-    const handler = () => setNotes(readLocalNotes(userId))
+    const handler = () => { setNotes(readLocalNotes(userId)); }
     setTimeout(handler, 0)
     window.addEventListener('spoter:favorites-changed', handler)
-    return () => window.removeEventListener('spoter:favorites-changed', handler)
+    return () => { window.removeEventListener('spoter:favorites-changed', handler); }
   }, [userId])
 
   const isLogin = location.pathname === '/login'

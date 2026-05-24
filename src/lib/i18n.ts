@@ -4,7 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import ptBR from '@/locales/pt-BR.json'
 import enUS from '@/locales/en-US.json'
 
-i18n
+void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({

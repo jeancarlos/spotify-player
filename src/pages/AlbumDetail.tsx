@@ -33,7 +33,7 @@ export function AlbumDetail() {
   const { state: playerState } = usePlayer()
 
   const handlePlay = useCallback(() => {
-    if (album.data?.uri) playContext(album.data.uri)
+    if (album.data?.uri) void playContext(album.data.uri)
   }, [album.data, playContext])
 
   const handleLayout = useCallback((h: number) => {
@@ -73,7 +73,7 @@ export function AlbumDetail() {
   return (
     <div className="min-h-screen">
       <CollectionHeader
-        imageUrl={album.data?.images?.[0]?.url}
+        imageUrl={album.data?.images[0]?.url}
         name={album.data?.name ?? ''}
         subtitle={albumSubtitle}
         artists={album.data?.artists}
@@ -82,7 +82,7 @@ export function AlbumDetail() {
         onPlay={handlePlay}
         onLayout={handleLayout}
         onArtistClick={(artistId) =>
-          navigate(`/artists/${artistId}`, { state: { from: location.pathname } })
+          { navigate(`/artists/${artistId}`, { state: { from: location.pathname } }); }
         }
       />
 
@@ -101,8 +101,8 @@ export function AlbumDetail() {
                     key={track.id}
                     track={track}
                     index={(page - 1) * LIMIT + i}
-                    isActive={playerState?.currentTrack?.id === track.id}
-                    onPlay={(t) => playTrack(t as SpotifyTrack, enrichedTracks)}
+                    isActive={playerState.currentTrack?.id === track.id}
+                    onPlay={async (t) => { await playTrack(t as SpotifyTrack, enrichedTracks); }}
                   />
                 ))}
               </div>
@@ -110,10 +110,10 @@ export function AlbumDetail() {
               <TrackTable
                 tracks={albumItems}
                 showAlbumColumn={false}
-                activeTrackId={playerState?.currentTrack?.id}
+                activeTrackId={playerState.currentTrack?.id}
                 onPlay={(track) => {
                   const enriched = enrichTrack(track as SpotifyAlbumTrack)
-                  playTrack(enriched, enrichedTracks)
+                  void playTrack(enriched, enrichedTracks)
                 }}
               />
             )}
@@ -122,8 +122,8 @@ export function AlbumDetail() {
               <Pagination
                 page={page}
                 hasNext={hasNext}
-                onPrev={() => setPage((p) => Math.max(1, p - 1))}
-                onNext={() => setPage((p) => p + 1)}
+                onPrev={() => { setPage((p) => Math.max(1, p - 1)); }}
+                onNext={() => { setPage((p) => p + 1); }}
               />
             )}
           </div>

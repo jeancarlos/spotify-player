@@ -19,7 +19,7 @@ export function lazyWithRetry<T extends ComponentType<unknown>>(
   chunkName: string,
   maxRetries = 2
 ): React.LazyExoticComponent<T> {
-  return lazy(() => retryImport(importFn, chunkName, maxRetries))
+  return lazy(async () => retryImport(importFn, chunkName, maxRetries))
 }
 
 async function retryImport<T extends ComponentType<unknown>>(
@@ -42,7 +42,10 @@ async function retryImport<T extends ComponentType<unknown>>(
     if (!hasReloaded) {
       sessionStorage.setItem(storageKey, '1')
       window.location.reload()
-      return new Promise(() => { })
+      // Block rendering while the page reloads
+      return new Promise(() => {
+        /* intentionally never resolves */
+      })
     }
 
     sessionStorage.removeItem(storageKey)

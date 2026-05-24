@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import i18n from '@/lib/i18n'
 
 const api = axios.create({
@@ -7,6 +7,10 @@ const api = axios.create({
 
 let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
+
+interface RetryableConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean
+}
 
 api.interceptors.request.use((config) => {
   const token = sessionStorage.getItem('access_token')
@@ -18,9 +22,9 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config
-    if (error.response?.status === 401 && !originalRequest._retry) {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as RetryableConfig | undefined
+    if (originalRequest && error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {
@@ -35,16 +39,16 @@ api.interceptors.response.use(
         const newToken = await refreshPromise
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`
-          return api(originalRequest)
+          return await api(originalRequest)
         }
       } catch (refreshError) {
         sessionStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         window.location.href = '/login'
-        return Promise.reject(refreshError)
+        return Promise.reject(refreshError instanceof Error ? refreshError : new Error('Refresh failed'))
       }
     }
-    return Promise.reject(error)
+    return Promise.reject(error instanceof Error ? error : new Error('Request failed'))
   }
 )
 

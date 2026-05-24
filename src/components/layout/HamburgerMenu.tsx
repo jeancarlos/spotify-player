@@ -17,8 +17,8 @@ export function HamburgerMenu() {
 
   const isOpen = uiState.sidebarOpen
   const isHome = location.pathname === '/'
-  const toggle = () => uiDispatch({ type: isOpen ? 'CLOSE_SIDEBAR' : 'OPEN_SIDEBAR' })
-  const close = useCallback(() => uiDispatch({ type: 'CLOSE_SIDEBAR' }), [uiDispatch])
+  const toggle = () => { uiDispatch({ type: isOpen ? 'CLOSE_SIDEBAR' : 'OPEN_SIDEBAR' }); }
+  const close = useCallback(() => { uiDispatch({ type: 'CLOSE_SIDEBAR' }); }, [uiDispatch])
 
   // Close on outside click
   useEffect(() => {
@@ -34,7 +34,7 @@ export function HamburgerMenu() {
       }
     }
     document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    return () => { document.removeEventListener('mousedown', handleClick); }
   }, [isOpen, close])
 
   // Close on Escape
@@ -44,7 +44,7 @@ export function HamburgerMenu() {
       if (e.key === 'Escape') close()
     }
     document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
+    return () => { document.removeEventListener('keydown', handleKey); }
   }, [isOpen, close])
 
   const handleNav = (path: string) => {
@@ -121,7 +121,7 @@ export function HamburgerMenu() {
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-black/40 font-bold text-sm flex-shrink-0">
-                    {authState.profile?.display_name?.[0] ?? '?'}
+                    {authState.profile?.display_name[0] ?? '?'}
                   </div>
                 )}
                 <span className="text-sm font-semibold text-black truncate">
@@ -133,7 +133,7 @@ export function HamburgerMenu() {
               <div className="flex flex-col py-1.5">
                 <button
                   role="menuitem"
-                  onClick={() => handleNav('/')}
+                  onClick={() => { handleNav('/'); }}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
                 >
                   <Home size={16} className="text-black/50 flex-shrink-0" />
@@ -142,7 +142,7 @@ export function HamburgerMenu() {
 
                 <button
                   role="menuitem"
-                  onClick={() => handleNav('/favorites')}
+                  onClick={() => { handleNav('/favorites'); }}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
                 >
                   <Heart size={16} className="text-black/50 flex-shrink-0" />
@@ -167,7 +167,7 @@ export function HamburgerMenu() {
       <AnimatePresence>
         {!isHome && (
           <motion.button
-            onClick={() => navigate(-1)}
+            onClick={() => { navigate(-1); }}
             className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
             aria-label={t('nav.back', 'Voltar')}
             initial={{ opacity: 0, x: -8 }}

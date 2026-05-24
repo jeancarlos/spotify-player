@@ -30,26 +30,24 @@ export function PlaylistDetail() {
   const { state: playerState } = usePlayer()
 
   const handlePlay = useCallback(() => {
-    if (playlist.data?.uri) playContext(playlist.data.uri)
+    if (playlist.data?.uri) void playContext(playlist.data.uri)
   }, [playlist.data, playContext])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)
   }, [])
 
-  const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? [])
-    .map((item) => item.track ?? item.item)
-    .filter((t): t is SpotifyTrack => t != null)
+  const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? []).map((item) => item.item)
 
   const hasNext = tracks.data ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
-  const ownerName = playlist.data?.owner?.display_name ?? ''
+  const ownerName = playlist.data?.owner.display_name ?? ''
   const subtitle = t('playlistDetail.owner', { name: ownerName })
 
   return (
     <div className="min-h-screen">
       <CollectionHeader
-        imageUrl={playlist.data?.images?.[0]?.url}
+        imageUrl={playlist.data?.images[0]?.url}
         name={playlist.data?.name ?? ''}
         subtitle={subtitle}
         playLabel={t('playlistDetail.playPlaylist')}
@@ -71,8 +69,8 @@ export function PlaylistDetail() {
                   key={track.id}
                   track={track}
                   index={(page - 1) * LIMIT + i}
-                  isActive={playerState?.currentTrack?.id === track.id}
-                  onPlay={(tr) => playTrack(tr as SpotifyTrack, playlistTracks)}
+                  isActive={playerState.currentTrack?.id === track.id}
+                  onPlay={async (tr) => { await playTrack(tr as SpotifyTrack, playlistTracks); }}
                 />
               ))}
             </div>
@@ -80,9 +78,9 @@ export function PlaylistDetail() {
             <TrackTable
               tracks={playlistTracks}
               showAlbumColumn={true}
-              activeTrackId={playerState?.currentTrack?.id}
+              activeTrackId={playerState.currentTrack?.id}
               onPlay={(track) => {
-                playTrack(track as SpotifyTrack, playlistTracks)
+                void playTrack(track as SpotifyTrack, playlistTracks)
               }}
             />
           )}
@@ -91,8 +89,8 @@ export function PlaylistDetail() {
             <Pagination
               page={page}
               hasNext={hasNext}
-              onPrev={() => setPage((p) => Math.max(1, p - 1))}
-              onNext={() => setPage((p) => p + 1)}
+              onPrev={() => { setPage((p) => Math.max(1, p - 1)); }}
+              onNext={() => { setPage((p) => p + 1); }}
             />
           )}
         </div>

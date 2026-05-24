@@ -23,7 +23,7 @@ export function Favorites() {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const close = useCallback(() => setOpen(false), [])
+  const close = useCallback(() => { setOpen(false); }, [])
 
   useEffect(() => {
     if (!open) return
@@ -37,7 +37,7 @@ export function Favorites() {
         close()
     }
     document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    return () => { document.removeEventListener('mousedown', handler); }
   }, [open, close])
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function Favorites() {
       if (e.key === 'Escape') close()
     }
     document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
+    return () => { document.removeEventListener('keydown', handler); }
   }, [open, close])
 
   return (
@@ -76,7 +76,7 @@ export function Favorites() {
           <div className="relative">
             <button
               ref={buttonRef}
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => { setOpen((v) => !v); }}
               aria-expanded={open}
               aria-haspopup="true"
               className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"
@@ -141,7 +141,7 @@ export function Favorites() {
                 track={track}
                 note={notes[track.uri] || undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={(t) => playTrack(t as SpotifyTrack)}
+                onPlay={async (t) => playTrack(t as SpotifyTrack)}
                 onRemove={removeTrack}
               />
             ))}

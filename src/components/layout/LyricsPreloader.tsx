@@ -10,7 +10,7 @@ export function LyricsPreloader() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (!queueData || !queueData.queue || queueData.queue.length === 0) return
+    if (!queueData?.queue || queueData.queue.length === 0) return
 
     // Preload lyrics for the first 2 tracks in the queue
     const tracksToPreload = queueData.queue.slice(0, 2)
@@ -28,9 +28,9 @@ export function LyricsPreloader() {
         // Only prefetch if not already in cache or being fetched
         const existingData = queryClient.getQueryData(queryKey)
         if (!existingData) {
-          queryClient.prefetchQuery({
+          void queryClient.prefetchQuery({
             queryKey,
-            queryFn: () => fetchLyrics({ artist, title, album, durationMs }),
+            queryFn: async () => fetchLyrics({ artist, title, album, durationMs }),
             staleTime: Infinity,
           })
         }

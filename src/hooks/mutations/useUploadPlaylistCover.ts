@@ -6,7 +6,7 @@ interface UploadCoverVars {
 }
 
 export function useUploadPlaylistCover() {
-  return useMutation<void, Error, UploadCoverVars>({
+  return useMutation<undefined, Error, UploadCoverVars>({
     mutationFn: async ({ playlistId, base64Jpeg }) => {
       const token = sessionStorage.getItem('access_token')
       if (!token) throw new Error('Sem token de acesso')

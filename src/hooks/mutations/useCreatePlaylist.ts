@@ -21,7 +21,7 @@ export function useCreatePlaylist() {
       return data
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['user-playlists'] })
+      void qc.invalidateQueries({ queryKey: ['user-playlists'] })
     },
   })
 }

@@ -9,43 +9,43 @@ import { lazyWithRetry } from '@/utils/lazyWithRetry'
 
 // Lazy load pages — uses retry + auto-reload to handle stale chunks after deploys
 const Login = lazyWithRetry(
-  () => import('@/pages/Login').then((m) => ({ default: m.Login })),
+  async () => import('@/pages/Login').then((m) => ({ default: m.Login })),
   'Login'
 )
 const OAuthCallback = lazyWithRetry(
-  () => import('@/pages/OAuthCallback').then((m) => ({ default: m.OAuthCallback })),
+  async () => import('@/pages/OAuthCallback').then((m) => ({ default: m.OAuthCallback })),
   'OAuthCallback'
 )
 const AuthError = lazyWithRetry(
-  () => import('@/pages/AuthError').then((m) => ({ default: m.AuthError })),
+  async () => import('@/pages/AuthError').then((m) => ({ default: m.AuthError })),
   'AuthError'
 )
 const Home = lazyWithRetry(
-  () => import('@/pages/Home').then((m) => ({ default: m.Home })),
+  async () => import('@/pages/Home').then((m) => ({ default: m.Home })),
   'Home'
 )
 const Artists = lazyWithRetry(
-  () => import('@/pages/Artists').then((m) => ({ default: m.Artists })),
+  async () => import('@/pages/Artists').then((m) => ({ default: m.Artists })),
   'Artists'
 )
 const ArtistDetail = lazyWithRetry(
-  () => import('@/pages/ArtistDetail').then((m) => ({ default: m.ArtistDetail })),
+  async () => import('@/pages/ArtistDetail').then((m) => ({ default: m.ArtistDetail })),
   'ArtistDetail'
 )
 const AlbumDetail = lazyWithRetry(
-  () => import('@/pages/AlbumDetail').then((m) => ({ default: m.AlbumDetail })),
+  async () => import('@/pages/AlbumDetail').then((m) => ({ default: m.AlbumDetail })),
   'AlbumDetail'
 )
 const PlaylistDetail = lazyWithRetry(
-  () => import('@/pages/PlaylistDetail').then((m) => ({ default: m.PlaylistDetail })),
+  async () => import('@/pages/PlaylistDetail').then((m) => ({ default: m.PlaylistDetail })),
   'PlaylistDetail'
 )
 const Favorites = lazyWithRetry(
-  () => import('@/pages/Favorites').then((m) => ({ default: m.Favorites })),
+  async () => import('@/pages/Favorites').then((m) => ({ default: m.Favorites })),
   'Favorites'
 )
 const Profile = lazyWithRetry(
-  () => import('@/pages/Profile').then((m) => ({ default: m.Profile })),
+  async () => import('@/pages/Profile').then((m) => ({ default: m.Profile })),
   'Profile'
 )
 

@@ -8,14 +8,14 @@ interface RemoveVars {
 
 export function useRemoveFromPlaylist() {
   const qc = useQueryClient()
-  return useMutation<void, Error, RemoveVars>({
+  return useMutation<undefined, Error, RemoveVars>({
     mutationFn: async ({ playlistId, uris }) => {
       await api.delete(`/playlists/${playlistId}/items`, {
         data: { items: uris.map((uri) => ({ uri })) },
       })
     },
     onSuccess: (_data, { playlistId }) => {
-      qc.invalidateQueries({ queryKey: ['playlist-tracks', playlistId] })
+      void qc.invalidateQueries({ queryKey: ['playlist-tracks', playlistId] })
     },
   })
 }

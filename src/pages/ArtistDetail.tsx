@@ -34,7 +34,7 @@ export function ArtistDetail() {
     ? albums.data.offset + albums.data.limit < albums.data.total
     : false
 
-  const handleLayout = useCallback((h: number) => setHeaderHeight(h), [])
+  const handleLayout = useCallback((h: number) => { setHeaderHeight(h); }, [])
 
   function handleAlbumClick(album: SpotifyAlbumSimple) {
     navigate(`/albums/${album.id}`, { state: { from: location.pathname } })
@@ -45,7 +45,7 @@ export function ArtistDetail() {
   return (
     <div className="min-h-screen">
       <ArtistHeader
-        imageUrl={artist.data?.images?.[0]?.url}
+        imageUrl={artist.data?.images[0]?.url}
         name={artist.data?.name ?? ''}
         subtitle={artistSubtitle}
         onLayout={handleLayout}
@@ -65,7 +65,7 @@ export function ArtistDetail() {
               <ArtistTopTracksChart
                 tracks={discographyTracks.data}
                 activeTrackId={state.currentTrack?.id}
-                onPlay={(track) => playTrack(track, discographyTracks.data)}
+                onPlay={async (track) => playTrack(track, discographyTracks.data)}
               />
             </section>
           )}
@@ -77,8 +77,8 @@ export function ArtistDetail() {
             onAlbumClick={handleAlbumClick}
             page={albumPage}
             hasNext={hasNextAlbums}
-            onPrevPage={() => setAlbumPage((p) => Math.max(1, p - 1))}
-            onNextPage={() => setAlbumPage((p) => p + 1)}
+            onPrevPage={() => { setAlbumPage((p) => Math.max(1, p - 1)); }}
+            onNextPage={() => { setAlbumPage((p) => p + 1); }}
           />
 
           <RelatedArtists artistId={id} />

@@ -28,6 +28,12 @@ export function TrackRow({
 
   const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
   const artistNames = 'artists' in track ? track.artists.map((a) => a.name).join(', ') : ''
+  let nameColor: string
+  if (dark) {
+    nameColor = isActive ? 'text-white' : 'text-white/80'
+  } else {
+    nameColor = isActive ? 'text-black' : 'text-black/80'
+  }
 
   return (
     <div
@@ -87,16 +93,7 @@ export function TrackRow({
       {/* Name + artist — note tooltip anchored here */}
       <div className="flex-1 min-w-0 relative">
         <p
-          className={cn(
-            'text-sm font-medium truncate',
-            dark
-              ? isActive
-                ? 'text-white'
-                : 'text-white/80'
-              : isActive
-                ? 'text-black'
-                : 'text-black/80'
-          )}
+          className={cn('text-sm font-medium truncate', nameColor)}
         >
           {track.name}
         </p>

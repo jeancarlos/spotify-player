@@ -9,8 +9,7 @@ import { CardSkeleton } from '@/components/shared/CardSkeleton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { Pagination } from '@/components/shared/Pagination'
 import { SearchResultsGrid } from '@/components/search/SearchResultsGrid'
-import { loadLastSearch } from '@/utils/search'
-import type { SearchTab } from '@/utils/search'
+import { loadLastSearch, type SearchTab } from '@/utils/search'
 
 export function Artists() {
   const { t } = useTranslation()
@@ -19,7 +18,7 @@ export function Artists() {
 
   const saved = loadLastSearch()
   const query = searchParams.get('q') ?? saved?.q ?? ''
-  const tab = (searchParams.get('tab') as SearchTab) ?? saved?.tab ?? 'artist'
+  const tab = (searchParams.get('tab') as SearchTab | null) ?? saved?.tab ?? 'artist'
   const page = Number(searchParams.get('page') ?? '1')
 
   const isArtist = tab === 'artist'
@@ -65,6 +64,46 @@ export function Artists() {
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const renderResults = () => {
+    if (isLoading) {
+      return (
+        <motion.div
+          key="skeleton"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3"
+        >
+          {Array.from({ length: 21 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </motion.div>
+      )
+    }
+    if (data) {
+      return (
+        <motion.div
+          key={`${query}-${tab}-${String(page)}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <SearchResultsGrid
+            tab={tab}
+            artists={artists.data?.items}
+            albums={albums.data?.items}
+            playlists={playlists.data?.items}
+            hasNext={hasNext}
+            onNextPage={() => { handlePageChange(page + 1); }}
+          />
+        </motion.div>
+      )
+    }
+    return null
+  }
+
   return (
     <div className="min-h-screen max-w-3xl mx-auto ">
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
@@ -87,37 +126,7 @@ export function Artists() {
         {!query && <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>}
 
         <AnimatePresence mode="wait">
-          {isLoading ? (
-            <motion.div
-              key="skeleton"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3"
-            >
-              {Array.from({ length: 21 }).map((_, i) => (
-                <CardSkeleton key={i} />
-              ))}
-            </motion.div>
-          ) : data ? (
-            <motion.div
-              key={`${query}-${tab}-${page}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <SearchResultsGrid
-                tab={tab}
-                artists={artists.data?.items}
-                albums={albums.data?.items}
-                playlists={playlists.data?.items}
-                hasNext={hasNext}
-                onNextPage={() => handlePageChange(page + 1)}
-              />
-            </motion.div>
-          ) : null}
+          {renderResults()}
         </AnimatePresence>
 
         {!isLoading && query && data?.items.length === 0 && (
@@ -128,8 +137,8 @@ export function Artists() {
           <Pagination
             page={page}
             hasNext={hasNext}
-            onPrev={() => handlePageChange(Math.max(1, page - 1))}
-            onNext={() => handlePageChange(page + 1)}
+            onPrev={() => { handlePageChange(Math.max(1, page - 1)); }}
+            onNext={() => { handlePageChange(page + 1); }}
             className="mt-12"
           />
         )}

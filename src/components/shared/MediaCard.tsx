@@ -32,7 +32,7 @@ export function MediaCard({
           onClick()
         }
       }}
-      aria-label={ariaLabel || title}
+      aria-label={ariaLabel ?? title}
     >
       <div className="relative aspect-square overflow-hidden rounded-[6px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
         {imageUrl ? (

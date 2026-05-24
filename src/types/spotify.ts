@@ -91,7 +91,7 @@ export interface SpotifyUser {
   display_name: string
   email: string
   images: SpotifyImage[]
-  product: 'premium' | 'free' | 'open' | string
+  product: string
   followers: { href: string | null; total: number }
   country: string
   href?: string
@@ -292,14 +292,14 @@ export interface SpotifyQueueResponse {
 }
 
 export interface SpotifyRecommendationsResponse {
-  seeds: Array<{
+  seeds: {
     afterFilteringSize: number
     afterRelinkingSize: number
     href: string
     id: string
     initialPoolSize: number
     type: 'ARTIST' | 'TRACK' | 'GENRE'
-  }>
+  }[]
   tracks: SpotifyTrack[]
 }
 
@@ -323,7 +323,7 @@ export interface SpotifyAlbumFull extends SpotifyAlbumSimple {
   label?: string
   genres?: string[]
   popularity?: number
-  copyrights?: Array<{ text: string; type: 'C' | 'P' }>
+  copyrights?: { text: string; type: 'C' | 'P' }[]
   external_ids?: { upc?: string; ean?: string }
 }
 

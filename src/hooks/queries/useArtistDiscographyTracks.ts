@@ -72,7 +72,7 @@ export function useArtistDiscographyTracks(artistId: string | undefined, topN = 
     if (!trackQueries.length) return []
     const all = trackQueries.flatMap((q) => q.data ?? [])
     const unique = Array.from(new Map(all.map((t) => [t.id, t])).values())
-    return unique.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0)).slice(0, topN)
+    return unique.sort((a, b) => b.popularity - a.popularity).slice(0, topN)
   })()
 
   return { data, isLoading }

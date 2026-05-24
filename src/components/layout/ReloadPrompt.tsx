@@ -10,10 +10,10 @@ export function ReloadPrompt() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      console.log('SW Registered: ' + r)
+      console.warn('SW Registered: ' + (r?.scope ?? 'unknown'))
     },
     onRegisterError(error) {
-      console.log('SW registration error', error)
+      console.error('SW registration error', error)
     },
   })
 
@@ -47,7 +47,7 @@ export function ReloadPrompt() {
 
         {needRefresh && (
           <button
-            onClick={() => updateServiceWorker(true)}
+            onClick={async () => updateServiceWorker(true)}
             className="flex items-center justify-center gap-2 w-full py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-black/80 transition-colors"
           >
             <RefreshCw size={14} />

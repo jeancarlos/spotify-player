@@ -28,9 +28,9 @@ const mockTrack = (id: string): SpotifyTrack =>
       uri: 'spotify:album:alb1',
       type: 'album',
     },
-  }) as SpotifyTrack
+  })
 
-beforeEach(() => localStorage.clear())
+beforeEach(() => { localStorage.clear(); })
 
 describe('readLocalTracks', () => {
   it('retorna [] quando não há dados', () => {

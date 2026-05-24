@@ -43,7 +43,7 @@ export function useSearchPaged<T, R>({
       const prevData = queryClient.getQueryData<CachedPage<T>>([queryKeyPrefix, query, page - 1])
       const preloadedR1 = prevData?.r4
 
-      const fetch = (offset: number, limit = CHUNK) =>
+      const fetch = async (offset: number, limit = CHUNK) =>
         api.get<R>('/search', { params: { q: query, type: apiType, limit, offset } })
 
       const [maybeR1, res2, r3, r4] = await Promise.all([
@@ -54,7 +54,7 @@ export function useSearchPaged<T, R>({
       ])
 
       const gp = getPageRef.current
-      const r1Items = preloadedR1 ?? gp(maybeR1!.data).items
+      const r1Items = preloadedR1 ?? (maybeR1 ? gp(maybeR1.data).items : [])
 
       return {
         ...gp(res2.data),
@@ -75,10 +75,10 @@ export function useSearchPaged<T, R>({
     const nextBase = (nextPage - 1) * PAGE_SIZE
     const gp = getPageRef.current
 
-    const fetchNext = (offset: number, limit = CHUNK) =>
+    const fetchNext = async (offset: number, limit = CHUNK) =>
       api.get<R>('/search', { params: { q: query, type: apiType, limit, offset } })
 
-    queryClient.prefetchQuery({
+    void queryClient.prefetchQuery({
       queryKey: [queryKeyPrefix, query, nextPage],
       staleTime: 60_000,
       queryFn: async () => {

@@ -10,8 +10,8 @@ import {
   LabelList,
   ResponsiveContainer,
   ReferenceLine,
+  type TooltipProps,
 } from 'recharts'
-import type { TooltipProps } from 'recharts'
 import type { SpotifyTrack } from '@/types/spotify'
 
 function seededFraction(seed: string): number {
@@ -135,20 +135,26 @@ function RoundedBar({ x = 0, y = 0, width = 0, height = 0, fill }: BarShapeProps
   )
 }
 
+function getBarFill(entryId: string, index: number, activeTrackId?: string): string {
+  if (entryId === activeTrackId) return 'rgba(0,0,0,0.78)'
+  if (index === 0) return 'rgba(0,0,0,0.52)'
+  return `rgba(0,0,0,${Math.max(0.12, 0.42 - index * 0.03)})`
+}
+
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   const chartData = useMemo<ChartEntry[]>(() => {
     const sorted = [...tracks]
       .slice(0, 10)
-      .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+      .sort((a, b) => b.popularity - a.popularity)
     return sorted.map((t) => ({
       id: t.id,
       label: t.name,
       name: t.name,
       artists: t.artists.map((a) => a.name).join(', '),
       albumName: t.album.name,
-      albumArt: t.album.images[1]?.url ?? t.album.images[0]?.url ?? '',
-      streams: estimateStreams(t.popularity ?? 0, t.id),
-      popularity: t.popularity ?? 0,
+      albumArt: (t.album.images.at(1) ?? t.album.images.at(0))?.url ?? '',
+      streams: estimateStreams(t.popularity, t.id),
+      popularity: t.popularity,
       track: t,
     }))
   }, [tracks])
@@ -218,18 +224,10 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
               formatter={formatStreams}
               style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
             />
-            {chartData.map((entry, i) => (
-              <Cell
-                key={entry.id}
-                fill={
-                  entry.id === activeTrackId
-                    ? 'rgba(0,0,0,0.78)'
-                    : i === 0
-                      ? 'rgba(0,0,0,0.52)'
-                      : `rgba(0,0,0,${Math.max(0.12, 0.42 - i * 0.03)})`
-                }
-              />
-            ))}
+            {chartData.map((entry, i) => {
+              const fill = getBarFill(entry.id, i, activeTrackId)
+              return <Cell key={entry.id} fill={fill} />
+            })}
           </Bar>
         </BarChart>
       </ResponsiveContainer>

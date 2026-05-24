@@ -24,7 +24,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
   const inputRef = useRef<HTMLInputElement>(null)
   const blurTimerRef = useRef<number>(0)
 
-  useEffect(() => () => clearTimeout(blurTimerRef.current), [])
+  useEffect(() => () => { clearTimeout(blurTimerRef.current); }, [])
 
   const debouncedQuery = useDebounce(query, 300)
   const { data: results = [], isPending } = useSearchTracks(
@@ -116,7 +116,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
         }}
         onBlur={() => {
           onBlur()
-          blurTimerRef.current = window.setTimeout(() => setIsOpen(false), 150)
+          blurTimerRef.current = window.setTimeout(() => { setIsOpen(false); }, 150)
         }}
         onKeyDown={handleKeyDown}
       />
@@ -142,7 +142,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
               id={`${listboxId}-${i}`}
               role="option"
               aria-selected={i === highlightIndex}
-              onClick={() => handleSelect(track)}
+              onClick={() => { handleSelect(track); }}
               className={cn(
                 'flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors',
                 i === highlightIndex ? 'bg-black/10' : 'hover:bg-black/5'

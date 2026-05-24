@@ -33,14 +33,14 @@ export function RelatedArtists({ artistId }: RelatedArtistsProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setVisibleCount((c) => Math.min(c + PAGE_SIZE, related.data!.length))
+          setVisibleCount((c) => Math.min(c + PAGE_SIZE, related.data.length))
         }
       },
       { threshold: 0.1 }
     )
 
     observer.observe(sentinel)
-    return () => observer.disconnect()
+    return () => { observer.disconnect(); }
   }, [related.data])
 
   if (!related.data || related.data.length === 0) return null

@@ -38,7 +38,7 @@ export function SearchResultsGrid({
                 ? t('artists.followers', { count: artist.followers.total })
                 : undefined
             }
-            onClick={() => navigate(`/artists/${artist.id}`)}
+            onClick={() => { navigate(`/artists/${artist.id}`); }}
           />
         ))}
 
@@ -49,7 +49,7 @@ export function SearchResultsGrid({
             title={album.name}
             imageUrl={album.images[0]?.url}
             subtitle={album.artists.map((a: { name: string }) => a.name).join(', ')}
-            onClick={() => navigate(`/albums/${album.id}`)}
+            onClick={() => { navigate(`/albums/${album.id}`); }}
           />
         ))}
 
@@ -62,7 +62,7 @@ export function SearchResultsGrid({
               title={playlist.name}
               imageUrl={playlist.images[0]?.url}
               subtitle={playlist.owner.display_name}
-              onClick={() => navigate(`/playlists/${playlist.id}`)}
+              onClick={() => { navigate(`/playlists/${playlist.id}`); }}
             />
           ))}
 

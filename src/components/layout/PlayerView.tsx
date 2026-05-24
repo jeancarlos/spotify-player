@@ -24,7 +24,7 @@ export function PlayerView() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { t } = useTranslation()
 
-  const activeTab = (searchParams.get('tab') as PlayerTab) || 'lyrics'
+  const activeTab = (searchParams.get('tab') ?? 'lyrics') as PlayerTab
 
   const handleTabChange = (tab: PlayerTab) => {
     setSearchParams({ tab }, { replace: true })
@@ -64,6 +64,56 @@ export function PlayerView() {
     },
     [dispatch, seekTo]
   )
+
+  const renderTabContent = () => {
+    if (activeTab === 'info') {
+      return (
+        <motion.div
+          key="info"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="h-full overflow-y-auto pt-4 pb-40"
+        >
+          {currentTrack && <TrackInfoPanel track={currentTrack} />}
+        </motion.div>
+      )
+    }
+    if (activeTab === 'queue') {
+      return (
+        <motion.div
+          key="queue"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="h-full"
+        >
+          <PlayerQueue />
+        </motion.div>
+      )
+    }
+    return (
+      <motion.div
+        key="lyrics"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 20 }}
+        className="h-full flex flex-col"
+      >
+        {lyrics.isPending ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
+          </div>
+        ) : (
+          <LyricsView
+            lines={lyrics.data ?? []}
+            progress={currentProgress}
+            onSeek={handleSeek}
+          />
+        )}
+      </motion.div>
+    )
+  }
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
@@ -139,47 +189,7 @@ export function PlayerView() {
       {/* Main Area */}
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
         <AnimatePresence mode="wait">
-          {activeTab === 'info' ? (
-            <motion.div
-              key="info"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="h-full overflow-y-auto pt-4 pb-40"
-            >
-              {currentTrack && <TrackInfoPanel track={currentTrack} />}
-            </motion.div>
-          ) : activeTab === 'queue' ? (
-            <motion.div
-              key="queue"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="h-full"
-            >
-              <PlayerQueue />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="lyrics"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="h-full flex flex-col"
-            >
-              {lyrics.isPending ? (
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
-                </div>
-              ) : (
-                <LyricsView
-                  lines={lyrics.data ?? []}
-                  progress={currentProgress}
-                  onSeek={handleSeek}
-                />
-              )}
-            </motion.div>
-          )}
+          {renderTabContent()}
         </AnimatePresence>
       </main>
 

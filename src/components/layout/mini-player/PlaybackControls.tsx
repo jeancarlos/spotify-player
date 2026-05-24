@@ -43,7 +43,7 @@ export function PlaybackControls() {
   const [searchParams] = useSearchParams()
 
   const isPlayerPage = location.pathname === '/player'
-  const activeTab = (searchParams.get('tab') as 'lyrics' | 'info' | 'queue') || 'lyrics'
+  const activeTab = (searchParams.get('tab') ?? 'lyrics') as 'lyrics' | 'info' | 'queue'
 
   const handlePlayPause = useCallback(async () => {
     const next = !isPlaying
@@ -90,7 +90,7 @@ export function PlaybackControls() {
       context: 'track',
       track: 'off',
     }
-    const next = nextRepeatState[repeat] || 'off'
+    const next = nextRepeatState[repeat]
     dispatch({ type: 'SET_REPEAT', payload: next })
     try {
       await api.put('/me/player/repeat', null, { params: { state: next }, responseType: 'text' })

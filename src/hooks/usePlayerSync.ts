@@ -76,7 +76,7 @@ export function usePlayerSync() {
     const imageUrl = track.album.images[0]?.url
     if (!imageUrl) return
 
-    extractPalette(imageUrl).then((palette) => {
+    void extractPalette(imageUrl).then((palette) => {
       if (palette) dispatch({ type: 'SET_PALETTE', payload: palette })
     })
   }, [state.currentTrack, dispatch])

@@ -71,9 +71,9 @@ export function useSpoterPlaylist() {
   // Keep multiple hook instances in sync when another instance writes to localStorage
   useEffect(() => {
     if (!userId) return
-    const handler = () => setLocalTracks(readLocalTracks(userId))
+    const handler = () => { setLocalTracks(readLocalTracks(userId)); }
     window.addEventListener('spoter:favorites-changed', handler)
-    return () => window.removeEventListener('spoter:favorites-changed', handler)
+    return () => { window.removeEventListener('spoter:favorites-changed', handler); }
   }, [userId])
 
   const [forcedId, setForcedId] = useState<string | null>(null)
@@ -136,7 +136,7 @@ export function useSpoterPlaylist() {
           setForcedId(p.id)
           uploadCover.mutate(
             { playlistId: p.id, base64Jpeg: spoterListCover },
-            { onSuccess: () => localStorage.setItem(coverKey(userId), '1') }
+            { onSuccess: () => { localStorage.setItem(coverKey(userId), '1'); } }
           )
         },
         onError: () => {
@@ -155,10 +155,10 @@ export function useSpoterPlaylist() {
 
   useEffect(() => {
     if (!playlists.isSuccess || !playlistId || !userId) return
-    const existing = playlists.data?.items.find((p) => p.id === playlistId)
+    const existing = playlists.data.items.find((p) => p.id === playlistId)
     if (!existing) {
-      const id = setTimeout(() => resetStalePlaylist(userId), 0)
-      return () => clearTimeout(id)
+      const id = setTimeout(() => { resetStalePlaylist(userId); }, 0)
+      return () => { clearTimeout(id); }
     }
     if (displayName && existing.name !== playlistName) {
       updatePlaylist.mutate({ playlistId, name: playlistName })
@@ -168,7 +168,7 @@ export function useSpoterPlaylist() {
       uploadCover.mutate(
         { playlistId, base64Jpeg: spoterListCover },
         {
-          onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
+          onSuccess: () => { localStorage.setItem(coverKey(userId), '1'); },
           onError: () => {
             coverUploaded.current = false
           },
@@ -200,7 +200,7 @@ export function useSpoterPlaylist() {
 
     if (missingUris.length === 0) return
 
-    hydrateFromApi(missingUris).then((fetched) => {
+    void hydrateFromApi(missingUris).then((fetched) => {
       if (fetched.length > 0) {
         setLocalTracks((prev) => {
           const merged = [...prev, ...fetched.filter((ft) => !prev.some((p) => p.uri === ft.uri))]
@@ -215,15 +215,13 @@ export function useSpoterPlaylist() {
   // Seed local tracks from Spotify playlist when localStorage and cookie are both empty.
   // writeLocalTracks dispatches spoter:favorites-changed; the sync handler above picks it up.
   useEffect(() => {
-    if (!seedQuery.isSuccess || !seedQuery.data || !userId || localTracks.length > 0) return
-    const fetched = seedQuery.data.items
-      .map((item) => item.track ?? item.item)
-      .filter((t): t is SpotifyTrack => t != null)
+    if (!seedQuery.isSuccess || !userId || localTracks.length > 0) return
+    const fetched = seedQuery.data.items.map((item) => item.item)
     if (fetched.length === 0) return
     const id = setTimeout(() => {
       if (readLocalTracks(userId).length === 0) writeLocalTracks(userId, fetched)
     }, 0)
-    return () => clearTimeout(id)
+    return () => { clearTimeout(id); }
   }, [seedQuery.isSuccess, seedQuery.data, userId, localTracks.length])
 
   const addTrack = useCallback(
@@ -253,8 +251,8 @@ export function useSpoterPlaylist() {
   const removeTrack = useCallback(
     (uri: string) => {
       const newTracks = tracksRef.current.filter((t) => t.uri !== uri)
-      const newNotes = { ...notesRef.current }
-      delete newNotes[uri]
+      const { [uri]: _removed, ...rest } = notesRef.current
+      const newNotes = rest
 
       writeLocalTracks(userId, newTracks)
       writeLocalNotes(userId, newNotes)
@@ -277,9 +275,8 @@ export function useSpoterPlaylist() {
       const newNotes = trimmed
         ? { ...notesRef.current, [uri]: trimmed }
         : (() => {
-            const n = { ...notesRef.current }
-            delete n[uri]
-            return n
+            const { [uri]: _removed, ...rest } = notesRef.current
+            return rest
           })()
 
       writeLocalNotes(userId, newNotes)

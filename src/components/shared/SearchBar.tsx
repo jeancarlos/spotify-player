@@ -3,8 +3,7 @@ import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useDebounce } from '@/hooks/useDebounce'
 import { cn } from '@/lib/utils'
-import { saveLastSearch } from '@/utils/search'
-import type { SearchTab } from '@/utils/search'
+import { saveLastSearch, type SearchTab } from '@/utils/search'
 
 interface SearchBarProps {
   onSearch: (query: string, tab: SearchTab) => void
@@ -58,7 +57,7 @@ export function SearchBar({
       <input
         id="global-search"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => { setQuery(e.target.value); }}
         placeholder={t('artists.searchPlaceholder')}
         className="flex-1 bg-transparent text-sm outline-none text-black placeholder:text-black/30 min-w-0"
       />
@@ -66,7 +65,7 @@ export function SearchBar({
         {tabs.map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => setTab(key)}
+            onClick={() => { setTab(key); }}
             role="tab"
             aria-selected={tab === key}
             className={cn(

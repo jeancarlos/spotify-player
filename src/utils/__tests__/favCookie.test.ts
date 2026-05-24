@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { readFavCookie, writeFavCookie } from '@/utils/favCookie'
-import type { FavCookieEntry } from '@/utils/favCookie'
+import { readFavCookie, writeFavCookie, type FavCookieEntry } from '@/utils/favCookie'
 
 function clearCookies() {
   document.cookie.split(';').forEach((c) => {

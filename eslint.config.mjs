@@ -15,6 +15,7 @@ export default tseslint.config(
       'playwright.config.ts',
       'tailwind.config.ts',
       'vite.config.ts',
+      'tests-e2e/**',
     ],
   },
   {
@@ -110,7 +111,6 @@ export default tseslint.config(
       '**/*.spec.{ts,tsx}',
       'src/test-setup.ts',
       'src/mocks/**',
-      'tests-e2e/**',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -122,8 +122,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/promise-function-async': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       'no-console': 'off',
       complexity: 'off',
     },
-  }
+  },
 )

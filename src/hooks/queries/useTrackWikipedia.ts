@@ -17,7 +17,7 @@ async function fetchWikipediaSummary(title: string, lang: string): Promise<WikiR
       `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
     )
     if (!res.ok) return null
-    const data: WikiSummary = await res.json()
+    const data = (await res.json()) as WikiSummary
     if (!data.extract) return null
     const extract = data.extract.length > 400 ? data.extract.slice(0, 400) + '...' : data.extract
     return {

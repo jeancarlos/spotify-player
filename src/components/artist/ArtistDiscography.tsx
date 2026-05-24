@@ -43,7 +43,7 @@ export function ArtistDiscography({
             <div
               key={album.id}
               className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group focus:outline-none focus:bg-black/5"
-              onClick={() => onAlbumClick(album)}
+              onClick={() => { onAlbumClick(album); }}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {

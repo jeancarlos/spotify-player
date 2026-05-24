@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
-import type { UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import type { PlaylistTracksResponse } from '@/types/spotify'
 
@@ -8,9 +7,9 @@ export function usePlaylistTracks(
   enabled = true,
   page = 1,
   limit = 20,
-  options?: Partial<UseQueryOptions<PlaylistTracksResponse, Error>>
+  options?: Partial<UseQueryOptions<PlaylistTracksResponse>>
 ) {
-  return useQuery<PlaylistTracksResponse, Error>({
+  return useQuery<PlaylistTracksResponse>({
     ...options,
     queryKey: ['playlist-tracks', playlistId, page, limit],
     enabled: enabled && playlistId.length > 0,

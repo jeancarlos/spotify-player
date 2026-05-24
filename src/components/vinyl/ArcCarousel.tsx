@@ -48,7 +48,6 @@ export function ArcCarousel({
         <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
             const pos = positions[i]
-            if (!pos) return null
 
             // Normal: cards fly upward (pos.y is negative)
             // Inverted: cards hang downward (negate pos.y)

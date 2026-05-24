@@ -16,7 +16,7 @@ async function fetchWikiSummary(lang: 'pt' | 'en', title: string): Promise<WikiR
   const base = `https://${lang}.wikipedia.org`
   const res = await fetch(`${base}/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
   if (!res.ok) return null
-  const data: WikiSummary = await res.json()
+  const data = (await res.json()) as WikiSummary
   if (!data.extract) return null
   const extract = data.extract.length > 500 ? data.extract.slice(0, 500) + '...' : data.extract
   return {
@@ -57,6 +57,6 @@ export function useArtistBio(artistName: string | undefined) {
     queryKey: ['artist-bio', artistName, i18n.language],
     enabled: !!artistName,
     staleTime: 1000 * 60 * 60,
-    queryFn: () => (artistName ? fetchArtistBio(artistName, preferPt) : null),
+    queryFn: async () => (artistName ? fetchArtistBio(artistName, preferPt) : null),
   })
 }

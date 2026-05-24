@@ -13,7 +13,7 @@ interface AddFavoriteFormProps {
   onClose: () => void
 }
 
-type FormValues = { track: SpotifyTrack; note: string }
+interface FormValues { track: SpotifyTrack | undefined; note: string }
 
 export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps) {
   const { t } = useTranslation()
@@ -45,11 +45,12 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const watchedTrack = watch('track')
-  const watchedNote = watch('note') ?? ''
+  const watchedNote = watch('note')
   const isAlreadyFavorite = !!watchedTrack && tracks.some((tr) => tr.uri === watchedTrack.uri)
   const noteLength = watchedNote.length
 
   const onSubmit = handleSubmit(({ track, note }) => {
+    if (!track) return
     onAdd(track, note.trim() || undefined)
     reset()
     onClose()

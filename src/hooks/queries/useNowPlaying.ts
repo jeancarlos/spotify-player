@@ -22,8 +22,7 @@ export function useNowPlaying(enabled = true) {
       const { data, status } = await api.get<NowPlayingResponse>('/me/player', {
         validateStatus: (s) => s === 200 || s === 204 || s === 429,
       })
-      // 429 = rate limited — return null to keep last known state, don't throw
-      if (status === 204 || status === 429 || !data) return null
+      if (status === 204 || status === 429) return null
       return data
     },
   })

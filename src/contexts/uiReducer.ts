@@ -11,7 +11,7 @@ export type UIAction =
   | { type: 'CLOSE_SIDEBAR' }
 
 export const initialUIState: UIState = {
-  language: (localStorage.getItem('spoter_lang') as 'pt-BR' | 'en-US') ?? 'pt-BR',
+  language: (localStorage.getItem('spoter_lang') ?? 'pt-BR') as 'pt-BR' | 'en-US',
   sidebarCollapsed: false,
   sidebarOpen: false,
 }

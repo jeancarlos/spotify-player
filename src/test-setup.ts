@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { vi } from 'vitest'
 // Mock parcial de react-i18next
 vi.mock('react-i18next', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react-i18next')>()
+  const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
     useTranslation: () => ({
@@ -17,8 +17,8 @@ vi.mock('react-i18next', async (importOriginal) => {
         }
 
         let val = translations[key] || key
-        if ((options as Record<string, unknown>)?.name)
-          val = val.replace('{{name}}', (options as Record<string, unknown>).name as string)
+        if ((options)?.name)
+          val = val.replace('{{name}}', (options).name as string)
         return val
       },
       i18n: {

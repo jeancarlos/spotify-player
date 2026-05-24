@@ -8,9 +8,14 @@ function migrateTab(tab: string): SearchTab {
   return 'artist'
 }
 
+interface StoredSearch {
+  q: string
+  tab: string
+}
+
 export function loadLastSearch(): { q: string; tab: SearchTab } | null {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null') as StoredSearch | null
     if (!raw) return null
     return { q: raw.q, tab: migrateTab(raw.tab) }
   } catch {

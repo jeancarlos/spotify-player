@@ -66,6 +66,6 @@ export function useLyrics(params: UseLyricsParams) {
     enabled: !!params.artist && !!params.title,
     retry: false,
     staleTime: Infinity,
-    queryFn: () => fetchLyrics(params),
+    queryFn: async () => fetchLyrics(params),
   })
 }

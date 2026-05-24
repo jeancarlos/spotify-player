@@ -24,10 +24,10 @@ export function OAuthCallback() {
     }
 
     handleCallback(code, state)
-      .then(() => navigate('/'))
+      .then(() => { navigate('/'); })
       .catch((err: unknown) => {
-        const code = (err as { code?: string })?.code ?? 'unknown'
-        navigate(`/auth-error?reason=${code}`, { replace: true })
+        const errCode = (err as { code?: string }).code ?? 'unknown'
+        navigate(`/auth-error?reason=${errCode}`, { replace: true })
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

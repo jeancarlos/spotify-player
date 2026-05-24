@@ -21,7 +21,7 @@ function useDiskLayout() {
       setVh(window.innerHeight)
     }
     window.addEventListener('resize', fn)
-    return () => window.removeEventListener('resize', fn)
+    return () => { window.removeEventListener('resize', fn); }
   }, [])
 
   const diskPx = Math.min(720, vw)

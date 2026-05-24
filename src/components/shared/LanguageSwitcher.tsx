@@ -23,7 +23,7 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
       {LANGUAGES.map(({ code, label }) => (
         <button
           key={code}
-          onClick={() => dispatch({ type: 'SET_LANGUAGE', payload: code })}
+          onClick={() => { dispatch({ type: 'SET_LANGUAGE', payload: code }); }}
           aria-pressed={state.language === code}
           className={`px-3 py-1 rounded-full font-mono text-xs transition-colors ${
             state.language === code ? 'bg-black text-white' : 'text-black/40 hover:text-black'

@@ -3,8 +3,7 @@ import type { SpotifyUser } from '@/types/spotify'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/lib/pkce'
 import api from '@/lib/axios'
 import i18n from '@/lib/i18n'
-import { authReducer, initialAuthState } from './authReducer'
-import type { AuthState } from './authReducer'
+import { authReducer, initialAuthState, type AuthState } from './authReducer'
 
 interface AuthContextValue {
   state: AuthState
@@ -41,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cachedProfile = (() => {
       try {
         const raw = localStorage.getItem('user_profile')
-        return raw ? JSON.parse(raw) : null
+        return raw ? (JSON.parse(raw) as SpotifyUser) : null
       } catch {
         return null
       }
@@ -68,9 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         dispatch({ type: 'SET_PROFILE', payload: res.data })
       })
-      .catch((err) => {
-        if (err?.response?.status === 429) {
-          setTimeout(() => setProfileRetry((n) => n + 1), 15_000)
+      .catch((err: unknown) => {
+        const axiosErr = err as { response?: { status?: number } }
+        if (axiosErr.response?.status === 429) {
+          setTimeout(() => { setProfileRetry((n) => n + 1); }, 15_000)
         } else {
           sessionStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
@@ -115,9 +115,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    const onMessage = (event: MessageEvent) => {
+    const onMessage = (event: MessageEvent<{ type?: string; accessToken?: string; refreshToken?: string }>) => {
       if (event.source !== popup) return
-      if (!event.data || typeof event.data !== 'object') return
+      if (typeof event.data !== 'object') return
 
       if (event.data.type === 'REQUEST_PKCE_DATA') {
         const v = localStorage.getItem('pkce_verifier')
@@ -127,11 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (event.data.type !== 'SPOTIFY_AUTH_TOKENS') return
-      const { accessToken, refreshToken } = event.data as {
-        type: string
-        accessToken: string
-        refreshToken: string
-      }
+      const { accessToken, refreshToken } = event.data
       if (!accessToken || !refreshToken) return
 
       cleanup()
@@ -179,13 +175,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             resolve({ nonce: null, verifier: null })
           }, 3000)
 
-          const handler = (ev: MessageEvent) => {
-            if (ev.data?.type !== 'PKCE_DATA') return
+          const handler = (ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>) => {
+            if (ev.data.type !== 'PKCE_DATA') return
             clearTimeout(timer)
             window.removeEventListener('message', handler)
             resolve({
-              nonce: ev.data.nonce as string | null,
-              verifier: ev.data.verifier as string | null,
+              nonce: ev.data.nonce ?? null,
+              verifier: ev.data.verifier ?? null,
             })
           }
           window.addEventListener('message', handler)
@@ -224,7 +220,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('pkce_state')
 
     if (window.opener) {
-      window.opener.postMessage(
+      const opener = window.opener as Window
+      opener.postMessage(
         {
           type: 'SPOTIFY_AUTH_TOKENS',
           accessToken: data.access_token,
