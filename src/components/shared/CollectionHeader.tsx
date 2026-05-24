@@ -51,13 +51,12 @@ export function CollectionHeader({
     <div className="">
       <div
         className="absolute left-1/2"
-        style={{ transform: 'translateX(-50%) translateY(-16px)', top: 0 }}
+        style={{ transform: 'translateX(-50%) translateY(-16px)', top: 0, zIndex: 2 }}
       >
         <motion.div
           initial={{ scale: 0.8, y: 60, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          style={{ zIndex: 2, position: 'relative' }}
         >
           <FlippableCover
             frontUrl={imageUrl}
