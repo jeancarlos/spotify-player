@@ -120,7 +120,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
       {error && <p className="text-xs text-red-500 mt-1 ml-1">{error}</p>}
 
       {isPending && debouncedQuery.length >= 2 && (
-        <div className="absolute top-full mt-1 left-0 right-0 glass rounded-xl p-3 z-50 shadow-xl">
+        <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-xl p-3 z-50 shadow-xl">
           <p className="text-xs text-black/40 text-center">{t('common.loading')}</p>
         </div>
       )}
@@ -130,7 +130,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
           id={listboxId}
           role="listbox"
           aria-label={t('favorites.trackLabel')}
-          className="absolute top-full mt-1 left-0 right-0 glass rounded-xl overflow-hidden z-50 shadow-xl"
+          className="absolute top-full mt-1 left-0 right-0 bg-white rounded-xl overflow-y-auto max-h-60 z-50 shadow-xl"
         >
           {results.map((track, i) => (
             <li
