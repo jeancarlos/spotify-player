@@ -94,7 +94,7 @@ export function TrackRow({
           {artistNames}
         </p>
         {note && (
-          <span className="pointer-events-none absolute -top-8 left-0 whitespace-nowrap max-w-[220px] truncate rounded-md bg-black/80 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity z-50">
+          <span className="pointer-events-none absolute bottom-full left-0 mb-1 whitespace-normal w-max max-w-xs rounded-md bg-black/80 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity z-50">
             {note}
           </span>
         )}

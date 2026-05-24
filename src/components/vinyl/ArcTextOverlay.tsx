@@ -7,11 +7,11 @@ interface ArcTextOverlayProps {
   isPlaying?: boolean
   // ─── EDITAR AQUI: geometria do arco ───────────────────────────────────────
   k?: number       // fração do raio do disco (0.0 – 1.0). Padrão: 0.88
-  arcDeg?: number  // graus abrangidos pelo arco. Padrão: 120
+  arcDeg?: number  // graus abrangidos pelo arco. Padrão: 200
   // ──────────────────────────────────────────────────────────────────────────
 }
 
-export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.88, arcDeg = 120 }: ArcTextOverlayProps) {
+export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.88, arcDeg = 200 }: ArcTextOverlayProps) {
   const uid = useId()
 
   const cx = diskPx / 2
