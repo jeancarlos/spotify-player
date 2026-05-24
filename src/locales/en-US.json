@@ -46,7 +46,8 @@
     "list": "List",
     "table": "Table",
     "popularity": "Pop.",
-    "name": "Name"
+    "name": "Name",
+    "clear": "Clear"
   },
   "artists": {
     "searchPlaceholder": "Search...",
@@ -121,7 +122,19 @@
     "addToList": "Add to Spoter List",
     "removeFromList": "Remove from Spoter List",
     "addedToList": "Added!",
-    "removedFromList": "Removed!"
+    "removedFromList": "Removed!",
+    "trackRequired": "Select a song",
+    "noteTooLong": "Maximum 300 characters",
+    "alreadyFavorite": "Already in favorites",
+    "notePlaceholder": "A personal note (optional)...",
+    "noteLabel": "Personal note",
+    "trackLabel": "Song",
+    "addConfirm": "Add to favorites",
+    "searchAutocomplete": "Search song or artist...",
+    "isFavorite": "♥ FAVORITE",
+    "noteCharsLeft": "{{count}}/300",
+    "editNote": "Edit note",
+    "clearTrack": "Clear selection"
   },
   "lyrics": {
     "searching": "Searching lyrics...",
