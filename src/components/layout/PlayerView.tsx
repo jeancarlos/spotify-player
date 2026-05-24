@@ -11,6 +11,7 @@ import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
+import { getFromPath } from '@/utils/routerState'
 
 type PlayerTab = 'lyrics' | 'info' | 'queue'
 
@@ -83,8 +84,7 @@ export function PlayerView() {
       <header className="relative z-20 flex items-center justify-between p-6 shrink-0">
         <button
           onClick={() => {
-            const from = location.state?.from ?? '/'
-            navigate(from)
+            navigate(getFromPath(location.state))
           }}
           className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none"
           aria-label={t('common.back')}
@@ -95,7 +95,7 @@ export function PlayerView() {
         <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
           {!noLyrics && (
             <button
-              onClick={() => handleTabChange('lyrics')}
+              onClick={() => { handleTabChange('lyrics'); }}
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
                 activeTab === 'lyrics'
@@ -108,7 +108,7 @@ export function PlayerView() {
             </button>
           )}
           <button
-            onClick={() => handleTabChange('info')}
+            onClick={() => { handleTabChange('info'); }}
             className={cn(
               'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
               activeTab === 'info'
@@ -120,7 +120,7 @@ export function PlayerView() {
             <span className="hidden min-[400px]:inline">{t('track.songDetails')}</span>
           </button>
           <button
-            onClick={() => handleTabChange('queue')}
+            onClick={() => { handleTabChange('queue'); }}
             className={cn(
               'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
               activeTab === 'queue'

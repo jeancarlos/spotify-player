@@ -3,6 +3,7 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useTranslation } from 'react-i18next'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { formatDuration } from '@/utils/formatDuration'
+import { getFromPath } from '@/utils/routerState'
 
 interface TrackInfoProps {
   progress: number
@@ -16,11 +17,11 @@ export function TrackInfo({ progress }: TrackInfoProps) {
   const location = useLocation()
 
   const isPlayerPage = location.pathname === '/player'
-  const duration = currentTrack?.duration_ms || 0
+  const duration = currentTrack?.duration_ms ?? 0
 
   const handleTrackClick = () => {
     if (isPlayerPage) {
-      navigate(location.state?.from ?? '/')
+      navigate(getFromPath(location.state))
     } else if (currentTrack) {
       navigate('/player?tab=lyrics', { state: { from: location.pathname } })
     }
@@ -70,7 +71,7 @@ export function TrackInfo({ progress }: TrackInfoProps) {
                 <button
                   key={a.id}
                   className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none focus:text-black focus:underline"
-                  onClick={() => navigate(`/artists/${a.id}`)}
+                  onClick={() => { navigate(`/artists/${a.id}`); }}
                 >
                   {a.name}
                   {i < currentTrack.artists.length - 1 ? ', ' : ''}
@@ -79,7 +80,7 @@ export function TrackInfo({ progress }: TrackInfoProps) {
             </div>
             <button
               onClick={() =>
-                navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+                { navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } }); }
               }
               className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
             >

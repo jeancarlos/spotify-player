@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
+import { getFromPath } from '@/utils/routerState'
 import type { AxiosError } from 'axios'
 
 export function ControlTip({ label }: { label: string }) {
@@ -171,7 +172,7 @@ export function PlaybackControls() {
             if (!isPlayerPage)
               navigate('/player?tab=lyrics', { state: { from: location.pathname } })
             else if (activeTab === 'lyrics') navigate('/player?tab=info', { replace: true })
-            else navigate(location.state?.from ?? '/')
+            else navigate(getFromPath(location.state))
           }}
           className="p-1.5 rounded-lg transition-colors outline-none text-black/30 hover:text-black"
         >
