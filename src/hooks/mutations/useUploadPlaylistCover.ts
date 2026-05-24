@@ -18,7 +18,7 @@ export function useUploadPlaylistCover() {
         },
         body: base64Jpeg,
       })
-      // Spotify retorna 202 Accepted (sem body)
+
       if (!res.ok) throw new Error(`upload capa: ${res.status}`)
     },
   })

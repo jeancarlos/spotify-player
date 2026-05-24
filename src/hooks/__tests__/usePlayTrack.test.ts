@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 
-// Mock dependencies
 vi.mock('@/lib/axios', () => ({
   default: { put: vi.fn() },
 }))
