@@ -7,7 +7,6 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
 import { useIsTrackFavorite } from '@/hooks/useIsTrackFavorite'
 
-// bottom-2 gap (8px) + player height (~68px) + peek above player (~60px)
 const PLAYER_CLEARANCE = 136
 
 function useVinylY() {
@@ -36,7 +35,6 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const { state: authState } = useAuth()
   const { loginY, homeY, otherY } = useVinylY()
 
-  // Identifica se a faixa atual está nos favoritos locais do usuário
   const userId = authState.profile?.id ?? ''
   const isFavorite = useIsTrackFavorite(state.currentTrack?.uri, userId)
 

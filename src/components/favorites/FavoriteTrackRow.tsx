@@ -16,11 +16,6 @@ interface FavoriteTrackRowProps {
   onSaveNote: (uri: string, note: string) => void
 }
 
-/**
- * Linha de faixa nos favoritos com accordion expansível.
- * Exibe info básica (capa, nome, artista, duração) sempre visível.
- * Ao expandir: mostra álbum, campo de nota pessoal, botões de ação.
- */
 export function FavoriteTrackRow({
   track,
   note,
@@ -34,7 +29,6 @@ export function FavoriteTrackRow({
 
   return (
     <div className={cn('rounded-xl transition-colors', isActive && 'bg-black/[0.04]')}>
-      {/* Cabeçalho — clique expande o accordion */}
       <div
         className="flex items-center gap-3 px-3 py-2.5 cursor-pointer group hover:bg-black/5 rounded-xl transition-colors"
         onClick={() => setExpanded((v) => !v)}
@@ -43,14 +37,12 @@ export function FavoriteTrackRow({
         aria-expanded={expanded}
         onKeyDown={(e) => e.key === 'Enter' && setExpanded((v) => !v)}
       >
-        {/* Capa do álbum */}
         <img
           src={track.album.images[0]?.url}
           alt={track.album.name}
           className="w-9 h-9 rounded-lg object-cover shrink-0"
         />
 
-        {/* Informações principais: nome e artista */}
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-medium truncate', isActive ? 'text-black' : 'text-black/80')}>
             {track.name}
@@ -60,12 +52,10 @@ export function FavoriteTrackRow({
           </p>
         </div>
 
-        {/* Duração em formato tabular */}
         <span className="text-xs text-black/30 shrink-0 tabular-nums">
           {formatDuration(track.duration_ms)}
         </span>
 
-        {/* Ícone chevron que roda ao expandir */}
         <ChevronDown
           size={14}
           className={cn(
@@ -75,7 +65,6 @@ export function FavoriteTrackRow({
         />
       </div>
 
-      {/* Painel expandido com AnimatePresence para suave entrada/saída */}
       <AnimatePresence initial={false}>
         {expanded && (
           <motion.div
@@ -87,15 +76,12 @@ export function FavoriteTrackRow({
             className="overflow-hidden"
           >
             <div className="px-3 pb-3 flex flex-col gap-2.5">
-              {/* Info extra: álbum e ano */}
               <p className="text-[11px] text-black/30 truncate">
                 {track.album.name} · {track.album.release_date?.slice(0, 4)}
               </p>
 
-              {/* Campo inline de nota pessoal */}
               <NoteField uri={track.uri} note={note} onSave={onSaveNote} />
 
-              {/* Ações: play e remover */}
               <div className="flex items-center gap-2 pt-0.5">
                 <button
                   onClick={() => onPlay(track)}

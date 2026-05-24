@@ -1,4 +1,4 @@
-import { useState, useRef, useId } from 'react'
+import { useState, useRef, useId, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
@@ -22,12 +22,15 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
   const [isOpen, setIsOpen] = useState(false)
   const [highlightIndex, setHighlightIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
+  const blurTimerRef = useRef<number>(0)
+
+  useEffect(() => () => clearTimeout(blurTimerRef.current), [])
 
   const debouncedQuery = useDebounce(query, 300)
-  // isPending é o nome correto no react-query v5 para queries não resolvidas
   const { data: results = [], isPending } = useSearchTracks(debouncedQuery, debouncedQuery.length >= 2)
 
   const handleSelect = (track: SpotifyTrack) => {
+    clearTimeout(blurTimerRef.current)
     onChange(track)
     setQuery('')
     setIsOpen(false)
@@ -38,7 +41,6 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
     onChange(null)
     setQuery('')
     setHighlightIndex(-1)
-    // Devolve foco ao input após limpar a seleção
     setTimeout(() => inputRef.current?.focus(), 0)
   }
 
@@ -59,7 +61,6 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
     }
   }
 
-  // Exibe a faixa selecionada com opção de limpar
   if (value) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 bg-black/5 rounded-xl">
@@ -110,23 +111,20 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
           setHighlightIndex(-1)
         }}
         onBlur={() => {
-          // Delay para permitir que click no item da lista dispare primeiro
-          setTimeout(() => setIsOpen(false), 150)
           onBlur()
+          blurTimerRef.current = window.setTimeout(() => setIsOpen(false), 150)
         }}
         onKeyDown={handleKeyDown}
       />
 
       {error && <p className="text-xs text-red-500 mt-1 ml-1">{error}</p>}
 
-      {/* Indicador de carregamento enquanto aguarda resposta da API */}
       {isPending && debouncedQuery.length >= 2 && (
         <div className="absolute top-full mt-1 left-0 right-0 glass rounded-xl p-3 z-50 shadow-xl">
           <p className="text-xs text-black/40 text-center">{t('common.loading')}</p>
         </div>
       )}
 
-      {/* Lista de sugestões com navegação por teclado */}
       {isOpen && results.length > 0 && (
         <ul
           id={listboxId}

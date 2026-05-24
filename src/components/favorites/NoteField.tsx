@@ -14,7 +14,6 @@ export function NoteField({ uri, note, onSave }: NoteFieldProps) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(note)
 
-  // Sincroniza o valor editável quando a nota muda externamente (ex: hidratação)
   useEffect(() => {
     if (!editing) setValue(note)
   }, [note, editing])

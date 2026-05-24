@@ -8,11 +8,8 @@ import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface AddFavoriteFormProps {
-  /** Lista de faixas já favoritadas, usada para detectar duplicatas */
   tracks: SpotifyTrack[]
-  /** Chamado ao submeter; note é undefined quando vazio */
   onAdd: (track: SpotifyTrack, note?: string) => void
-  /** Fecha o painel/modal após submissão ou cancelamento */
   onClose: () => void
 }
 
@@ -21,7 +18,6 @@ type FormValues = { track: SpotifyTrack; note: string }
 export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps) {
   const { t } = useTranslation()
 
-  // Schema recriado quando t muda (troca de idioma em runtime)
   const schema = useMemo(
     () =>
       z.object({
@@ -49,7 +45,6 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
 
   const watchedTrack = watch('track')
   const watchedNote = watch('note') ?? ''
-  // Verifica se a faixa selecionada já é favorita (por URI único do Spotify)
   const isAlreadyFavorite =
     !!watchedTrack && tracks.some((tr) => tr.uri === watchedTrack.uri)
   const noteLength = watchedNote.length
@@ -66,7 +61,6 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
         {t('favorites.addHeading')}
       </p>
 
-      {/* Campo: Música (autocomplete controlado via Controller) */}
       <div className="flex flex-col gap-1">
         <label className="text-xs font-medium text-black/60">
           {t('favorites.trackLabel')}{' '}
@@ -91,7 +85,6 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
         )}
       </div>
 
-      {/* Campo: Nota pessoal (register direto, sem controlled overhead) */}
       <div className="flex flex-col gap-1">
         <label className="text-xs font-medium text-black/60">
           {t('favorites.noteLabel')}
@@ -109,7 +102,6 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
           ) : (
             <span />
           )}
-          {/* Contador muda de cor ao ultrapassar 280 chars (aviso antecipado) */}
           <span
             className={cn(
               'text-[11px] tabular-nums',
@@ -121,7 +113,6 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
         </div>
       </div>
 
-      {/* Botão de submit — desabilitado se form inválido, submetendo ou duplicata */}
       <button
         type="submit"
         disabled={!isValid || isSubmitting || isAlreadyFavorite}

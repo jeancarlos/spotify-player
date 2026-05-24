@@ -31,7 +31,6 @@ export function useSpoterPlaylist() {
     [displayName, t]
   )
 
-  // ── Estado local (fonte de verdade para a lista) ──────────────────────────
   const [localTracks, setLocalTracks] = useState<SpotifyTrack[]>(() =>
     userId ? readLocalTracks(userId) : []
   )
@@ -40,13 +39,11 @@ export function useSpoterPlaylist() {
   )
   const [isHydrating, setIsHydrating] = useState(false)
 
-  // Refs para escritas síncronas sem depender de stale closures
   const tracksRef = useRef(localTracks)
   const notesRef = useRef(localNotes)
   useEffect(() => { tracksRef.current = localTracks }, [localTracks])
   useEffect(() => { notesRef.current = localNotes }, [localNotes])
 
-  // Carrega do localStorage quando userId se torna disponível (auth pode carregar depois da montagem)
   const prevUserId = useRef('')
   useEffect(() => {
     if (!userId || userId === prevUserId.current) return
@@ -55,7 +52,6 @@ export function useSpoterPlaylist() {
     setLocalNotes(readLocalNotes(userId))
   }, [userId])
 
-  // ── Gerenciamento da playlist Spotify ─────────────────────────────────────
   const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
   const coverUploaded = useRef(false)
@@ -68,7 +64,6 @@ export function useSpoterPlaylist() {
   const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
 
-  // Migra chave legada (compartilhada) para chave por usuário
   useEffect(() => {
     if (!userId) return
     const key = storageKey(userId)
@@ -129,8 +124,8 @@ export function useSpoterPlaylist() {
     if (!playlists.isSuccess || !playlistId || !userId) return
     const existing = playlists.data?.items.find((p) => p.id === playlistId)
     if (!existing) {
-      setTimeout(() => resetStalePlaylist(userId), 0)
-      return
+      const id = setTimeout(() => resetStalePlaylist(userId), 0)
+      return () => clearTimeout(id)
     }
     if (displayName && existing.name !== playlistName) {
       updatePlaylist.mutate({ playlistId, name: playlistName })
@@ -147,7 +142,6 @@ export function useSpoterPlaylist() {
     }
   }, [playlists.isSuccess, playlistId, userId, displayName, playlistName, playlists.data, updatePlaylist, uploadCover])
 
-  // ── Hidratação one-shot via cookie + API ──────────────────────────────────
   useEffect(() => {
     if (!userId || hydrationAttempted.current) return
     hydrationAttempted.current = true
@@ -178,7 +172,6 @@ export function useSpoterPlaylist() {
     })
   }, [userId])
 
-  // ── Ações (escritas síncronas via refs) ───────────────────────────────────
   const addTrack = useCallback(
     (track: SpotifyTrack, note?: string) => {
       if (tracksRef.current.some((t) => t.uri === track.uri)) return

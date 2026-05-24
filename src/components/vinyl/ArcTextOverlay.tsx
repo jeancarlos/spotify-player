@@ -17,7 +17,6 @@ export function ArcTextOverlay({ label, diskPx, k = 0.88, arcDeg = 120 }: ArcTex
   const cy = diskPx / 2
   const r = (diskPx / 2) * k
 
-  // Arco centrado no topo do disco (270° no sistema SVG onde y cresce para baixo)
   const startAngleRad = (270 - arcDeg / 2) * (Math.PI / 180)
   const endAngleRad = (270 + arcDeg / 2) * (Math.PI / 180)
 

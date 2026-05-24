@@ -23,7 +23,6 @@ export function Favorites() {
 
   const close = useCallback(() => setOpen(false), [])
 
-  // Fecha o popover ao clicar fora
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
@@ -39,7 +38,6 @@ export function Favorites() {
     return () => document.removeEventListener('mousedown', handler)
   }, [open, close])
 
-  // Fecha o popover com Escape
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
@@ -52,7 +50,6 @@ export function Favorites() {
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">
       <div className="max-w-2xl mx-auto">
-        {/* Cabeçalho com título e botão de adicionar */}
         <div className="flex items-center justify-between mb-6 pt-6">
           <div>
             <h1 className="text-2xl font-black text-black">{t('nav.favorites')}</h1>
@@ -74,7 +71,6 @@ export function Favorites() {
             </div>
           </div>
 
-          {/* Botão Adicionar + Popover com AddFavoriteForm */}
           <div className="relative">
             <button
               ref={buttonRef}
@@ -129,7 +125,6 @@ export function Favorites() {
           </div>
         </div>
 
-        {/* Skeleton exibido enquanto carrega a playlist */}
         {isLoading && (
           <div className="space-y-1">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -151,12 +146,10 @@ export function Favorites() {
           </div>
         )}
 
-        {/* Estado vazio após carregamento */}
         {!isLoading && tracks.length === 0 && (
           <EmptyState message={t('favorites.emptyList')} icon={<Music size={32} />} />
         )}
 
-        {/* Lista de faixas favoritas */}
         {!isLoading && tracks.length > 0 && (
           <div className="space-y-0.5">
             {tracks.map((track) => (
