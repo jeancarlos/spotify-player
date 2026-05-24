@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/header-repo.png" alt="Spoter Header" width="100%">
+  <img src="docs/assets/header-repo.png" alt="Spoter Header" width="600px">
 </p>
 
 # Spoter (Hiring Challenge)
