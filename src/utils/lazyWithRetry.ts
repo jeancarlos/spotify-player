@@ -31,24 +31,20 @@ async function retryImport<T extends ComponentType<unknown>>(
     return await importFn()
   } catch (error) {
     if (retriesLeft > 0) {
-      // Exponential backoff: 1s, 2s
       const delay = 1000 * (3 - retriesLeft)
       await new Promise((resolve) => setTimeout(resolve, delay))
       return retryImport(importFn, chunkName, retriesLeft - 1)
     }
 
-    // All retries exhausted — force reload (once) to get fresh HTML
     const storageKey = `chunk-reload:${chunkName}`
     const hasReloaded = sessionStorage.getItem(storageKey)
 
     if (!hasReloaded) {
       sessionStorage.setItem(storageKey, '1')
       window.location.reload()
-      // Return a never-resolving promise so React doesn't render a broken tree
-      return new Promise(() => {})
+      return new Promise(() => { })
     }
 
-    // Already reloaded once — clear flag and let the error propagate
     sessionStorage.removeItem(storageKey)
     throw error
   }
