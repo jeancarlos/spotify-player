@@ -3,18 +3,19 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Play } from 'lucide-react'
 import { useArtist } from '@/hooks/queries/useArtist'
+import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscographyTracks'
 import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { CollectionHeader } from '@/components/shared/CollectionHeader'
+import { ArtistHeroSection } from '@/components/artist/ArtistHeroSection'
 import { ArtistBio } from '@/components/artist/ArtistBio'
 import { RelatedArtists } from '@/components/artist/RelatedArtists'
 import { ArtistDiscography } from '@/components/artist/ArtistDiscography'
 import { ArtistTopTracksChart } from '@/components/artist/ArtistTopTracksChart'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
-import type { SpotifyAlbumSimple } from '@/types/spotify'
+import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
 
 export function ArtistDetail() {
   const { id } = useParams<{ id: string }>()
@@ -27,9 +28,10 @@ export function ArtistDetail() {
 
   const [albumPage, setAlbumPage] = useState(1)
   const [discView, setDiscView] = useState<ViewMode>('list')
-  const [headerHeight, setHeaderHeight] = useState(0)
+  const [heroHeight, setHeroHeight] = useState(340)
 
   const artist = useArtist(id)
+  const topTracks = useArtistTopTracks(id)
   const albums = useArtistAlbums(id, albumPage, 10)
   const discographyTracks = useArtistDiscographyTracks(id)
 
@@ -37,27 +39,32 @@ export function ArtistDetail() {
     ? albums.data.offset + albums.data.limit < albums.data.total
     : false
 
-  const handleLayout = useCallback((h: number) => setHeaderHeight(h), [])
+  const handleLayout = useCallback((h: number) => setHeroHeight(h), [])
 
   function handleAlbumClick(album: SpotifyAlbumSimple) {
     navigate(`/albums/${album.id}`, { state: { from: location.pathname } })
   }
 
-  const artistSubtitle = artist.data?.genres?.slice(0, 2).join(' · ') ?? ''
+  function handleTrackPlay(track: SpotifyTrack) {
+    if (artist.data?.uri) {
+      playContext(artist.data.uri)
+    } else {
+      playTrack(track)
+    }
+  }
 
   return (
     <div className="min-h-screen">
-      <CollectionHeader
-        imageUrl={artist.data?.images?.[0]?.url}
-        name={artist.data?.name ?? ''}
-        subtitle={artistSubtitle}
-        playLabel={t('player.play')}
-        onPlay={() => artist.data?.uri && playContext(artist.data.uri)}
+      <ArtistHeroSection
+        artist={artist.data}
+        topTracks={topTracks.data}
+        activeTrackId={state.currentTrack?.id}
+        onTrackPlay={handleTrackPlay}
         onLayout={handleLayout}
-        imageRound
+        carouselTitle={t('artistDetail.topTracks')}
       />
 
-      <div style={{ paddingTop: headerHeight }} className="pb-32">
+      <div style={{ paddingTop: heroHeight }} className="pb-32">
         <div className="max-w-3xl mx-auto px-4">
           <ArtistBio artistName={artist.data?.name} />
 
