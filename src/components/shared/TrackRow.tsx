@@ -14,6 +14,45 @@ interface TrackRowProps {
   theme?: 'light' | 'dark'
 }
 
+interface TrackTheme {
+  row: string
+  number: string
+  icon: string
+  text: string
+  subtext: string
+  duration: string
+  remove: string
+}
+
+function resolveTextColor(dark: boolean, isActive: boolean): string {
+  if (dark) return isActive ? 'text-white' : 'text-white/80'
+  return isActive ? 'text-black' : 'text-black/80'
+}
+
+function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
+  return {
+    row: cn(
+      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group focus:outline-none',
+      dark
+        ? cn('hover:bg-white/5', isActive && 'bg-white/10')
+        : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
+    ),
+    number: cn('text-xs font-bold tabular-nums group-hover:hidden', dark ? 'text-white/30' : 'text-black/30'),
+    icon: dark ? 'fill-white text-white' : 'fill-black text-black',
+    text: cn('text-sm font-medium truncate', resolveTextColor(dark, isActive)),
+    subtext: cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40'),
+    duration: cn('text-xs tabular-nums shrink-0', dark ? 'text-white/20' : 'text-black/30'),
+    remove: cn(
+      'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 focus:outline-none focus:opacity-100',
+      dark ? 'text-white/30 hover:text-red-400' : 'text-black/30 hover:text-red-500'
+    ),
+  }
+}
+
+function isActivationKey(key: string): boolean {
+  return key === 'Enter' || key === ' '
+}
+
 export function TrackRow({
   track,
   isActive = false,
@@ -24,30 +63,19 @@ export function TrackRow({
   theme = 'light',
 }: TrackRowProps) {
   const { t } = useTranslation()
-  const dark = theme === 'dark'
+  const s = buildTrackTheme(theme === 'dark', isActive)
 
   const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
   const artistNames = 'artists' in track ? track.artists.map((a) => a.name).join(', ') : ''
-  let nameColor: string
-  if (dark) {
-    nameColor = isActive ? 'text-white' : 'text-white/80'
-  } else {
-    nameColor = isActive ? 'text-black' : 'text-black/80'
-  }
 
   return (
     <div
-      className={cn(
-        'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group focus:outline-none',
-        dark
-          ? cn('hover:bg-white/5', isActive && 'bg-white/10')
-          : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
-      )}
+      className={s.row}
       onClick={() => onPlay?.(track)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (isActivationKey(e.key)) {
           e.preventDefault()
           onPlay?.(track)
         }
@@ -64,24 +92,16 @@ export function TrackRow({
       >
         {index !== undefined ? (
           <>
-            <span
-              className={cn(
-                'text-xs font-bold tabular-nums group-hover:hidden',
-                dark ? 'text-white/30' : 'text-black/30'
-              )}
-            >
+            <span className={s.number}>
               {String(index + 1).padStart(2, '0')}
             </span>
             <Play
               size={12}
-              className={cn(
-                'hidden group-hover:block',
-                dark ? 'fill-white text-white' : 'fill-black text-black'
-              )}
+              className={cn('hidden group-hover:block', s.icon)}
             />
           </>
         ) : (
-          <Play size={12} className={dark ? 'fill-white text-white' : 'fill-black text-black'} />
+          <Play size={12} className={s.icon} />
         )}
       </button>
 
@@ -92,12 +112,10 @@ export function TrackRow({
 
       {/* Name + artist — note tooltip anchored here */}
       <div className="flex-1 min-w-0 relative">
-        <p
-          className={cn('text-sm font-medium truncate', nameColor)}
-        >
+        <p className={s.text}>
           {track.name}
         </p>
-        <p className={cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40')}>
+        <p className={s.subtext}>
           {artistNames}
         </p>
         {note && (
@@ -108,9 +126,7 @@ export function TrackRow({
       </div>
 
       {/* Duration */}
-      <span
-        className={cn('text-xs tabular-nums shrink-0', dark ? 'text-white/20' : 'text-black/30')}
-      >
+      <span className={s.duration}>
         {formatDuration(track.duration_ms)}
       </span>
 
@@ -122,10 +138,7 @@ export function TrackRow({
             onRemove(track.uri)
           }}
           aria-label={t('favorites.removeConfirm')}
-          className={cn(
-            'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 focus:outline-none focus:opacity-100',
-            dark ? 'text-white/30 hover:text-red-400' : 'text-black/30 hover:text-red-500'
-          )}
+          className={s.remove}
         >
           <Trash2 size={14} />
         </button>

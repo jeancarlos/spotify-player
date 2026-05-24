@@ -11,6 +11,94 @@ interface TrackTableProps {
   onAlbumClick?: (albumId: string) => void
 }
 
+interface TrackTableRowProps {
+  track: SpotifyTrack | SpotifyAlbumTrack
+  index: number
+  isActive: boolean
+  showAlbumColumn: boolean
+  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
+  onAlbumClick?: (albumId: string) => void
+}
+
+function resolveTrackMeta(track: SpotifyTrack | SpotifyAlbumTrack) {
+  return {
+    albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
+    albumId: 'album' in track ? track.album.id : undefined,
+    albumName: 'album' in track ? track.album.name : '—',
+    artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '—',
+    popularity: 'popularity' in track ? track.popularity : '—',
+  }
+}
+
+function TrackTableRow({ track, index, isActive, showAlbumColumn, onPlay, onAlbumClick }: TrackTableRowProps) {
+  const { albumImage, albumId, albumName, artistNames, popularity } = resolveTrackMeta(track)
+
+  return (
+    <tr
+      className={cn('group hover:bg-black/4 transition-colors cursor-pointer', isActive && 'bg-black/6')}
+      onClick={() => onPlay?.(track)}
+    >
+      <td className="py-2 px-3 text-black/30 tabular-nums">
+        <span className="group-hover:hidden">{index + 1}</span>
+        <button
+          className="hidden group-hover:flex items-center justify-center"
+          aria-label={`Tocar ${track.name}`}
+          onClick={(e) => {
+            e.stopPropagation()
+            onPlay?.(track)
+          }}
+        >
+          <Play size={11} className="fill-black text-black" />
+        </button>
+      </td>
+      <td className="py-2 px-3 w-10">
+        {albumImage && (
+          <img
+            src={albumImage}
+            alt=""
+            className="w-8 h-8 rounded-md object-cover shrink-0"
+            style={{ minWidth: 32, minHeight: 32 }}
+          />
+        )}
+      </td>
+      <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[180px] truncate">
+        {track.name}
+      </td>
+      <td className="py-2 px-3 text-black/50 whitespace-nowrap">
+        {artistNames}
+      </td>
+      {showAlbumColumn && (
+        <td className="py-2 px-3 text-black/50 whitespace-nowrap">
+          {albumId ? (
+            <button
+              className="hover:text-black hover:underline transition-colors"
+              onClick={(e) => {
+                e.stopPropagation()
+                onAlbumClick?.(albumId)
+              }}
+            >
+              {albumName}
+            </button>
+          ) : (
+            '—'
+          )}
+        </td>
+      )}
+      <td className="py-2 px-3 text-right text-black/40 tabular-nums whitespace-nowrap">
+        {formatDuration(track.duration_ms)}
+      </td>
+      <td className="py-2 px-3 text-right text-black/40 tabular-nums">
+        {popularity}
+      </td>
+      <td className="py-2 px-3 text-center">
+        {track.explicit && (
+          <span className="text-[8px] font-black bg-black/10 rounded px-1 py-0.5">E</span>
+        )}
+      </td>
+    </tr>
+  )
+}
+
 export function TrackTable({
   tracks,
   showAlbumColumn = true,
@@ -36,80 +124,17 @@ export function TrackTable({
           </tr>
         </thead>
         <tbody>
-          {tracks.map((track, i) => {
-            const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
-            const albumId = 'album' in track ? track.album.id : undefined
-            const isActive = track.id === activeTrackId
-
-            return (
-              <tr
-                key={track.id}
-                className={cn(
-                  'group hover:bg-black/4 transition-colors cursor-pointer',
-                  isActive && 'bg-black/6'
-                )}
-                onClick={() => onPlay?.(track)}
-              >
-                <td className="py-2 px-3 text-black/30 tabular-nums">
-                  <span className="group-hover:hidden">{i + 1}</span>
-                  <button
-                    className="hidden group-hover:flex items-center justify-center"
-                    aria-label={`Tocar ${track.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onPlay?.(track)
-                    }}
-                  >
-                    <Play size={11} className="fill-black text-black" />
-                  </button>
-                </td>
-                <td className="py-2 px-3 w-10">
-                  {albumImage && (
-                    <img
-                      src={albumImage}
-                      alt=""
-                      className="w-8 h-8 rounded-md object-cover shrink-0"
-                      style={{ minWidth: 32, minHeight: 32 }}
-                    />
-                  )}
-                </td>
-                <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[180px] truncate">
-                  {track.name}
-                </td>
-                <td className="py-2 px-3 text-black/50 whitespace-nowrap">
-                  {'artists' in track ? track.artists.map((a) => a.name).join(', ') : '—'}
-                </td>
-                {showAlbumColumn && (
-                  <td className="py-2 px-3 text-black/50 whitespace-nowrap">
-                    {albumId ? (
-                      <button
-                        className="hover:text-black hover:underline transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onAlbumClick?.(albumId)
-                        }}
-                      >
-                        {'album' in track ? track.album.name : '—'}
-                      </button>
-                    ) : (
-                      '—'
-                    )}
-                  </td>
-                )}
-                <td className="py-2 px-3 text-right text-black/40 tabular-nums whitespace-nowrap">
-                  {formatDuration(track.duration_ms)}
-                </td>
-                <td className="py-2 px-3 text-right text-black/40 tabular-nums">
-                  {'popularity' in track ? track.popularity : '—'}
-                </td>
-                <td className="py-2 px-3 text-center">
-                  {track.explicit && (
-                    <span className="text-[8px] font-black bg-black/10 rounded px-1 py-0.5">E</span>
-                  )}
-                </td>
-              </tr>
-            )
-          })}
+          {tracks.map((track, i) => (
+            <TrackTableRow
+              key={track.id}
+              track={track}
+              index={i}
+              isActive={track.id === activeTrackId}
+              showAlbumColumn={showAlbumColumn}
+              onPlay={onPlay}
+              onAlbumClick={onAlbumClick}
+            />
+          ))}
         </tbody>
       </table>
     </div>
