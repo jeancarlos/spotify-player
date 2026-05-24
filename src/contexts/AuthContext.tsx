@@ -15,6 +15,9 @@ interface AuthContextValue {
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
+const REDIRECT_ORIGIN = new URL(import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string).origin
+const ALLOWED_OPENER_ORIGINS = new Set([window.location.origin, REDIRECT_ORIGIN])
+
 const SCOPES = [
   'user-read-private',
   'user-read-email',
@@ -61,11 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       .catch((err) => {
         if (err?.response?.status === 429) {
-          // Rate-limited: token still valid, retry after back-off
           setTimeout(() => setProfileRetry((n) => n + 1), 15_000)
         } else {
-          // Truly unauthorized — clear storage before dispatching LOGOUT
-          // so the reducer init can't resurrect a stale token on remount
           sessionStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
           dispatch({ type: 'LOGOUT' })
@@ -81,8 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('pkce_verifier', verifier)
     localStorage.setItem('pkce_state', nonce)
 
-    // Embed current origin in state so the popup can address postMessage correctly
-    // even when redirect_uri has a different host (e.g. localhost vs 127.0.0.1 in dev)
     const statePayload = btoa(JSON.stringify({ n: nonce, o: window.location.origin }))
 
     const params = new URLSearchParams({
@@ -96,43 +94,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     const authUrl = `https://accounts.spotify.com/authorize?${params}`
-    const w = 500,
-      h = 700
+    const w = 500, h = 700
     const left = Math.round(screen.width / 2 - w / 2)
     const top = Math.round(screen.height / 2 - h / 2)
-    const popup = window.open(
-      authUrl,
-      'spotify_login',
-      `width=${w},height=${h},left=${left},top=${top}`
-    )
+    const popup = window.open(authUrl, 'spotify_login', `width=${w},height=${h},left=${left},top=${top}`)
 
     if (!popup) {
       window.location.href = authUrl
       return
     }
 
-    // Accept messages from current origin OR the registered redirect origin
-    const redirectOrigin = new URL(import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string).origin
-
     const onMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin && event.origin !== redirectOrigin) return
+      if (event.source !== popup) return
       if (!event.data || typeof event.data !== 'object') return
 
       if (event.data.type === 'REQUEST_PKCE_DATA') {
         const v = localStorage.getItem('pkce_verifier')
         const n = localStorage.getItem('pkce_state')
-        ;(event.source as Window).postMessage({ type: 'PKCE_DATA', verifier: v, nonce: n }, event.origin)
+        popup.postMessage({ type: 'PKCE_DATA', verifier: v, nonce: n }, REDIRECT_ORIGIN)
         return
       }
 
       if (event.data.type !== 'SPOTIFY_AUTH_TOKENS') return
-      window.removeEventListener('message', onMessage)
       const { accessToken, refreshToken } = event.data as {
-        type: string
-        accessToken: string
-        refreshToken: string
+        type: string; accessToken: string; refreshToken: string
       }
       if (!accessToken || !refreshToken) return
+
+      cleanup()
       sessionStorage.setItem('access_token', accessToken)
       localStorage.setItem('refresh_token', refreshToken)
       localStorage.removeItem('pkce_verifier')
@@ -140,29 +129,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
     }
 
+    const pollId = setInterval(() => {
+      if (popup.closed) cleanup()
+    }, 1000)
+
+    const cleanup = () => {
+      window.removeEventListener('message', onMessage)
+      clearInterval(pollId)
+    }
+
     window.addEventListener('message', onMessage)
   }, [])
 
   const handleCallback = useCallback(async (code: string, receivedState: string) => {
-    // State may be base64-encoded JSON { n: nonce, o: openerOrigin } (popup flow)
-    // or a plain nonce string (same-tab fallback)
     let nonce = receivedState
     let openerOrigin = window.location.origin
     try {
       const decoded = JSON.parse(atob(receivedState)) as { n?: string; o?: string }
       if (decoded.n && decoded.o) {
         nonce = decoded.n
-        openerOrigin = decoded.o
+        openerOrigin = ALLOWED_OPENER_ORIGINS.has(decoded.o)
+          ? decoded.o
+          : window.location.origin
       }
     } catch { /* plain state — same-tab flow */ }
 
     let savedNonce = localStorage.getItem('pkce_state')
     let verifier = localStorage.getItem('pkce_verifier')
 
-    // Cross-origin fallback: popup at 127.0.0.1 requesting pkce from main window at localhost
     if (window.opener && (!savedNonce || !verifier)) {
       const pkce = await new Promise<{ nonce: string | null; verifier: string | null }>((resolve) => {
-        const timer = setTimeout(() => resolve({ nonce: null, verifier: null }), 3000)
+        // FIX (LOW): removeEventListener também no path de timeout
+        const timer = setTimeout(() => {
+          window.removeEventListener('message', handler)
+          resolve({ nonce: null, verifier: null })
+        }, 3000)
+
         const handler = (ev: MessageEvent) => {
           if (ev.data?.type !== 'PKCE_DATA') return
           clearTimeout(timer)
@@ -215,7 +217,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // Same-tab fallback
     sessionStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
     dispatch({

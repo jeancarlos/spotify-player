@@ -18,14 +18,16 @@ export function usePlayerSync() {
   const { data } = useNowPlaying(authState.isAuthenticated)
   const lastTrackIdRef = useRef<string | null>(null)
 
-  // Sincronizar com API Spotify
+  const stateRef = useRef(state)
+  useEffect(() => { stateRef.current = state })
+
   useEffect(() => {
     if (!data) return
 
+    const s = stateRef.current
     const remote = data.item
-    const localId = state.currentTrack?.id
+    const localId = s.currentTrack?.id
 
-    // Troca de música
     if (remote && remote.id !== localId) {
       dispatch({ type: 'SET_TRACK', payload: remote })
       queryClient.setQueriesData<RecentlyPlayedItem[]>(
@@ -38,21 +40,19 @@ export function usePlayerSync() {
       )
     }
 
-    // Estado de play/pause
-    if (data.is_playing !== state.isPlaying) {
+    if (data.is_playing !== s.isPlaying) {
       dispatch({ type: 'SET_PLAYING', payload: data.is_playing })
     }
 
-    // Shuffle / Repeat
-    if (data.shuffle_state !== state.shuffle) {
+    if (data.shuffle_state !== s.shuffle) {
       dispatch({ type: 'SET_SHUFFLE', payload: data.shuffle_state })
     }
-    if (data.repeat_state !== state.repeat) {
+
+    if (data.repeat_state !== s.repeat) {
       dispatch({ type: 'SET_REPEAT', payload: data.repeat_state })
     }
-  }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [data, dispatch, queryClient])
 
-  // Extração de paleta (cores do fundo)
   useEffect(() => {
     const track = state.currentTrack
     if (!track || track.id === lastTrackIdRef.current) return

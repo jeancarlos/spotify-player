@@ -19,37 +19,43 @@ export function Artists() {
 
   const saved = loadLastSearch()
   const query = searchParams.get('q') ?? saved?.q ?? ''
-  const tab = (searchParams.get('tab') as SearchTab) ?? saved?.tab ?? 'artista'
+  const tab = (searchParams.get('tab') as SearchTab) ?? saved?.tab ?? 'artist'
   const page = Number(searchParams.get('page') ?? '1')
+
+  const isArtist = tab === 'artist'
+  const isAlbum = tab === 'album'
+  const isPlaylist = tab === 'playlist'
 
   useEffect(() => {
     if (!query.trim()) navigate('/', { replace: true })
   }, [query, navigate])
 
-  const artists = useArtists(tab === 'artista' ? query : '', page)
-  const albums = useSearchAlbums(tab === 'album' ? query : '', page)
-  const playlists = useSearchPlaylists(tab === 'playlist' ? query : '', page)
+  // Todos os hooks são chamados incondicionalmente — query vazia desabilita o fetch via `enabled`
+  const artists = useArtists(isArtist ? query : '', page)
+  const albums = useSearchAlbums(isAlbum ? query : '', page)
+  const playlists = useSearchPlaylists(isPlaylist ? query : '', page)
 
-  const isArtist = tab === 'artista'
-  const isPlaylist = tab === 'playlist'
-
-  // Refactor nested ternaries into clearer derivations
-  const getSearchData = () => {
-    if (isArtist) return artists
-    if (isPlaylist) return playlists
-    return albums
-  }
-
-  const { data, isPending: isLoading } = getSearchData()
+  const activeQuery = {
+    artist: artists,
+    playlist: playlists,
+    album: albums,
+  }[tab]
+  const { data, isPending: isLoading } = activeQuery
   const hasNext = data ? data.offset + data.items.length < data.total : false
 
+  const headerLabel = {
+    artist: t('artists.searchArtists'),
+    playlist: t('artists.searchPlaylists'),
+    album: t('artists.searchAlbums'),
+  }[tab]
+
   const handleSearch = useCallback(
-    (q: string, t: SearchTab) => {
+    (q: string, nextTab: SearchTab) => {
       if (!q.trim()) {
         navigate('/', { replace: true })
         return
       }
-      setSearchParams({ q, tab: t, page: '1' }, { replace: true })
+      setSearchParams({ q, tab: nextTab, page: '1' }, { replace: true })
     },
     [navigate, setSearchParams]
   )
@@ -59,17 +65,8 @@ export function Artists() {
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const getHeaderLabel = () => {
-    if (isArtist) return t('artists.searchArtists')
-    if (isPlaylist) return t('artists.searchPlaylists')
-    return t('artists.searchAlbums')
-  }
-
-  const headerLabel = getHeaderLabel()
-
   return (
     <div className="min-h-screen">
-      {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar
           onSearch={handleSearch}
@@ -80,7 +77,6 @@ export function Artists() {
       </div>
 
       <div className="pt-36 px-6 pb-32">
-        {/* Results header */}
         {query && (
           <p className="text-sm text-black/40 mb-6" aria-live="polite">
             {headerLabel}
@@ -88,10 +84,10 @@ export function Artists() {
           </p>
         )}
 
-        {/* Empty state */}
-        {!query && <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>}
+        {!query && (
+          <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>
+        )}
 
-        {/* Loading */}
         {isLoading && (
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
             {Array.from({ length: 21 }).map((_, i) => (
@@ -100,7 +96,6 @@ export function Artists() {
           </div>
         )}
 
-        {/* Results grid */}
         {!isLoading && data && (
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
             {isArtist &&
@@ -118,7 +113,7 @@ export function Artists() {
                 />
               ))}
 
-            {tab === 'album' &&
+            {isAlbum &&
               albums.data?.items.map((album) => (
                 <MediaCard
                   key={album.id}
@@ -142,18 +137,17 @@ export function Artists() {
                   />
                 ))}
 
-            {/* 21º slot — card de próxima página */}
             {hasNext && (
               <button
                 onClick={() => handlePageChange(page + 1)}
-                className="aspect-square rounded-[6px] bg-black/4 hover:bg-black/8 ring-1 ring-black/6 transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center justify-center gap-1 group"
+                className="aspect-square rounded-[6px] border border-dashed border-black/20 bg-black/[0.03] hover:bg-black/[0.07] hover:border-black/35 transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center justify-center gap-1.5 group"
                 aria-label={t('artists.next')}
               >
                 <ChevronRight
-                  size={20}
-                  className="text-black/25 group-hover:text-black/50 transition-colors"
+                  size={18}
+                  className="text-black/30 group-hover:text-black/55 transition-colors"
                 />
-                <span className="text-[8px] font-semibold text-black/25 group-hover:text-black/50 transition-colors uppercase tracking-wider">
+                <span className="text-[8px] font-semibold text-black/30 group-hover:text-black/55 transition-colors uppercase tracking-wider leading-none">
                   {t('artists.next')}
                 </span>
               </button>
@@ -161,12 +155,10 @@ export function Artists() {
           </div>
         )}
 
-        {/* No results */}
         {!isLoading && query && data?.items.length === 0 && (
           <p className="text-center text-black/30 mt-20">{t('artists.noResults')}</p>
         )}
 
-        {/* Pagination */}
         {data && data.items.length > 0 && (
           <Pagination
             page={page}

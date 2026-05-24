@@ -3,9 +3,11 @@ import { useEffect, useRef } from 'react'
 import api from '@/lib/axios'
 import type { PagingObject } from '@/types/spotify'
 
-const PAGE_SIZE = 21
+// Layout da grade: r1(7) + r2(7) + r3(6) = 20 cards de dados.
+// O 21º slot visual é o card "próxima página" — não entra no PAGE_SIZE.
 const CHUNK = 7
-const CHUNK_LAST = CHUNK - 1 // 6 — deixa 1 slot livre para o card "próxima página"
+const CHUNK_LAST = 6
+export const PAGE_SIZE = CHUNK * 2 + CHUNK_LAST // 20
 
 export interface CachedPage<T> extends PagingObject<T> {
   r4?: T[]
@@ -28,7 +30,6 @@ export function useSearchPaged<T, R>({
 }: UseSearchPagedOptions<T, R>) {
   const queryClient = useQueryClient()
 
-  // Ref pra não incluir getPage (inline fn) nas deps do useEffect
   const getPageRef = useRef(getPage)
   useEffect(() => {
     getPageRef.current = getPage
@@ -41,6 +42,7 @@ export function useSearchPaged<T, R>({
       const base = (page - 1) * PAGE_SIZE
       const prevData = queryClient.getQueryData<CachedPage<T>>([queryKeyPrefix, query, page - 1])
       const preloadedR1 = prevData?.r4
+
       const fetch = (offset: number, limit = CHUNK) =>
         api.get<R>('/search', { params: { q: query, type: apiType, limit, offset } })
 
@@ -48,7 +50,7 @@ export function useSearchPaged<T, R>({
         preloadedR1 ? null : fetch(base),
         fetch(base + CHUNK),
         fetch(base + CHUNK * 2, CHUNK_LAST),
-        fetch(base + CHUNK * 3),
+        fetch(base + PAGE_SIZE), // próxima página começa exatamente em base + 20
       ])
 
       const gp = getPageRef.current
@@ -83,7 +85,7 @@ export function useSearchPaged<T, R>({
         const [res2, r3, r4] = await Promise.all([
           fetchNext(nextBase + CHUNK),
           fetchNext(nextBase + CHUNK * 2, CHUNK_LAST),
-          fetchNext(nextBase + CHUNK * 3),
+          fetchNext(nextBase + PAGE_SIZE),
         ])
 
         return {

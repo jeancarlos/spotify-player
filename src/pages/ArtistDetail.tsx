@@ -163,6 +163,8 @@ export function ArtistDetail() {
           </section>
         )}
 
+        <ArtistBio artistName={artist.data?.name} />
+
         {/* Discography */}
         <section className="mb-8">
           <div className="flex items-center justify-between px-2 mb-3">
@@ -180,9 +182,6 @@ export function ArtistDetail() {
             className="mt-4"
           />
         </section>
-
-        {/* Artist bio */}
-        <ArtistBio artistName={artist.data?.name} />
 
         {/* Musical profile */}
         {avgFeatures && (

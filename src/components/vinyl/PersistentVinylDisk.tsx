@@ -44,7 +44,13 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const albumArt = state.currentTrack?.album.images[0]?.url
   const albumName = state.currentTrack?.album.name
 
-  const y = isLogin ? loginY : isHome ? homeY : playerHovered ? homeY : otherY
+  const getY = () => {
+    if (isLogin) return loginY
+    if (isHome || playerHovered) return homeY
+    return otherY
+  }
+
+  const y = getY()
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[3] pointer-events-none flex justify-center">

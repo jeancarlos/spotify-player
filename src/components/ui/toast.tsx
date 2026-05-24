@@ -1,8 +1,6 @@
-import { createContext, useContext, useReducer, useCallback } from 'react'
+import { createContext, useContext, useReducer, useCallback, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, AlertCircle, CheckCircle2, Info } from 'lucide-react'
-
-/* ─── Types ─── */
 
 type ToastVariant = 'error' | 'success' | 'info'
 
@@ -13,8 +11,6 @@ interface Toast {
 }
 
 type ToastAction = { type: 'ADD'; payload: Toast } | { type: 'REMOVE'; payload: string }
-
-/* ─── Context ─── */
 
 interface ToastContextValue {
   toasts: Toast[]
@@ -35,18 +31,25 @@ function toastReducer(state: Toast[], action: ToastAction): Toast[] {
   }
 }
 
-/* ─── Provider ─── */
-
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, dispatch] = useReducer(toastReducer, [])
+  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
 
   const toast = useCallback((message: string, variant: ToastVariant = 'info') => {
     const id = `${Date.now()}-${Math.random()}`
     dispatch({ type: 'ADD', payload: { id, message, variant } })
-    setTimeout(() => dispatch({ type: 'REMOVE', payload: id }), 4500)
+    timers.current.set(id, setTimeout(() => {
+      timers.current.delete(id)
+      dispatch({ type: 'REMOVE', payload: id })
+    }, 4500))
   }, [])
 
   const dismiss = useCallback((id: string) => {
+    const timerId = timers.current.get(id)
+    if (timerId !== undefined) {
+      clearTimeout(timerId)
+      timers.current.delete(id)
+    }
     dispatch({ type: 'REMOVE', payload: id })
   }, [])
 
@@ -65,8 +68,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, toast, dismiss }}>
       {children}
-
-      {/* Toast viewport */}
       <div className="fixed bottom-24 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
         <AnimatePresence>
           {toasts.map((t) => (
@@ -94,8 +95,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     </ToastContext.Provider>
   )
 }
-
-/* ─── Hook ─── */
 
 export function useToast() {
   const ctx = useContext(ToastContext)
