@@ -10,8 +10,17 @@ function createWrapper() {
     createElement(QueryClientProvider, { client: qc }, children)
 }
 
-const MB_HIT = {
-  releases: [{ id: 'mbid-123' }],
+// Respostas do MusicBrainz URL lookup (estratégia 1)
+const MB_URL_HIT = {
+  relations: [{ release: { id: 'mbid-from-url' } }],
+}
+const MB_URL_MISS = {
+  relations: [],
+}
+
+// Resposta do MusicBrainz busca por nome (estratégia 2)
+const MB_SEARCH_HIT = {
+  releases: [{ id: 'mbid-from-search' }],
 }
 
 const CAA_HIT = {
@@ -46,9 +55,9 @@ describe('useAlbumBackCover', () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it('retorna backUrl quando MusicBrainz e CAA respondem com back cover', async () => {
+  it('retorna backUrl via lookup por Spotify URL (estratégia 1)', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({ ok: true, json: async () => MB_HIT } as Response)
+      .mockResolvedValueOnce({ ok: true, json: async () => MB_URL_HIT } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => CAA_HIT } as Response)
 
     const { result } = renderHook(
@@ -58,15 +67,33 @@ describe('useAlbumBackCover', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.backUrl).toBe('https://caa/back-lg.jpg')
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(fetch).mock.calls[0][0]).toContain('open.spotify.com/album/alb-1')
+  })
+
+  it('usa fallback por nome quando URL lookup não acha release', async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: true, json: async () => MB_URL_MISS } as Response)
+      .mockResolvedValueOnce({ ok: true, json: async () => MB_SEARCH_HIT } as Response)
+      .mockResolvedValueOnce({ ok: true, json: async () => CAA_HIT } as Response)
+
+    const { result } = renderHook(
+      () => useAlbumBackCover('alb-2', 'Abbey Road', 'The Beatles'),
+      { wrapper: createWrapper() }
+    )
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.backUrl).toBe('https://caa/back-lg.jpg')
+    expect(fetch).toHaveBeenCalledTimes(3)
   })
 
   it('retorna null quando CAA não tem imagem do tipo Back', async () => {
     vi.mocked(fetch)
-      .mockResolvedValueOnce({ ok: true, json: async () => MB_HIT } as Response)
+      .mockResolvedValueOnce({ ok: true, json: async () => MB_URL_HIT } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => CAA_NO_BACK } as Response)
 
     const { result } = renderHook(
-      () => useAlbumBackCover('alb-2', 'Album', 'Artista'),
+      () => useAlbumBackCover('alb-3', 'Album', 'Artista'),
       { wrapper: createWrapper() }
     )
 
@@ -74,18 +101,19 @@ describe('useAlbumBackCover', () => {
     expect(result.current.backUrl).toBeNull()
   })
 
-  it('retorna null quando MusicBrainz não retorna releases', async () => {
+  it('retorna null quando ambas as estratégias falham em achar MBID', async () => {
     vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: true, json: async () => MB_URL_MISS } as Response)
       .mockResolvedValueOnce({ ok: true, json: async () => ({ releases: [] }) } as Response)
 
     const { result } = renderHook(
-      () => useAlbumBackCover('alb-3', 'Desconhecido', 'Artista'),
+      () => useAlbumBackCover('alb-4', 'Desconhecido', 'Artista'),
       { wrapper: createWrapper() }
     )
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.backUrl).toBeNull()
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledTimes(2)
   })
 
   it('usa cache do localStorage e não refaz fetch', async () => {
