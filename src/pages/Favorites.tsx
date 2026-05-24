@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
-import { Music, Plus, X } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { Music, Plus, X, GripVertical, RefreshCw } from 'lucide-react'
+import { AnimatePresence, motion, Reorder } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
@@ -13,29 +13,136 @@ import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackRowSkeleton } from '@/components/shared/TrackRowSkeleton'
 import type { SpotifyTrack } from '@/types/spotify'
 
-export function Favorites() {
-  const { t } = useTranslation()
-  const { state: playerState } = usePlayer()
-  const { tracks, notes, addTrack, removeTrack, isLoading, playlistId, playlistName } =
-    useSpoterPlaylist()
-  const playTrack = usePlayTrack()
-  const [open, setOpen] = useState(false)
+interface AddButtonProps {
+  tracks: SpotifyTrack[]
+  onAdd: (track: SpotifyTrack, note?: string) => void
+}
 
+function AddButton({ tracks, onAdd }: AddButtonProps) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const close = useCallback(() => {
-    setOpen(false)
-  }, [])
-
+  const close = useCallback(() => { setOpen(false) }, [])
   usePopoverDismiss(open, close, buttonRef, popoverRef)
+
+  return (
+    <div className="relative">
+      <button
+        ref={buttonRef}
+        onClick={() => { setOpen((v) => !v) }}
+        aria-expanded={open}
+        aria-haspopup="true"
+        className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          {open ? (
+            <motion.span
+              key="x"
+              initial={{ rotate: -90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 90, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              style={{ display: 'flex' }}
+            >
+              <X size={16} />
+            </motion.span>
+          ) : (
+            <motion.span
+              key="plus"
+              initial={{ rotate: 90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: -90, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              style={{ display: 'flex' }}
+            >
+              <Plus size={16} />
+            </motion.span>
+          )}
+        </AnimatePresence>
+        {open ? t('favorites.close') : t('favorites.addButton')}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            ref={popoverRef}
+            className="absolute top-[calc(100%+8px)] right-0 w-80 glass rounded-2xl shadow-xl overflow-hidden z-30"
+            initial={{ opacity: 0, scale: 0.92, y: -6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: -6 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
+            style={{ transformOrigin: 'top right' }}
+          >
+            <AddFavoriteForm tracks={tracks} onAdd={onAdd} onClose={close} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function useDragOrder(tracks: SpotifyTrack[]) {
+  const [dragOrder, setDragOrder] = useState<SpotifyTrack[] | null>(null)
+  const dragOrderRef = useRef<SpotifyTrack[]>(tracks)
+  const originalOrderRef = useRef<SpotifyTrack[]>(tracks)
+
+  // During drag: use local order; otherwise fall back to source of truth
+  const displayTracks = dragOrder ?? tracks
+
+  function handleReorder(newOrder: SpotifyTrack[]) {
+    setDragOrder(newOrder)
+    dragOrderRef.current = newOrder
+  }
+
+  function onDragStart(currentTracks: SpotifyTrack[]) {
+    originalOrderRef.current = [...currentTracks]
+    dragOrderRef.current = [...currentTracks]
+    setDragOrder([...currentTracks])
+  }
+
+  function onDragEnd(track: SpotifyTrack, reorderTrack: (from: number, to: number) => void) {
+    const from = originalOrderRef.current.findIndex((tr) => tr.id === track.id)
+    const to = dragOrderRef.current.findIndex((tr) => tr.id === track.id)
+    if (from !== to) reorderTrack(from, to)
+    // Clear local state so displayTracks follows tracks again
+    setDragOrder(null)
+  }
+
+  return { displayTracks, handleReorder, onDragStart, onDragEnd }
+}
+
+export function Favorites() {
+  const { t } = useTranslation()
+  const { state: playerState } = usePlayer()
+  const {
+    tracks,
+    notes,
+    addTrack,
+    removeTrack,
+    reorderTrack,
+    refresh,
+    isRefreshing,
+    isLoading,
+    playlistId,
+    playlistName,
+  } = useSpoterPlaylist()
+  const playTrack = usePlayTrack()
+
+  const { displayTracks, handleReorder, onDragStart, onDragEnd } = useDragOrder(tracks)
 
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6 pt-6">
           <div>
-            <h1 className="text-2xl font-black text-black">{t('nav.favorites')}</h1>
+            <h1
+              className="text-2xl font-black text-black"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {t('nav.favorites')}
+            </h1>
             <div className="mt-0.5">
               {playlistId ? (
                 <Tooltip content={t('favorites.viewOnSpotify')}>
@@ -54,59 +161,21 @@ export function Favorites() {
             </div>
           </div>
 
-          <div className="relative">
-            <button
-              ref={buttonRef}
-              onClick={() => {
-                setOpen((v) => !v)
-              }}
-              aria-expanded={open}
-              aria-haspopup="true"
-              className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {open ? (
-                  <motion.span
-                    key="x"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    style={{ display: 'flex' }}
-                  >
-                    <X size={16} />
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="plus"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    style={{ display: 'flex' }}
-                  >
-                    <Plus size={16} />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              {open ? t('favorites.close') : t('favorites.addButton')}
-            </button>
+          <div className="flex items-center gap-2">
+            {/* Refresh button */}
+            <Tooltip content={t('favorites.refreshFromSpotify')}>
+              <button
+                onClick={() => { void refresh() }}
+                disabled={isRefreshing}
+                className="p-2 glass rounded-full text-black/50 hover:text-black/80 transition-colors disabled:opacity-40"
+                aria-label={t('favorites.refreshFromSpotify')}
+              >
+                <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+              </button>
+            </Tooltip>
 
-            <AnimatePresence>
-              {open && (
-                <motion.div
-                  ref={popoverRef}
-                  className="absolute top-[calc(100%+8px)] right-0 w-80 glass rounded-2xl shadow-xl overflow-hidden z-30"
-                  initial={{ opacity: 0, scale: 0.92, y: -6 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.92, y: -6 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
-                  style={{ transformOrigin: 'top right' }}
-                >
-                  <AddFavoriteForm tracks={tracks} onAdd={addTrack} onClose={close} />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Add button */}
+            <AddButton tracks={tracks} onAdd={addTrack} />
           </div>
         </div>
 
@@ -116,19 +185,40 @@ export function Favorites() {
           <EmptyState message={t('favorites.emptyList')} icon={<Music size={32} />} />
         )}
 
-        {!isLoading && tracks.length > 0 && (
-          <div className="space-y-0.5">
-            {tracks.map((track) => (
-              <TrackRow
+        {!isLoading && displayTracks.length > 0 && (
+          <Reorder.Group
+            axis="y"
+            values={displayTracks}
+            onReorder={handleReorder}
+            className="flex flex-col gap-0.5"
+          >
+            {displayTracks.map((track, i) => (
+              <Reorder.Item
                 key={track.id}
-                track={track}
-                note={notes[track.uri] || undefined}
-                isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={async (t) => playTrack(t as SpotifyTrack)}
-                onRemove={removeTrack}
-              />
+                value={track}
+                className="flex items-center"
+                onDragStart={() => { onDragStart(displayTracks) }}
+                onDragEnd={() => { onDragEnd(track, reorderTrack) }}
+              >
+                <GripVertical
+                  size={16}
+                  className="text-black/20 hover:text-black/50 shrink-0 cursor-grab active:cursor-grabbing ml-1"
+                  aria-hidden
+                />
+                <div className="flex-1 min-w-0">
+                  <TrackRow
+                    track={track}
+                    index={i}
+                    note={notes[track.uri] ?? undefined}
+                    isActive={playerState.currentTrack?.uri === track.uri}
+                    onPlay={async (tr) => playTrack(tr as SpotifyTrack)}
+                    onRemove={removeTrack}
+                    onReorderTo={(newIdx) => { reorderTrack(i, newIdx) }}
+                  />
+                </div>
+              </Reorder.Item>
             ))}
-          </div>
+          </Reorder.Group>
         )}
       </div>
     </div>
