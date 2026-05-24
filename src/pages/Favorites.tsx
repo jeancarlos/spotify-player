@@ -8,13 +8,13 @@ import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
-import { FavoriteTrackRow } from '@/components/favorites/FavoriteTrackRow'
+import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackRowSkeleton } from '@/components/shared/TrackRowSkeleton'
 
 export function Favorites() {
   const { t } = useTranslation()
   const { state: playerState } = usePlayer()
-  const { tracks, notes, addTrack, removeTrack, updateNote, isLoading, playlistId, playlistName } =
+  const { tracks, notes, addTrack, removeTrack, isLoading, playlistId, playlistName } =
     useSpoterPlaylist()
   const playTrack = usePlayTrack()
   const [open, setOpen] = useState(false)
@@ -135,14 +135,13 @@ export function Favorites() {
         {!isLoading && tracks.length > 0 && (
           <div className="space-y-0.5">
             {tracks.map((track) => (
-              <FavoriteTrackRow
+              <TrackRow
                 key={track.id}
                 track={track}
-                note={notes[track.uri] ?? ''}
+                note={notes[track.uri] || undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
                 onPlay={playTrack}
                 onRemove={removeTrack}
-                onSaveNote={updateNote}
               />
             ))}
           </div>
