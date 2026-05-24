@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useEffect, useCallback } from 'react'
+import React, { createContext, useReducer, useEffect, useCallback, useState } from 'react'
 import type { SpotifyUser } from '@/types/spotify'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/lib/pkce'
 import api from '@/lib/axios'
@@ -37,13 +37,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   })
 
+  const [profileRetry, setProfileRetry] = useState(0)
+
   useEffect(() => {
-    if (state.isAuthenticated && !state.profile) {
-      api.get<SpotifyUser>('/me')
-        .then(res => dispatch({ type: 'SET_PROFILE', payload: res.data }))
-        .catch(() => dispatch({ type: 'LOGOUT' }))
-    }
-  }, [state.isAuthenticated, state.profile])
+    if (!state.isAuthenticated || state.profile) return
+    api.get<SpotifyUser>('/me')
+      .then(res => dispatch({ type: 'SET_PROFILE', payload: res.data }))
+      .catch((err) => {
+        if (err?.response?.status === 429) {
+          // Rate-limited: token still valid, retry after back-off
+          setTimeout(() => setProfileRetry(n => n + 1), 15_000)
+        } else {
+          // Truly unauthorized — clear storage before dispatching LOGOUT
+          // so the reducer init can't resurrect a stale token on remount
+          sessionStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          dispatch({ type: 'LOGOUT' })
+        }
+      })
+  }, [state.isAuthenticated, state.profile, profileRetry])
 
   const login = useCallback(async () => {
     const verifier = generateCodeVerifier()
