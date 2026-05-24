@@ -3,7 +3,7 @@ import { Music, Plus, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
-import { useFavorites } from '@/contexts/FavoritesContext'
+import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Tooltip } from '@/components/shared/Tooltip'
@@ -14,7 +14,7 @@ export function Favorites() {
   const { t } = useTranslation()
   const { state: playerState } = usePlayer()
   const { tracks, notes, addTrack, removeTrack, updateNote, isLoading, playlistId, playlistName } =
-    useFavorites()
+    useSpoterPlaylist()
   const playTrack = usePlayTrack()
   const [open, setOpen] = useState(false)
 

@@ -4,7 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/hooks/usePlayer'
-import { useFavorites } from '@/contexts/FavoritesContext'
+import { useAuth } from '@/hooks/useAuth'
+import { readLocalTracks } from '@/utils/favStorage'
 
 // bottom-2 gap (8px) + player height (~68px) + peek above player (~60px)
 const PLAYER_CLEARANCE = 136
@@ -32,13 +33,15 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const { t } = useTranslation()
   const location = useLocation()
   const { state } = usePlayer()
-  const { tracks: favTracks } = useFavorites()
+  const { state: authState } = useAuth()
   const { loginY, homeY, otherY } = useVinylY()
 
-  // Verifica se a faixa atual está nos favoritos via contexto reativo (sem localStorage direto)
+  // Identifica se a faixa atual está nos favoritos locais do usuário
+  const userId = authState.profile?.id ?? ''
   const isFavorite =
     !!state.currentTrack &&
-    favTracks.some((t) => t.uri === state.currentTrack!.uri)
+    !!userId &&
+    readLocalTracks(userId).some((t) => t.uri === state.currentTrack!.uri)
 
   const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'
