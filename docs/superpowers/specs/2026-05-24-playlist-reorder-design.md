@@ -34,6 +34,7 @@ Adicionar reordenação de tracks na tela de Favoritos via dois mecanismos: arra
 | `src/hooks/useSpoterPlaylist.ts` | Adiciona `reorderTrack`, `refresh`, `isRefreshing` |
 | `src/components/shared/TrackRow.tsx` | Prop opcional `onReorderTo` — número de índice editável |
 | `src/components/favorites/TrackAutocomplete.tsx` | Fix visual: `ResultsList` usa glassmorphism |
+| `src/components/shared/Tooltip.tsx` | Adiciona props `placement`, `align`, `maxWidth` |
 | `src/pages/Favorites.tsx` | `Reorder.Group`, drag handles, botão refresh, Inter font no título |
 | `src/locales/pt-BR.json` + `en-US.json` | Strings novas |
 
@@ -179,6 +180,29 @@ className="absolute top-full rounded-xl ... bg-white ..."
 className="absolute top-full rounded-xl ... bg-white/90 backdrop-blur-sm ..."
 ```
 Remove o `bg-white` hard que quebrava o glassmorphism do app.
+
+### Unificação do componente `Tooltip`
+
+Atualmente existem dois designs de tooltip divergentes:
+
+| Onde | Implementação | Problema |
+|---|---|---|
+| `Tooltip.tsx` (compartilhado) | Componente próprio | `whitespace-nowrap`, centralizado, posição `-top-7` |
+| Nota pessoal em `TrackRow` | Inline manual | `whitespace-normal`, alinhado à esquerda, `bottom-full` |
+
+**Fix:** Estender `Tooltip.tsx` com props opcionais e usar o componente em ambos os casos:
+
+```tsx
+interface TooltipProps {
+  content: string
+  children: ReactNode
+  placement?: 'top' | 'bottom'   // default: 'top'
+  align?: 'center' | 'start'     // default: 'center'
+  maxWidth?: string               // default: 'whitespace-nowrap'
+}
+```
+
+`TrackRow` substitui o tooltip inline pelo `<Tooltip placement="bottom" align="start" maxWidth="max-w-xs">` — mesmo visual, zero código duplicado.
 
 ---
 
