@@ -1,5 +1,5 @@
 import { test as base, type Page } from '@playwright/test'
-import { mockUser, mockArtists, mockTracks, mockAlbums, pagingOf, mockArtist, mockAlbum } from './mock-data'
+import { mockUser, mockArtists, mockTracks, mockAlbums, pagingOf, mockArtist } from './mock-data'
 
 async function setupAuth(page: Page) {
   await page.addInitScript(() => {

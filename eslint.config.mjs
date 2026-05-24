@@ -25,7 +25,6 @@ export default tseslint.config(
       prettier,
     ],
     files: ['**/*.{ts,tsx}'],
-    ignores: ['tests-e2e/**'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -126,15 +125,12 @@ export default tseslint.config(
       '@typescript-eslint/unbound-method': 'off',
       'no-console': 'off',
       complexity: 'off',
+      'react-hooks/rules-of-hooks': 'off',
     },
   },
-  // Disable type-aware parsing for E2E tests (not in tsconfig)
+  // Disable type-aware rules for E2E tests (not in tsconfig)
   {
     files: ['tests-e2e/**'],
-    languageOptions: {
-      parserOptions: {
-        project: false,
-      },
-    },
+    extends: [tseslint.configs.disableTypeChecked],
   },
 )
