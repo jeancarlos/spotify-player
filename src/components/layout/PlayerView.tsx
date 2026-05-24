@@ -12,17 +12,176 @@ import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
 import api from '@/lib/axios'
 import { getFromPath } from '@/utils/routerState'
+import type { SpotifyTrack } from '@/types/spotify'
+import type { UseQueryResult } from '@tanstack/react-query'
+import type { LyricLine } from '@/types/lyrics'
 
 type PlayerTab = 'lyrics' | 'info' | 'queue'
 
+async function seekRequest(ms: number) {
+  try {
+    await api.put('/me/player/seek', null, {
+      params: { position_ms: ms },
+      responseType: 'text',
+    })
+  } catch {
+    /* silent */
+  }
+}
+
+function usePlayerSeek() {
+  const { dispatch } = usePlayer()
+  const { seekTo } = useProgressEngine()
+  return useCallback(
+    async (ms: number) => {
+      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
+      seekTo(ms)
+      await seekRequest(ms)
+    },
+    [dispatch, seekTo]
+  )
+}
+
+interface TrackFields {
+  artistName: string
+  trackName: string
+  albumName: string | undefined
+  albumArt: string | undefined
+}
+
+function extractTrackFields(track: SpotifyTrack | null): TrackFields {
+  if (!track) {
+    return { artistName: '', trackName: '', albumName: undefined, albumArt: undefined }
+  }
+  return {
+    artistName: track.artists[0]?.name ?? '',
+    trackName: track.name,
+    albumName: track.album.name,
+    albumArt: track.album.images[0]?.url,
+  }
+}
+
+function useTabRedirect(
+  noLyrics: boolean,
+  activeTab: PlayerTab,
+  setSearchParams: ReturnType<typeof useSearchParams>[1]
+) {
+  useEffect(() => {
+    if (noLyrics && activeTab === 'lyrics') {
+      setSearchParams({ tab: 'info' }, { replace: true })
+    }
+  }, [noLyrics, activeTab, setSearchParams])
+}
+
+interface PlayerTabBarProps {
+  activeTab: PlayerTab
+  noLyrics: boolean
+  onTabChange: (tab: PlayerTab) => void
+}
+
+function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
+  const { t } = useTranslation()
+  const tabClass = (tab: PlayerTab) =>
+    cn(
+      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
+      activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/70'
+    )
+  return (
+    <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+      {!noLyrics && (
+        <button onClick={() => { onTabChange('lyrics') }} className={tabClass('lyrics')}>
+          <Music2 size={14} className="shrink-0" />
+          <span className="hidden min-[400px]:inline">{t('player.lyrics')}</span>
+        </button>
+      )}
+      <button onClick={() => { onTabChange('info') }} className={tabClass('info')}>
+        <Info size={14} className="shrink-0" />
+        <span className="hidden min-[400px]:inline">{t('track.songDetails')}</span>
+      </button>
+      <button onClick={() => { onTabChange('queue') }} className={tabClass('queue')}>
+        <ListMusic size={14} className="shrink-0" />
+        <span className="hidden min-[400px]:inline">{t('player.queue')}</span>
+      </button>
+    </div>
+  )
+}
+
+interface PlayerContentPaneProps {
+  activeTab: PlayerTab
+  currentTrack: SpotifyTrack | null
+  lyrics: UseQueryResult<LyricLine[]>
+  currentProgress: number
+  onSeek: (ms: number) => Promise<void>
+}
+
+function PlayerContentPane({
+  activeTab,
+  currentTrack,
+  lyrics,
+  currentProgress,
+  onSeek,
+}: PlayerContentPaneProps) {
+  const { t } = useTranslation()
+
+  if (activeTab === 'info') {
+    return (
+      <motion.div
+        key="info"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        className="h-full overflow-y-auto pt-4 pb-40"
+      >
+        {currentTrack && <TrackInfoPanel track={currentTrack} />}
+      </motion.div>
+    )
+  }
+
+  if (activeTab === 'queue') {
+    return (
+      <motion.div
+        key="queue"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        className="h-full"
+      >
+        <PlayerQueue />
+      </motion.div>
+    )
+  }
+
+  return (
+    <motion.div
+      key="lyrics"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      className="h-full flex flex-col"
+    >
+      {lyrics.isPending ? (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
+        </div>
+      ) : (
+        <LyricsView
+          lines={lyrics.data ?? []}
+          progress={currentProgress}
+          onSeek={onSeek}
+        />
+      )}
+    </motion.div>
+  )
+}
+
 export function PlayerView() {
-  const { state, dispatch } = usePlayer()
+  const { state } = usePlayer()
   const { currentTrack, duration } = state
-  const { currentProgress, seekTo } = useProgressEngine()
+  const { currentProgress } = useProgressEngine()
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { t } = useTranslation()
+  const handleSeek = usePlayerSeek()
 
   const activeTab = (searchParams.get('tab') ?? 'lyrics') as PlayerTab
 
@@ -30,90 +189,17 @@ export function PlayerView() {
     setSearchParams({ tab }, { replace: true })
   }
 
-  const artistName = currentTrack?.artists[0]?.name ?? ''
-  const trackName = currentTrack?.name ?? ''
-  const albumName = currentTrack?.album.name
+  const { artistName, trackName, albumName, albumArt } = extractTrackFields(currentTrack)
   const lyrics = useLyrics({
     artist: artistName,
     title: trackName,
     album: albumName,
     durationMs: duration,
   })
-  const albumArt = currentTrack?.album.images[0]?.url
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
 
-  useEffect(() => {
-    if (noLyrics && activeTab === 'lyrics') {
-      setSearchParams({ tab: 'info' }, { replace: true })
-    }
-  }, [noLyrics, activeTab, setSearchParams])
-
-  const handleSeek = useCallback(
-    async (ms: number) => {
-      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-      seekTo(ms)
-      try {
-        await api.put('/me/player/seek', null, {
-          params: { position_ms: ms },
-          responseType: 'text',
-        })
-      } catch {
-        /* silent */
-      }
-    },
-    [dispatch, seekTo]
-  )
-
-  const renderTabContent = () => {
-    if (activeTab === 'info') {
-      return (
-        <motion.div
-          key="info"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="h-full overflow-y-auto pt-4 pb-40"
-        >
-          {currentTrack && <TrackInfoPanel track={currentTrack} />}
-        </motion.div>
-      )
-    }
-    if (activeTab === 'queue') {
-      return (
-        <motion.div
-          key="queue"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="h-full"
-        >
-          <PlayerQueue />
-        </motion.div>
-      )
-    }
-    return (
-      <motion.div
-        key="lyrics"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 20 }}
-        className="h-full flex flex-col"
-      >
-        {lyrics.isPending ? (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
-          </div>
-        ) : (
-          <LyricsView
-            lines={lyrics.data ?? []}
-            progress={currentProgress}
-            onSeek={handleSeek}
-          />
-        )}
-      </motion.div>
-    )
-  }
+  useTabRedirect(noLyrics, activeTab, setSearchParams)
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
@@ -137,63 +223,32 @@ export function PlayerView() {
             navigate(getFromPath(location.state))
           }}
           className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none"
-          aria-label={t('common.back')}
+          aria-label="back"
         >
           <ArrowLeft size={20} className="text-white" />
         </button>
 
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-          {!noLyrics && (
-            <button
-              onClick={() => { handleTabChange('lyrics'); }}
-              className={cn(
-                'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
-                activeTab === 'lyrics'
-                  ? 'bg-white text-black shadow-lg'
-                  : 'text-white/40 hover:text-white/70'
-              )}
-            >
-              <Music2 size={14} className="shrink-0" />
-              <span className="hidden min-[400px]:inline">{t('player.lyrics')}</span>
-            </button>
-          )}
-          <button
-            onClick={() => { handleTabChange('info'); }}
-            className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
-              activeTab === 'info'
-                ? 'bg-white text-black shadow-lg'
-                : 'text-white/40 hover:text-white/70'
-            )}
-          >
-            <Info size={14} className="shrink-0" />
-            <span className="hidden min-[400px]:inline">{t('track.songDetails')}</span>
-          </button>
-          <button
-            onClick={() => { handleTabChange('queue'); }}
-            className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
-              activeTab === 'queue'
-                ? 'bg-white text-black shadow-lg'
-                : 'text-white/40 hover:text-white/70'
-            )}
-          >
-            <ListMusic size={14} className="shrink-0" />
-            <span className="hidden min-[400px]:inline">{t('player.queue')}</span>
-          </button>
-        </div>
+        <PlayerTabBar
+          activeTab={activeTab}
+          noLyrics={noLyrics}
+          onTabChange={handleTabChange}
+        />
 
         <div className="w-10" />
       </header>
 
-      {/* Main Area */}
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
         <AnimatePresence mode="wait">
-          {renderTabContent()}
+          <PlayerContentPane
+            activeTab={activeTab}
+            currentTrack={currentTrack}
+            lyrics={lyrics}
+            currentProgress={currentProgress}
+            onSeek={handleSeek}
+          />
         </AnimatePresence>
       </main>
 
-      {/* Footer spacing for MiniPlayer (which is in AppRoot) */}
       <div className="h-27 shrink-0" />
     </div>
   )
