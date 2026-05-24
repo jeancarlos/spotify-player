@@ -6,6 +6,9 @@ vi.mock('@/hooks/queries/useUserPlaylists', () => ({
     data: { items: [{ id: 'pl-123', name: "User's Spoter List" }] },
   }),
 }))
+vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
+  usePlaylistTracks: () => ({ isSuccess: false, data: null }),
+}))
 vi.mock('@/hooks/mutations/useCreatePlaylist', () => ({
   useCreatePlaylist: () => ({ mutate: vi.fn() }),
 }))

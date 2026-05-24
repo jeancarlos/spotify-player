@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { TrackRow } from '@/components/shared/TrackRow'
+import type { SpotifyTrack } from '@/types/spotify'
 
 export function PlayerQueue() {
   const { t } = useTranslation()
@@ -21,7 +22,7 @@ export function PlayerQueue() {
 
   return (
     <div className="h-full overflow-y-auto px-4 py-4 pb-32">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-3xl mx-auto">
         <h3 className="text-[10px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">
           {t('player.nextUp')}
         </h3>
@@ -31,7 +32,7 @@ export function PlayerQueue() {
               key={`${track.uri}-${i}`}
               track={track}
               theme="dark"
-              onPlay={playTrack}
+              onPlay={(t) => playTrack(t as SpotifyTrack)}
             />
           ))}
         </div>

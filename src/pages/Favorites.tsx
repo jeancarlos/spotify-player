@@ -10,6 +10,7 @@ import { Tooltip } from '@/components/shared/Tooltip'
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackRowSkeleton } from '@/components/shared/TrackRowSkeleton'
+import type { SpotifyTrack } from '@/types/spotify'
 
 export function Favorites() {
   const { t } = useTranslation()
@@ -140,7 +141,7 @@ export function Favorites() {
                 track={track}
                 note={notes[track.uri] || undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={playTrack}
+                onPlay={(t) => playTrack(t as SpotifyTrack)}
                 onRemove={removeTrack}
               />
             ))}

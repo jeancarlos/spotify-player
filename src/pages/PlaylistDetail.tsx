@@ -72,7 +72,7 @@ export function PlaylistDetail() {
                   track={track}
                   index={(page - 1) * LIMIT + i}
                   isActive={playerState?.currentTrack?.id === track.id}
-                  onPlay={(tr) => playTrack(tr, playlistTracks)}
+                  onPlay={(tr) => playTrack(tr as SpotifyTrack, playlistTracks)}
                 />
               ))}
             </div>

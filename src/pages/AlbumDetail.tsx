@@ -110,7 +110,7 @@ export function AlbumDetail() {
                   track={track}
                   index={(page - 1) * LIMIT + i}
                   isActive={playerState?.currentTrack?.id === track.id}
-                  onPlay={(t) => playTrack(t, enrichedTracks)}
+                  onPlay={(t) => playTrack(t as SpotifyTrack, enrichedTracks)}
                 />
               ))}
             </div>
