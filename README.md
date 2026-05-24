@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/header-repo.png" alt="Spoter Header" width="100%">
+</p>
+
 # Spoter (Hiring Challenge)
 
 Spoter é um player de música web imersivo integrado com a API do Spotify, utilizando React, TypeScript, Vite, Tailwind CSS e Shadcn/UI com "Glassmorfismo".
