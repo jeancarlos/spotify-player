@@ -83,6 +83,9 @@ export function FlippableCover({
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
+        onKeyDown={onClick ? (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') onClick()
+        } : undefined}
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         style={{
@@ -95,12 +98,14 @@ export function FlippableCover({
           transformStyle: 'preserve-3d',
           position: 'relative',
           zIndex: isHovered ? 10 : 0,
+          borderRadius: '0.75rem',
+        }}
+        animate={{
           boxShadow: isHovered
             ? '0 24px 60px rgba(0,0,0,0.45)'
             : '0 12px 40px rgba(0,0,0,0.28)',
-          transition: 'box-shadow 0.2s',
-          borderRadius: '0.75rem',
         }}
+        transition={{ boxShadow: { duration: 0.2 } }}
         whileTap={onClick ? { scale: 0.97 } : undefined}
       >
         {hasBack ? (
