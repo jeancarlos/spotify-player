@@ -22,6 +22,9 @@ export default defineConfig(() => ({
       ],
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webp,ico}'],
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
       },
       manifest: {
         name: 'Spoter - Spotify Player',
