@@ -19,8 +19,8 @@ test('can switch language', async ({ page }) => {
   const langPT = page.getByRole('button', { name: 'PT' });
 
   await langEN.click();
-  await expect(page.getByText(/Your immersive music experience/i)).toBeVisible();
+  await expect(page.getByText(/Sign in with Spotify/i)).toBeVisible();
 
   await langPT.click();
-  await expect(page.getByText(/Sua experiência musical imersiva/i)).toBeVisible();
+  await expect(page.getByText(/Entrar com Spotify/i)).toBeVisible();
 });
