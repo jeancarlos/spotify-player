@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
@@ -30,7 +29,6 @@ interface PersistentVinylDiskProps {
 }
 
 export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDiskProps) {
-  const { t } = useTranslation()
   const location = useLocation()
   const { state } = usePlayer()
   const { state: authState } = useAuth()
@@ -42,8 +40,8 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const [notes, setNotes] = useState<Record<string, string>>({})
   useEffect(() => {
     if (!userId) return
-    setNotes(readLocalNotes(userId))
     const handler = () => setNotes(readLocalNotes(userId))
+    setTimeout(handler, 0)
     window.addEventListener('spoter:favorites-changed', handler)
     return () => window.removeEventListener('spoter:favorites-changed', handler)
   }, [userId])
