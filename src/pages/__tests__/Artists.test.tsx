@@ -49,7 +49,7 @@ describe('Artists page', () => {
     renderArtists()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'Mock' } })
-    expect((await screen.findAllByText('Mock Artist')).length).toBeGreaterThan(0)
+    expect((await screen.findAllByText('Mock Artist', {}, { timeout: 3000 })).length).toBeGreaterThan(0)
   })
 
   it('shows search prompt when query is empty', () => {

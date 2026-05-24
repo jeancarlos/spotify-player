@@ -158,7 +158,8 @@ export function TrackRow({
 
       {onRemove && (
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation()
             onRemove(track.uri)
           }}
           aria-label={t('favorites.removeConfirm')}
