@@ -58,19 +58,36 @@ export function useArtistDetailPage(id: string | undefined) {
   const albumItems = useMemo(() => albums.data?.items ?? [], [albums.data])
   const activeTrackId = state.currentTrack?.id
 
-  return {
-    discographyTracks,
-    discView,
-    setDiscView,
-    albumPage,
-    setAlbumPage,
-    headerHeight,
-    hasNextAlbums,
-    handleLayout,
-    handleAlbumClick,
-    playTrack,
-    albumItems,
-    activeTrackId,
-    ...meta,
-  }
+  return useMemo(
+    () => ({
+      discographyTracks,
+      discView,
+      setDiscView,
+      albumPage,
+      setAlbumPage,
+      headerHeight,
+      hasNextAlbums,
+      handleLayout,
+      handleAlbumClick,
+      playTrack,
+      albumItems,
+      activeTrackId,
+      ...meta,
+    }),
+    [
+      discographyTracks,
+      discView,
+      setDiscView,
+      albumPage,
+      setAlbumPage,
+      headerHeight,
+      hasNextAlbums,
+      handleLayout,
+      handleAlbumClick,
+      playTrack,
+      albumItems,
+      activeTrackId,
+      meta,
+    ]
+  )
 }

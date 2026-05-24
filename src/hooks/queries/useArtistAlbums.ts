@@ -6,6 +6,7 @@ export function useArtistAlbums(artistId: string | undefined, page: number, limi
   return useQuery<PagingObject<SpotifyAlbumSimple>>({
     queryKey: ['artist-albums', artistId, page],
     enabled: !!artistId,
+    staleTime: 1000 * 60 * 15, // 15 minutes
     queryFn: async () => {
       const { data } = await api.get<PagingObject<SpotifyAlbumSimple>>(
         `/artists/${artistId}/albums`,

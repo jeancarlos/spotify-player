@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useArtistDetailPage } from '@/hooks/useArtistDetailPage'
 import { ArtistHeader } from '@/components/artist/ArtistHeader'
 import { ArtistBio } from '@/components/artist/ArtistBio'
-import { RelatedArtists } from '@/components/artist/RelatedArtists'
 import { ArtistDiscography } from '@/components/artist/ArtistDiscography'
 import { ArtistTopTracksChart } from '@/components/artist/ArtistTopTracksChart'
 
@@ -71,8 +70,6 @@ export function ArtistDetail() {
               setAlbumPage((p) => p + 1)
             }}
           />
-
-          <RelatedArtists artistId={id} />
         </div>
       </div>
     </div>

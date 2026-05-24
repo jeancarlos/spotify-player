@@ -1,5 +1,7 @@
-import { useQueries, useQuery } from '@tanstack/react-query'
+import { useQueries } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import api from '@/lib/axios'
+import { useArtistAlbums } from './useArtistAlbums'
 import type {
   SpotifyTrack,
   SpotifyAlbumSimple,
@@ -36,26 +38,15 @@ function enrichTrack(track: SpotifyAlbumTrack, album: SpotifyAlbumSimple): Spoti
 }
 
 export function useArtistDiscographyTracks(artistId: string | undefined, topN = 10) {
-  const albums = useQuery<PagingObject<SpotifyAlbumSimple>>({
-    queryKey: ['artist-albums-disc', artistId],
-    enabled: !!artistId,
-    staleTime: 1000 * 60 * 10,
-    queryFn: async () => {
-      const { data } = await api.get<PagingObject<SpotifyAlbumSimple>>(
-        `/artists/${artistId}/albums`,
-        { params: { limit: 5, offset: 0, include_groups: 'album,single', market: 'BR' } }
-      )
-      return data
-    },
-  })
+  const albums = useArtistAlbums(artistId, 1, 10)
 
-  const albumList = albums.data?.items ?? []
+  const albumList = useMemo(() => albums.data?.items.slice(0, 5) ?? [], [albums.data?.items])
 
   const trackQueries = useQueries({
     queries: albumList.map((album) => ({
       queryKey: ['album-tracks-disc', album.id],
       enabled: !!album.id,
-      staleTime: 1000 * 60 * 10,
+      staleTime: 1000 * 60 * 60, // 1 hour
       queryFn: async (): Promise<SpotifyTrack[]> => {
         const { data } = await api.get<PagingObject<SpotifyAlbumTrack>>(
           `/albums/${album.id}/tracks`,
@@ -68,12 +59,14 @@ export function useArtistDiscographyTracks(artistId: string | undefined, topN = 
 
   const isLoading = albums.isLoading || trackQueries.some((q) => q.isLoading)
 
-  const data: SpotifyTrack[] = (() => {
+  const data = useMemo(() => {
     if (!trackQueries.length) return []
     const all = trackQueries.flatMap((q) => q.data ?? [])
+    if (all.length === 0) return []
     const unique = Array.from(new Map(all.map((t) => [t.id, t])).values())
     return unique.sort((a, b) => b.popularity - a.popularity).slice(0, topN)
-  })()
+  }, [trackQueries, topN])
 
-  return { data, isLoading }
+  return useMemo(() => ({ data, isLoading }), [data, isLoading])
 }
+
