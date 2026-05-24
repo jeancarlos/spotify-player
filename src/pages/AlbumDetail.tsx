@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
-import { useAudioFeatures } from '@/hooks/queries/useAudioFeatures'
 import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { usePlayer } from '@/hooks/usePlayer'
@@ -11,11 +10,7 @@ import { CollectionHeader } from '@/components/shared/CollectionHeader'
 import { ListTableSwitch, type ViewMode } from '@/components/shared/ListTableSwitch'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackTable } from '@/components/shared/TrackTable'
-import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
-import { TrackPopularityChart } from '@/components/shared/TrackPopularityChart'
 import { Pagination } from '@/components/shared/Pagination'
-import { averageAudioFeatures } from '@/utils/audioFeatures'
-import { useTracks } from '@/hooks/queries/useTracks'
 import { formatDate } from '@/utils/formatDate'
 import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
@@ -34,15 +29,6 @@ export function AlbumDetail() {
   const playContext = usePlayContext()
   const playTrack = usePlayTrack()
   const { state: playerState } = usePlayer()
-
-  const trackIds = (tracks.data?.items ?? []).map((t) => t.id)
-  const audioFeatures = useAudioFeatures(trackIds)
-  const fullTracks = useTracks(trackIds)
-
-  const avgFeatures = (() => {
-    if (!audioFeatures.data || audioFeatures.data.length === 0) return null
-    return averageAudioFeatures(audioFeatures.data)
-  })()
 
   const handlePlay = useCallback(() => {
     if (album.data?.uri) playContext(album.data.uri)
@@ -96,7 +82,6 @@ export function AlbumDetail() {
 
       <div style={{ paddingTop: headerHeight }} className="pb-32">
         <div className="max-w-3xl mx-auto px-4">
-          {/* Tracks section */}
           <div className="mt-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-bold text-black/80">{t('albumDetail.tracks')}</h2>
@@ -118,7 +103,6 @@ export function AlbumDetail() {
             ) : (
               <TrackTable
                 tracks={albumItems}
-                audioFeatures={audioFeatures.data}
                 showAlbumColumn={false}
                 activeTrackId={playerState?.currentTrack?.id}
                 onPlay={(track) => {
@@ -137,29 +121,6 @@ export function AlbumDetail() {
               />
             )}
           </div>
-
-          {/* Popularity chart */}
-          {fullTracks.data && fullTracks.data.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-base font-bold text-black/80 mb-4">
-                {t('albumDetail.popularity', 'Popularidade das faixas')}
-              </h2>
-              <TrackPopularityChart
-                tracks={fullTracks.data}
-                activeTrackId={playerState?.currentTrack?.id}
-              />
-            </div>
-          )}
-
-          {/* Musical profile section */}
-          {avgFeatures && (
-            <div className="mt-8 flex flex-col items-center">
-              <h2 className="text-base font-bold text-black/80 mb-4 self-start">
-                {t('albumDetail.musicalProfile')}
-              </h2>
-              <MusicalProfileCharts features={avgFeatures} theme="light" />
-            </div>
-          )}
         </div>
       </div>
     </div>
