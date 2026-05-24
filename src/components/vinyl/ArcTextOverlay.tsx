@@ -64,7 +64,7 @@ export function ArcTextOverlay({
           fontFamily="inter"
           fill="rgba(0,0,0,0.75)"
         >
-          <textPath href={`#arc-fav-${uid}`} textAnchor="middle">
+          <textPath href={`#arc-fav-${uid}`} startOffset="50%" textAnchor="middle">
             {label}
           </textPath>
         </text>
