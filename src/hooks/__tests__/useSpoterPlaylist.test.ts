@@ -116,21 +116,6 @@ describe('useSpoterPlaylist', () => {
     expect(result.current.tracks).toHaveLength(0)
   })
 
-  it('updateNote salva e remove nota', () => {
-    const { result } = renderHook(() => useSpoterPlaylist())
-    act(() => {
-      result.current.addTrack(mockTrack('t5'))
-    })
-    act(() => {
-      result.current.updateNote('spotify:track:t5', 'ouço no gym')
-    })
-    expect(result.current.notes['spotify:track:t5']).toBe('ouço no gym')
-    act(() => {
-      result.current.updateNote('spotify:track:t5', '')
-    })
-    expect(result.current.notes['spotify:track:t5']).toBeUndefined()
-  })
-
   describe('reorderTrack', () => {
     it('move track para frente na lista', () => {
       writeLocalTracks('user-1', [mockTrack('t1'), mockTrack('t2'), mockTrack('t3')])

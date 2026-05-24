@@ -14,7 +14,6 @@ test('shows login button', async ({ page }) => {
 test('can switch language', async ({ page }) => {
   await page.goto('/login');
 
-  // Usamos getByRole para ser mais resiliente que IDs dinâmicos
   const langEN = page.getByRole('button', { name: 'EN' });
   const langPT = page.getByRole('button', { name: 'PT' });
 

@@ -291,27 +291,6 @@ export function useSpoterPlaylist() {
     [userId, playlistId, removeMutation]
   )
 
-  const updateNote = useCallback(
-    (uri: string, note: string) => {
-      const trimmed = note.trim()
-      const newNotes = trimmed
-        ? { ...notesRef.current, [uri]: trimmed }
-        : (() => {
-            const { [uri]: _removed, ...rest } = notesRef.current
-            return rest
-          })()
-
-      writeLocalNotes(userId, newNotes)
-      writeFavCookie(
-        userId,
-        tracksRef.current.map((t) => ({ uri: t.uri, note: newNotes[t.uri] ?? '' }))
-      )
-
-      setLocalNotes(newNotes)
-    },
-    [userId]
-  )
-
   const reorderTrack = useCallback(
     (fromIndex: number, toIndex: number) => {
       const clampedTo = Math.max(0, Math.min(toIndex, tracksRef.current.length - 1))
@@ -367,7 +346,6 @@ export function useSpoterPlaylist() {
     notes: localNotes,
     addTrack,
     removeTrack,
-    updateNote,
     reorderTrack,
     refresh,
     isRefreshing,

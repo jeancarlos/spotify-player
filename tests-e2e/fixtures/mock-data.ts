@@ -61,7 +61,6 @@ export const mockAlbum = {
   external_urls: { spotify: '' },
 }
 
-// 40 artists for pagination tests (page size = 20)
 export const mockArtists = Array.from({ length: 40 }, (_, i) =>
   mockArtist({ id: `artist-${i + 1}`, name: `Artist ${i + 1}` })
 )
