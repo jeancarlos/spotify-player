@@ -61,11 +61,6 @@ export function useSpoterPlaylist() {
   const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
 
-  // Recarrega favoritos locais ao trocar de usuário
-  useEffect(() => {
-    if (userId) setLocalTracks(readLocalTracks(userId))
-  }, [userId])
-
   // Migra chave antiga (shared) para chave por usuário
   useEffect(() => {
     if (!userId) return

@@ -3,9 +3,6 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { ShieldX } from 'lucide-react'
 
-const REASONS = ['state_mismatch', 'token_error'] as const
-type Reason = (typeof REASONS)[number]
-
 function getDescription(t: (key: string) => string, reason: string): string {
   if (reason === 'state_mismatch') return t('authError.stateMismatch')
   if (reason === 'token_error') return t('authError.tokenError')
