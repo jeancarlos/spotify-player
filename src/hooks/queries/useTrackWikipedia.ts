@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 interface WikiResult {
   extract: string
@@ -10,37 +11,58 @@ interface WikiSummary {
   content_urls?: { desktop?: { page?: string } }
 }
 
-async function fetchWikipediaSummary(title: string): Promise<WikiResult | null> {
-  const res = await fetch(
-    `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
-  )
-  if (!res.ok) return null
-  const data: WikiSummary = await res.json()
-  if (!data.extract) return null
-  const extract = data.extract.length > 400 ? data.extract.slice(0, 400) + '...' : data.extract
-  return {
-    extract,
-    url:
-      data.content_urls?.desktop?.page ??
-      `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+async function fetchWikipediaSummary(title: string, lang: string): Promise<WikiResult | null> {
+  try {
+    const res = await fetch(
+      `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
+    )
+    if (!res.ok) return null
+    const data: WikiSummary = await res.json()
+    if (!data.extract) return null
+    const extract = data.extract.length > 400 ? data.extract.slice(0, 400) + '...' : data.extract
+    return {
+      extract,
+      url:
+        data.content_urls?.desktop?.page ??
+        `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+    }
+  } catch {
+    return null
   }
 }
 
+async function searchAndFetch(trackName: string, artistName: string, lang: string): Promise<WikiResult | null> {
+  const query = `${trackName} ${artistName} song`
+  const searchRes = await fetch(
+    `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=3&format=json&origin=*`
+  )
+  if (!searchRes.ok) return null
+
+  const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
+  const match = titles.find((t) => t.toLowerCase().includes(trackName.toLowerCase()))
+  if (!match) return null
+
+  return fetchWikipediaSummary(match, lang)
+}
+
 export function useTrackWikipedia(trackName: string | undefined, artistName: string | undefined) {
+  const { i18n } = useTranslation()
+  const currentLang = i18n.language.startsWith('pt') ? 'pt' : 'en'
+
   return useQuery<WikiResult | null>({
-    queryKey: ['track-wikipedia', trackName, artistName],
+    queryKey: ['track-wikipedia', trackName, artistName, currentLang],
     enabled: !!trackName && !!artistName,
     staleTime: 1000 * 60 * 60,
     queryFn: async () => {
       if (!trackName || !artistName) return null
-      const query = `${trackName} ${artistName} song`
-      const searchRes = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=3&format=json&origin=*`
-      )
-      const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
-      const match = titles.find((t) => t.toLowerCase().includes(trackName.toLowerCase()))
-      if (!match) return null
-      return fetchWikipediaSummary(match)
+
+      if (currentLang === 'pt') {
+        const ptResult = await searchAndFetch(trackName, artistName, 'pt')
+        if (ptResult) return ptResult
+      }
+
+      return searchAndFetch(trackName, artistName, 'en')
     },
   })
 }
+
