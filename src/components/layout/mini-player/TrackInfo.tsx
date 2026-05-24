@@ -71,7 +71,9 @@ export function TrackInfo({ progress }: TrackInfoProps) {
                 <button
                   key={a.id}
                   className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none focus:text-black focus:underline"
-                  onClick={() => { navigate(`/artists/${a.id}`); }}
+                  onClick={() => {
+                    navigate(`/artists/${a.id}`)
+                  }}
                 >
                   {a.name}
                   {i < currentTrack.artists.length - 1 ? ', ' : ''}
@@ -79,9 +81,9 @@ export function TrackInfo({ progress }: TrackInfoProps) {
               ))}
             </div>
             <button
-              onClick={() =>
-                { navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } }); }
-              }
+              onClick={() => {
+                navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+              }}
               className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
             >
               {currentTrack.album.name}

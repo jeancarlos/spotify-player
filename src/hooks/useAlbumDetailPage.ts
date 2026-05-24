@@ -7,7 +7,12 @@ import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { usePlayer } from '@/hooks/usePlayer'
 import { formatDate } from '@/utils/formatDate'
-import type { SpotifyTrack, SpotifyAlbumTrack, SpotifyAlbumSimple, SpotifyAlbumFull } from '@/types/spotify'
+import type {
+  SpotifyTrack,
+  SpotifyAlbumTrack,
+  SpotifyAlbumSimple,
+  SpotifyAlbumFull,
+} from '@/types/spotify'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 export const ALBUM_LIMIT = 20
@@ -100,9 +105,7 @@ export function useAlbumDetailPage() {
   )
 
   const hasNext =
-    tracks.data != null
-      ? tracks.data.offset + tracks.data.limit < tracks.data.total
-      : false
+    tracks.data != null ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
   const enrichTrackInline = useCallback(
     (track: SpotifyAlbumTrack): SpotifyTrack => ({

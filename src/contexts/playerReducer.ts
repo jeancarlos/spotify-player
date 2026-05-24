@@ -56,9 +56,7 @@ type PlaybackAction =
   | { type: 'SET_SHUFFLE'; payload: boolean }
   | { type: 'SET_REPEAT'; payload: 'off' | 'track' | 'context' }
 
-type UiAction =
-  | { type: 'TOGGLE_FULLSCREEN' }
-  | { type: 'SET_PALETTE'; payload: [string, string] }
+type UiAction = { type: 'TOGGLE_FULLSCREEN' } | { type: 'SET_PALETTE'; payload: [string, string] }
 
 function queueReducer(state: PlayerState, action: QueueAction): PlayerState {
   switch (action.type) {
@@ -68,6 +66,8 @@ function queueReducer(state: PlayerState, action: QueueAction): PlayerState {
       return { ...state, queue: action.payload }
     case 'SET_SEEK_TIME':
       return { ...state, lastSeekTime: action.payload }
+    default:
+      return state
   }
 }
 
@@ -87,6 +87,8 @@ function playbackReducer(state: PlayerState, action: PlaybackAction): PlayerStat
       return { ...state, shuffle: action.payload }
     case 'SET_REPEAT':
       return { ...state, repeat: action.payload }
+    default:
+      return state
   }
 }
 
@@ -96,6 +98,8 @@ function uiReducer(state: PlayerState, action: UiAction): PlayerState {
       return { ...state, isFullscreen: !state.isFullscreen }
     case 'SET_PALETTE':
       return { ...state, palette: action.payload }
+    default:
+      return state
   }
 }
 

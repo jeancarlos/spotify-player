@@ -24,7 +24,9 @@ export function OAuthCallback() {
     }
 
     handleCallback(code, state)
-      .then(() => { navigate('/'); })
+      .then(() => {
+        navigate('/')
+      })
       .catch((err: unknown) => {
         const errCode = (err as { code?: string }).code ?? 'unknown'
         navigate(`/auth-error?reason=${errCode}`, { replace: true })

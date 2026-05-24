@@ -9,10 +9,18 @@ import { PlayerProvider } from '@/contexts/PlayerContext'
 import { ToastProvider } from '@/components/ui/toast'
 import { Artists } from '../Artists'
 
-beforeAll(() => { server.listen({ onUnhandledRequest: 'warn' }); })
-beforeEach(() => { localStorage.clear(); })
-afterEach(() => { server.resetHandlers(); })
-afterAll(() => { server.close(); })
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'warn' })
+})
+beforeEach(() => {
+  localStorage.clear()
+})
+afterEach(() => {
+  server.resetHandlers()
+})
+afterAll(() => {
+  server.close()
+})
 
 function renderArtists() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })

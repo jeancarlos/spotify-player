@@ -45,7 +45,9 @@ api.interceptors.response.use(
         sessionStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         window.location.href = '/login'
-        return Promise.reject(refreshError instanceof Error ? refreshError : new Error('Refresh failed'))
+        return Promise.reject(
+          refreshError instanceof Error ? refreshError : new Error('Refresh failed')
+        )
       }
     }
     return Promise.reject(error instanceof Error ? error : new Error('Request failed'))

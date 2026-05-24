@@ -43,7 +43,9 @@ async function requestPkceFromOpener(
       resolve({ nonce: null, verifier: null })
     }, 3000)
 
-    const handler = (ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>) => {
+    const handler = (
+      ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>
+    ) => {
       if (ev.data.type !== 'PKCE_DATA') return
       clearTimeout(timer)
       window.removeEventListener('message', handler)
@@ -132,7 +134,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch((err: unknown) => {
         const axiosErr = err as { response?: { status?: number } }
         if (axiosErr.response?.status === 429) {
-          setTimeout(() => { setProfileRetry((n) => n + 1); }, 15_000)
+          setTimeout(() => {
+            setProfileRetry((n) => n + 1)
+          }, 15_000)
         } else {
           sessionStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
@@ -177,7 +181,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    const onMessage = (event: MessageEvent<{ type?: string; accessToken?: string; refreshToken?: string }>) => {
+    const onMessage = (
+      event: MessageEvent<{ type?: string; accessToken?: string; refreshToken?: string }>
+    ) => {
       if (event.source !== popup) return
       if (typeof event.data !== 'object') return
 

@@ -36,28 +36,27 @@ import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { writeLocalTracks } from '@/utils/favStorage'
 import type { SpotifyTrack } from '@/types/spotify'
 
-const mockTrack = (id: string): SpotifyTrack =>
-  ({
-    id,
-    uri: `spotify:track:${id}`,
-    name: `Track ${id}`,
-    duration_ms: 180000,
-    explicit: false,
-    popularity: 50,
-    preview_url: null,
-    type: 'track',
-    artists: [{ id: 'a1', name: 'Artista', uri: 'spotify:artist:a1', type: 'artist' }],
-    album: {
-      id: 'alb1',
-      name: 'Álbum',
-      images: [{ url: 'https://img.example.com/1.jpg', width: 300, height: 300 }],
-      release_date: '2024-01-01',
-      album_type: 'album',
-      artists: [],
-      uri: 'spotify:album:alb1',
-      type: 'album',
-    },
-  })
+const mockTrack = (id: string): SpotifyTrack => ({
+  id,
+  uri: `spotify:track:${id}`,
+  name: `Track ${id}`,
+  duration_ms: 180000,
+  explicit: false,
+  popularity: 50,
+  preview_url: null,
+  type: 'track',
+  artists: [{ id: 'a1', name: 'Artista', uri: 'spotify:artist:a1', type: 'artist' }],
+  album: {
+    id: 'alb1',
+    name: 'Álbum',
+    images: [{ url: 'https://img.example.com/1.jpg', width: 300, height: 300 }],
+    release_date: '2024-01-01',
+    album_type: 'album',
+    artists: [],
+    uri: 'spotify:album:alb1',
+    type: 'album',
+  },
+})
 
 beforeEach(() => {
   localStorage.clear()

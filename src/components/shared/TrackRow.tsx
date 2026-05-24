@@ -37,7 +37,10 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
         ? cn('hover:bg-white/5', isActive && 'bg-white/10')
         : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
     ),
-    number: cn('text-xs font-bold tabular-nums group-hover:hidden', dark ? 'text-white/30' : 'text-black/30'),
+    number: cn(
+      'text-xs font-bold tabular-nums group-hover:hidden',
+      dark ? 'text-white/30' : 'text-black/30'
+    ),
     icon: dark ? 'fill-white text-white' : 'fill-black text-black',
     text: cn('text-sm font-medium truncate', resolveTextColor(dark, isActive)),
     subtext: cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40'),
@@ -92,13 +95,8 @@ export function TrackRow({
       >
         {index !== undefined ? (
           <>
-            <span className={s.number}>
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <Play
-              size={12}
-              className={cn('hidden group-hover:block', s.icon)}
-            />
+            <span className={s.number}>{String(index + 1).padStart(2, '0')}</span>
+            <Play size={12} className={cn('hidden group-hover:block', s.icon)} />
           </>
         ) : (
           <Play size={12} className={s.icon} />
@@ -112,12 +110,8 @@ export function TrackRow({
 
       {/* Name + artist — note tooltip anchored here */}
       <div className="flex-1 min-w-0 relative">
-        <p className={s.text}>
-          {track.name}
-        </p>
-        <p className={s.subtext}>
-          {artistNames}
-        </p>
+        <p className={s.text}>{track.name}</p>
+        <p className={s.subtext}>{artistNames}</p>
         {note && (
           <span className="pointer-events-none absolute bottom-full left-0 mb-1 whitespace-normal w-max max-w-xs rounded-md bg-black/80 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity z-50">
             {note}
@@ -126,9 +120,7 @@ export function TrackRow({
       </div>
 
       {/* Duration */}
-      <span className={s.duration}>
-        {formatDuration(track.duration_ms)}
-      </span>
+      <span className={s.duration}>{formatDuration(track.duration_ms)}</span>
 
       {/* Remove button */}
       {onRemove && (

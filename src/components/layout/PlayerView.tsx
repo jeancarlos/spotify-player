@@ -89,16 +89,31 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
   return (
     <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
       {!noLyrics && (
-        <button onClick={() => { onTabChange('lyrics') }} className={tabClass('lyrics')}>
+        <button
+          onClick={() => {
+            onTabChange('lyrics')
+          }}
+          className={tabClass('lyrics')}
+        >
           <Music2 size={14} className="shrink-0" />
           <span className="hidden min-[400px]:inline">{t('player.lyrics')}</span>
         </button>
       )}
-      <button onClick={() => { onTabChange('info') }} className={tabClass('info')}>
+      <button
+        onClick={() => {
+          onTabChange('info')
+        }}
+        className={tabClass('info')}
+      >
         <Info size={14} className="shrink-0" />
         <span className="hidden min-[400px]:inline">{t('track.songDetails')}</span>
       </button>
-      <button onClick={() => { onTabChange('queue') }} className={tabClass('queue')}>
+      <button
+        onClick={() => {
+          onTabChange('queue')
+        }}
+        className={tabClass('queue')}
+      >
         <ListMusic size={14} className="shrink-0" />
         <span className="hidden min-[400px]:inline">{t('player.queue')}</span>
       </button>
@@ -164,11 +179,7 @@ function PlayerContentPane({
           <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
         </div>
       ) : (
-        <LyricsView
-          lines={lyrics.data ?? []}
-          progress={currentProgress}
-          onSeek={onSeek}
-        />
+        <LyricsView lines={lyrics.data ?? []} progress={currentProgress} onSeek={onSeek} />
       )}
     </motion.div>
   )
@@ -228,11 +239,7 @@ export function PlayerView() {
           <ArrowLeft size={20} className="text-white" />
         </button>
 
-        <PlayerTabBar
-          activeTab={activeTab}
-          noLyrics={noLyrics}
-          onTabChange={handleTabChange}
-        />
+        <PlayerTabBar activeTab={activeTab} noLyrics={noLyrics} onTabChange={handleTabChange} />
 
         <div className="w-10" />
       </header>

@@ -29,7 +29,9 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
           id={`${listboxId}-${i}`}
           role="option"
           aria-selected={i === highlightIndex}
-          onClick={() => { onSelect(track); }}
+          onClick={() => {
+            onSelect(track)
+          }}
           className={cn(
             'flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors',
             i === highlightIndex ? 'bg-black/10' : 'hover:bg-black/5'
@@ -162,7 +164,9 @@ function TrackSearchInput({
         }}
         onBlur={() => {
           onBlur()
-          blurTimerRef.current = window.setTimeout(() => { onClose(); }, 150)
+          blurTimerRef.current = window.setTimeout(() => {
+            onClose()
+          }, 150)
         }}
         onKeyDown={handleKeyDown}
       />
@@ -206,7 +210,12 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
   const inputRef = useRef<HTMLInputElement>(null)
   const blurTimerRef = useRef<number>(0)
 
-  useEffect(() => () => { clearTimeout(blurTimerRef.current); }, [])
+  useEffect(
+    () => () => {
+      clearTimeout(blurTimerRef.current)
+    },
+    []
+  )
 
   const debouncedQuery = useDebounce(query, 300)
   const { data: results = [], isPending } = useSearchTracks(
@@ -231,11 +240,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
 
   if (value) {
     return (
-      <SelectedTrack
-        track={value}
-        onClear={handleClear}
-        clearLabel={t('favorites.clearTrack')}
-      />
+      <SelectedTrack track={value} onClear={handleClear} clearLabel={t('favorites.clearTrack')} />
     )
   }
 
@@ -252,8 +257,12 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
       debouncedQuery={debouncedQuery}
       error={error}
       onQueryChange={setQuery}
-      onOpen={() => { setIsOpen(true) }}
-      onClose={() => { setIsOpen(false) }}
+      onOpen={() => {
+        setIsOpen(true)
+      }}
+      onClose={() => {
+        setIsOpen(false)
+      }}
       onBlur={onBlur}
       onSelect={handleSelect}
       setHighlightIndex={setHighlightIndex}

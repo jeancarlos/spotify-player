@@ -41,9 +41,7 @@ export function useArtistDetailPage(id: string | undefined) {
   const discographyTracks = useArtistDiscographyTracks(id)
 
   const hasNextAlbums =
-    albums.data != null
-      ? albums.data.offset + albums.data.limit < albums.data.total
-      : false
+    albums.data != null ? albums.data.offset + albums.data.limit < albums.data.total : false
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)

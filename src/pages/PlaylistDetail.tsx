@@ -52,7 +52,9 @@ export function PlaylistDetail() {
                   track={track}
                   index={(page - 1) * PLAYLIST_LIMIT + i}
                   isActive={playerState.currentTrack?.id === track.id}
-                  onPlay={async (tr) => { await playTrack(tr as SpotifyTrack, playlistTracks); }}
+                  onPlay={async (tr) => {
+                    await playTrack(tr as SpotifyTrack, playlistTracks)
+                  }}
                 />
               ))}
             </div>
@@ -71,8 +73,12 @@ export function PlaylistDetail() {
             <Pagination
               page={page}
               hasNext={hasNext}
-              onPrev={() => { setPage((p) => Math.max(1, p - 1)); }}
-              onNext={() => { setPage((p) => p + 1); }}
+              onPrev={() => {
+                setPage((p) => Math.max(1, p - 1))
+              }}
+              onNext={() => {
+                setPage((p) => p + 1)
+              }}
             />
           )}
         </div>

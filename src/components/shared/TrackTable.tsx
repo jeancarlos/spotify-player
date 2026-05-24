@@ -30,12 +30,22 @@ function resolveTrackMeta(track: SpotifyTrack | SpotifyAlbumTrack) {
   }
 }
 
-function TrackTableRow({ track, index, isActive, showAlbumColumn, onPlay, onAlbumClick }: TrackTableRowProps) {
+function TrackTableRow({
+  track,
+  index,
+  isActive,
+  showAlbumColumn,
+  onPlay,
+  onAlbumClick,
+}: TrackTableRowProps) {
   const { albumImage, albumId, albumName, artistNames, popularity } = resolveTrackMeta(track)
 
   return (
     <tr
-      className={cn('group hover:bg-black/4 transition-colors cursor-pointer', isActive && 'bg-black/6')}
+      className={cn(
+        'group hover:bg-black/4 transition-colors cursor-pointer',
+        isActive && 'bg-black/6'
+      )}
       onClick={() => onPlay?.(track)}
     >
       <td className="py-2 px-3 text-black/30 tabular-nums">
@@ -64,9 +74,7 @@ function TrackTableRow({ track, index, isActive, showAlbumColumn, onPlay, onAlbu
       <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[180px] truncate">
         {track.name}
       </td>
-      <td className="py-2 px-3 text-black/50 whitespace-nowrap">
-        {artistNames}
-      </td>
+      <td className="py-2 px-3 text-black/50 whitespace-nowrap">{artistNames}</td>
       {showAlbumColumn && (
         <td className="py-2 px-3 text-black/50 whitespace-nowrap">
           {albumId ? (
@@ -87,9 +95,7 @@ function TrackTableRow({ track, index, isActive, showAlbumColumn, onPlay, onAlbu
       <td className="py-2 px-3 text-right text-black/40 tabular-nums whitespace-nowrap">
         {formatDuration(track.duration_ms)}
       </td>
-      <td className="py-2 px-3 text-right text-black/40 tabular-nums">
-        {popularity}
-      </td>
+      <td className="py-2 px-3 text-right text-black/40 tabular-nums">{popularity}</td>
       <td className="py-2 px-3 text-center">
         {track.explicit && (
           <span className="text-[8px] font-black bg-black/10 rounded px-1 py-0.5">E</span>

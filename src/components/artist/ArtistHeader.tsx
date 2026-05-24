@@ -11,9 +11,13 @@ interface ArtistHeaderProps {
 function useArtistHeaderLayout() {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
-    const fn = () => { setVw(window.innerWidth); }
+    const fn = () => {
+      setVw(window.innerWidth)
+    }
     window.addEventListener('resize', fn)
-    return () => { window.removeEventListener('resize', fn); }
+    return () => {
+      window.removeEventListener('resize', fn)
+    }
   }, [])
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
@@ -35,9 +39,13 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
   useEffect(() => {
     const el = document.getElementById('main-content')
     if (!el) return
-    const fn = () => { scrollY.set(el.scrollTop); }
+    const fn = () => {
+      scrollY.set(el.scrollTop)
+    }
     el.addEventListener('scroll', fn, { passive: true })
-    return () => { el.removeEventListener('scroll', fn); }
+    return () => {
+      el.removeEventListener('scroll', fn)
+    }
   }, [scrollY])
 
   return (

@@ -35,7 +35,9 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
             <tr
               key={album.id}
               className="group hover:bg-black/4 transition-colors cursor-pointer"
-              onClick={() => { onClick(album); }}
+              onClick={() => {
+                onClick(album)
+              }}
             >
               <td className="py-2 px-3">
                 <img

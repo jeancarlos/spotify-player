@@ -1,5 +1,10 @@
 import React, { createContext, useReducer } from 'react'
-import { playerReducer, initialPlayerState, type PlayerState, type PlayerAction } from './playerReducer'
+import {
+  playerReducer,
+  initialPlayerState,
+  type PlayerState,
+  type PlayerAction,
+} from './playerReducer'
 
 interface PlayerContextValue {
   state: PlayerState

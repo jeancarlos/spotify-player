@@ -57,7 +57,9 @@ export function SearchBar({
       <input
         id="global-search"
         value={query}
-        onChange={(e) => { setQuery(e.target.value); }}
+        onChange={(e) => {
+          setQuery(e.target.value)
+        }}
         placeholder={t('artists.searchPlaceholder')}
         className="flex-1 bg-transparent text-sm outline-none text-black placeholder:text-black/30 min-w-0"
       />
@@ -65,7 +67,9 @@ export function SearchBar({
         {tabs.map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => { setTab(key); }}
+            onClick={() => {
+              setTab(key)
+            }}
             role="tab"
             aria-selected={tab === key}
             className={cn(

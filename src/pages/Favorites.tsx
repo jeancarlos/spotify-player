@@ -24,7 +24,9 @@ export function Favorites() {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const close = useCallback(() => { setOpen(false); }, [])
+  const close = useCallback(() => {
+    setOpen(false)
+  }, [])
 
   usePopoverDismiss(open, close, buttonRef, popoverRef)
 
@@ -55,7 +57,9 @@ export function Favorites() {
           <div className="relative">
             <button
               ref={buttonRef}
-              onClick={() => { setOpen((v) => !v); }}
+              onClick={() => {
+                setOpen((v) => !v)
+              }}
               aria-expanded={open}
               aria-haspopup="true"
               className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"

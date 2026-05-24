@@ -143,9 +143,7 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   const chartData = useMemo<ChartEntry[]>(() => {
-    const sorted = [...tracks]
-      .slice(0, 10)
-      .sort((a, b) => b.popularity - a.popularity)
+    const sorted = [...tracks].slice(0, 10).sort((a, b) => b.popularity - a.popularity)
     return sorted.map((t) => ({
       id: t.id,
       label: t.name,

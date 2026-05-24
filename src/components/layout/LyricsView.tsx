@@ -42,7 +42,13 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
               filter: `blur(${SLOT_BLUR[i]}px)`,
             }}
             transition={{ duration: 0.3 }}
-            onClick={line && onSeek ? () => { onSeek(line.time); } : undefined}
+            onClick={
+              line && onSeek
+                ? () => {
+                    onSeek(line.time)
+                  }
+                : undefined
+            }
             className={`text-center leading-tight select-none line-clamp-2 ${
               isActive
                 ? 'text-white font-bold text-2xl md:text-3xl'

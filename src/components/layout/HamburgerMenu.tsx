@@ -65,8 +65,12 @@ export function HamburgerMenu() {
 
   const isOpen = uiState.sidebarOpen
   const isHome = location.pathname === '/'
-  const toggle = () => { uiDispatch({ type: isOpen ? 'CLOSE_SIDEBAR' : 'OPEN_SIDEBAR' }); }
-  const close = useCallback(() => { uiDispatch({ type: 'CLOSE_SIDEBAR' }); }, [uiDispatch])
+  const toggle = () => {
+    uiDispatch({ type: isOpen ? 'CLOSE_SIDEBAR' : 'OPEN_SIDEBAR' })
+  }
+  const close = useCallback(() => {
+    uiDispatch({ type: 'CLOSE_SIDEBAR' })
+  }, [uiDispatch])
 
   usePopoverDismiss(isOpen, close, buttonRef, popoverRef)
 
@@ -112,10 +116,7 @@ export function HamburgerMenu() {
             >
               {/* Profile header */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-black/5">
-                <ProfileAvatar
-                  avatarUrl={avatar}
-                  displayName={authState.profile?.display_name}
-                />
+                <ProfileAvatar avatarUrl={avatar} displayName={authState.profile?.display_name} />
                 <span className="text-sm font-semibold text-black truncate">
                   {authState.profile?.display_name ?? ''}
                 </span>
@@ -125,7 +126,9 @@ export function HamburgerMenu() {
               <div className="flex flex-col py-1.5">
                 <button
                   role="menuitem"
-                  onClick={() => { handleNav('/'); }}
+                  onClick={() => {
+                    handleNav('/')
+                  }}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
                 >
                   <Home size={16} className="text-black/50 flex-shrink-0" />
@@ -134,7 +137,9 @@ export function HamburgerMenu() {
 
                 <button
                   role="menuitem"
-                  onClick={() => { handleNav('/favorites'); }}
+                  onClick={() => {
+                    handleNav('/favorites')
+                  }}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
                 >
                   <Heart size={16} className="text-black/50 flex-shrink-0" />
@@ -159,7 +164,9 @@ export function HamburgerMenu() {
       <AnimatePresence>
         {!isHome && (
           <motion.button
-            onClick={() => { navigate(-1); }}
+            onClick={() => {
+              navigate(-1)
+            }}
             className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
             aria-label={t('nav.back', 'Voltar')}
             initial={{ opacity: 0, x: -8 }}

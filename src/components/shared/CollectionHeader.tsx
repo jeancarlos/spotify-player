@@ -25,9 +25,13 @@ interface CollectionHeaderProps {
 function useCollectionLayout() {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
-    const fn = () => { setVw(window.innerWidth); }
+    const fn = () => {
+      setVw(window.innerWidth)
+    }
     window.addEventListener('resize', fn)
-    return () => { window.removeEventListener('resize', fn); }
+    return () => {
+      window.removeEventListener('resize', fn)
+    }
   }, [])
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
@@ -111,7 +115,9 @@ export function CollectionHeader({
                 <span key={a.id}>
                   {i > 0 && ', '}
                   <button
-                    onClick={() => { onArtistClick(a.id); }}
+                    onClick={() => {
+                      onArtistClick(a.id)
+                    }}
                     className="hover:text-black transition-colors underline underline-offset-2 decoration-black/20 hover:decoration-black/60"
                   >
                     {a.name}

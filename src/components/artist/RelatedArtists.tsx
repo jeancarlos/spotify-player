@@ -40,7 +40,9 @@ export function RelatedArtists({ artistId }: RelatedArtistsProps) {
     )
 
     observer.observe(sentinel)
-    return () => { observer.disconnect(); }
+    return () => {
+      observer.disconnect()
+    }
   }, [related.data])
 
   if (!related.data || related.data.length === 0) return null

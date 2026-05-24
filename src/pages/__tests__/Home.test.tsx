@@ -14,8 +14,12 @@ beforeAll(async () => {
   server.listen({ onUnhandledRequest: 'error' })
   await i18n.changeLanguage('pt-BR')
 })
-afterEach(() => { server.resetHandlers(); })
-afterAll(() => { server.close(); })
+afterEach(() => {
+  server.resetHandlers()
+})
+afterAll(() => {
+  server.close()
+})
 
 function renderHome() {
   const client = new QueryClient({
@@ -25,7 +29,14 @@ function renderHome() {
     <I18nextProvider i18n={i18n}>
       <MemoryRouter>
         <QueryClientProvider client={client}>
-          <PlayerContext.Provider value={{ state: initialPlayerState, dispatch: () => { /* noop */ } }}>
+          <PlayerContext.Provider
+            value={{
+              state: initialPlayerState,
+              dispatch: () => {
+                /* noop */
+              },
+            }}
+          >
             <ToastProvider>
               <Home />
             </ToastProvider>

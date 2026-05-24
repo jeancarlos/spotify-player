@@ -55,7 +55,9 @@ export function Artists() {
             albums={albums.data?.items}
             playlists={playlists.data?.items}
             hasNext={hasNext}
-            onNextPage={() => { handlePageChange(page + 1); }}
+            onNextPage={() => {
+              handlePageChange(page + 1)
+            }}
           />
         </motion.div>
       )
@@ -84,9 +86,7 @@ export function Artists() {
 
         {!query && <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>}
 
-        <AnimatePresence mode="wait">
-          {renderResults()}
-        </AnimatePresence>
+        <AnimatePresence mode="wait">{renderResults()}</AnimatePresence>
 
         {!isLoading && query && data?.items.length === 0 && (
           <p className="text-center text-black/30 mt-20">{t('artists.noResults')}</p>
@@ -96,8 +96,12 @@ export function Artists() {
           <Pagination
             page={page}
             hasNext={hasNext}
-            onPrev={() => { handlePageChange(Math.max(1, page - 1)); }}
-            onNext={() => { handlePageChange(page + 1); }}
+            onPrev={() => {
+              handlePageChange(Math.max(1, page - 1))
+            }}
+            onNext={() => {
+              handlePageChange(page + 1)
+            }}
             className="mt-12"
           />
         )}

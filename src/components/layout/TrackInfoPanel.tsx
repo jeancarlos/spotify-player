@@ -45,7 +45,9 @@ export function TrackInfoPanel({ track }: Props) {
             {track.artists.map((a, i) => (
               <span key={a.id} className="flex items-center">
                 <button
-                  onClick={() => { navigate(`/artists/${a.id}`); }}
+                  onClick={() => {
+                    navigate(`/artists/${a.id}`)
+                  }}
                   className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors outline-none focus:text-white focus:underline"
                 >
                   {a.name}

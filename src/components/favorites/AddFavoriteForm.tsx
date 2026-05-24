@@ -13,7 +13,10 @@ interface AddFavoriteFormProps {
   onClose: () => void
 }
 
-interface FormValues { track: SpotifyTrack | undefined; note: string }
+interface FormValues {
+  track: SpotifyTrack | undefined
+  note: string
+}
 
 export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps) {
   const { t } = useTranslation()

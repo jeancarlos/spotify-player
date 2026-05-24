@@ -7,7 +7,9 @@ export async function extractPalette(imageUrl: string): Promise<[string, string]
     img.crossOrigin = 'anonymous'
 
     await new Promise<void>((resolve, reject) => {
-      img.onload = () => { resolve(); }
+      img.onload = () => {
+        resolve()
+      }
       img.onerror = reject
       img.src = imageUrl
     })

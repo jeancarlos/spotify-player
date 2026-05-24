@@ -64,8 +64,12 @@ export function ArtistDetail() {
             onAlbumClick={handleAlbumClick}
             page={albumPage}
             hasNext={hasNextAlbums}
-            onPrevPage={() => { setAlbumPage((p) => Math.max(1, p - 1)); }}
-            onNextPage={() => { setAlbumPage((p) => p + 1); }}
+            onPrevPage={() => {
+              setAlbumPage((p) => Math.max(1, p - 1))
+            }}
+            onNextPage={() => {
+              setAlbumPage((p) => p + 1)
+            }}
           />
 
           <RelatedArtists artistId={id} />
