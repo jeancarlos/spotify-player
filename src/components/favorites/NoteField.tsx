@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -14,19 +14,12 @@ export function NoteField({ uri, note, onSave }: NoteFieldProps) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(note)
 
-  useEffect(() => {
-    if (!editing) setValue(note)
-  }, [note, editing])
-
   const commit = () => {
     setEditing(false)
     onSave(uri, value.trim())
   }
 
-  const cancel = () => {
-    setValue(note)
-    setEditing(false)
-  }
+  const cancel = () => setEditing(false)
 
   if (editing) {
     return (

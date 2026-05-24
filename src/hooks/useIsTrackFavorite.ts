@@ -1,29 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useSyncExternalStore } from 'react'
 import { readLocalTracks } from '@/utils/favStorage'
 
+function subscribe(callback: () => void) {
+  window.addEventListener('spoter:favorites-changed', callback)
+  return () => window.removeEventListener('spoter:favorites-changed', callback)
+}
+
 export function useIsTrackFavorite(uri: string | null | undefined, userId: string): boolean {
-  const [isFav, setIsFav] = useState(() =>
-    !!uri && !!userId && readLocalTracks(userId).some((t) => t.uri === uri)
+  return useSyncExternalStore(
+    subscribe,
+    () => !!uri && !!userId && readLocalTracks(userId).some((t) => t.uri === uri),
+    () => false
   )
-
-  useEffect(() => {
-    if (!uri || !userId) {
-      setIsFav(false)
-      return
-    }
-
-    setIsFav(readLocalTracks(userId).some((t) => t.uri === uri))
-
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent<{ userId: string }>).detail
-      if (detail.userId === userId) {
-        setIsFav(readLocalTracks(userId).some((t) => t.uri === uri))
-      }
-    }
-
-    window.addEventListener('spoter:favorites-changed', handler)
-    return () => window.removeEventListener('spoter:favorites-changed', handler)
-  }, [uri, userId])
-
-  return isFav
 }

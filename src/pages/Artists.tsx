@@ -1,14 +1,13 @@
 import { useCallback, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronRight } from 'lucide-react'
 import { useArtists } from '@/hooks/queries/useArtists'
 import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
 import { useSearchPlaylists } from '@/hooks/queries/useSearchPlaylists'
-import { MediaCard } from '@/components/shared/MediaCard'
 import { CardSkeleton } from '@/components/shared/CardSkeleton'
 import { SearchBar } from '@/components/shared/SearchBar'
 import { Pagination } from '@/components/shared/Pagination'
+import { SearchResultsGrid } from '@/components/search/SearchResultsGrid'
 import { loadLastSearch } from '@/utils/search'
 import type { SearchTab } from '@/utils/search'
 
@@ -97,62 +96,14 @@ export function Artists() {
         )}
 
         {!isLoading && data && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {isArtist &&
-              artists.data?.items.map((artist) => (
-                <MediaCard
-                  key={artist.id}
-                  title={artist.name}
-                  imageUrl={artist.images[0]?.url}
-                  subtitle={
-                    artist.followers?.total != null
-                      ? t('artists.followers', { count: artist.followers.total })
-                      : undefined
-                  }
-                  onClick={() => navigate(`/artists/${artist.id}`)}
-                />
-              ))}
-
-            {isAlbum &&
-              albums.data?.items.map((album) => (
-                <MediaCard
-                  key={album.id}
-                  title={album.name}
-                  imageUrl={album.images[0]?.url}
-                  subtitle={album.artists.map((a: { name: string }) => a.name).join(', ')}
-                  onClick={() => navigate(`/albums/${album.id}`)}
-                />
-              ))}
-
-            {isPlaylist &&
-              playlists.data?.items
-                .filter((p): p is NonNullable<typeof p> => !!p)
-                .map((playlist) => (
-                  <MediaCard
-                    key={playlist.id}
-                    title={playlist.name}
-                    imageUrl={playlist.images[0]?.url}
-                    subtitle={playlist.owner.display_name}
-                    onClick={() => navigate(`/playlists/${playlist.id}`)}
-                  />
-                ))}
-
-            {hasNext && (
-              <button
-                onClick={() => handlePageChange(page + 1)}
-                className="aspect-square rounded-[6px] border border-dashed border-black/20 bg-black/[0.03] hover:bg-black/[0.07] hover:border-black/35 transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center justify-center gap-1.5 group"
-                aria-label={t('artists.next')}
-              >
-                <ChevronRight
-                  size={18}
-                  className="text-black/30 group-hover:text-black/55 transition-colors"
-                />
-                <span className="text-[8px] font-semibold text-black/30 group-hover:text-black/55 transition-colors uppercase tracking-wider leading-none">
-                  {t('artists.next')}
-                </span>
-              </button>
-            )}
-          </div>
+          <SearchResultsGrid
+            tab={tab}
+            artists={artists.data?.items}
+            albums={albums.data?.items}
+            playlists={playlists.data?.items}
+            hasNext={hasNext}
+            onNextPage={() => handlePageChange(page + 1)}
+          />
         )}
 
         {!isLoading && query && data?.items.length === 0 && (

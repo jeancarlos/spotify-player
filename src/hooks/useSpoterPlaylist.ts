@@ -37,7 +37,13 @@ export function useSpoterPlaylist() {
   const [localNotes, setLocalNotes] = useState<Record<string, string>>(() =>
     userId ? readLocalNotes(userId) : {}
   )
-  const [isHydrating, setIsHydrating] = useState(false)
+  const [isHydrating, setIsHydrating] = useState(() => {
+    if (!userId) return false
+    const cookieEntries = readFavCookie(userId)
+    if (cookieEntries.length === 0) return false
+    const currentTracks = readLocalTracks(userId)
+    return cookieEntries.some((e) => !currentTracks.some((t) => t.uri === e.uri))
+  })
 
   const tracksRef = useRef(localTracks)
   const notesRef = useRef(localNotes)
@@ -156,7 +162,6 @@ export function useSpoterPlaylist() {
 
     if (missingUris.length === 0) return
 
-    setIsHydrating(true)
     hydrateFromApi(missingUris).then((fetched) => {
       if (fetched.length > 0) {
         setLocalTracks((prev) => {
