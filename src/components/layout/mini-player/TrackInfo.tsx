@@ -1,6 +1,8 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Info } from 'lucide-react'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useTranslation } from 'react-i18next'
+import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { formatDuration } from '@/utils/formatDuration'
 import { getFromPath } from '@/utils/routerState'
@@ -15,9 +17,11 @@ export function TrackInfo({ progress }: TrackInfoProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
+  const { notes } = useSpoterPlaylist()
 
   const isPlayerPage = location.pathname === '/player'
   const duration = currentTrack?.duration_ms ?? 0
+  const personalNote = currentTrack ? (notes[currentTrack.uri] ?? '') : ''
 
   const handleTrackClick = () => {
     if (isPlayerPage) {
@@ -41,21 +45,37 @@ export function TrackInfo({ progress }: TrackInfoProps) {
   }
 
   return (
-    <div className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden group/track">
-      {/* Disco e Info Principal (Área de clique para o player) */}
+    <div className="flex ml-[-5px] items-center gap-2.5 flex-1 min-w-0  group/track">
       <div
-        className="flex items-center gap-2.5 min-w-0 overflow-hidden cursor-pointer"
+        className="flex items-center gap-2.5 min-w-0 cursor-pointer"
         role="button"
         tabIndex={0}
         aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
       >
-        <img
-          src={currentTrack.album.images[0]?.url}
-          alt={currentTrack.album.name}
-          className="w-12 h-12 rounded-full"
-          onClick={handleTrackClick}
-          onKeyDown={handleEnterTrack}
-        />
+        <div className="relative shrink-0">
+          {personalNote && (
+            <div className="group/note absolute top-0 left-0 z-10">
+              <button
+                type="button"
+                className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-black/60 hover:text-black transition-colors cursor-default"
+                aria-label={personalNote}
+                tabIndex={-1}
+              >
+                <Info size={12} />
+              </button>
+              <span className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-[10px] leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]">
+                {personalNote}
+              </span>
+            </div>
+          )}
+          <img
+            src={currentTrack.album.images[0]?.url}
+            alt={currentTrack.album.name}
+            className="w-12 h-12 rounded-full"
+            onClick={handleTrackClick}
+            onKeyDown={handleEnterTrack}
+          />
+        </div>
         <div className="min-w-0 flex flex-col justify-center">
           <button
             onClick={handleTrackClick}
