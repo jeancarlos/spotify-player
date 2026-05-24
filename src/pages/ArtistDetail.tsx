@@ -1,11 +1,9 @@
 import { useState, useCallback } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Play } from 'lucide-react'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscographyTracks'
-import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { ArtistHeader } from '@/components/artist/ArtistHeader'
@@ -22,7 +20,6 @@ export function ArtistDetail() {
   const location = useLocation()
   const { t } = useTranslation()
   const { state } = usePlayer()
-  const playContext = usePlayContext()
   const playTrack = usePlayTrack()
 
   const [albumPage, setAlbumPage] = useState(1)
@@ -62,16 +59,7 @@ export function ArtistDetail() {
             <section className="mb-8">
               <div className="flex items-center justify-between px-2 mb-3">
                 <h3 className="text-sm font-bold text-black/50">{t('artistDetail.topTracksRanked')}</h3>
-                {artist.data?.uri && (
-                  <button
-                    onClick={() => playContext(artist.data!.uri)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono border border-black/15 bg-white/60 backdrop-blur-sm text-black/50 hover:bg-black hover:text-white hover:border-black transition-colors outline-none"
-                  >
-                    <Play size={11} />
-                    {t('player.play')}
-                  </button>
-                )}
-              </div>
+                </div>
               <ArtistTopTracksChart
                 tracks={discographyTracks.data}
                 activeTrackId={state.currentTrack?.id}
