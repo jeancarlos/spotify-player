@@ -9,12 +9,7 @@ describe('EmptyState', () => {
   })
 
   it('renders the icon if provided', () => {
-    render(
-      <EmptyState 
-        message="With icon" 
-        icon={<svg data-testid="mock-icon" />} 
-      />
-    )
+    render(<EmptyState message="With icon" icon={<svg data-testid="mock-icon" />} />)
     expect(screen.getByText('With icon')).toBeInTheDocument()
     expect(screen.getByTestId('mock-icon')).toBeInTheDocument()
   })

@@ -21,7 +21,7 @@ describe('Pagination', () => {
     render(<Pagination page={1} hasNext={true} onPrev={onPrev} onNext={vi.fn()} />)
     const prevButton = screen.getByText('artists.previous').closest('button')
     expect(prevButton).toBeDisabled()
-    
+
     if (prevButton) fireEvent.click(prevButton)
     expect(onPrev).not.toHaveBeenCalled()
   })
@@ -31,7 +31,7 @@ describe('Pagination', () => {
     render(<Pagination page={2} hasNext={true} onPrev={onPrev} onNext={vi.fn()} />)
     const prevButton = screen.getByText('artists.previous').closest('button')
     expect(prevButton).not.toBeDisabled()
-    
+
     if (prevButton) fireEvent.click(prevButton)
     expect(onPrev).toHaveBeenCalled()
   })
@@ -41,7 +41,7 @@ describe('Pagination', () => {
     render(<Pagination page={2} hasNext={false} onPrev={vi.fn()} onNext={onNext} />)
     const nextButton = screen.getByText('artists.next').closest('button')
     expect(nextButton).toBeDisabled()
-    
+
     if (nextButton) fireEvent.click(nextButton)
     expect(onNext).not.toHaveBeenCalled()
   })
@@ -51,7 +51,7 @@ describe('Pagination', () => {
     render(<Pagination page={2} hasNext={true} onPrev={vi.fn()} onNext={onNext} />)
     const nextButton = screen.getByText('artists.next').closest('button')
     expect(nextButton).not.toBeDisabled()
-    
+
     if (nextButton) fireEvent.click(nextButton)
     expect(onNext).toHaveBeenCalled()
   })
