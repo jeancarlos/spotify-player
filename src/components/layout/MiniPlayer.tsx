@@ -44,7 +44,7 @@ function ProgressBar({ progress, duration, onChange }: ProgressBarProps) {
   const background = `linear-gradient(to right, #1DB954 ${percentage}%, #d4d4d8 ${percentage}%)`
 
   return (
-    <div className="flex flex-col items-center gap-1 absolute top-[-1px] left-0 right-0 w-full z-10 px-8">
+    <div className="group/progress flex flex-col items-center gap-1 absolute top-[-1px] left-0 right-0 w-full z-10 px-8">
       <input
         type="range"
         min={0}
@@ -53,7 +53,7 @@ function ProgressBar({ progress, duration, onChange }: ProgressBarProps) {
         onChange={onChange}
         aria-label={t('player.seek')}
         aria-valuetext={`${formatDuration(progress)} de ${formatDuration(duration)}`}
-        className="w-full h-1.5 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0"
+        className="w-full h-[1px] appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-webkit-slider-thumb]:scale-0 [&::-webkit-slider-thumb]:transition-transform group-hover/progress:[&::-webkit-slider-thumb]:scale-100 active:[&::-webkit-slider-thumb]:scale-100 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:scale-0 [&::-moz-range-thumb]:transition-transform group-hover/progress:[&::-moz-range-thumb]:scale-100 active:[&::-moz-range-thumb]:scale-100"
         style={{ background }}
       />
     </div>
