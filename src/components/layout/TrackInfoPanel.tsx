@@ -9,8 +9,7 @@ import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 import { StatCard } from '@/components/shared/StatCard'
 import { MoodZone } from '@/components/shared/MoodZone'
-import { FlippableCover } from '@/components/shared/FlippableCover'
-import { useAlbumBackCover } from '@/hooks/queries/useAlbumBackCover'
+import { TiltCover } from '@/components/shared/TiltCover'
 
 const GENRE_POOL = [
   'pop', 'rock', 'indie', 'electronic', 'r&b', 'hip-hop', 'alternative',
@@ -62,9 +61,6 @@ export function TrackInfoPanel({ track }: Props) {
   const artist = useArtist(track.artists[0]?.id)
   const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
 
-  const artistName = track.artists[0]?.name ?? ''
-  const { backUrl } = useAlbumBackCover(track.album.id, track.album.name, artistName)
-
   const realFeatures = features.data?.[0] ?? null
   const f: AudioFeatures = realFeatures ?? fakeFeatures(track.id)
   const hasRealFeatures = realFeatures !== null
@@ -77,9 +73,8 @@ export function TrackInfoPanel({ track }: Props) {
       <div className="flex flex-col items-center gap-6 px-5 py-4">
 
         {/* Album art */}
-        <FlippableCover
-          frontUrl={track.album.images[0]?.url}
-          backUrl={backUrl}
+        <TiltCover
+          imageUrl={track.album.images[0]?.url}
           size={176}
           name={track.album.name}
         />

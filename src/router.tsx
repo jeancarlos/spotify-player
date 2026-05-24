@@ -1,24 +1,38 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
 import { AppRoot } from '@/components/layout/AppRoot'
 import { AppShell } from '@/components/layout/AppShell'
 import { PlayerView } from '@/components/layout/PlayerView'
-import { Login } from '@/pages/Login'
-import { OAuthCallback } from '@/pages/OAuthCallback'
-import { Home } from '@/pages/Home'
-import { Artists } from '@/pages/Artists'
-import { ArtistDetail } from '@/pages/ArtistDetail'
-import { AlbumDetail } from '@/pages/AlbumDetail'
-import { PlaylistDetail } from '@/pages/PlaylistDetail'
-import { Favorites } from '@/pages/Favorites'
-import { Profile } from '@/pages/Profile'
+
+// Lazy load pages
+const Login = lazy(() => import('@/pages/Login').then(module => ({ default: module.Login })))
+const OAuthCallback = lazy(() => import('@/pages/OAuthCallback').then(module => ({ default: module.OAuthCallback })))
+const Home = lazy(() => import('@/pages/Home').then(module => ({ default: module.Home })))
+const Artists = lazy(() => import('@/pages/Artists').then(module => ({ default: module.Artists })))
+const ArtistDetail = lazy(() => import('@/pages/ArtistDetail').then(module => ({ default: module.ArtistDetail })))
+const AlbumDetail = lazy(() => import('@/pages/AlbumDetail').then(module => ({ default: module.AlbumDetail })))
+const PlaylistDetail = lazy(() => import('@/pages/PlaylistDetail').then(module => ({ default: module.PlaylistDetail })))
+const Favorites = lazy(() => import('@/pages/Favorites').then(module => ({ default: module.Favorites })))
+const Profile = lazy(() => import('@/pages/Profile').then(module => ({ default: module.Profile })))
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="w-8 h-8 border-4 border-green-500 rounded-full border-t-transparent animate-spin" />
+  </div>
+)
+
+const withSuspense = (Component: React.ReactNode) => (
+  <Suspense fallback={<PageLoader />}>{Component}</Suspense>
+)
 
 export const router = createBrowserRouter([
   {
     element: <AppRoot />,
     children: [
-      { path: '/login', element: <Login /> },
-      { path: '/callback', element: <OAuthCallback /> },
+      { path: '/login', element: withSuspense(<Login />) },
+      { path: '/callback', element: withSuspense(<OAuthCallback />) },
       {
         path: '/player',
         element: (
@@ -35,13 +49,13 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
-          { index: true, element: <Home /> },
-          { path: 'artists', element: <Artists /> },
-          { path: 'artists/:id', element: <ArtistDetail /> },
-          { path: 'albums/:id', element: <AlbumDetail /> },
-          { path: 'playlists/:id', element: <PlaylistDetail /> },
-          { path: 'favorites', element: <Favorites /> },
-          { path: 'profile', element: <Profile /> },
+          { index: true, element: withSuspense(<Home />) },
+          { path: 'artists', element: withSuspense(<Artists />) },
+          { path: 'artists/:id', element: withSuspense(<ArtistDetail />) },
+          { path: 'albums/:id', element: withSuspense(<AlbumDetail />) },
+          { path: 'playlists/:id', element: withSuspense(<PlaylistDetail />) },
+          { path: 'favorites', element: withSuspense(<Favorites />) },
+          { path: 'profile', element: withSuspense(<Profile />) },
         ],
       },
     ],

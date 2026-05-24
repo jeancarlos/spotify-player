@@ -53,7 +53,11 @@ function ProgressBar({ progress, duration, onChange }: ProgressBarProps) {
   )
 }
 
-export function MiniPlayer() {
+interface MiniPlayerProps {
+  onHoverChange?: (hovered: boolean) => void
+}
+
+export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
   const { state, dispatch } = usePlayer()
   const { currentTrack, isPlaying, shuffle, repeat } = state
   const { currentProgress, seekTo: engineSeekTo } = useProgressEngine()
@@ -149,6 +153,8 @@ export function MiniPlayer() {
       transition={{ type: 'spring', stiffness: 240, damping: 26 }}
       className="rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
       aria-label={t('lyrics.nowPlaying', 'Tocando agora')}
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
     >
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 

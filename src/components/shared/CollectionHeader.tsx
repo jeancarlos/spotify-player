@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { FlippableCover } from './FlippableCover'
+import { TiltCover } from './TiltCover'
 
 interface CollectionHeaderProps {
   imageUrl: string | undefined
-  backUrl?: string | null
   name: string
   subtitle: string
   year?: string
@@ -33,7 +32,6 @@ function useCollectionLayout() {
 
 export function CollectionHeader({
   imageUrl,
-  backUrl,
   name,
   subtitle,
   year,
@@ -58,20 +56,19 @@ export function CollectionHeader({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         >
-          <FlippableCover
-            frontUrl={imageUrl}
-            backUrl={backUrl}
+          <TiltCover
+            imageUrl={imageUrl}
             size={imgPx}
             name={name}
             onClick={onPlay}
           >
             <div className={cn(
-              'absolute inset-0 rounded-xl flex items-center justify-center',
+              'absolute inset-0 flex items-center justify-center',
               'bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200',
             )}>
               <Play size={48} fill="white" color="white" className="drop-shadow-lg" />
             </div>
-          </FlippableCover>
+          </TiltCover>
         </motion.div>
       </div>
 

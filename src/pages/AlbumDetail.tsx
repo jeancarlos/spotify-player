@@ -16,7 +16,6 @@ import { TrackPopularityChart } from '@/components/shared/TrackPopularityChart'
 import { Pagination } from '@/components/shared/Pagination'
 import { averageAudioFeatures } from '@/utils/audioFeatures'
 import { useTracks } from '@/hooks/queries/useTracks'
-import { useAlbumBackCover } from '@/hooks/queries/useAlbumBackCover'
 import { formatDate } from '@/utils/formatDate'
 import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
@@ -84,14 +83,10 @@ export function AlbumDetail() {
     ? album.data.artists.map(a => a.name).join(', ')
     : ''
 
-  const albumArtistName = album.data?.artists?.[0]?.name ?? ''
-  const { backUrl } = useAlbumBackCover(album.data?.id, album.data?.name ?? '', albumArtistName)
-
   return (
     <div className="min-h-screen">
       <CollectionHeader
         imageUrl={album.data?.images?.[0]?.url}
-        backUrl={backUrl}
         name={album.data?.name ?? ''}
         subtitle={albumSubtitle}
         year={albumYear}
