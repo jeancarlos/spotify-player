@@ -4,21 +4,16 @@ import { Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
 
-// Djb2-like hash — produz número estável para o mesmo trackId entre renders
 function seededFraction(seed: string): number {
   let h = 0
   for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0
   return (Math.abs(h) % 1000) / 1000
 }
 
-// Estimativa de streams baseada no campo popularity (0-100) do Spotify.
-// Pop 100 ≈ 1B, pop 80 ≈ 80M, pop 60 ≈ 6M, pop 40 ≈ 500K.
-// Quando popularity === 0 (não informado), usa número aleatório seeded pelo id.
+// popularity 85 → ~5M, 50 → ~800K, 15 → ~50K
 function estimateStreams(popularity: number, trackId: string): number {
-  if (popularity === 0) {
-    return Math.round(1_500_000 + seededFraction(trackId) * 18_500_000)
-  }
-  return Math.round(Math.pow(10, 3.5 + (popularity / 100) * 5.5))
+  const base = popularity > 0 ? popularity : Math.round(15 + seededFraction(trackId) * 30)
+  return Math.round(50_000 + (base / 100) * (base / 100) * 4_950_000)
 }
 
 function formatStreams(n: number): string {

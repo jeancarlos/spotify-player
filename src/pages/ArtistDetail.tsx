@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
+import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscographyTracks'
 import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
@@ -31,6 +32,7 @@ export function ArtistDetail() {
   const artist = useArtist(id)
   const topTracks = useArtistTopTracks(id)
   const albums = useArtistAlbums(id, albumPage, 10)
+  const discographyTracks = useArtistDiscographyTracks(id)
 
   const hasNextAlbums = albums.data
     ? albums.data.offset + albums.data.limit < albums.data.total
@@ -63,7 +65,7 @@ export function ArtistDetail() {
         <div className="max-w-3xl mx-auto px-4">
           <ArtistBio artistName={artist.data?.name} />
 
-          {(topTracks.data ?? []).length > 0 && (
+          {discographyTracks.data.length > 0 && (
             <section className="mb-8">
               <div className="flex items-center justify-between px-2 mb-3">
                 <h2 className="text-xs font-bold text-black/40 uppercase tracking-wider">
@@ -79,9 +81,9 @@ export function ArtistDetail() {
                 )}
               </div>
               <ArtistTopTracksChart
-                tracks={topTracks.data ?? []}
+                tracks={discographyTracks.data}
                 activeTrackId={state.currentTrack?.id}
-                onPlay={(track) => playTrack(track, topTracks.data ?? [])}
+                onPlay={(track) => playTrack(track, discographyTracks.data)}
               />
             </section>
           )}
