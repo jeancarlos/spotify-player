@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('@/hooks/queries/useUserPlaylists', () => ({
   useUserPlaylists: () => ({
     isSuccess: true,
-    data: { items: [{ id: 'pl-123', name: "User's Spoter List" }] },
+    data: { items: [{ id: 'pl-123', name: "User's Spoter List", owner: { id: 'user-1' } }] },
   }),
 }))
 vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
@@ -24,9 +24,6 @@ vi.mock('@/hooks/mutations/useAddToPlaylist', () => ({
 vi.mock('@/hooks/mutations/useRemoveFromPlaylist', () => ({
   useRemoveFromPlaylist: () => ({ mutate: vi.fn() }),
 }))
-vi.mock('@/hooks/mutations/useReorderPlaylistTracks', () => ({
-  useReorderPlaylistTracks: () => ({ mutate: vi.fn() }),
-}))
 vi.mock('@/components/ui/toast', () => ({
   useToast: () => ({ toast: vi.fn() }),
 }))
@@ -42,7 +39,7 @@ vi.mock('@/utils/favHydration', () => ({
 
 import { renderHook, act } from '@testing-library/react'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
-import { writeLocalTracks, readLocalTracks } from '@/utils/favStorage'
+import { writeLocalTracks } from '@/utils/favStorage'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const mockTrack = (id: string): SpotifyTrack => ({
@@ -75,7 +72,7 @@ beforeEach(() => {
 })
 
 describe('useSpoterPlaylist', () => {
-  it('encontra a playlist existente pelo nome', () => {
+  it('encontra a playlist existente pelo nome e dono', () => {
     const { result } = renderHook(() => useSpoterPlaylist())
     expect(result.current.playlistId).toBe('pl-123')
   })
@@ -114,68 +111,5 @@ describe('useSpoterPlaylist', () => {
       result.current.removeTrack('spotify:track:t4')
     })
     expect(result.current.tracks).toHaveLength(0)
-  })
-
-  describe('reorderTrack', () => {
-    it('move track para frente na lista', () => {
-      writeLocalTracks('user-1', [mockTrack('t1'), mockTrack('t2'), mockTrack('t3')])
-      const { result } = renderHook(() => useSpoterPlaylist())
-
-      act(() => {
-        result.current.reorderTrack(0, 2)
-      })
-
-      expect(result.current.tracks[0].id).toBe('t2')
-      expect(result.current.tracks[1].id).toBe('t3')
-      expect(result.current.tracks[2].id).toBe('t1')
-    })
-
-    it('move track para trás na lista', () => {
-      writeLocalTracks('user-1', [mockTrack('t1'), mockTrack('t2'), mockTrack('t3')])
-      const { result } = renderHook(() => useSpoterPlaylist())
-
-      act(() => {
-        result.current.reorderTrack(2, 0)
-      })
-
-      expect(result.current.tracks[0].id).toBe('t3')
-      expect(result.current.tracks[1].id).toBe('t1')
-      expect(result.current.tracks[2].id).toBe('t2')
-    })
-
-    it('não faz nada quando fromIndex === toIndex', () => {
-      writeLocalTracks('user-1', [mockTrack('t1'), mockTrack('t2')])
-      const { result } = renderHook(() => useSpoterPlaylist())
-      const before = [...result.current.tracks]
-
-      act(() => {
-        result.current.reorderTrack(1, 1)
-      })
-
-      expect(result.current.tracks).toEqual(before)
-    })
-
-    it('faz clamp de toIndex quando maior que o tamanho da lista', () => {
-      writeLocalTracks('user-1', [mockTrack('t1'), mockTrack('t2'), mockTrack('t3')])
-      const { result } = renderHook(() => useSpoterPlaylist())
-
-      act(() => {
-        result.current.reorderTrack(0, 99)
-      })
-
-      expect(result.current.tracks[2].id).toBe('t1')
-    })
-
-    it('persiste nova ordem no localStorage', () => {
-      writeLocalTracks('user-1', [mockTrack('t1'), mockTrack('t2'), mockTrack('t3')])
-      const { result } = renderHook(() => useSpoterPlaylist())
-
-      act(() => {
-        result.current.reorderTrack(0, 2)
-      })
-
-      const saved = readLocalTracks('user-1')
-      expect(saved[2].id).toBe('t1')
-    })
   })
 })

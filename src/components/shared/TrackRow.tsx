@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Play, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
@@ -11,7 +10,6 @@ interface TrackRowProps {
   isActive?: boolean
   onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
   onRemove?: (uri: string) => void
-  onReorderTo?: (newIndex: number) => void
   note?: string
   index?: number
   theme?: 'light' | 'dark'
@@ -57,64 +55,6 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
 
 function isActivationKey(key: string): boolean {
   return key === 'Enter' || key === ' '
-}
-
-// IndexCell: renderizado FORA de qualquer <button> quando onReorderTo está presente,
-// evitando aninhamento de elementos interativos (HTML inválido).
-interface IndexCellProps {
-  index: number
-  theme: TrackTheme
-  onReorderTo: (newIndex: number) => void
-  trackName: string
-}
-
-function IndexCell({ index, theme, onReorderTo, trackName }: IndexCellProps) {
-  const { t } = useTranslation()
-  const [editing, setEditing] = useState(false)
-  const [inputVal, setInputVal] = useState(String(index + 1))
-
-  const display = String(index + 1).padStart(2, '0')
-
-  function confirm() {
-    const parsed = parseInt(inputVal, 10)
-    if (!isNaN(parsed) && parsed >= 1) {
-      onReorderTo(parsed - 1)
-    }
-    setEditing(false)
-  }
-
-  if (editing) {
-    return (
-      <input
-        type="number"
-        min={1}
-        value={inputVal}
-        autoFocus
-        className="w-10 text-xs font-bold tabular-nums text-center bg-black/10 rounded focus:outline-none focus:ring-1 focus:ring-black/30"
-        onChange={(e) => { setInputVal(e.target.value) }}
-        onBlur={confirm}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') { e.preventDefault(); confirm() }
-          if (e.key === 'Escape') { e.stopPropagation(); setEditing(false) }
-        }}
-        onClick={(e) => { e.stopPropagation() }}
-      />
-    )
-  }
-
-  return (
-    <button
-      aria-label={t('favorites.reorderPosition', { name: trackName })}
-      onClick={(e) => {
-        e.stopPropagation()
-        setInputVal(String(index + 1))
-        setEditing(true)
-      }}
-      className={cn('text-xs font-bold tabular-nums w-6 text-center', theme.number, 'hover:!text-black/60 cursor-pointer')}
-    >
-      {display}
-    </button>
-  )
 }
 
 interface NameAreaProps {
@@ -174,7 +114,6 @@ export function TrackRow({
   isActive = false,
   onPlay,
   onRemove,
-  onReorderTo,
   note,
   index,
   theme = 'light',
@@ -193,33 +132,27 @@ export function TrackRow({
   }
 
   return (
-    <div
-      className={s.row}
-      onClick={() => onPlay?.(track)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-    >
-      {/* Play icon / index number.
-          IndexCell é renderizado FORA de <button> quando onReorderTo está presente,
-          evitando botão aninhado dentro de botão (HTML inválido). */}
-      {index !== undefined && onReorderTo ? (
-        <IndexCell index={index} theme={s} onReorderTo={onReorderTo} trackName={track.name} />
-      ) : (
-        <PlayCell trackName={track.name} index={index} theme={s} onPlay={onPlay} track={track} />
-      )}
+    <div className={s.row} role="button" tabIndex={0} onKeyDown={handleKeyDown}>
+      <PlayCell
+        trackName={track.name}
+        index={index}
+        theme={s}
+        onPlay={onPlay}
+        track={track}
+      />
 
-      {/* Album cover */}
-      {albumImage && (
-        <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
-      )}
+      <div
+        className="flex-1 min-w-0 flex items-center gap-3"
+        onClick={() => onPlay?.(track)}
+      >
+        {albumImage && (
+          <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
+        )}
+        <NameArea track={track} note={note} theme={s} artistNames={artistNames} />
+      </div>
 
-      <NameArea track={track} note={note} theme={s} artistNames={artistNames} />
-
-      {/* Duration */}
       <span className={s.duration}>{formatDuration(track.duration_ms)}</span>
 
-      {/* Remove button */}
       {onRemove && (
         <button
           onClick={(e) => {

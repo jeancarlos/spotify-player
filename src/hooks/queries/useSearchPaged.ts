@@ -2,7 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import type { PagingObject } from '@/types/spotify'
 
-export const PAGE_SIZE = 20
+// Spotify documents a max limit of 50, but apps in development mode / restricted quota
+// reject with 400 "Invalid limit" above 15. Do not change without enabling extended quota first.
+export const PAGE_SIZE = 15
 
 interface UseSearchPagedOptions<T, R> {
   queryKeyPrefix: string

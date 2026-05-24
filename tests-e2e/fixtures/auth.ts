@@ -1,5 +1,5 @@
 import { test as base, type Page } from '@playwright/test'
-import { mockUser, mockArtists, mockTracks, mockAlbums, pagingOf, mockArtist } from './mock-data'
+import { mockUser, mockArtists, mockTracks, mockAlbums, mockPlaylists, pagingOf, mockArtist } from './mock-data'
 
 async function setupAuth(page: Page) {
   await page.addInitScript(() => {
@@ -41,17 +41,29 @@ async function setupApiRoutes(page: Page) {
     const offset = Number(url.searchParams.get('offset') ?? '0')
     const limit = Number(url.searchParams.get('limit') ?? '20')
     if (type.includes('album')) {
-      return route.fulfill({ json: { albums: pagingOf(mockAlbums) } })
+      const filteredAlbums = mockAlbums.filter((a) =>
+        a.name.toLowerCase().includes(q.toLowerCase())
+      )
+      const slice = filteredAlbums.slice(offset, offset + limit)
+      return route.fulfill({
+        json: { albums: pagingOf(slice, filteredAlbums.length, offset) },
+      })
+    }
+    if (type.includes('playlist')) {
+      const filteredPlaylists = mockPlaylists.filter((p) =>
+        p.name.toLowerCase().includes(q.toLowerCase())
+      )
+      const slice = filteredPlaylists.slice(offset, offset + limit)
+      return route.fulfill({
+        json: { playlists: pagingOf(slice, filteredPlaylists.length, offset) },
+      })
     }
     const filtered = mockArtists.filter((a) =>
       a.name.toLowerCase().includes(q.toLowerCase())
     )
     return route.fulfill({
       json: {
-        artists: {
-          ...pagingOf(filtered.slice(offset, offset + limit)),
-          total: filtered.length,
-        },
+        artists: pagingOf(filtered.slice(offset, offset + limit), filtered.length, offset),
       },
     })
   })

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { Tooltip } from '../Tooltip'
 
 describe('Tooltip', () => {
-  it('renderiza os children corretamente', () => {
+  it('renders children correctly', () => {
     render(
       <Tooltip content="Texto de ajuda">
         <button>Hover</button>
@@ -12,7 +12,7 @@ describe('Tooltip', () => {
     expect(screen.getByText('Hover')).toBeInTheDocument()
   })
 
-  it('renderiza o conteúdo do tooltip no documento (oculto via css)', () => {
+  it('renders tooltip content in the document (hidden via css)', () => {
     render(
       <Tooltip content="Texto de ajuda">
         <button>Hover</button>
@@ -21,7 +21,7 @@ describe('Tooltip', () => {
     expect(screen.getByText('Texto de ajuda')).toBeInTheDocument()
   })
 
-  it('aplica alinhamento start quando align="start"', () => {
+  it('applies start alignment when align="start"', () => {
     render(
       <Tooltip content="Nota" align="start">
         <span>trigger</span>
@@ -32,7 +32,7 @@ describe('Tooltip', () => {
     expect(tip.className).not.toContain('-translate-x-1/2')
   })
 
-  it('aplica whitespace-normal e maxWidth quando maxWidth fornecido', () => {
+  it('applies whitespace-normal and maxWidth when maxWidth provided', () => {
     render(
       <Tooltip content="Nota longa" maxWidth="max-w-xs">
         <span>trigger</span>
@@ -43,13 +43,13 @@ describe('Tooltip', () => {
     expect(tip.className).toContain('max-w-xs')
   })
 
-  it('aplica className no wrapper quando fornecido', () => {
+  it('applies className to wrapper when provided', () => {
     render(
       <Tooltip content="Nota" className="flex-1 min-w-0 block">
         <span>trigger</span>
       </Tooltip>
     )
-    // wrapper é o span pai do tooltip content
+    // wrapper is the parent span of the tooltip content
     const wrapper = screen.getByText('trigger').parentElement
     expect(wrapper?.className).toContain('flex-1')
   })

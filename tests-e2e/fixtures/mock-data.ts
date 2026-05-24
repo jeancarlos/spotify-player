@@ -48,7 +48,7 @@ export const mockTrack = {
   },
 }
 
-export const mockAlbum = {
+const baseAlbum = {
   id: 'album-1',
   name: 'Mock Album',
   images: [{ url: 'https://picsum.photos/300', width: 300, height: 300 }],
@@ -61,6 +61,25 @@ export const mockAlbum = {
   external_urls: { spotify: '' },
 }
 
+const basePlaylist = {
+  id: 'playlist-1',
+  name: 'Mock Playlist',
+  description: null,
+  images: [{ url: 'https://picsum.photos/300', width: 300, height: 300 }],
+  owner: { id: 'user1', display_name: 'Test User', uri: 'spotify:user:user1', href: '', type: 'user' as const, external_urls: { spotify: '' } },
+  items: { total: 5, href: '' },
+  tracks: { total: 5, href: '' },
+  uri: 'spotify:playlist:playlist-1',
+  public: false,
+  type: 'playlist' as const,
+  snapshot_id: 'snap1',
+  external_urls: { spotify: '' },
+  href: '',
+}
+
+export const mockAlbum = baseAlbum
+export const mockPlaylist = basePlaylist
+
 export const mockArtists = Array.from({ length: 40 }, (_, i) =>
   mockArtist({ id: `artist-${i + 1}`, name: `Artist ${i + 1}` })
 )
@@ -71,22 +90,27 @@ export const mockTracks = Array.from({ length: 10 }, (_, i) => ({
   name: `Track ${i + 1}`,
 }))
 
-const mockAlbums = Array.from({ length: 5 }, (_, i) => ({
-  ...mockAlbum,
+export const mockAlbums = Array.from({ length: 25 }, (_, i) => ({
+  ...baseAlbum,
   id: `album-${i + 1}`,
   name: `Album ${i + 1}`,
 }))
 
-export { mockAlbums }
+export const mockPlaylists = Array.from({ length: 25 }, (_, i) => ({
+  ...basePlaylist,
+  id: `playlist-${i + 1}`,
+  name: `Playlist ${i + 1}`,
+}))
 
-export function pagingOf<T>(items: T[], total?: number) {
+export function pagingOf<T>(items: T[], total?: number, offset = 0) {
+  const tot = total ?? items.length
   return {
     items,
     limit: 20,
-    offset: 0,
-    total: total ?? items.length,
-    next: null,
-    previous: null,
+    offset,
+    total: tot,
+    next: offset + items.length < tot ? 'next' : null,
+    previous: offset > 0 ? 'previous' : null,
     href: '',
   }
 }

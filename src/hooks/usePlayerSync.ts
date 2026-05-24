@@ -30,7 +30,7 @@ export function usePlayerSync() {
   useEffect(() => {
     const s = stateRef.current
 
-    // Se o player estiver inativo (204), apenas limpamos o estado de reprodução
+    // If the player is inactive (204), we just clear the playback state
     if (!data) {
       if (s.isPlaying) dispatch({ type: 'SET_PLAYING', payload: false })
       return
@@ -61,7 +61,7 @@ export function usePlayerSync() {
     }
   }, [data, dispatch, queryClient])
 
-  // Sincroniza a fila (queue)
+  // Sync the queue
   useEffect(() => {
     if (queueData?.queue) {
       dispatch({ type: 'SET_QUEUE', payload: queueData.queue })

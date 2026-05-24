@@ -52,9 +52,9 @@ export function SearchBar({
       )}
     >
       {isPending ? (
-        <Loader2 size={15} className="text-black/40 shrink-0 animate-spin" />
+        <Loader2 size={15} className="text-black/40 shrink-0 animate-spin" data-testid="search-spinner" aria-hidden="true" />
       ) : (
-        <Search size={15} className="text-black/40 shrink-0" />
+        <Search size={15} className="text-black/40 shrink-0" data-testid="search-icon" aria-hidden="true" />
       )}
       <label htmlFor="global-search" className="sr-only">
         {t('artists.searchPlaceholder')}

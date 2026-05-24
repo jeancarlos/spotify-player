@@ -8,7 +8,6 @@ import { useUpdatePlaylist } from '@/hooks/mutations/useUpdatePlaylist'
 import { useAddToPlaylist } from '@/hooks/mutations/useAddToPlaylist'
 import { useRemoveFromPlaylist } from '@/hooks/mutations/useRemoveFromPlaylist'
 import { useUploadPlaylistCover } from '@/hooks/mutations/useUploadPlaylistCover'
-import { useReorderPlaylistTracks } from '@/hooks/mutations/useReorderPlaylistTracks'
 import { useToast } from '@/components/ui/toast'
 import api from '@/lib/axios'
 import {
@@ -95,7 +94,6 @@ export function useSpoterPlaylist() {
   const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
   const { toast } = useToast()
-  const reorderMutation = useReorderPlaylistTracks()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
@@ -116,7 +114,7 @@ export function useSpoterPlaylist() {
     const saved = localStorage.getItem(storageKey(userId))
     if (saved) return saved
     if (playlists.data) {
-      const found = playlists.data.items.find((p) => p.name === playlistName)
+      const found = playlists.data.items.find((p) => p.name === playlistName && p.owner.id === userId)
       if (found) return found.id
     }
     return ''
@@ -291,37 +289,6 @@ export function useSpoterPlaylist() {
     [userId, playlistId, removeMutation]
   )
 
-  const reorderTrack = useCallback(
-    (fromIndex: number, toIndex: number) => {
-      const clampedTo = Math.max(0, Math.min(toIndex, tracksRef.current.length - 1))
-      if (fromIndex === clampedTo) return
-
-      const insertBefore = clampedTo > fromIndex ? clampedTo + 1 : clampedTo
-      const prevTracks = [...tracksRef.current]
-
-      const newTracks = [...prevTracks]
-      const [moved] = newTracks.splice(fromIndex, 1)
-      newTracks.splice(clampedTo, 0, moved)
-
-      writeLocalTracks(userId, newTracks)
-      setLocalTracks(newTracks)
-
-      if (playlistId) {
-        reorderMutation.mutate(
-          { playlistId, rangeStart: fromIndex, insertBefore },
-          {
-            onError: () => {
-              writeLocalTracks(userId, prevTracks)
-              setLocalTracks(prevTracks)
-              toast(t('favorites.reorderError'), 'error')
-            },
-          }
-        )
-      }
-    },
-    [userId, playlistId, reorderMutation, toast, t]
-  )
-
   const refresh = useCallback(async () => {
     if (!playlistId || !userId) return
     setIsRefreshing(true)
@@ -346,7 +313,6 @@ export function useSpoterPlaylist() {
     notes: localNotes,
     addTrack,
     removeTrack,
-    reorderTrack,
     refresh,
     isRefreshing,
     isLoading: isHydrating && localTracks.length === 0,

@@ -11,7 +11,7 @@ export interface PlayerState {
   repeat: 'off' | 'track' | 'context'
   isFullscreen: boolean
   palette: [string, string] | null
-  lastSeekTime: number // Timestamp local do último seek manual
+  lastSeekTime: number // Local timestamp of the last manual seek
 }
 
 export type PlayerAction =

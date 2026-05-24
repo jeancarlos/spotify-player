@@ -5,9 +5,9 @@ interface ArcTextOverlayProps {
   label: string
   diskPx: number
   isPlaying?: boolean
-  // ─── EDITAR AQUI: geometria do arco ───────────────────────────────────────
-  k?: number // fração do raio do disco (0.0 – 1.0). Padrão: 0.88
-  arcDeg?: number // graus abrangidos pelo arco. Padrão: 200
+  // ─── EDIT HERE: Arc Geometry ──────────────────────────────────────────────
+  k?: number // Fraction of disk radius (0.0 – 1.0). Default: 0.88
+  arcDeg?: number // Degrees spanned by the arc. Default: 200
   // ──────────────────────────────────────────────────────────────────────────
 }
 
