@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 
 interface ArtistHeaderProps {
@@ -32,8 +32,12 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
   const scrollY = useMotionValue(0)
   const opacity = useTransform(scrollY, [0, headerHeight * 0.65], [1, 0])
 
+  const lastHeight = useRef<number>(0)
   useEffect(() => {
-    onLayout(headerHeight)
+    if (headerHeight !== lastHeight.current) {
+      lastHeight.current = headerHeight
+      onLayout(headerHeight)
+    }
   }, [headerHeight, onLayout])
 
   useEffect(() => {

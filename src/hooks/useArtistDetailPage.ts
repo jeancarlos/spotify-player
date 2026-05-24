@@ -38,7 +38,10 @@ export function useArtistDetailPage(id: string | undefined) {
 
   const artist = useArtist(id)
   const albums = useArtistAlbums(id, albumPage, 10)
-  const discographyTracks = useArtistDiscographyTracks(id)
+  
+  // Only pass the first few albums for discography tracks calculation
+  const initialAlbums = useMemo(() => albums.data?.items ?? [], [albums.data?.items])
+  const discographyTracks = useArtistDiscographyTracks(id, 10, initialAlbums)
 
   const hasNextAlbums =
     albums.data != null ? albums.data.offset + albums.data.limit < albums.data.total : false

@@ -24,13 +24,6 @@ api.interceptors.request.use(async (config) => {
   return config
 })
 
-async function handleRateLimit(error: AxiosError, originalRequest: RetryableConfig) {
-  const retryAfter = Number(error.response?.headers['retry-after'] ?? 10)
-  backoffUntil = Date.now() + retryAfter * 1000
-  await new Promise((r) => setTimeout(r, retryAfter * 1000))
-  return api(originalRequest)
-}
-
 async function handleUnauthorized(originalRequest: RetryableConfig) {
   originalRequest._retry = true
   try {
@@ -61,15 +54,19 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryableConfig | undefined
-    
-    if (error.response?.status === 429 && originalRequest) {
-      return handleRateLimit(error, originalRequest)
+
+    if (error.response?.status === 429) {
+      // Let React Query handle the retry with backoff.
+      // We can still set backoffUntil to delay subsequent requests.
+      const retryAfter = Number(error.response.headers['retry-after'] ?? 5)
+      backoffUntil = Date.now() + retryAfter * 1000
+      return Promise.reject(error)
     }
 
     if (originalRequest && error.response?.status === 401 && !originalRequest._retry) {
       return handleUnauthorized(originalRequest)
     }
-    
+
     return Promise.reject(error instanceof Error ? error : new Error('Request failed'))
   }
 )

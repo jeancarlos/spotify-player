@@ -37,36 +37,46 @@ function enrichTrack(track: SpotifyAlbumTrack, album: SpotifyAlbumSimple): Spoti
   }
 }
 
-export function useArtistDiscographyTracks(artistId: string | undefined, topN = 10) {
-  const albums = useArtistAlbums(artistId, 1, 10)
+export function useArtistDiscographyTracks(
+  artistId: string | undefined,
+  topN = 10,
+  externalAlbums?: SpotifyAlbumSimple[]
+) {
+  const internalAlbums = useArtistAlbums(artistId, 1, 10)
 
-  const albumList = useMemo(() => albums.data?.items.slice(0, 5) ?? [], [albums.data?.items])
+  const albumList = useMemo(() => {
+    if (externalAlbums && externalAlbums.length > 0) return externalAlbums.slice(0, 5)
+    return internalAlbums.data?.items.slice(0, 5) ?? []
+  }, [externalAlbums, internalAlbums.data?.items])
 
-  const trackQueries = useQueries({
+  const trackQueriesResults = useQueries({
     queries: albumList.map((album) => ({
       queryKey: ['album-tracks-disc', album.id],
       enabled: !!album.id,
       staleTime: 1000 * 60 * 60, // 1 hour
       queryFn: async (): Promise<SpotifyTrack[]> => {
-        const { data } = await api.get<PagingObject<SpotifyAlbumTrack>>(
+        const { data: res } = await api.get<PagingObject<SpotifyAlbumTrack>>(
           `/albums/${album.id}/tracks`,
           { params: { limit: 10, offset: 0, market: 'BR' } }
         )
-        return data.items.map((t) => enrichTrack(t, album))
+        return res.items.map((t) => enrichTrack(t, album))
       },
     })),
   })
 
-  const isLoading = albums.isLoading || trackQueries.some((q) => q.isLoading)
+  const isLoading =
+    (!externalAlbums && internalAlbums.isLoading) || trackQueriesResults.some((q) => q.isLoading)
 
   const data = useMemo(() => {
-    if (!trackQueries.length) return []
-    const all = trackQueries.flatMap((q) => q.data ?? [])
+    if (!trackQueriesResults.length) return []
+    const all = trackQueriesResults.flatMap((q) => q.data ?? [])
     if (all.length === 0) return []
     const unique = Array.from(new Map(all.map((t) => [t.id, t])).values())
     return unique.sort((a, b) => b.popularity - a.popularity).slice(0, topN)
-  }, [trackQueries, topN])
+  }, [trackQueriesResults, topN])
 
-  return useMemo(() => ({ data, isLoading }), [data, isLoading])
+  const result = useMemo(() => ({ data, isLoading }), [data, isLoading])
+
+  return result
 }
 
