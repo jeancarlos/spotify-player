@@ -78,6 +78,7 @@ export function HamburgerMenu() {
     close()
     navigate(path)
   }
+
   const handleLogout = () => {
     close()
     logout()
@@ -88,7 +89,6 @@ export function HamburgerMenu() {
 
   return (
     <div className="fixed top-4 left-4 z-40 flex items-center gap-2">
-      {/* Hamburger button */}
       <div className="relative">
         <button
           ref={buttonRef}
@@ -101,7 +101,6 @@ export function HamburgerMenu() {
           <MenuToggleIcon isOpen={isOpen} />
         </button>
 
-        {/* Popover */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -114,7 +113,6 @@ export function HamburgerMenu() {
               transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
               style={{ transformOrigin: 'top left' }}
             >
-              {/* Profile header */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-black/5">
                 <ProfileAvatar avatarUrl={avatar} displayName={authState.profile?.display_name} />
                 <span className="text-sm font-semibold text-black truncate">
@@ -122,7 +120,6 @@ export function HamburgerMenu() {
                 </span>
               </div>
 
-              {/* Nav items */}
               <div className="flex flex-col py-1.5">
                 <button
                   role="menuitem"
@@ -160,7 +157,6 @@ export function HamburgerMenu() {
         </AnimatePresence>
       </div>
 
-      {/* Back button — hidden on home */}
       <AnimatePresence>
         {!isHome && (
           <motion.button

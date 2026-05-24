@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Play, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
+import { Tooltip } from '@/components/shared/Tooltip'
 import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
 interface TrackRowProps {
@@ -9,6 +11,7 @@ interface TrackRowProps {
   isActive?: boolean
   onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
   onRemove?: (uri: string) => void
+  onReorderTo?: (newIndex: number) => void
   note?: string
   index?: number
   theme?: 'light' | 'dark'
@@ -56,11 +59,122 @@ function isActivationKey(key: string): boolean {
   return key === 'Enter' || key === ' '
 }
 
+// IndexCell: renderizado FORA de qualquer <button> quando onReorderTo está presente,
+// evitando aninhamento de elementos interativos (HTML inválido).
+interface IndexCellProps {
+  index: number
+  theme: TrackTheme
+  onReorderTo: (newIndex: number) => void
+  trackName: string
+}
+
+function IndexCell({ index, theme, onReorderTo, trackName }: IndexCellProps) {
+  const { t } = useTranslation()
+  const [editing, setEditing] = useState(false)
+  const [inputVal, setInputVal] = useState(String(index + 1))
+
+  const display = String(index + 1).padStart(2, '0')
+
+  function confirm() {
+    const parsed = parseInt(inputVal, 10)
+    if (!isNaN(parsed) && parsed >= 1) {
+      onReorderTo(parsed - 1)
+    }
+    setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <input
+        type="number"
+        min={1}
+        value={inputVal}
+        autoFocus
+        className="w-10 text-xs font-bold tabular-nums text-center bg-black/10 rounded focus:outline-none focus:ring-1 focus:ring-black/30"
+        onChange={(e) => { setInputVal(e.target.value) }}
+        onBlur={confirm}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); confirm() }
+          if (e.key === 'Escape') { e.stopPropagation(); setEditing(false) }
+        }}
+        onClick={(e) => { e.stopPropagation() }}
+      />
+    )
+  }
+
+  return (
+    <button
+      aria-label={t('favorites.reorderPosition', { name: trackName })}
+      onClick={(e) => {
+        e.stopPropagation()
+        setInputVal(String(index + 1))
+        setEditing(true)
+      }}
+      className={cn('text-xs font-bold tabular-nums w-6 text-center', theme.number, 'hover:!text-black/60 cursor-pointer')}
+    >
+      {display}
+    </button>
+  )
+}
+
+interface NameAreaProps {
+  track: SpotifyTrack | SpotifyAlbumTrack
+  note?: string
+  theme: TrackTheme
+  artistNames: string
+}
+
+function NameArea({ track, note, theme: s, artistNames }: NameAreaProps) {
+  const nameBlock = (
+    <>
+      <p className={s.text}>{track.name}</p>
+      <p className={s.subtext}>{artistNames}</p>
+    </>
+  )
+  if (note) {
+    return (
+      <Tooltip content={note} align="start" maxWidth="max-w-xs" className="flex-1 min-w-0 block">
+        {nameBlock}
+      </Tooltip>
+    )
+  }
+  return <div className="flex-1 min-w-0">{nameBlock}</div>
+}
+
+interface PlayCellProps {
+  trackName: string
+  index?: number
+  theme: TrackTheme
+  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
+  track: SpotifyTrack | SpotifyAlbumTrack
+}
+
+function PlayCell({ trackName, index, theme: s, onPlay, track }: PlayCellProps) {
+  const { t } = useTranslation()
+  return (
+    <button
+      className="w-6 shrink-0 flex items-center justify-center focus:outline-none"
+      aria-label={t('player.playTrack', { name: trackName })}
+      onClick={(e) => { e.stopPropagation(); onPlay?.(track) }}
+    >
+      {index !== undefined ? (
+        <>
+          <span className={s.number}>{String(index + 1).padStart(2, '0')}</span>
+          <Play size={12} className={cn('hidden group-hover:block', s.icon)} />
+        </>
+      ) : (
+        <Play size={12} className={s.icon} />
+      )}
+    </button>
+  )
+}
+
 export function TrackRow({
   track,
   isActive = false,
   onPlay,
   onRemove,
+  onReorderTo,
   note,
   index,
   theme = 'light',
@@ -71,53 +185,36 @@ export function TrackRow({
   const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
   const artistNames = 'artists' in track ? track.artists.map((a) => a.name).join(', ') : ''
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (isActivationKey(e.key)) {
+      e.preventDefault()
+      onPlay?.(track)
+    }
+  }
+
   return (
     <div
       className={s.row}
       onClick={() => onPlay?.(track)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (isActivationKey(e.key)) {
-          e.preventDefault()
-          onPlay?.(track)
-        }
-      }}
+      onKeyDown={handleKeyDown}
     >
-      {/* Play icon / index number */}
-      <button
-        className="w-6 shrink-0 flex items-center justify-center focus:outline-none"
-        aria-label={t('player.playTrack', { name: track.name })}
-        onClick={(e) => {
-          e.stopPropagation()
-          onPlay?.(track)
-        }}
-      >
-        {index !== undefined ? (
-          <>
-            <span className={s.number}>{String(index + 1).padStart(2, '0')}</span>
-            <Play size={12} className={cn('hidden group-hover:block', s.icon)} />
-          </>
-        ) : (
-          <Play size={12} className={s.icon} />
-        )}
-      </button>
+      {/* Play icon / index number.
+          IndexCell é renderizado FORA de <button> quando onReorderTo está presente,
+          evitando botão aninhado dentro de botão (HTML inválido). */}
+      {index !== undefined && onReorderTo ? (
+        <IndexCell index={index} theme={s} onReorderTo={onReorderTo} trackName={track.name} />
+      ) : (
+        <PlayCell trackName={track.name} index={index} theme={s} onPlay={onPlay} track={track} />
+      )}
 
       {/* Album cover */}
       {albumImage && (
         <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
       )}
 
-      {/* Name + artist — note tooltip anchored here */}
-      <div className="flex-1 min-w-0 relative">
-        <p className={s.text}>{track.name}</p>
-        <p className={s.subtext}>{artistNames}</p>
-        {note && (
-          <span className="pointer-events-none absolute bottom-full left-0 mb-1 whitespace-normal w-max max-w-xs rounded-md bg-black/80 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity z-50">
-            {note}
-          </span>
-        )}
-      </div>
+      <NameArea track={track} note={note} theme={s} artistNames={artistNames} />
 
       {/* Duration */}
       <span className={s.duration}>{formatDuration(track.duration_ms)}</span>

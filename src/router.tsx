@@ -7,7 +7,6 @@ import { AppShell } from '@/components/layout/AppShell'
 import { PlayerView } from '@/components/layout/PlayerView'
 import { lazyWithRetry } from '@/utils/lazyWithRetry'
 
-// Lazy load pages — uses retry + auto-reload to handle stale chunks after deploys
 const Login = lazyWithRetry(
   async () => import('@/pages/Login').then((m) => ({ default: m.Login })),
   'Login'
@@ -49,7 +48,6 @@ const Profile = lazyWithRetry(
   'Profile'
 )
 
-// Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen bg-white">
     <div className="w-8 h-8 border-4 border-green-500 rounded-full border-t-transparent animate-spin" />

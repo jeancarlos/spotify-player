@@ -23,10 +23,8 @@ export function TrackInfoPanel({ track }: Props) {
   return (
     <div>
       <div className="flex flex-col items-center gap-6 px-5 py-4 pb-20">
-        {/* Album art */}
         <TiltCover imageUrl={track.album.images[0]?.url} size={176} name={track.album.name} />
 
-        {/* Track metadata */}
         <div className="text-center space-y-1">
           <div className="flex items-center justify-center gap-2">
             <h2
@@ -61,7 +59,6 @@ export function TrackInfoPanel({ track }: Props) {
           <p className="text-white/35 text-xs">{track.album.name}</p>
         </div>
 
-        {/* Lançamento + Duração */}
         <div className="flex justify-center gap-2.5 w-full max-w-sm">
           <StatCard label={t('track.releaseDate')} value={formatDate(track.album.release_date)} />
           <StatCard label={t('track.duration')} value={formatDuration(track.duration_ms)} />
@@ -83,7 +80,6 @@ export function TrackInfoPanel({ track }: Props) {
           </Section>
         )}
 
-        {/* Genre tags */}
         <div className="flex flex-wrap justify-center gap-1.5">
           {genres.map((g) => (
             <span

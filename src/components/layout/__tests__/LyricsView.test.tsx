@@ -26,23 +26,19 @@ describe('LyricsView', () => {
   })
 
   it('highlights the correct line based on progress', () => {
-    // progress=25000ms → activeIndex=5 (time: 5*5000=25000)
     render(<LyricsView lines={manyLines} progress={25000} />)
     expect(screen.getByText('Linha 5')).toHaveClass('font-bold')
   })
 
   it('does not render lines outside the 9-slot window', () => {
-    // activeIndex=10 → window shows lines 6-14; line 0 not in DOM
     render(<LyricsView lines={manyLines} progress={50000} />)
     expect(screen.getByText('Linha 10')).toBeInTheDocument()
     expect(screen.queryByText('Linha 0')).not.toBeInTheDocument()
   })
 
   it('renders ghost slots when near the start', () => {
-    // activeIndex=0 → slots 0-3 are ghost; lines 0-4 are in slots 4-8
     render(<LyricsView lines={fewLines} progress={0} />)
     expect(screen.getByText('Primeira')).toBeInTheDocument()
-    // line beyond window should not appear
     expect(screen.queryByText('Linha 5')).not.toBeInTheDocument()
   })
 })

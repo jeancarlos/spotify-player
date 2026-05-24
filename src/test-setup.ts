@@ -1,13 +1,12 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
-// Mock parcial de react-i18next
+
 vi.mock('react-i18next', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
     useTranslation: () => ({
       t: (key: string, options?: Record<string, unknown>) => {
-        // Mapeamento para strings usadas em regex nos testes
         const translations: Record<string, string> = {
           'playlist.defaultName': 'Spoter List',
           'home.recentlyPlayed': 'Tocadas Recentemente',
@@ -32,7 +31,6 @@ vi.mock('react-i18next', async (importOriginal) => {
   }
 })
 
-// Mock de matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
@@ -47,7 +45,6 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// Mock de virtual:pwa-register/react
 vi.mock('virtual:pwa-register/react', () => ({
   useRegisterSW: () => ({
     offlineReady: [false, vi.fn()],
@@ -56,7 +53,6 @@ vi.mock('virtual:pwa-register/react', () => ({
   }),
 }))
 
-// Mock de ResizeObserver
 class ResizeObserver {
   observe = vi.fn()
   unobserve = vi.fn()

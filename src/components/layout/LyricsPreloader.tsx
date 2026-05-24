@@ -12,7 +12,6 @@ export function LyricsPreloader() {
   useEffect(() => {
     if (!queueData?.queue || queueData.queue.length === 0) return
 
-    // Preload lyrics for the first 2 tracks in the queue
     const tracksToPreload = queueData.queue.slice(0, 2)
 
     tracksToPreload.forEach((track) => {
@@ -25,7 +24,6 @@ export function LyricsPreloader() {
         const cleanedTitle = cleanTitle(title)
         const queryKey = ['lyrics', artist, cleanedTitle, durationMs]
 
-        // Only prefetch if not already in cache or being fetched
         const existingData = queryClient.getQueryData(queryKey)
         if (!existingData) {
           void queryClient.prefetchQuery({

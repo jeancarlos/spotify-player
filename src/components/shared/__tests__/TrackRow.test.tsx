@@ -85,4 +85,40 @@ describe('TrackRow', () => {
     render(<TrackRow track={track} note="great song" />)
     expect(screen.getByText('great song')).toBeInTheDocument()
   })
+
+  it('mostra número como botão clicável quando onReorderTo é fornecido', () => {
+    render(<TrackRow track={track} index={2} onReorderTo={vi.fn()} />)
+    // O número vira um button separado para edição
+    expect(screen.getByRole('button', { name: /reorderPosition/i })).toBeInTheDocument()
+  })
+
+  it('exibe input ao clicar no número quando onReorderTo é fornecido', async () => {
+    const user = userEvent.setup()
+    render(<TrackRow track={track} index={2} onReorderTo={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: /reorderPosition/i }))
+    expect(screen.getByRole('spinbutton')).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton')).toHaveValue(3) // 1-based
+  })
+
+  it('chama onReorderTo com índice 0-based ao confirmar com Enter', async () => {
+    const user = userEvent.setup()
+    const onReorderTo = vi.fn()
+    render(<TrackRow track={track} index={2} onReorderTo={onReorderTo} />)
+    await user.click(screen.getByRole('button', { name: /reorderPosition/i }))
+    const input = screen.getByRole('spinbutton')
+    await user.clear(input)
+    await user.type(input, '1')
+    await user.keyboard('{Enter}')
+    expect(onReorderTo).toHaveBeenCalledWith(0) // 1-based "1" → 0-based 0
+  })
+
+  it('fecha input sem chamar onReorderTo ao pressionar Escape', async () => {
+    const user = userEvent.setup()
+    const onReorderTo = vi.fn()
+    render(<TrackRow track={track} index={2} onReorderTo={onReorderTo} />)
+    await user.click(screen.getByRole('button', { name: /reorderPosition/i }))
+    await user.keyboard('{Escape}')
+    expect(onReorderTo).not.toHaveBeenCalled()
+    expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
+  })
 })

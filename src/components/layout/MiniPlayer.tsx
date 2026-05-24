@@ -1,4 +1,3 @@
-// src/components/layout/MiniPlayer.tsx
 import { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { usePlayer } from '@/hooks/usePlayer'

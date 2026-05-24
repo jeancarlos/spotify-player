@@ -48,10 +48,8 @@ export function MediaCard({
           </div>
         )}
 
-        {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
-        {/* Text Content */}
         <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
           <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">
             {title}

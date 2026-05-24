@@ -10,7 +10,6 @@ export function PlayerQueue() {
   const playTrack = usePlayTrack()
   const { queue, currentTrack } = state
 
-  // Filtra a fila para remover a música atual e duplicatas
   const filteredQueue = queue.reduce((acc: SpotifyTrack[], track) => {
     const isCurrent = track.uri === currentTrack?.uri
     const isDuplicate = acc.some((t) => t.uri === track.uri)
