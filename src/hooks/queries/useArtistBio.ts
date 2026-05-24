@@ -35,10 +35,7 @@ async function searchWiki(lang: 'pt' | 'en', artistName: string): Promise<string
   return titles.find((t) => t.toLowerCase().includes(artistName.toLowerCase())) ?? null
 }
 
-async function fetchArtistBio(
-  artistName: string,
-  preferPt: boolean
-): Promise<WikiResult | null> {
+async function fetchArtistBio(artistName: string, preferPt: boolean): Promise<WikiResult | null> {
   if (preferPt) {
     const ptTitle = await searchWiki('pt', artistName)
     if (ptTitle) {

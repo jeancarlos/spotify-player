@@ -1,5 +1,14 @@
 import { useCallback } from 'react'
-import { SkipBack, Play, Pause, SkipForward, Shuffle, Repeat, Repeat1, ListMusic } from 'lucide-react'
+import {
+  SkipBack,
+  Play,
+  Pause,
+  SkipForward,
+  Shuffle,
+  Repeat,
+  Repeat1,
+  ListMusic,
+} from 'lucide-react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useProgressEngine } from '@/hooks/useProgressEngine'
@@ -76,7 +85,9 @@ export function PlaybackControls() {
 
   const cycleRepeat = useCallback(async () => {
     const nextRepeatState: Record<string, 'off' | 'context' | 'track'> = {
-      off: 'context', context: 'track', track: 'off',
+      off: 'context',
+      context: 'track',
+      track: 'off',
     }
     const next = nextRepeatState[repeat] || 'off'
     dispatch({ type: 'SET_REPEAT', payload: next })
@@ -93,22 +104,38 @@ export function PlaybackControls() {
   return (
     <div className="flex items-center gap-1.5 shrink-0">
       <div className="relative group hidden sm:block">
-        <button onClick={toggleShuffle} className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}>
+        <button
+          onClick={toggleShuffle}
+          className={cn(
+            'p-1.5 rounded-lg transition-colors',
+            shuffle ? 'text-black' : 'text-black/30 hover:text-black/60'
+          )}
+        >
           <Shuffle size={15} />
         </button>
         <ControlTip label={t('player.shuffle')} />
       </div>
 
       <div className="relative group hidden min-[400px]:block">
-        <button onClick={handlePrev} className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors">
+        <button
+          onClick={handlePrev}
+          className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
+        >
           <SkipBack size={18} className="fill-current" />
         </button>
         <ControlTip label={t('player.previous')} />
       </div>
 
       <div className="relative group/play">
-        <button onClick={handlePlayPause} className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors">
-          {isPlaying ? <Pause size={14} className="fill-white text-white" /> : <Play size={14} className="fill-white text-white ml-0.5" />}
+        <button
+          onClick={handlePlayPause}
+          className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
+        >
+          {isPlaying ? (
+            <Pause size={14} className="fill-white text-white" />
+          ) : (
+            <Play size={14} className="fill-white text-white ml-0.5" />
+          )}
         </button>
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
           {t('login.hint')}
@@ -116,14 +143,23 @@ export function PlaybackControls() {
       </div>
 
       <div className="relative group hidden min-[400px]:block">
-        <button onClick={handleNext} className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors">
+        <button
+          onClick={handleNext}
+          className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
+        >
           <SkipForward size={18} className="fill-current" />
         </button>
         <ControlTip label={t('player.next')} />
       </div>
 
       <div className="relative group hidden sm:block">
-        <button onClick={cycleRepeat} className={cn('p-1.5 rounded-lg transition-colors', repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60')}>
+        <button
+          onClick={cycleRepeat}
+          className={cn(
+            'p-1.5 rounded-lg transition-colors',
+            repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60'
+          )}
+        >
           {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
         </button>
         <ControlTip label={t('player.repeat')} />
@@ -132,7 +168,8 @@ export function PlaybackControls() {
       <div className="relative group hidden sm:block">
         <button
           onClick={() => {
-            if (!isPlayerPage) navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+            if (!isPlayerPage)
+              navigate('/player?tab=lyrics', { state: { from: location.pathname } })
             else if (activeTab === 'lyrics') navigate('/player?tab=info', { replace: true })
             else navigate(location.state?.from ?? '/')
           }}
@@ -140,7 +177,9 @@ export function PlaybackControls() {
         >
           <ListMusic size={15} />
         </button>
-        <ControlTip label={isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')} />
+        <ControlTip
+          label={isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')}
+        />
       </div>
     </div>
   )

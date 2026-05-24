@@ -85,7 +85,7 @@ export function CollectionHeader({
           alt={name}
           className="absolute left-0 right-0 top-[-300px] sepia-[.25] h-[600px] scale-2 opacity-10 w-full blur-3xl z-0"
           draggable={false}
-          animate={{ opacity: 0.10 }}
+          animate={{ opacity: 0.1 }}
           initial={{ opacity: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
         />

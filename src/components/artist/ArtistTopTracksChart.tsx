@@ -55,7 +55,11 @@ function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
   const e = payload[0].payload as ChartEntry
   return (
     <div className="flex items-start gap-3 bg-white/96 backdrop-blur-sm border border-black/[0.07] rounded-2xl p-3 shadow-xl max-w-[260px] pointer-events-none">
-      <img src={e.albumArt} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm" />
+      <img
+        src={e.albumArt}
+        alt=""
+        className="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm"
+      />
       <div className="min-w-0 flex-1">
         <p className="text-[12px] font-bold text-black leading-snug line-clamp-2">{e.name}</p>
         <p className="text-[10px] text-black/50 mt-0.5 truncate">{e.artists}</p>
@@ -150,10 +154,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   }, [tracks])
 
   const avgStreams = useMemo(
-    () =>
-      Math.round(
-        chartData.reduce((s, e) => s + e.streams, 0) / Math.max(chartData.length, 1)
-      ),
+    () => Math.round(chartData.reduce((s, e) => s + e.streams, 0) / Math.max(chartData.length, 1)),
     [chartData]
   )
 
@@ -186,10 +187,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
             tickLine={false}
           />
 
-          <Tooltip
-            content={<CustomTooltip />}
-            cursor={{ fill: 'rgba(0,0,0,0.025)', rx: 6 }}
-          />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.025)', rx: 6 }} />
 
           <ReferenceLine
             x={avgStreams}

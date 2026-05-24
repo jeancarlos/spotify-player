@@ -27,7 +27,10 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
   useEffect(() => () => clearTimeout(blurTimerRef.current), [])
 
   const debouncedQuery = useDebounce(query, 300)
-  const { data: results = [], isPending } = useSearchTracks(debouncedQuery, debouncedQuery.length >= 2)
+  const { data: results = [], isPending } = useSearchTracks(
+    debouncedQuery,
+    debouncedQuery.length >= 2
+  )
 
   const handleSelect = (track: SpotifyTrack) => {
     clearTimeout(blurTimerRef.current)

@@ -6,12 +6,18 @@ interface ArcTextOverlayProps {
   diskPx: number
   isPlaying?: boolean
   // ─── EDITAR AQUI: geometria do arco ───────────────────────────────────────
-  k?: number       // fração do raio do disco (0.0 – 1.0). Padrão: 0.88
-  arcDeg?: number  // graus abrangidos pelo arco. Padrão: 200
+  k?: number // fração do raio do disco (0.0 – 1.0). Padrão: 0.88
+  arcDeg?: number // graus abrangidos pelo arco. Padrão: 200
   // ──────────────────────────────────────────────────────────────────────────
 }
 
-export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.93, arcDeg = 200 }: ArcTextOverlayProps) {
+export function ArcTextOverlay({
+  label,
+  diskPx,
+  isPlaying = false,
+  k = 0.93,
+  arcDeg = 200,
+}: ArcTextOverlayProps) {
   const uid = useId()
 
   const cx = diskPx / 2
@@ -58,10 +64,7 @@ export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.93, arc
           fontFamily="inter"
           fill="rgba(0,0,0,0.75)"
         >
-          <textPath
-            href={`#arc-fav-${uid}`}
-            textAnchor="middle"
-          >
+          <textPath href={`#arc-fav-${uid}`} textAnchor="middle">
             {label}
           </textPath>
         </text>

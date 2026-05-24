@@ -51,10 +51,10 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 
       {currentTrack && (
-        <ProgressBar 
-          progress={currentProgress} 
-          duration={currentTrack.duration_ms} 
-          onChange={handleSeek} 
+        <ProgressBar
+          progress={currentProgress}
+          duration={currentTrack.duration_ms}
+          onChange={handleSeek}
         />
       )}
 

@@ -11,7 +11,16 @@ const track: SpotifyTrack = {
   duration_ms: 212000,
   explicit: false,
   popularity: 80,
-  artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', href: '', type: 'artist', external_urls: { spotify: '' } }],
+  artists: [
+    {
+      id: 'a1',
+      name: 'Test Artist',
+      uri: 'spotify:artist:a1',
+      href: '',
+      type: 'artist',
+      external_urls: { spotify: '' },
+    },
+  ],
   album: {
     id: 'al1',
     name: 'Test Album',

@@ -54,10 +54,10 @@ export function TrackInfo({ progress }: TrackInfoProps) {
           className="w-12 h-12 rounded-full"
           onClick={handleTrackClick}
           onKeyDown={handleEnterTrack}
-
         />
         <div className="min-w-0 flex flex-col justify-center">
-          <button onClick={handleTrackClick}
+          <button
+            onClick={handleTrackClick}
             onKeyDown={handleEnterTrack}
             className="text-xs text-left font-bold text-black truncate hover:underline cursor-pointer"
             aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
@@ -72,12 +72,15 @@ export function TrackInfo({ progress }: TrackInfoProps) {
                   className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none focus:text-black focus:underline"
                   onClick={() => navigate(`/artists/${a.id}`)}
                 >
-                  {a.name}{i < currentTrack.artists.length - 1 ? ', ' : ''}
+                  {a.name}
+                  {i < currentTrack.artists.length - 1 ? ', ' : ''}
                 </button>
               ))}
             </div>
             <button
-              onClick={() => navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })}
+              onClick={() =>
+                navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+              }
               className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
             >
               {currentTrack.album.name}
@@ -85,7 +88,6 @@ export function TrackInfo({ progress }: TrackInfoProps) {
           </div>
         </div>
       </div>
-
 
       <div className="flex flex-col gap-0.5 ml-auto pr-2" aria-hidden="true">
         <span className="text-[10px] font-mono shrink-0 tabular-nums">

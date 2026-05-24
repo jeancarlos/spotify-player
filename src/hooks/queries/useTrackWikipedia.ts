@@ -31,7 +31,11 @@ async function fetchWikipediaSummary(title: string, lang: string): Promise<WikiR
   }
 }
 
-async function searchAndFetch(trackName: string, artistName: string, lang: string): Promise<WikiResult | null> {
+async function searchAndFetch(
+  trackName: string,
+  artistName: string,
+  lang: string
+): Promise<WikiResult | null> {
   const query = `${trackName} ${artistName} song`
   const searchRes = await fetch(
     `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=3&format=json&origin=*`
@@ -65,4 +69,3 @@ export function useTrackWikipedia(trackName: string | undefined, artistName: str
     },
   })
 }
-

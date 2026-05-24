@@ -42,7 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const raw = localStorage.getItem('user_profile')
         return raw ? JSON.parse(raw) : null
-      } catch { return null }
+      } catch {
+        return null
+      }
     })()
     return {
       accessToken,
@@ -59,7 +61,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     api
       .get<SpotifyUser>('/me')
       .then((res) => {
-        try { localStorage.setItem('user_profile', JSON.stringify(res.data)) } catch { /* quota */ }
+        try {
+          localStorage.setItem('user_profile', JSON.stringify(res.data))
+        } catch {
+          /* quota */
+        }
         dispatch({ type: 'SET_PROFILE', payload: res.data })
       })
       .catch((err) => {
@@ -94,10 +100,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     const authUrl = `https://accounts.spotify.com/authorize?${params}`
-    const w = 500, h = 700
+    const w = 500,
+      h = 700
     const left = Math.round(screen.width / 2 - w / 2)
     const top = Math.round(screen.height / 2 - h / 2)
-    const popup = window.open(authUrl, 'spotify_login', `width=${w},height=${h},left=${left},top=${top}`)
+    const popup = window.open(
+      authUrl,
+      'spotify_login',
+      `width=${w},height=${h},left=${left},top=${top}`
+    )
 
     if (!popup) {
       window.location.href = authUrl
@@ -117,7 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (event.data.type !== 'SPOTIFY_AUTH_TOKENS') return
       const { accessToken, refreshToken } = event.data as {
-        type: string; accessToken: string; refreshToken: string
+        type: string
+        accessToken: string
+        refreshToken: string
       }
       if (!accessToken || !refreshToken) return
 
@@ -148,35 +161,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const decoded = JSON.parse(atob(receivedState)) as { n?: string; o?: string }
       if (decoded.n && decoded.o) {
         nonce = decoded.n
-        openerOrigin = ALLOWED_OPENER_ORIGINS.has(decoded.o)
-          ? decoded.o
-          : window.location.origin
+        openerOrigin = ALLOWED_OPENER_ORIGINS.has(decoded.o) ? decoded.o : window.location.origin
       }
-    } catch { /* plain state — same-tab flow */ }
+    } catch {
+      /* plain state — same-tab flow */
+    }
 
     let savedNonce = localStorage.getItem('pkce_state')
     let verifier = localStorage.getItem('pkce_verifier')
 
     if (window.opener && (!savedNonce || !verifier)) {
-      const pkce = await new Promise<{ nonce: string | null; verifier: string | null }>((resolve) => {
-        // FIX (LOW): removeEventListener também no path de timeout
-        const timer = setTimeout(() => {
-          window.removeEventListener('message', handler)
-          resolve({ nonce: null, verifier: null })
-        }, 3000)
+      const pkce = await new Promise<{ nonce: string | null; verifier: string | null }>(
+        (resolve) => {
+          // FIX (LOW): removeEventListener também no path de timeout
+          const timer = setTimeout(() => {
+            window.removeEventListener('message', handler)
+            resolve({ nonce: null, verifier: null })
+          }, 3000)
 
-        const handler = (ev: MessageEvent) => {
-          if (ev.data?.type !== 'PKCE_DATA') return
-          clearTimeout(timer)
-          window.removeEventListener('message', handler)
-          resolve({
-            nonce: ev.data.nonce as string | null,
-            verifier: ev.data.verifier as string | null,
-          })
+          const handler = (ev: MessageEvent) => {
+            if (ev.data?.type !== 'PKCE_DATA') return
+            clearTimeout(timer)
+            window.removeEventListener('message', handler)
+            resolve({
+              nonce: ev.data.nonce as string | null,
+              verifier: ev.data.verifier as string | null,
+            })
+          }
+          window.addEventListener('message', handler)
+          ;(window.opener as Window).postMessage({ type: 'REQUEST_PKCE_DATA' }, openerOrigin)
         }
-        window.addEventListener('message', handler)
-        ;(window.opener as Window).postMessage({ type: 'REQUEST_PKCE_DATA' }, openerOrigin)
-      })
+      )
       savedNonce = pkce.nonce
       verifier = pkce.verifier
     }
@@ -210,7 +225,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (window.opener) {
       window.opener.postMessage(
-        { type: 'SPOTIFY_AUTH_TOKENS', accessToken: data.access_token, refreshToken: data.refresh_token },
+        {
+          type: 'SPOTIFY_AUTH_TOKENS',
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+        },
         openerOrigin
       )
       window.close()

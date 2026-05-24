@@ -1,6 +1,11 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
 import api from '@/lib/axios'
-import type { SpotifyTrack, SpotifyAlbumSimple, SpotifyAlbumTrack, PagingObject } from '@/types/spotify'
+import type {
+  SpotifyTrack,
+  SpotifyAlbumSimple,
+  SpotifyAlbumTrack,
+  PagingObject,
+} from '@/types/spotify'
 
 function seededFraction(seed: string): number {
   let h = 0

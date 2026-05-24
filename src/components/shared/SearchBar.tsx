@@ -25,7 +25,9 @@ export function SearchBar({
   const debouncedQuery = useDebounce(query, 400)
   const mounted = useRef(false)
   const onSearchRef = useRef(onSearch)
-  useEffect(() => { onSearchRef.current = onSearch }, [onSearch])
+  useEffect(() => {
+    onSearchRef.current = onSearch
+  }, [onSearch])
 
   useEffect(() => {
     if (!mounted.current) {
@@ -43,7 +45,12 @@ export function SearchBar({
   ]
 
   return (
-    <div className={cn('glass flex items-center gap-2 px-4 py-2.5 rounded-full max-w-lg w-full', className)}>
+    <div
+      className={cn(
+        'glass flex items-center gap-2 px-4 py-2.5 rounded-full max-w-lg w-full',
+        className
+      )}
+    >
       <Search size={15} className="text-black/40 shrink-0" />
       <label htmlFor="global-search" className="sr-only">
         {t('artists.searchPlaceholder')}
@@ -64,7 +71,9 @@ export function SearchBar({
             aria-selected={tab === key}
             className={cn(
               'text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
-              tab === key ? 'bg-black text-white' : 'text-black/40 hover:text-black hover:bg-black/5'
+              tab === key
+                ? 'bg-black text-white'
+                : 'text-black/40 hover:text-black hover:bg-black/5'
             )}
           >
             {label}

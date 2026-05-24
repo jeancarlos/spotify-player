@@ -58,8 +58,10 @@ export function ArtistDetail() {
           {discographyTracks.data.length > 0 && (
             <section className="mb-8">
               <div className="flex items-center justify-between px-2 mb-3">
-                <h3 className="text-sm font-bold text-black/50">{t('artistDetail.topTracksRanked')}</h3>
-                </div>
+                <h3 className="text-sm font-bold text-black/50">
+                  {t('artistDetail.topTracksRanked')}
+                </h3>
+              </div>
               <ArtistTopTracksChart
                 tracks={discographyTracks.data}
                 activeTrackId={state.currentTrack?.id}

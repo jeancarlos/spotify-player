@@ -48,10 +48,14 @@ const mockTrack = (id: string): SpotifyTrack =>
     type: 'track',
     artists: [{ id: 'a1', name: 'Artista', uri: 'spotify:artist:a1', type: 'artist' }],
     album: {
-      id: 'alb1', name: 'Álbum',
+      id: 'alb1',
+      name: 'Álbum',
       images: [{ url: 'https://img.example.com/1.jpg', width: 300, height: 300 }],
-      release_date: '2024-01-01', album_type: 'album', artists: [],
-      uri: 'spotify:album:alb1', type: 'album',
+      release_date: '2024-01-01',
+      album_type: 'album',
+      artists: [],
+      uri: 'spotify:album:alb1',
+      type: 'album',
     },
   }) as SpotifyTrack
 
@@ -77,7 +81,9 @@ describe('useSpoterPlaylist', () => {
 
   it('addTrack persiste no localStorage', () => {
     const { result } = renderHook(() => useSpoterPlaylist())
-    act(() => { result.current.addTrack(mockTrack('t2')) })
+    act(() => {
+      result.current.addTrack(mockTrack('t2'))
+    })
     expect(result.current.tracks).toHaveLength(1)
     expect(result.current.tracks[0].id).toBe('t2')
   })
@@ -93,17 +99,27 @@ describe('useSpoterPlaylist', () => {
 
   it('removeTrack remove a track', () => {
     const { result } = renderHook(() => useSpoterPlaylist())
-    act(() => { result.current.addTrack(mockTrack('t4')) })
-    act(() => { result.current.removeTrack('spotify:track:t4') })
+    act(() => {
+      result.current.addTrack(mockTrack('t4'))
+    })
+    act(() => {
+      result.current.removeTrack('spotify:track:t4')
+    })
     expect(result.current.tracks).toHaveLength(0)
   })
 
   it('updateNote salva e remove nota', () => {
     const { result } = renderHook(() => useSpoterPlaylist())
-    act(() => { result.current.addTrack(mockTrack('t5')) })
-    act(() => { result.current.updateNote('spotify:track:t5', 'ouço no gym') })
+    act(() => {
+      result.current.addTrack(mockTrack('t5'))
+    })
+    act(() => {
+      result.current.updateNote('spotify:track:t5', 'ouço no gym')
+    })
     expect(result.current.notes['spotify:track:t5']).toBe('ouço no gym')
-    act(() => { result.current.updateNote('spotify:track:t5', '') })
+    act(() => {
+      result.current.updateNote('spotify:track:t5', '')
+    })
     expect(result.current.notes['spotify:track:t5']).toBeUndefined()
   })
 })

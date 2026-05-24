@@ -46,8 +46,7 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
   // eslint-disable-next-line react-hooks/incompatible-library
   const watchedTrack = watch('track')
   const watchedNote = watch('note') ?? ''
-  const isAlreadyFavorite =
-    !!watchedTrack && tracks.some((tr) => tr.uri === watchedTrack.uri)
+  const isAlreadyFavorite = !!watchedTrack && tracks.some((tr) => tr.uri === watchedTrack.uri)
   const noteLength = watchedNote.length
 
   const onSubmit = handleSubmit(({ track, note }) => {
@@ -65,7 +64,9 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
       <div className="flex flex-col gap-1">
         <label className="text-xs font-medium text-black/60">
           {t('favorites.trackLabel')}{' '}
-          <span aria-hidden className="text-black/30">*</span>
+          <span aria-hidden className="text-black/30">
+            *
+          </span>
         </label>
         <Controller
           name="track"
@@ -87,9 +88,7 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-black/60">
-          {t('favorites.noteLabel')}
-        </label>
+        <label className="text-xs font-medium text-black/60">{t('favorites.noteLabel')}</label>
         <textarea
           {...register('note')}
           placeholder={t('favorites.notePlaceholder')}
@@ -98,11 +97,7 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
           className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors resize-none"
         />
         <div className="flex items-center justify-between">
-          {errors.note ? (
-            <p className="text-xs text-red-500">{errors.note.message}</p>
-          ) : (
-            <span />
-          )}
+          {errors.note ? <p className="text-xs text-red-500">{errors.note.message}</p> : <span />}
           <span
             className={cn(
               'text-[11px] tabular-nums',

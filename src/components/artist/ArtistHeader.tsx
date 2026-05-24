@@ -75,7 +75,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
           alt={name}
           className="absolute left-0 right-0 top-[-100px] h-[500px]  sepia-[.25] scale-125 opacity-10 w-full blur-3xl z-0"
           draggable={false}
-          animate={{ opacity: 0.10 }}
+          animate={{ opacity: 0.1 }}
           initial={{ opacity: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
         />
@@ -94,9 +94,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
         >
           {name}
         </h1>
-        {subtitle && (
-          <p className="text-sm text-black/50 mt-1 text-center px-8">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-sm text-black/50 mt-1 text-center px-8">{subtitle}</p>}
       </motion.div>
     </motion.div>
   )

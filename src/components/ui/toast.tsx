@@ -38,10 +38,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const toast = useCallback((message: string, variant: ToastVariant = 'info') => {
     const id = `${Date.now()}-${Math.random()}`
     dispatch({ type: 'ADD', payload: { id, message, variant } })
-    timers.current.set(id, setTimeout(() => {
-      timers.current.delete(id)
-      dispatch({ type: 'REMOVE', payload: id })
-    }, 4500))
+    timers.current.set(
+      id,
+      setTimeout(() => {
+        timers.current.delete(id)
+        dispatch({ type: 'REMOVE', payload: id })
+      }, 4500)
+    )
   }, [])
 
   const dismiss = useCallback((id: string) => {

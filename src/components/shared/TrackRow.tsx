@@ -51,20 +51,28 @@ export function TrackRow({
       <button
         className="w-6 shrink-0 flex items-center justify-center focus:outline-none"
         aria-label={t('player.playTrack', { name: track.name })}
-        onClick={(e) => { e.stopPropagation(); onPlay?.(track) }}
+        onClick={(e) => {
+          e.stopPropagation()
+          onPlay?.(track)
+        }}
       >
         {index !== undefined ? (
           <>
-            <span className={cn(
-              'text-xs font-bold tabular-nums group-hover:hidden',
-              dark ? 'text-white/30' : 'text-black/30'
-            )}>
+            <span
+              className={cn(
+                'text-xs font-bold tabular-nums group-hover:hidden',
+                dark ? 'text-white/30' : 'text-black/30'
+              )}
+            >
               {String(index + 1).padStart(2, '0')}
             </span>
-            <Play size={12} className={cn(
-              'hidden group-hover:block',
-              dark ? 'fill-white text-white' : 'fill-black text-black'
-            )} />
+            <Play
+              size={12}
+              className={cn(
+                'hidden group-hover:block',
+                dark ? 'fill-white text-white' : 'fill-black text-black'
+              )}
+            />
           </>
         ) : (
           <Play size={12} className={dark ? 'fill-white text-white' : 'fill-black text-black'} />
@@ -73,21 +81,23 @@ export function TrackRow({
 
       {/* Album cover */}
       {albumImage && (
-        <img
-          src={albumImage}
-          alt=""
-          className="w-9 h-9 rounded-lg object-cover shrink-0"
-        />
+        <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
       )}
 
       {/* Name + artist — note tooltip anchored here */}
       <div className="flex-1 min-w-0 relative">
-        <p className={cn(
-          'text-sm font-medium truncate',
-          dark
-            ? isActive ? 'text-white' : 'text-white/80'
-            : isActive ? 'text-black' : 'text-black/80'
-        )}>
+        <p
+          className={cn(
+            'text-sm font-medium truncate',
+            dark
+              ? isActive
+                ? 'text-white'
+                : 'text-white/80'
+              : isActive
+                ? 'text-black'
+                : 'text-black/80'
+          )}
+        >
           {track.name}
         </p>
         <p className={cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40')}>
@@ -101,17 +111,19 @@ export function TrackRow({
       </div>
 
       {/* Duration */}
-      <span className={cn(
-        'text-xs tabular-nums shrink-0',
-        dark ? 'text-white/20' : 'text-black/30'
-      )}>
+      <span
+        className={cn('text-xs tabular-nums shrink-0', dark ? 'text-white/20' : 'text-black/30')}
+      >
         {formatDuration(track.duration_ms)}
       </span>
 
       {/* Remove button */}
       {onRemove && (
         <button
-          onClick={(e) => { e.stopPropagation(); onRemove(track.uri) }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onRemove(track.uri)
+          }}
           aria-label={t('favorites.removeConfirm')}
           className={cn(
             'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 focus:outline-none focus:opacity-100',

@@ -4,7 +4,7 @@ export interface FavCookieEntry {
 }
 
 // ─── EDITAR AQUI: limites do cookie ──────────────────────────────────────────
-const NOTE_TRUNCATE = 80       // chars máximos da nota no cookie
+const NOTE_TRUNCATE = 80 // chars máximos da nota no cookie
 const COOKIE_BYTE_LIMIT = 3500 // bytes antes de omitir notas
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -12,9 +12,7 @@ const cookieKey = (userId: string) => `spoter_fav_v1_${userId}`
 
 export function readFavCookie(userId: string): FavCookieEntry[] {
   const key = cookieKey(userId)
-  const pair = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith(`${key}=`))
+  const pair = document.cookie.split('; ').find((row) => row.startsWith(`${key}=`))
   if (!pair) return []
   try {
     return JSON.parse(decodeURIComponent(pair.slice(key.length + 1))) as FavCookieEntry[]

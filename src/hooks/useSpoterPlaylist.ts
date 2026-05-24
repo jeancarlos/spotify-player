@@ -8,7 +8,12 @@ import { useUpdatePlaylist } from '@/hooks/mutations/useUpdatePlaylist'
 import { useAddToPlaylist } from '@/hooks/mutations/useAddToPlaylist'
 import { useRemoveFromPlaylist } from '@/hooks/mutations/useRemoveFromPlaylist'
 import { useUploadPlaylistCover } from '@/hooks/mutations/useUploadPlaylistCover'
-import { readLocalTracks, writeLocalTracks, readLocalNotes, writeLocalNotes } from '@/utils/favStorage'
+import {
+  readLocalTracks,
+  writeLocalTracks,
+  readLocalNotes,
+  writeLocalNotes,
+} from '@/utils/favStorage'
 import { readFavCookie, writeFavCookie } from '@/utils/favCookie'
 import { hydrateFromApi } from '@/utils/favHydration'
 import spoterListCover from '@/assets/spoterListCover'
@@ -48,8 +53,12 @@ export function useSpoterPlaylist() {
 
   const tracksRef = useRef(localTracks)
   const notesRef = useRef(localNotes)
-  useEffect(() => { tracksRef.current = localTracks }, [localTracks])
-  useEffect(() => { notesRef.current = localNotes }, [localNotes])
+  useEffect(() => {
+    tracksRef.current = localTracks
+  }, [localTracks])
+  useEffect(() => {
+    notesRef.current = localNotes
+  }, [localNotes])
 
   const prevUserId = useRef('')
   useEffect(() => {
@@ -130,7 +139,9 @@ export function useSpoterPlaylist() {
             { onSuccess: () => localStorage.setItem(coverKey(userId), '1') }
           )
         },
-        onError: () => { createAttempted.current = false },
+        onError: () => {
+          createAttempted.current = false
+        },
       }
     )
   }, [playlists.isSuccess, playlistId, userId, playlistName, createPlaylist, uploadCover])
@@ -158,11 +169,22 @@ export function useSpoterPlaylist() {
         { playlistId, base64Jpeg: spoterListCover },
         {
           onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
-          onError: () => { coverUploaded.current = false },
+          onError: () => {
+            coverUploaded.current = false
+          },
         }
       )
     }
-  }, [playlists.isSuccess, playlistId, userId, displayName, playlistName, playlists.data, updatePlaylist, uploadCover])
+  }, [
+    playlists.isSuccess,
+    playlistId,
+    userId,
+    displayName,
+    playlistName,
+    playlists.data,
+    updatePlaylist,
+    uploadCover,
+  ])
 
   useEffect(() => {
     if (!userId || hydrationAttempted.current) return
@@ -181,10 +203,7 @@ export function useSpoterPlaylist() {
     hydrateFromApi(missingUris).then((fetched) => {
       if (fetched.length > 0) {
         setLocalTracks((prev) => {
-          const merged = [
-            ...prev,
-            ...fetched.filter((ft) => !prev.some((p) => p.uri === ft.uri)),
-          ]
+          const merged = [...prev, ...fetched.filter((ft) => !prev.some((p) => p.uri === ft.uri))]
           writeLocalTracks(userId, merged)
           return merged
         })

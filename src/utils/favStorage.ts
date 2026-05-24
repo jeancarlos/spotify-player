@@ -16,7 +16,9 @@ export function writeLocalTracks(userId: string, tracks: SpotifyTrack[]): void {
   try {
     localStorage.setItem(tracksKey(userId), JSON.stringify(tracks))
     window.dispatchEvent(new CustomEvent('spoter:favorites-changed', { detail: { userId } }))
-  } catch { /* quota exceeded */ }
+  } catch {
+    /* quota exceeded */
+  }
 }
 
 export function readLocalNotes(userId: string): Record<string, string> {
@@ -31,5 +33,7 @@ export function readLocalNotes(userId: string): Record<string, string> {
 export function writeLocalNotes(userId: string, notes: Record<string, string>): void {
   try {
     localStorage.setItem(notesKey(userId), JSON.stringify(notes))
-  } catch { /* quota exceeded */ }
+  } catch {
+    /* quota exceeded */
+  }
 }

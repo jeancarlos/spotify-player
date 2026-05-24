@@ -84,9 +84,7 @@ export function Artists() {
           </p>
         )}
 
-        {!query && (
-          <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>
-        )}
+        {!query && <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>}
 
         <AnimatePresence mode="wait">
           {isLoading ? (

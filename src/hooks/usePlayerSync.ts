@@ -16,14 +16,16 @@ export function usePlayerSync() {
   const { state: authState } = useAuth()
   const { state, dispatch } = usePlayer()
   const queryClient = useQueryClient()
-  
+
   const { data } = useNowPlaying(authState.isAuthenticated)
   const { data: queueData } = useQueue(authState.isAuthenticated)
-  
+
   const lastTrackIdRef = useRef<string | null>(null)
 
   const stateRef = useRef(state)
-  useEffect(() => { stateRef.current = state })
+  useEffect(() => {
+    stateRef.current = state
+  })
 
   useEffect(() => {
     const s = stateRef.current
@@ -39,14 +41,11 @@ export function usePlayerSync() {
 
     if (remote && remote.id !== localId) {
       dispatch({ type: 'SET_TRACK', payload: remote })
-      queryClient.setQueriesData<RecentlyPlayedItem[]>(
-        { queryKey: ['recently-played'] },
-        (old) => {
-          if (!old) return old
-          const entry: RecentlyPlayedItem = { track: remote, played_at: new Date().toISOString() }
-          return [entry, ...old.filter((i) => i.track.id !== remote.id)].slice(0, old.length)
-        }
-      )
+      queryClient.setQueriesData<RecentlyPlayedItem[]>({ queryKey: ['recently-played'] }, (old) => {
+        if (!old) return old
+        const entry: RecentlyPlayedItem = { track: remote, played_at: new Date().toISOString() }
+        return [entry, ...old.filter((i) => i.track.id !== remote.id)].slice(0, old.length)
+      })
     }
 
     if (data.is_playing !== s.isPlaying) {
