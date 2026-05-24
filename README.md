@@ -69,24 +69,28 @@ graph TD
     Start((Início)) --> Login[Página de Login]
     Login --> i18n{Troca de Idioma PT/EN}
     Login --> Auth[Autenticação Mock]
-    Auth --> Search[Pesquisa de Artistas e Álbuns]
-    Search --> Pagination[Navegação por Páginas]
-    Search --> Tabs[Filtros por Categoria]
-    Search --> Detail[Detalhes do Artista]
-    Detail --> Content(Top Tracks, Bio, Discos)
-    Detail --> Chart(Gráficos de Popularidade)
+    Auth --> SearchBar[Campo de Busca]
+    SearchBar --> Spinner(Debounce / Spinner)
+    SearchBar --> Tabs[Filtros: Artista · Álbum · Playlist]
+    Tabs --> Results[Resultados em Grid]
+    Results --> Pagination[Paginação Next/Prev]
+    Results --> ArtistDetail[Detalhes do Artista]
+    Results --> AlbumDetail[Detalhes do Álbum]
+    ArtistDetail --> Content(Top Tracks, Bio, Discos)
+    ArtistDetail --> Chart(Gráficos de Popularidade)
     Auth --> Favs[Gerenciamento de Favoritos]
     Favs --> Form(Formulário com Validação)
     Form --> Storage(Persistência LocalStorage)
 ```
 
-| Módulo | Funcionalidades Testadas |
+| Arquivo | Funcionalidades Testadas |
 | :--- | :--- |
-| **Smoke** | Carregamento inicial, título da página e visibilidade do login. |
-| **i18n** | Tradução dinâmica (PT/EN) e persistência do idioma entre rotas. |
-| **Pesquisa** | Busca por artistas/álbuns, paginação (Next/Prev) e alternância de abas. |
-| **Detalhes** | Exibição de bio, tabela de faixas mais ouvidas e integração com Recharts (SVG). |
-| **Favoritos** | Fluxo completo de CRUD (LocalStorage), busca de faixas e validação de formulário. |
+| `smoke.spec.ts` | Carregamento inicial, título da página e visibilidade do login. |
+| `i18n.spec.ts` | Tradução dinâmica (PT/EN) e persistência do idioma entre rotas. |
+| `artists.spec.ts` | Renderização de cards, paginação básica e alternância de abas. |
+| `search.spec.ts` | SearchBar (spinner/debounce), busca por artista/álbum/playlist, paginação completa (next/prev/URL direta), card de próxima página na grid, estado sem resultados e navegação para detalhe. |
+| `artist-detail.spec.ts` | Exibição de bio, tabela de faixas mais ouvidas e integração com Recharts (SVG). |
+| `favorites.spec.ts` | Fluxo completo de CRUD (LocalStorage), busca de faixas e validação de formulário. |
 
 ### Executando os Testes E2E
 

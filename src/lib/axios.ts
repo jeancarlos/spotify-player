@@ -24,43 +24,52 @@ api.interceptors.request.use(async (config) => {
   return config
 })
 
+async function handleRateLimit(error: AxiosError, originalRequest: RetryableConfig) {
+  const retryAfter = Number(error.response?.headers['retry-after'] ?? 10)
+  backoffUntil = Date.now() + retryAfter * 1000
+  await new Promise((r) => setTimeout(r, retryAfter * 1000))
+  return api(originalRequest)
+}
+
+async function handleUnauthorized(originalRequest: RetryableConfig) {
+  originalRequest._retry = true
+  try {
+    if (!isRefreshing) {
+      isRefreshing = true
+      refreshPromise = refreshToken().finally(() => {
+        isRefreshing = false
+        refreshPromise = null
+      })
+    }
+    const newToken = await refreshPromise
+    if (newToken) {
+      originalRequest.headers.Authorization = `Bearer ${newToken}`
+      return await api(originalRequest)
+    }
+  } catch (refreshError) {
+    sessionStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    window.location.href = '/login'
+    return Promise.reject(
+      refreshError instanceof Error ? refreshError : new Error('Refresh failed')
+    )
+  }
+  return Promise.reject(new Error('Unauthorized handling failed'))
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryableConfig | undefined
+    
     if (error.response?.status === 429 && originalRequest) {
-      const retryAfter = Number(error.response.headers['retry-after'] ?? 10)
-      backoffUntil = Date.now() + retryAfter * 1000
-      await new Promise((r) => setTimeout(r, retryAfter * 1000))
-      return api(originalRequest)
+      return handleRateLimit(error, originalRequest)
     }
 
     if (originalRequest && error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-
-      try {
-        if (!isRefreshing) {
-          isRefreshing = true
-          refreshPromise = refreshToken().finally(() => {
-            isRefreshing = false
-            refreshPromise = null
-          })
-        }
-
-        const newToken = await refreshPromise
-        if (newToken) {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-          return await api(originalRequest)
-        }
-      } catch (refreshError) {
-        sessionStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        window.location.href = '/login'
-        return Promise.reject(
-          refreshError instanceof Error ? refreshError : new Error('Refresh failed')
-        )
-      }
+      return handleUnauthorized(originalRequest)
     }
+    
     return Promise.reject(error instanceof Error ? error : new Error('Request failed'))
   }
 )

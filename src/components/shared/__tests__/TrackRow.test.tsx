@@ -62,7 +62,7 @@ describe('TrackRow', () => {
     expect(screen.getByRole('button', { name: /favorites\.removeConfirm/i })).toBeInTheDocument()
   })
 
-  it('calls onRemove and not onPlay when trash clicked', async () => {
+  it('calls onRemove and not onPlay when trash clicked', () => {
     const onRemove = vi.fn()
     const onPlay = vi.fn()
     render(<TrackRow track={track} onPlay={onPlay} onRemove={onRemove} />)

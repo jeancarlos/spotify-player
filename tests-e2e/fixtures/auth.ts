@@ -1,5 +1,5 @@
 import { test as base, type Page } from '@playwright/test'
-import { mockUser, mockArtists, mockTracks, mockAlbums, mockPlaylists, pagingOf, mockArtist } from './mock-data'
+import { mockUser, mockArtists, mockTracks, mockAlbums, mockPlaylists, mockAlbum, pagingOf, mockArtist } from './mock-data'
 
 async function setupAuth(page: Page) {
   await page.addInitScript(() => {
@@ -119,6 +119,13 @@ async function setupApiRoutes(page: Page) {
     } else {
       await route.fallback()
     }
+  })
+  await page.route('**/api.spotify.com/v1/albums/*/tracks**', (route) =>
+    route.fulfill({ json: pagingOf(mockTracks) })
+  )
+  await page.route('**/api.spotify.com/v1/albums/*', (route, request) => {
+    const id = new URL(request.url()).pathname.split('/').pop() ?? 'album-1'
+    return route.fulfill({ json: { ...mockAlbum, id, name: `Album ${id.replace('album-', '')}` } })
   })
   await page.route('**/api.spotify.com/v1/me/player**', (route) =>
     route.fulfill({

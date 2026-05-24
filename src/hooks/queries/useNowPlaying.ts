@@ -16,7 +16,7 @@ export function useNowPlaying(enabled = true) {
     queryKey: ['now-playing'],
     enabled,
     refetchInterval: (query) => {
-      const data = query.state.data as NowPlayingResponse | null | undefined
+      const data = query.state.data
       return data?.is_playing === false ? 30_000 : 10_000
     },
     refetchIntervalInBackground: false,
