@@ -8,7 +8,7 @@ import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscography
 import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { CollectionHeader } from '@/components/shared/CollectionHeader'
+import { ArtistHeader } from '@/components/artist/ArtistHeader'
 import { ArtistBio } from '@/components/artist/ArtistBio'
 import { RelatedArtists } from '@/components/artist/RelatedArtists'
 import { ArtistDiscography } from '@/components/artist/ArtistDiscography'
@@ -47,14 +47,11 @@ export function ArtistDetail() {
 
   return (
     <div className="min-h-screen">
-      <CollectionHeader
+      <ArtistHeader
         imageUrl={artist.data?.images?.[0]?.url}
         name={artist.data?.name ?? ''}
         subtitle={artistSubtitle}
-        playLabel={t('player.play')}
-        onPlay={() => artist.data?.uri && playContext(artist.data.uri)}
         onLayout={handleLayout}
-        imageRound
       />
 
       <div style={{ paddingTop: headerHeight }} className="pb-32">
