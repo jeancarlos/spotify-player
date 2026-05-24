@@ -109,7 +109,11 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
           setIsOpen(true)
           setHighlightIndex(-1)
         }}
-        onBlur={onBlur}
+        onBlur={() => {
+          // Delay para permitir que click no item da lista dispare primeiro
+          setTimeout(() => setIsOpen(false), 150)
+          onBlur()
+        }}
         onKeyDown={handleKeyDown}
       />
 

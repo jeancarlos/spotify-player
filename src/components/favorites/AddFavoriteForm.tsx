@@ -99,7 +99,7 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
         <textarea
           {...register('note')}
           placeholder={t('favorites.notePlaceholder')}
-          maxLength={320}
+          maxLength={300}
           rows={2}
           className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors resize-none"
         />
