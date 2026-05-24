@@ -113,4 +113,17 @@ describe('useAlbumBackCover', () => {
     expect(result.current.backUrl).toBeNull()
     expect(fetch).not.toHaveBeenCalled()
   })
+
+  it('retorna null sem cachear quando fetch lança erro de rede', async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network Error'))
+
+    const { result } = renderHook(
+      () => useAlbumBackCover('alb-err', 'Album', 'Artista'),
+      { wrapper: createWrapper() }
+    )
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.backUrl).toBeNull()
+    expect(localStorage.getItem('caa:alb-err')).toBeNull()
+  })
 })

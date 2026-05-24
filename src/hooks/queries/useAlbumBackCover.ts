@@ -29,20 +29,28 @@ export function useAlbumBackCover(
       const cached = localStorage.getItem(cacheKey)
       if (cached !== null) return cached === 'null' ? null : cached
 
+      const escapeQuery = (s: string) => s.replace(/([+\-&|!(){}[\]^"~*?:\\])/g, '\\$1')
+
       try {
-        const query = `release:"${albumName}"+artistname:"${artistName}"`
+        const query = `release:"${escapeQuery(albumName)}"+artistname:"${escapeQuery(artistName)}"`
         const mbRes = await fetch(
           `https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(query)}&limit=1&fmt=json`,
           { headers: { 'User-Agent': 'SpotifyPlayer/1.0 (jeancosouza@gmail.com)' } },
         )
-        if (!mbRes.ok) { localStorage.setItem(cacheKey, 'null'); return null }
+        if (!mbRes.ok) {
+          if (mbRes.status === 404) { localStorage.setItem(cacheKey, 'null'); return null }
+          return null
+        }
 
         const mbData: MBSearchResult = await mbRes.json()
         const mbid = mbData.releases?.[0]?.id
         if (!mbid) { localStorage.setItem(cacheKey, 'null'); return null }
 
         const caaRes = await fetch(`https://coverartarchive.org/release/${mbid}`)
-        if (!caaRes.ok) { localStorage.setItem(cacheKey, 'null'); return null }
+        if (!caaRes.ok) {
+          if (caaRes.status === 404) { localStorage.setItem(cacheKey, 'null'); return null }
+          return null
+        }
 
         const caaData: CAAResponse = await caaRes.json()
         const back = caaData.images.find(img => img.types.includes('Back'))
@@ -51,7 +59,6 @@ export function useAlbumBackCover(
         localStorage.setItem(cacheKey, url ?? 'null')
         return url
       } catch {
-        localStorage.setItem(cacheKey, 'null')
         return null
       }
     },
