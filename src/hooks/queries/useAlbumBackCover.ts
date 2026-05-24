@@ -65,14 +65,13 @@ export function useAlbumBackCover(
     queryFn: async () => {
       const cacheKey = `caa:${albumId}`
       const cached = localStorage.getItem(cacheKey)
-      if (cached !== null) return cached === 'null' ? null : cached
+      if (cached) return cached
 
       try {
         const mbid = await fetchMbid(albumId!, albumName, artistName)
-        if (!mbid) { localStorage.setItem(cacheKey, 'null'); return null }
-
+        if (!mbid) return null
         const url = await fetchBackUrl(mbid)
-        localStorage.setItem(cacheKey, url ?? 'null')
+        if (url) localStorage.setItem(cacheKey, url)
         return url
       } catch {
         return null

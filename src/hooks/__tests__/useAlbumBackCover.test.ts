@@ -129,17 +129,19 @@ describe('useAlbumBackCover', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('usa cache null do localStorage e não refaz fetch', async () => {
-    localStorage.setItem('caa:alb-null', 'null')
+  it('não cacheia null — refaz fetch em nova sessão para álbuns sem back cover', async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: true, json: async () => MB_URL_HIT } as Response)
+      .mockResolvedValueOnce({ ok: true, json: async () => CAA_NO_BACK } as Response)
 
     const { result } = renderHook(
-      () => useAlbumBackCover('alb-null', 'Album', 'Artista'),
+      () => useAlbumBackCover('alb-no-back', 'Album', 'Artista'),
       { wrapper: createWrapper() }
     )
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.backUrl).toBeNull()
-    expect(fetch).not.toHaveBeenCalled()
+    expect(localStorage.getItem('caa:alb-no-back')).toBeNull()
   })
 
   it('retorna null sem cachear quando fetch lança erro de rede', async () => {
