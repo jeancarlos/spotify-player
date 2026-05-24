@@ -1,37 +1,21 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
-import type { AxiosError } from 'axios'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserPlaylists } from '@/hooks/queries/useUserPlaylists'
-import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
 import { useCreatePlaylist } from '@/hooks/mutations/useCreatePlaylist'
 import { useUpdatePlaylist } from '@/hooks/mutations/useUpdatePlaylist'
 import { useAddToPlaylist } from '@/hooks/mutations/useAddToPlaylist'
 import { useRemoveFromPlaylist } from '@/hooks/mutations/useRemoveFromPlaylist'
 import { useUploadPlaylistCover } from '@/hooks/mutations/useUploadPlaylistCover'
+import { readLocalTracks, writeLocalTracks, readLocalNotes, writeLocalNotes } from '@/utils/favStorage'
+import { readFavCookie, writeFavCookie } from '@/utils/favCookie'
+import { hydrateFromApi } from '@/utils/favHydration'
 import spoterListCover from '@/assets/spoterListCover'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const LEGACY_KEY = 'spoter_playlist_id'
-
 const storageKey = (userId: string) => `spoter_playlist_${userId}`
 const coverKey = (userId: string) => `spoter_cover_v2_${userId}`
-const localTracksKey = (userId: string) => `spoter_favorites_${userId}`
-
-function readLocalTracks(userId: string): SpotifyTrack[] {
-  try {
-    const raw = localStorage.getItem(localTracksKey(userId))
-    return raw ? (JSON.parse(raw) as SpotifyTrack[]) : []
-  } catch {
-    return []
-  }
-}
-
-function writeLocalTracks(userId: string, tracks: SpotifyTrack[]) {
-  try {
-    localStorage.setItem(localTracksKey(userId), JSON.stringify(tracks))
-  } catch { /* storage quota */ }
-}
 
 export function useSpoterPlaylist() {
   const { t } = useTranslation()
@@ -47,12 +31,26 @@ export function useSpoterPlaylist() {
     [displayName, t]
   )
 
-  const [forcedId, setForcedId] = useState<string | null>(null)
+  // ── Estado local (fonte de verdade para a lista) ──────────────────────────
   const [localTracks, setLocalTracks] = useState<SpotifyTrack[]>(() =>
     userId ? readLocalTracks(userId) : []
   )
+  const [localNotes, setLocalNotes] = useState<Record<string, string>>(() =>
+    userId ? readLocalNotes(userId) : {}
+  )
+  const [isHydrating, setIsHydrating] = useState(false)
+
+  // Refs para escritas síncronas sem depender de stale closures
+  const tracksRef = useRef(localTracks)
+  const notesRef = useRef(localNotes)
+  useEffect(() => { tracksRef.current = localTracks }, [localTracks])
+  useEffect(() => { notesRef.current = localNotes }, [localNotes])
+
+  // ── Gerenciamento da playlist Spotify ─────────────────────────────────────
+  const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
   const coverUploaded = useRef(false)
+  const hydrationAttempted = useRef(false)
 
   const playlists = useUserPlaylists(!!userId)
   const createPlaylist = useCreatePlaylist()
@@ -61,7 +59,7 @@ export function useSpoterPlaylist() {
   const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
 
-  // Migra chave antiga (shared) para chave por usuário
+  // Migra chave legada (compartilhada) para chave por usuário
   useEffect(() => {
     if (!userId) return
     const key = storageKey(userId)
@@ -77,29 +75,23 @@ export function useSpoterPlaylist() {
   const playlistId = useMemo(() => {
     if (forcedId !== null) return forcedId
     if (!userId) return ''
-
     const saved = localStorage.getItem(storageKey(userId))
     if (saved) return saved
-
     if (playlists.data) {
       const found = playlists.data.items.find((p) => p.name === playlistName)
       if (found) return found.id
     }
-
     return ''
   }, [forcedId, userId, playlists.data, playlistName])
 
-  // Persiste ID quando descoberto por nome
   useEffect(() => {
     if (!userId || !playlistId) return
     const key = storageKey(userId)
     if (!localStorage.getItem(key)) localStorage.setItem(key, playlistId)
   }, [userId, playlistId])
 
-  // Cria playlist se não existe
   useEffect(() => {
     if (!playlists.isSuccess || playlistId || !userId || createAttempted.current) return
-
     createAttempted.current = true
     createPlaylist.mutate(
       { userId, name: playlistName },
@@ -109,14 +101,10 @@ export function useSpoterPlaylist() {
           setForcedId(p.id)
           uploadCover.mutate(
             { playlistId: p.id, base64Jpeg: spoterListCover },
-            {
-              onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
-            }
+            { onSuccess: () => localStorage.setItem(coverKey(userId), '1') }
           )
         },
-        onError: () => {
-          createAttempted.current = false
-        },
+        onError: () => { createAttempted.current = false },
       }
     )
   }, [playlists.isSuccess, playlistId, userId, playlistName, createPlaylist, uploadCover])
@@ -128,82 +116,135 @@ export function useSpoterPlaylist() {
     setForcedId(null)
   }
 
-  // Sincroniza nome e capa de playlists já existentes
   useEffect(() => {
     if (!playlists.isSuccess || !playlistId || !userId) return
-
-    // Se o ID salvo não existe mais nas playlists do usuário → resetar
     const existing = playlists.data?.items.find((p) => p.id === playlistId)
     if (!existing) {
       setTimeout(() => resetStalePlaylist(userId), 0)
       return
     }
-
     if (displayName && existing.name !== playlistName) {
       updatePlaylist.mutate({ playlistId, name: playlistName })
     }
-
     if (!coverUploaded.current && !localStorage.getItem(coverKey(userId))) {
       coverUploaded.current = true
       uploadCover.mutate(
         { playlistId, base64Jpeg: spoterListCover },
         {
           onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
-          onError: () => {
-            coverUploaded.current = false
-          },
+          onError: () => { coverUploaded.current = false },
         }
       )
     }
-  }, [
-    playlists.isSuccess,
-    playlistId,
-    userId,
-    displayName,
-    playlistName,
-    playlists.data,
-    updatePlaylist,
-    uploadCover,
-  ])
+  }, [playlists.isSuccess, playlistId, userId, displayName, playlistName, playlists.data, updatePlaylist, uploadCover])
 
-  const tracksQuery = usePlaylistTracks(playlistId, !!playlistId, 1, 50)
-
+  // ── Hidratação one-shot via cookie + API ──────────────────────────────────
   useEffect(() => {
-    if (tracksQuery.isError && (tracksQuery.error as AxiosError).response?.status === 404) {
-      if (userId) localStorage.removeItem(storageKey(userId))
-      createAttempted.current = false
-      coverUploaded.current = false
-      setTimeout(() => setForcedId(''), 0)
-    }
-  }, [tracksQuery.isError, tracksQuery.error, userId])
+    if (!userId || hydrationAttempted.current) return
+    hydrationAttempted.current = true
 
-  const addTrack = (track: SpotifyTrack) => {
-    if (playlistId) addMutation.mutate({ playlistId, uris: [track.uri] })
-    setLocalTracks((prev) => {
-      if (prev.some((t) => t.uri === track.uri)) return prev
-      const updated = [...prev, track]
-      writeLocalTracks(userId, updated)
-      return updated
+    const cookieEntries = readFavCookie(userId)
+    if (cookieEntries.length === 0) return
+
+    const currentTracks = readLocalTracks(userId)
+    const missingUris = cookieEntries
+      .filter((e) => !currentTracks.some((t) => t.uri === e.uri))
+      .map((e) => e.uri)
+
+    if (missingUris.length === 0) return
+
+    setIsHydrating(true)
+    hydrateFromApi(missingUris).then((fetched) => {
+      if (fetched.length > 0) {
+        setLocalTracks((prev) => {
+          const merged = [
+            ...prev,
+            ...fetched.filter((ft) => !prev.some((p) => p.uri === ft.uri)),
+          ]
+          writeLocalTracks(userId, merged)
+          return merged
+        })
+      }
+      setIsHydrating(false)
     })
-  }
+  }, [userId])
 
-  const removeTrack = (uri: string) => {
-    if (playlistId) removeMutation.mutate({ playlistId, uris: [uri] })
-    setLocalTracks((prev) => {
-      const updated = prev.filter((t) => t.uri !== uri)
-      writeLocalTracks(userId, updated)
-      return updated
-    })
-  }
+  // ── Ações (escritas síncronas via refs) ───────────────────────────────────
+  const addTrack = useCallback(
+    (track: SpotifyTrack, note?: string) => {
+      if (tracksRef.current.some((t) => t.uri === track.uri)) return
 
-  const apiTracks = tracksQuery.data?.items.map((i) => i.item) ?? null
+      const newTracks = [...tracksRef.current, track]
+      const newNotes = note?.trim()
+        ? { ...notesRef.current, [track.uri]: note.trim() }
+        : notesRef.current
+
+      writeLocalTracks(userId, newTracks)
+      if (note?.trim()) writeLocalNotes(userId, newNotes)
+      writeFavCookie(
+        userId,
+        newTracks.map((t) => ({ uri: t.uri, note: newNotes[t.uri] ?? '' }))
+      )
+
+      setLocalTracks(newTracks)
+      if (note?.trim()) setLocalNotes(newNotes)
+
+      if (playlistId) addMutation.mutate({ playlistId, uris: [track.uri] })
+    },
+    [userId, playlistId, addMutation]
+  )
+
+  const removeTrack = useCallback(
+    (uri: string) => {
+      const newTracks = tracksRef.current.filter((t) => t.uri !== uri)
+      const newNotes = { ...notesRef.current }
+      delete newNotes[uri]
+
+      writeLocalTracks(userId, newTracks)
+      writeLocalNotes(userId, newNotes)
+      writeFavCookie(
+        userId,
+        newTracks.map((t) => ({ uri: t.uri, note: newNotes[t.uri] ?? '' }))
+      )
+
+      setLocalTracks(newTracks)
+      setLocalNotes(newNotes)
+
+      if (playlistId) removeMutation.mutate({ playlistId, uris: [uri] })
+    },
+    [userId, playlistId, removeMutation]
+  )
+
+  const updateNote = useCallback(
+    (uri: string, note: string) => {
+      const trimmed = note.trim()
+      const newNotes = trimmed
+        ? { ...notesRef.current, [uri]: trimmed }
+        : (() => {
+            const n = { ...notesRef.current }
+            delete n[uri]
+            return n
+          })()
+
+      writeLocalNotes(userId, newNotes)
+      writeFavCookie(
+        userId,
+        tracksRef.current.map((t) => ({ uri: t.uri, note: newNotes[t.uri] ?? '' }))
+      )
+
+      setLocalNotes(newNotes)
+    },
+    [userId]
+  )
 
   return {
     playlistId,
     playlistName,
-    tracks: apiTracks ?? localTracks,
+    tracks: localTracks,
+    notes: localNotes,
     addTrack,
     removeTrack,
-    isLoading: !!userId && (!playlists.isSuccess || (!!playlistId && tracksQuery.isLoading)),
+    updateNote,
+    isLoading: isHydrating && localTracks.length === 0,
   }
 }
