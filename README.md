@@ -49,3 +49,60 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 - `npm run build`: Gera a build de produção.
 - `npm run lint`: Executa a verificação de código.
 - `npm test`: Roda a suíte de testes com o Vitest.
+- `npm run test:e2e`: Executa os testes de ponta a ponta (E2E) com Playwright.
+
+## Testes End-to-End (E2E)
+
+O projeto utiliza **Playwright** para garantir a integridade dos fluxos principais. Os testes rodam em um ambiente isolado com mocks da API do Spotify.
+
+### Fluxos Cobertos
+
+```mermaid
+graph TD
+    Start((Início)) --> Login[Página de Login]
+    Login --> i18n{Troca de Idioma PT/EN}
+    Login --> Auth[Autenticação Mock]
+    Auth --> Search[Pesquisa de Artistas e Álbuns]
+    Search --> Pagination[Navegação por Páginas]
+    Search --> Tabs[Filtros por Categoria]
+    Search --> Detail[Detalhes do Artista]
+    Detail --> Content(Top Tracks, Bio, Discos)
+    Detail --> Chart(Gráficos de Popularidade)
+    Auth --> Favs[Gerenciamento de Favoritos]
+    Favs --> Form(Formulário com Validação)
+    Form --> Storage(Persistência LocalStorage)
+```
+
+### Gráfico de Cobertura Funcional
+
+```mermaid
+pie title Cobertura E2E por Módulo
+    "Pesquisa & Listagem" : 35
+    "Detalhes do Artista" : 25
+    "Favoritos (CRUD)" : 20
+    "Internacionalização" : 15
+    "Sanidade (Smoke)" : 5
+```
+
+| Módulo | Funcionalidades Testadas |
+| :--- | :--- |
+| **Smoke** | Carregamento inicial, título da página e visibilidade do login. |
+| **i18n** | Tradução dinâmica (PT/EN) e persistência do idioma entre rotas. |
+| **Pesquisa** | Busca por artistas/álbuns, paginação (Next/Prev) e alternância de abas. |
+| **Detalhes** | Exibição de bio, tabela de faixas mais ouvidas e integração com Recharts (SVG). |
+| **Favoritos** | Fluxo completo de CRUD (LocalStorage), busca de faixas e validação de formulário. |
+
+### Executando os Testes E2E
+
+Para rodar os testes localmente:
+
+```bash
+# Instalar navegadores do Playwright (apenas na primeira vez)
+npx playwright install
+
+# Executar testes em modo headless
+npm run test:e2e
+
+# Executar testes com interface visual (UI Mode)
+npx playwright test --ui
+```
