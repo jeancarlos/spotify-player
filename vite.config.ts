@@ -5,8 +5,8 @@ import path from 'path'
 
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
-  base: '/spotify-player/',
+export default defineConfig(() => ({
+  base: '/',
   plugins: [
     react(),
     VitePWA({
@@ -124,4 +124,4 @@ export default defineConfig({
     exclude: ['node_modules', '.claude/**', 'tests-e2e/**'],
     coverage: { provider: 'v8', include: ['src/**/*.{ts,tsx}'] },
   },
-} as any)
+} as any))
