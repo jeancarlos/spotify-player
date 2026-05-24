@@ -55,14 +55,15 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
 
   const getY = () => {
     if (isLogin) return loginY
-    if (isHome || playerHovered) return homeY
+    if (isHome) return homeY
+    if (playerHovered) return homeY
     return otherY
   }
 
   const y = getY()
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[3] pointer-events-none flex justify-center">
+    <div className="fixed inset-x-0 bottom-0 z-[15] pointer-events-none flex justify-center">
       <motion.div
         animate={{ y }}
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}

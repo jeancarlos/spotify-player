@@ -91,7 +91,7 @@ export function ArcCarousel({
           animate={{ opacity: 1 }}
           transition={{
             delay: baseDelay + items.length * 0.06 + 0.3,
-            duration: 0.6,
+            duration: 0.4,
             ease: 'easeOut',
           }}
         >
@@ -102,12 +102,8 @@ export function ArcCarousel({
             fontSize="11"
             fill="rgba(0,0,0,0.4)"
             fontWeight="600"
-            letterSpacing="1.5"
+            letterSpacing="1.4"
             fontFamily="monospace"
-            paintOrder="stroke fill"
-            stroke="white"
-            strokeWidth="8"
-            strokeLinejoin="round"
           >
             <textPath href={`#arc-${uid}`} startOffset="50%" textAnchor="middle">
               {title.toUpperCase()}

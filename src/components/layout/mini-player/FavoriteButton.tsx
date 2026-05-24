@@ -13,7 +13,7 @@ export function FavoriteButton() {
   const { toast } = useToast()
   const { t } = useTranslation()
   const { tracks, addTrack, removeTrack } = useSpoterPlaylist()
-  
+
   const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
 
   const handleHeart = useCallback(() => {
@@ -41,7 +41,7 @@ export function FavoriteButton() {
       >
         <Heart size={16} className={isSaved ? 'fill-current' : ''} />
       </button>
-      <ControlTip label={isSaved ? t('favorites.removedFromList') : t('favorites.addToList')} />
+      <ControlTip label={isSaved ? t('favorites.removeFromList') : t('favorites.addToList')} />
     </div>
   )
 }

@@ -27,13 +27,12 @@ function useDiskLayout() {
   const diskPx = Math.min(720, vw)
   const translateY = Math.round(diskPx * 0.28)
   const arcRadius = Math.max(130, Math.round(diskPx * 0.45))
-  const arcBottom = Math.max(80, diskPx - translateY - arcRadius - 20)
-  const arcDeg = vw < 768 ? 105 : 75
+  const arcBottom = Math.max(80, diskPx - translateY - arcRadius - (vw < 768 ? 0 : 20))
+  const arcDeg = vw < 768 ? 90 : 75
 
-  // Cards do carousel voam acima do container via transform (card central: y = -arcRadius - 60)
   const carouselContainerTop = vh - arcBottom - (arcRadius + 70)
   const carouselVisualTop = carouselContainerTop - (arcRadius + 60)
-  const hintSpace = carouselVisualTop - 120 // 120px = searchbar bottom estimado
+  const hintSpace = carouselVisualTop - 120
   const showHint = hintSpace >= 80
 
   return {
@@ -52,7 +51,7 @@ export function Home() {
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
-  
+
   const isLoading = recentlyPlayed.isPending
   const isError = recentlyPlayed.isError
 
@@ -70,12 +69,10 @@ export function Home() {
 
   return (
     <div className="h-screen overflow-hidden relative">
-      {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
 
-      {/* Hint text — centralizado no espaço entre searchbar e carousel */}
       {showHint && !isLoading && tracks.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -84,31 +81,29 @@ export function Home() {
           className="fixed left-0 right-0 z-[4] flex justify-center px-8 pointer-events-none"
           style={{ top: hintTop }}
         >
-          <p className="text-center text-[11px] text-black/30 leading-relaxed max-w-xs -translate-y-1/2">
+          <p className="text-center text-[12px] text-black/30 leading-relaxed max-w-xs">
             {t('login.hint')}
           </p>
         </motion.div>
       )}
 
-      {/* Fixed arc carousel — disk is rendered by PersistentVinylDisk at root level */}
       <div className="fixed inset-0 pointer-events-none z-[5]">
-        {/* Arc Carousel */}
         <div
           className="absolute left-1/2 pointer-events-auto"
           style={{ bottom: arcBottom, transform: 'translateX(-50%)' }}
         >
           {isLoading && (
             <div className="flex items-center justify-center mb-12">
-               <div className="w-6 h-6 border-2 border-black/10 rounded-full border-t-black/30 animate-spin" />
+              <div className="w-6 h-6 border-2 border-black/10 rounded-full border-t-black/30 animate-spin" />
             </div>
           )}
 
           {isError && (
-             <p className="text-center text-xs text-black/20 mb-12">{t('common.error')}</p>
+            <p className="text-center text-xs text-black/20 mb-12">{t('common.error')}</p>
           )}
 
           {!isLoading && !isError && tracks.length === 0 && (
-             <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
+            <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
           )}
 
           {tracks.length > 0 && (

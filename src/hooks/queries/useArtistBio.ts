@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 interface WikiResult {
   extract: string
   url: string
+  lang: 'pt' | 'en'
 }
 
 interface WikiSummary {
@@ -10,20 +11,39 @@ interface WikiSummary {
   content_urls?: { desktop?: { page?: string } }
 }
 
-async function fetchWikipediaSummary(title: string): Promise<WikiResult | null> {
-  const res = await fetch(
-    `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
-  )
+async function fetchWikiSummary(lang: 'pt' | 'en', title: string): Promise<WikiResult | null> {
+  const base = `https://${lang}.wikipedia.org`
+  const res = await fetch(`${base}/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
   if (!res.ok) return null
   const data: WikiSummary = await res.json()
   if (!data.extract) return null
   const extract = data.extract.length > 500 ? data.extract.slice(0, 500) + '...' : data.extract
   return {
     extract,
-    url:
-      data.content_urls?.desktop?.page ??
-      `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+    lang,
+    url: data.content_urls?.desktop?.page ?? `${base}/wiki/${encodeURIComponent(title)}`,
   }
+}
+
+async function searchWiki(lang: 'pt' | 'en', artistName: string): Promise<string | null> {
+  const res = await fetch(
+    `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(artistName)}&limit=3&format=json&origin=*`
+  )
+  if (!res.ok) return null
+  const [, titles] = (await res.json()) as [string, string[], string[], string[]]
+  return titles.find((t) => t.toLowerCase().includes(artistName.toLowerCase())) ?? null
+}
+
+async function fetchArtistBio(artistName: string): Promise<WikiResult | null> {
+  const ptTitle = await searchWiki('pt', artistName)
+  if (ptTitle) {
+    const result = await fetchWikiSummary('pt', ptTitle)
+    if (result) return result
+  }
+
+  const enTitle = await searchWiki('en', artistName)
+  if (!enTitle) return null
+  return fetchWikiSummary('en', enTitle)
 }
 
 export function useArtistBio(artistName: string | undefined) {
@@ -31,15 +51,6 @@ export function useArtistBio(artistName: string | undefined) {
     queryKey: ['artist-bio', artistName],
     enabled: !!artistName,
     staleTime: 1000 * 60 * 60,
-    queryFn: async () => {
-      if (!artistName) return null
-      const searchRes = await fetch(
-        `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(artistName)}&limit=3&format=json&origin=*`
-      )
-      const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
-      const match = titles.find((t) => t.toLowerCase().includes(artistName.toLowerCase()))
-      if (!match) return null
-      return fetchWikipediaSummary(match)
-    },
+    queryFn: () => (artistName ? fetchArtistBio(artistName) : null),
   })
 }

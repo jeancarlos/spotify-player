@@ -125,7 +125,7 @@
     "addedToList": "Adicionada!",
     "removedFromList": "Removida!",
     "trackRequired": "Selecione uma música",
-    "noteTooLong": "Máximo de 300 caracteres",
+    "noteTooLong": "Máximo de 80 caracteres",
     "alreadyFavorite": "Já está nos favoritos",
     "notePlaceholder": "Uma nota pessoal (opcional)...",
     "noteLabel": "Nota pessoal",
@@ -133,7 +133,7 @@
     "addConfirm": "Adicionar ao favorito",
     "searchAutocomplete": "Buscar música ou artista...",
     "isFavorite": "♥ FAVORITO",
-    "noteCharsLeft": "{{count}}/300",
+    "noteCharsLeft": "{{count}}/80",
     "editNote": "Editar nota",
     "clearTrack": "Limpar seleção"
   },

@@ -10,7 +10,15 @@ export function PlayerQueue() {
   const playTrack = usePlayTrack()
   const { queue, currentTrack } = state
 
-  const filteredQueue = queue[0]?.uri === currentTrack?.uri ? queue.slice(1) : queue
+  // Filtra a fila para remover a música atual e duplicatas
+  const filteredQueue = queue.reduce((acc: SpotifyTrack[], track) => {
+    const isCurrent = track.uri === currentTrack?.uri
+    const isDuplicate = acc.some((t) => t.uri === track.uri)
+    if (!isCurrent && !isDuplicate) {
+      acc.push(track)
+    }
+    return acc
+  }, [])
 
   if (filteredQueue.length === 0) {
     return (
@@ -21,7 +29,7 @@ export function PlayerQueue() {
   }
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-4 pb-32">
+    <div className="h-full overflow-y-auto px-4 py-4 pb-40">
       <div className="max-w-3xl mx-auto">
         <h3 className="text-[10px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">
           {t('player.nextUp')}

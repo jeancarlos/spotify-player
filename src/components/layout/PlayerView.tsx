@@ -145,7 +145,7 @@ export function PlayerView() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="h-full overflow-y-auto pt-4 pb-12"
+              className="h-full overflow-y-auto pt-4 pb-40"
             >
               {currentTrack && <TrackInfoPanel track={currentTrack} />}
             </motion.div>

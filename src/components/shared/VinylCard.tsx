@@ -33,9 +33,8 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
             ? 'ring-2 ring-[#1DB954] scale-105 shadow-[0_0_18px_rgba(29,185,84,0.45)]'
             : 'ring-1 ring-white/10'
         )}
-        style={{ width: dim, height: dim, borderRadius: 14 }}
+        style={{ width: dim, height: dim, borderRadius: '8px' }}
       >
-        {/* Album art */}
         <img
           src={track.album.images[0]?.url ?? ''}
           alt={track.album.name}

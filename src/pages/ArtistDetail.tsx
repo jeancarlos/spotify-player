@@ -12,7 +12,7 @@ import { ArtistHeroSection } from '@/components/artist/ArtistHeroSection'
 import { ArtistBio } from '@/components/artist/ArtistBio'
 import { RelatedArtists } from '@/components/artist/RelatedArtists'
 import { ArtistDiscography } from '@/components/artist/ArtistDiscography'
-import { TrackRow } from '@/components/shared/TrackRow'
+import { ArtistTopTracksChart } from '@/components/artist/ArtistTopTracksChart'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 import { averageAudioFeatures } from '@/utils/audioFeatures'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
@@ -29,7 +29,7 @@ export function ArtistDetail() {
 
   const [albumPage, setAlbumPage] = useState(1)
   const [discView, setDiscView] = useState<ViewMode>('list')
-  const [fixedZoneHeight, setFixedZoneHeight] = useState(340)
+  const [heroHeight, setHeroHeight] = useState(340)
 
   const artist = useArtist(id)
   const topTracks = useArtistTopTracks(id)
@@ -45,11 +45,6 @@ export function ArtistDetail() {
   const hasNextAlbums = albums.data
     ? albums.data.offset + albums.data.limit < albums.data.total
     : false
-
-  function handleBack() {
-    const from = (location.state as { from?: string } | null)?.from
-    navigate(from ?? '/artists')
-  }
 
   function handleAlbumClick(album: SpotifyAlbumSimple) {
     navigate(`/albums/${album.id}`, { state: { from: location.pathname } })
@@ -70,64 +65,59 @@ export function ArtistDetail() {
         topTracks={topTracks.data}
         activeTrackId={state.currentTrack?.id}
         onTrackPlay={handleTrackPlay}
-        onBack={handleBack}
-        onLayout={setFixedZoneHeight}
+        onLayout={setHeroHeight}
         carouselTitle={t('artistDetail.topTracks')}
       />
 
-      <div style={{ paddingTop: fixedZoneHeight }} className="px-4 pb-32">
-        {(topTracks.data ?? []).length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xs font-bold text-black/40 uppercase tracking-wider px-2 mb-3">
-              {t('artistDetail.topTracks')}
-            </h2>
-            <div className="space-y-0.5">
-              {(topTracks.data ?? []).map((track, i) => (
-                <TrackRow
-                  key={track.id}
-                  track={track}
-                  index={i}
-                  isActive={state.currentTrack?.id === track.id}
-                  onPlay={(t) => playTrack(t as SpotifyTrack, topTracks.data ?? [])}
-                />
-              ))}
-            </div>
-            {artist.data?.uri && (
-              <button
-                onClick={() => playContext(artist.data!.uri)}
-                className="text-[10px] font-bold text-black/40 hover:text-black uppercase tracking-wider px-2 pt-2 transition-colors outline-none"
-              >
-                {t('player.play')} {t('artistDetail.topTracks')}
-              </button>
-            )}
-          </section>
-        )}
+      <div style={{ paddingTop: heroHeight }} className="pb-32">
+        <div className="max-w-3xl mx-auto px-4">
+          <ArtistBio artistName={artist.data?.name} />
 
-        <ArtistBio artistName={artist.data?.name} />
+          {(topTracks.data ?? []).length > 0 && (
+            <section className="mb-8">
+              <div className="flex items-center justify-between px-2 mb-3">
+                <h2 className="text-xs font-bold text-black/40 uppercase tracking-wider">
+                  {t('artistDetail.topTracksRanked')}
+                </h2>
+                {artist.data?.uri && (
+                  <button
+                    onClick={() => playContext(artist.data!.uri)}
+                    className="text-[10px] font-bold text-black/35 hover:text-black uppercase tracking-wider transition-colors outline-none"
+                  >
+                    {t('player.play')}
+                  </button>
+                )}
+              </div>
+              <ArtistTopTracksChart
+                tracks={topTracks.data ?? []}
+                activeTrackId={state.currentTrack?.id}
+                onPlay={(track) => playTrack(track, topTracks.data ?? [])}
+              />
+            </section>
+          )}
 
-        <ArtistDiscography
-          albums={albums.data?.items ?? []}
-          view={discView}
-          onViewChange={setDiscView}
-          onAlbumClick={handleAlbumClick}
-          page={albumPage}
-          hasNext={hasNextAlbums}
-          onPrevPage={() => setAlbumPage((p) => Math.max(1, p - 1))}
-          onNextPage={() => setAlbumPage((p) => p + 1)}
-        />
+          <ArtistDiscography
+            albums={albums.data?.items ?? []}
+            view={discView}
+            onViewChange={setDiscView}
+            onAlbumClick={handleAlbumClick}
+            page={albumPage}
+            hasNext={hasNextAlbums}
+            onPrevPage={() => setAlbumPage((p) => Math.max(1, p - 1))}
+            onNextPage={() => setAlbumPage((p) => p + 1)}
+          />
 
-        {/* Musical profile */}
-        {avgFeatures && (
-          <section className="mb-8 px-2">
-            <h3 className="text-sm font-bold text-black/50 mb-4">
-              {t('artistDetail.musicalProfile')}
-            </h3>
-            <MusicalProfileCharts features={avgFeatures} theme="light" />
-          </section>
-        )}
+          {avgFeatures && (
+            <section className="mb-8 px-2">
+              <h3 className="text-sm font-bold text-black/50 mb-4">
+                {t('artistDetail.musicalProfile')}
+              </h3>
+              <MusicalProfileCharts features={avgFeatures} theme="light" />
+            </section>
+          )}
 
-        {/* Related artists */}
-        <RelatedArtists artistId={id} />
+          <RelatedArtists artistId={id} />
+        </div>
       </div>
     </div>
   )

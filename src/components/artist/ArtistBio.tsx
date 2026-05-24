@@ -21,7 +21,7 @@ export function ArtistBio({ artistName }: ArtistBioProps) {
         rel="noopener noreferrer"
         className="text-xs text-black/40 hover:text-black/70 underline mt-2 inline-block transition-colors"
       >
-        Wikipedia →
+        Wikipedia {bio.data.lang === 'en' ? '(EN)' : ''} →
       </a>
     </section>
   )

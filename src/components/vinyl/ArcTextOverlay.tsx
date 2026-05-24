@@ -11,15 +11,18 @@ interface ArcTextOverlayProps {
   // ──────────────────────────────────────────────────────────────────────────
 }
 
-export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.88, arcDeg = 200 }: ArcTextOverlayProps) {
+export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.93, arcDeg = 200 }: ArcTextOverlayProps) {
   const uid = useId()
 
   const cx = diskPx / 2
   const cy = diskPx / 2
-  const r = (diskPx / 2) * k
+  const r = (diskPx / 2) * k + 10
 
-  const startAngleRad = (270 - arcDeg / 2) * (Math.PI / 180)
-  const endAngleRad = (270 + arcDeg / 2) * (Math.PI / 180)
+  const fontSize = 10
+  const letterSpacing = 1
+
+  const startAngleRad = (270 - arcDeg / 2) * (Math.PI / 230)
+  const endAngleRad = (270 + arcDeg / 2) * (Math.PI / 230)
 
   const x1 = cx + r * Math.cos(startAngleRad)
   const y1 = cy + r * Math.sin(startAngleRad)
@@ -39,39 +42,27 @@ export function ArcTextOverlay({ label, diskPx, isPlaying = false, k = 0.88, arc
         width={diskPx}
         height={diskPx}
         className="absolute inset-0 pointer-events-none"
-        initial={{ opacity: 0, rotate: 0 }}
-        animate={{ opacity: 1, rotate: isPlaying ? 360 : 0 }}
-        exit={{ opacity: 0 }}
+        initial={{ rotate: -180 }}
+        animate={{ rotate: isPlaying ? 180 : -180 }}
         transition={rotateTransition}
         style={{ overflow: 'visible', originX: '50%', originY: '50%' }}
         aria-hidden
       >
         <defs>
           <path id={`arc-fav-${uid}`} d={arcPath} />
-          <filter id={`arc-bg-${uid}`} x="-10%" y="-50%" width="120%" height="200%">
-            <feMorphology in="SourceAlpha" operator="dilate" radius="4" result="expanded" />
-            <feFlood floodColor="white" floodOpacity="0.88" result="color" />
-            <feComposite in="color" in2="expanded" operator="in" result="background" />
-            <feMerge>
-              <feMergeNode in="background" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
         <text
-          fontSize="11"
+          fontSize={fontSize}
           fontWeight="700"
-          letterSpacing="2"
-          fontFamily="monospace"
+          letterSpacing={letterSpacing}
+          fontFamily="inter"
           fill="rgba(0,0,0,0.75)"
-          filter={`url(#arc-bg-${uid})`}
         >
           <textPath
             href={`#arc-fav-${uid}`}
-            startOffset="50%"
             textAnchor="middle"
           >
-            {label.toUpperCase()}
+            {label}
           </textPath>
         </text>
       </motion.svg>
