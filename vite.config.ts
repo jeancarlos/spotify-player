@@ -6,6 +6,7 @@ import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/spotify-player/',
   plugins: [
     react(),
     VitePWA({
