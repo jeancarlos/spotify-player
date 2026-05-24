@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 interface WikiResult {
   extract: string
@@ -34,11 +35,16 @@ async function searchWiki(lang: 'pt' | 'en', artistName: string): Promise<string
   return titles.find((t) => t.toLowerCase().includes(artistName.toLowerCase())) ?? null
 }
 
-async function fetchArtistBio(artistName: string): Promise<WikiResult | null> {
-  const ptTitle = await searchWiki('pt', artistName)
-  if (ptTitle) {
-    const result = await fetchWikiSummary('pt', ptTitle)
-    if (result) return result
+async function fetchArtistBio(
+  artistName: string,
+  preferPt: boolean
+): Promise<WikiResult | null> {
+  if (preferPt) {
+    const ptTitle = await searchWiki('pt', artistName)
+    if (ptTitle) {
+      const result = await fetchWikiSummary('pt', ptTitle)
+      if (result) return result
+    }
   }
 
   const enTitle = await searchWiki('en', artistName)
@@ -47,10 +53,13 @@ async function fetchArtistBio(artistName: string): Promise<WikiResult | null> {
 }
 
 export function useArtistBio(artistName: string | undefined) {
+  const { i18n } = useTranslation()
+  const preferPt = i18n.language === 'pt-BR'
+
   return useQuery<WikiResult | null>({
-    queryKey: ['artist-bio', artistName],
+    queryKey: ['artist-bio', artistName, i18n.language],
     enabled: !!artistName,
     staleTime: 1000 * 60 * 60,
-    queryFn: () => (artistName ? fetchArtistBio(artistName) : null),
+    queryFn: () => (artistName ? fetchArtistBio(artistName, preferPt) : null),
   })
 }
