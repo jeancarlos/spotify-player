@@ -1,10 +1,15 @@
-// src/hooks/usePlayerSync.ts
 import { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNowPlaying } from '@/hooks/queries/useNowPlaying'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
 import { extractPalette } from '@/lib/colorThief'
+import type { SpotifyTrack } from '@/types/spotify'
+
+interface RecentlyPlayedItem {
+  track: SpotifyTrack
+  played_at: string
+}
 
 export function usePlayerSync() {
   const { state: authState } = useAuth()
@@ -23,7 +28,14 @@ export function usePlayerSync() {
     // Troca de música
     if (remote && remote.id !== localId) {
       dispatch({ type: 'SET_TRACK', payload: remote })
-      queryClient.invalidateQueries({ queryKey: ['recently-played'] })
+      queryClient.setQueriesData<RecentlyPlayedItem[]>(
+        { queryKey: ['recently-played'] },
+        (old) => {
+          if (!old) return old
+          const entry: RecentlyPlayedItem = { track: remote, played_at: new Date().toISOString() }
+          return [entry, ...old.filter((i) => i.track.id !== remote.id)].slice(0, old.length)
+        }
+      )
     }
 
     // Estado de play/pause

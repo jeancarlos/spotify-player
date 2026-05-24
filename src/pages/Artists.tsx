@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ChevronRight } from 'lucide-react'
 import { useArtists } from '@/hooks/queries/useArtists'
 import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
 import { useSearchPlaylists } from '@/hooks/queries/useSearchPlaylists'
@@ -140,6 +141,23 @@ export function Artists() {
                     onClick={() => navigate(`/playlists/${playlist.id}`)}
                   />
                 ))}
+
+            {/* 21º slot — card de próxima página */}
+            {hasNext && (
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                className="aspect-square rounded-[6px] bg-black/4 hover:bg-black/8 ring-1 ring-black/6 transition-all duration-200 hover:scale-105 active:scale-95 flex flex-col items-center justify-center gap-1 group"
+                aria-label={t('artists.next')}
+              >
+                <ChevronRight
+                  size={20}
+                  className="text-black/25 group-hover:text-black/50 transition-colors"
+                />
+                <span className="text-[8px] font-semibold text-black/25 group-hover:text-black/50 transition-colors uppercase tracking-wider">
+                  {t('artists.next')}
+                </span>
+              </button>
+            )}
           </div>
         )}
 

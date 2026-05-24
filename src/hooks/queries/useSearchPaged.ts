@@ -5,6 +5,7 @@ import type { PagingObject } from '@/types/spotify'
 
 const PAGE_SIZE = 21
 const CHUNK = 7
+const CHUNK_LAST = CHUNK - 1 // 6 — deixa 1 slot livre para o card "próxima página"
 
 export interface CachedPage<T> extends PagingObject<T> {
   r4?: T[]
@@ -40,13 +41,13 @@ export function useSearchPaged<T, R>({
       const base = (page - 1) * PAGE_SIZE
       const prevData = queryClient.getQueryData<CachedPage<T>>([queryKeyPrefix, query, page - 1])
       const preloadedR1 = prevData?.r4
-      const fetch = (offset: number) =>
-        api.get<R>('/search', { params: { q: query, type: apiType, limit: CHUNK, offset } })
+      const fetch = (offset: number, limit = CHUNK) =>
+        api.get<R>('/search', { params: { q: query, type: apiType, limit, offset } })
 
       const [maybeR1, res2, r3, r4] = await Promise.all([
         preloadedR1 ? null : fetch(base),
         fetch(base + CHUNK),
-        fetch(base + CHUNK * 2),
+        fetch(base + CHUNK * 2, CHUNK_LAST),
         fetch(base + CHUNK * 3),
       ])
 
@@ -72,8 +73,8 @@ export function useSearchPaged<T, R>({
     const nextBase = (nextPage - 1) * PAGE_SIZE
     const gp = getPageRef.current
 
-    const fetchNext = (offset: number) =>
-      api.get<R>('/search', { params: { q: query, type: apiType, limit: CHUNK, offset } })
+    const fetchNext = (offset: number, limit = CHUNK) =>
+      api.get<R>('/search', { params: { q: query, type: apiType, limit, offset } })
 
     queryClient.prefetchQuery({
       queryKey: [queryKeyPrefix, query, nextPage],
@@ -81,7 +82,7 @@ export function useSearchPaged<T, R>({
       queryFn: async () => {
         const [res2, r3, r4] = await Promise.all([
           fetchNext(nextBase + CHUNK),
-          fetchNext(nextBase + CHUNK * 2),
+          fetchNext(nextBase + CHUNK * 2, CHUNK_LAST),
           fetchNext(nextBase + CHUNK * 3),
         ])
 

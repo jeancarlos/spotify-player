@@ -80,7 +80,7 @@ export function Favorites() {
   const onSubmit = (data: SearchForm) => setSearchQuery(data.query)
 
   const handleAdd = (track: SpotifyTrack) => {
-    addTrack(track.uri)
+    addTrack(track)
     close()
   }
 

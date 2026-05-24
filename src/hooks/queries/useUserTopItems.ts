@@ -8,6 +8,7 @@ type TimeRange = 'short_term' | 'medium_term' | 'long_term'
 export function useUserTopTracks(timeRange: TimeRange = 'short_term', limit = 10) {
   return useQuery<SpotifyTrack[]>({
     queryKey: ['top-tracks', timeRange, limit],
+    staleTime: 1000 * 60 * 30,
     retry: false,
     queryFn: async () => {
       try {
@@ -26,6 +27,7 @@ export function useUserTopTracks(timeRange: TimeRange = 'short_term', limit = 10
 export function useUserTopArtistsFull(timeRange: TimeRange = 'short_term', limit = 10) {
   return useQuery<SpotifyArtist[]>({
     queryKey: ['top-artists-full', timeRange, limit],
+    staleTime: 1000 * 60 * 30,
     retry: false,
     queryFn: async () => {
       try {

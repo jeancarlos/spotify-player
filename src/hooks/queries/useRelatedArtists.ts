@@ -7,6 +7,7 @@ export function useRelatedArtists(artistId: string | undefined) {
   return useQuery<SpotifyArtist[]>({
     queryKey: ['related-artists', artistId],
     enabled: !!artistId,
+    staleTime: Infinity,
     retry: false,
     queryFn: async () => {
       try {

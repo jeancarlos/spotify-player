@@ -176,7 +176,7 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
       removeTrack(currentTrack.uri)
       toast(t('favorites.removedFromList'), 'info')
     } else {
-      addTrack(currentTrack.uri)
+      addTrack(currentTrack)
       toast(t('favorites.addedToList'), 'success')
     }
   }, [currentTrack, isSaved, addTrack, removeTrack, toast, t])

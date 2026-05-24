@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRecentlyPlayed } from '@/hooks/queries/useRecentlyPlayed'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
@@ -53,15 +52,10 @@ export function Home() {
   const playTrack = usePlayTrack()
   const recentlyPlayed = useRecentlyPlayed(50)
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
-  const [offset, setOffset] = useState(0)
-
   const allTracks: SpotifyTrack[] = recentlyPlayed.data
     ? [...new Map(recentlyPlayed.data.map((i) => [i.track.id, i.track])).values()]
     : []
-  const tracks = allTracks.slice(offset, offset + 5)
-  const canPrev = offset > 0
-  const canNext = offset + 5 < allTracks.length
-  const hasNav = allTracks.length > 5
+  const tracks = allTracks.slice(0, 5)
 
   const handleSearch = useCallback(
     (query: string, tab: SearchTab) => {
@@ -92,28 +86,6 @@ export function Home() {
         </motion.div>
       )}
 
-      {/* Mobile semi-circle nav buttons — fixed to screen edges */}
-      {hasNav && (
-        <>
-          <button
-            onClick={() => setOffset((o) => Math.max(0, o - 1))}
-            disabled={!canPrev}
-            className="md:hidden fixed left-0 bottom-24 z-10 w-10 h-20 rounded-r-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pl-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
-            aria-label={t('artists.previous')}
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            onClick={() => setOffset((o) => o + 1)}
-            disabled={!canNext}
-            className="md:hidden fixed right-0 bottom-24 z-10 w-10 h-20 rounded-l-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center pr-1 disabled:opacity-0 disabled:pointer-events-none transition-opacity"
-            aria-label={t('artists.next')}
-          >
-            <ChevronRight size={18} />
-          </button>
-        </>
-      )}
-
       {/* Fixed arc carousel — disk is rendered by PersistentVinylDisk at root level */}
       <div className="fixed inset-0 pointer-events-none z-[5]">
         {/* Arc Carousel */}
@@ -123,27 +95,6 @@ export function Home() {
         >
           {tracks.length > 0 && (
             <div className="relative">
-              {/* Desktop side buttons */}
-              {hasNav && (
-                <>
-                  <button
-                    onClick={() => setOffset((o) => Math.max(0, o - 1))}
-                    disabled={!canPrev}
-                    className="hidden md:flex absolute bottom-10 -left-10 p-2 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
-                    aria-label={t('artists.previous')}
-                  >
-                    <ChevronLeft size={18} />
-                  </button>
-                  <button
-                    onClick={() => setOffset((o) => o + 1)}
-                    disabled={!canNext}
-                    className="hidden md:flex absolute bottom-10 -right-10 p-2 rounded-full bg-black/40 text-white disabled:opacity-20 transition-opacity items-center justify-center"
-                    aria-label={t('artists.next')}
-                  >
-                    <ChevronRight size={18} />
-                  </button>
-                </>
-              )}
               <ArcCarousel
                 items={tracks.map((track) => ({
                   id: track.id,

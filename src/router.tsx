@@ -11,6 +11,9 @@ const Login = lazy(() => import('@/pages/Login').then((module) => ({ default: mo
 const OAuthCallback = lazy(() =>
   import('@/pages/OAuthCallback').then((module) => ({ default: module.OAuthCallback }))
 )
+const AuthError = lazy(() =>
+  import('@/pages/AuthError').then((module) => ({ default: module.AuthError }))
+)
 const Home = lazy(() => import('@/pages/Home').then((module) => ({ default: module.Home })))
 const Artists = lazy(() =>
   import('@/pages/Artists').then((module) => ({ default: module.Artists }))
@@ -48,6 +51,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/login', element: withSuspense(<Login />) },
       { path: '/callback', element: withSuspense(<OAuthCallback />) },
+      { path: '/auth-error', element: withSuspense(<AuthError />) },
       {
         path: '/player',
         element: (

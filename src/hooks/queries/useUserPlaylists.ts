@@ -11,6 +11,7 @@ export function useUserPlaylists(
     ...options,
     queryKey: ['user-playlists'],
     enabled,
+    staleTime: 1000 * 60 * 15,
     queryFn: async () => {
       const { data } = await api.get<UserPlaylistsResponse>('/me/playlists', {
         params: { limit: 50 },

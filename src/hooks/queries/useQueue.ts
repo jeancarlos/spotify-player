@@ -6,7 +6,8 @@ export function useQueue(enabled = true) {
   return useQuery<SpotifyQueueResponse | null>({
     queryKey: ['player-queue'],
     enabled,
-    refetchInterval: 30000, // Queue doesn't change as often as progress
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
     queryFn: async () => {
       try {
         const { data } = await api.get<SpotifyQueueResponse>('/me/player/queue')

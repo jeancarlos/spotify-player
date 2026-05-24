@@ -55,7 +55,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!state.isAuthenticated || state.profile) return
     api
       .get<SpotifyUser>('/me')
-      .then((res) => dispatch({ type: 'SET_PROFILE', payload: res.data }))
+      .then((res) => {
+        try { localStorage.setItem('user_profile', JSON.stringify(res.data)) } catch { /* quota */ }
+        dispatch({ type: 'SET_PROFILE', payload: res.data })
+      })
       .catch((err) => {
         if (err?.response?.status === 429) {
           // Rate-limited: token still valid, retry after back-off
@@ -82,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
       response_type: 'code',
-      redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string,
+      redirect_uri: `${window.location.origin}/callback`,
       scope: SCOPES,
       code_challenge_method: 'S256',
       code_challenge: challenge,
@@ -131,13 +134,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const verifier = localStorage.getItem('pkce_verifier')
 
     if (receivedState !== savedState || !verifier) {
-      throw new Error(i18n.t('auth.invalidState'))
+      throw Object.assign(new Error(i18n.t('auth.invalidState')), { code: 'state_mismatch' })
     }
 
     const params = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string,
+      redirect_uri: `${window.location.origin}/callback`,
       client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
       code_verifier: verifier,
     })
@@ -148,7 +151,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       body: params,
     })
 
-    if (!res.ok) throw new Error(i18n.t('auth.tokenExchangeFailed'))
+    if (!res.ok) {
+      throw Object.assign(new Error(i18n.t('auth.tokenExchangeFailed')), { code: 'token_error' })
+    }
 
     const data = (await res.json()) as { access_token: string; refresh_token: string }
 
@@ -181,6 +186,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     sessionStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
+    localStorage.removeItem('user_profile')
     dispatch({ type: 'LOGOUT' })
   }, [])
 

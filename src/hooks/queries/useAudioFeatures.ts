@@ -11,6 +11,7 @@ export function useAudioFeatures(trackIds: string[]) {
   return useQuery<AudioFeatures[]>({
     queryKey: ['audio-features', trackIds.join(',')],
     enabled: trackIds.length > 0,
+    staleTime: Infinity,
     retry: false,
     queryFn: async () => {
       try {

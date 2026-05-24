@@ -10,11 +10,28 @@ import { useAddToPlaylist } from '@/hooks/mutations/useAddToPlaylist'
 import { useRemoveFromPlaylist } from '@/hooks/mutations/useRemoveFromPlaylist'
 import { useUploadPlaylistCover } from '@/hooks/mutations/useUploadPlaylistCover'
 import spoterListCover from '@/assets/spoterListCover'
+import type { SpotifyTrack } from '@/types/spotify'
 
 const LEGACY_KEY = 'spoter_playlist_id'
 
 const storageKey = (userId: string) => `spoter_playlist_${userId}`
 const coverKey = (userId: string) => `spoter_cover_v2_${userId}`
+const localTracksKey = (userId: string) => `spoter_favorites_${userId}`
+
+function readLocalTracks(userId: string): SpotifyTrack[] {
+  try {
+    const raw = localStorage.getItem(localTracksKey(userId))
+    return raw ? (JSON.parse(raw) as SpotifyTrack[]) : []
+  } catch {
+    return []
+  }
+}
+
+function writeLocalTracks(userId: string, tracks: SpotifyTrack[]) {
+  try {
+    localStorage.setItem(localTracksKey(userId), JSON.stringify(tracks))
+  } catch { /* storage quota */ }
+}
 
 export function useSpoterPlaylist() {
   const { t } = useTranslation()
@@ -31,6 +48,9 @@ export function useSpoterPlaylist() {
   )
 
   const [forcedId, setForcedId] = useState<string | null>(null)
+  const [localTracks, setLocalTracks] = useState<SpotifyTrack[]>(() =>
+    userId ? readLocalTracks(userId) : []
+  )
   const createAttempted = useRef(false)
   const coverUploaded = useRef(false)
 
@@ -40,6 +60,11 @@ export function useSpoterPlaylist() {
   const uploadCover = useUploadPlaylistCover()
   const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
+
+  // Recarrega favoritos locais ao trocar de usuário
+  useEffect(() => {
+    if (userId) setLocalTracks(readLocalTracks(userId))
+  }, [userId])
 
   // Migra chave antiga (shared) para chave por usuário
   useEffect(() => {
@@ -157,17 +182,31 @@ export function useSpoterPlaylist() {
     }
   }, [tracksQuery.isError, tracksQuery.error, userId])
 
-  const addTrack = (uri: string) => {
-    if (playlistId) addMutation.mutate({ playlistId, uris: [uri] })
+  const addTrack = (track: SpotifyTrack) => {
+    if (playlistId) addMutation.mutate({ playlistId, uris: [track.uri] })
+    setLocalTracks((prev) => {
+      if (prev.some((t) => t.uri === track.uri)) return prev
+      const updated = [...prev, track]
+      writeLocalTracks(userId, updated)
+      return updated
+    })
   }
+
   const removeTrack = (uri: string) => {
     if (playlistId) removeMutation.mutate({ playlistId, uris: [uri] })
+    setLocalTracks((prev) => {
+      const updated = prev.filter((t) => t.uri !== uri)
+      writeLocalTracks(userId, updated)
+      return updated
+    })
   }
+
+  const apiTracks = tracksQuery.data?.items.map((i) => i.item) ?? null
 
   return {
     playlistId,
     playlistName,
-    tracks: tracksQuery.data?.items.map((i) => i.item) ?? [],
+    tracks: apiTracks ?? localTracks,
     addTrack,
     removeTrack,
     isLoading: !!userId && (!playlists.isSuccess || (!!playlistId && tracksQuery.isLoading)),

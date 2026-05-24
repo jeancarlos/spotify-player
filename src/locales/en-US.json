@@ -159,6 +159,15 @@
     "invalidState": "Invalid OAuth state or verifier missing",
     "tokenExchangeFailed": "Token exchange failed"
   },
+  "authError": {
+    "title": "Authentication failed",
+    "stateMismatch": "Session security data expired or was lost.",
+    "tokenError": "Could not complete the authorization exchange with Spotify.",
+    "unknown": "An unexpected error occurred during authentication.",
+    "hint": "This can happen if the window took too long to respond or the browser blocked session access.",
+    "retry": "Try again",
+    "close": "Close window"
+  },
   "track": {
     "popularity": "Popularity",
     "key": "Key",

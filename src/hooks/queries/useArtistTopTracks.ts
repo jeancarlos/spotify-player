@@ -7,6 +7,7 @@ export function useArtistTopTracks(artistId: string | undefined) {
   return useQuery<SpotifyTrack[]>({
     queryKey: ['artist-top-tracks', artistId],
     enabled: !!artistId,
+    staleTime: 1000 * 60 * 30,
     retry: false,
     queryFn: async () => {
       try {

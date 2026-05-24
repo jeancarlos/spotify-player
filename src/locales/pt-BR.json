@@ -159,6 +159,15 @@
     "invalidState": "Estado OAuth inválido ou verifier ausente",
     "tokenExchangeFailed": "Troca de token falhou"
   },
+  "authError": {
+    "title": "Falha na autenticação",
+    "stateMismatch": "Os dados de segurança da sessão expiraram ou foram perdidos.",
+    "tokenError": "Não foi possível completar a troca de autorização com o Spotify.",
+    "unknown": "Ocorreu um erro inesperado durante a autenticação.",
+    "hint": "Isso pode acontecer se a janela demorou muito para responder ou se o browser bloqueou o acesso à sessão.",
+    "retry": "Tentar novamente",
+    "close": "Fechar janela"
+  },
   "track": {
     "popularity": "Popularidade",
     "key": "Tonalidade",

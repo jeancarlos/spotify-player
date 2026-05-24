@@ -11,6 +11,7 @@ export function useRecommendations(seedArtistIds: string[], limit = 20) {
   return useQuery({
     queryKey: ['recommendations', seedArtistIds.join(','), limit],
     enabled: seedArtistIds.length > 0,
+    staleTime: 1000 * 60 * 30,
     retry: false,
     queryFn: async () => {
       try {

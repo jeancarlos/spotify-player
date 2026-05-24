@@ -6,6 +6,7 @@ import type { NewReleasesResponse } from '@/types/spotify'
 export function useNewReleases(limit = 20) {
   return useQuery({
     queryKey: ['new-releases', limit],
+    staleTime: 1000 * 60 * 120,
     retry: false,
     queryFn: async () => {
       try {
