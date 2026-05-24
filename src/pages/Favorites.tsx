@@ -1,57 +1,29 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Search, Plus, Trash2, X, Music } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Music, Plus, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { usePlayer } from '@/hooks/usePlayer'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
-import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { TrackRow } from '@/components/shared/TrackRow'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Tooltip } from '@/components/shared/Tooltip'
-import type { SpotifyTrack } from '@/types/spotify'
+import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
+import { FavoriteTrackRow } from '@/components/favorites/FavoriteTrackRow'
 
 export function Favorites() {
   const { t } = useTranslation()
-  const { tracks, addTrack, removeTrack, isLoading, playlistId, playlistName } = useSpoterPlaylist()
+  const { state: playerState } = usePlayer()
+  const { tracks, notes, addTrack, removeTrack, updateNote, isLoading, playlistId, playlistName } =
+    useSpoterPlaylist()
   const playTrack = usePlayTrack()
-  const [searchQuery, setSearchQuery] = useState('')
   const [open, setOpen] = useState(false)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const searchSchema = useMemo(
-    () =>
-      z.object({
-        query: z.string().min(2, t('favorites.minQuery')),
-      }),
-    [t]
-  )
+  const close = useCallback(() => setOpen(false), [])
 
-  type SearchForm = z.infer<typeof searchSchema>
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<SearchForm>({
-    resolver: zodResolver(searchSchema),
-    defaultValues: { query: '' },
-  })
-
-  const close = useCallback(() => {
-    setOpen(false)
-    setSearchQuery('')
-    reset()
-  }, [reset])
-
-  const searchResults = useSearchTracks(searchQuery, searchQuery.length >= 2)
-
-  // Fecha ao clicar fora
+  // Fecha o popover ao clicar fora
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
@@ -67,7 +39,7 @@ export function Favorites() {
     return () => document.removeEventListener('mousedown', handler)
   }, [open, close])
 
-  // Fecha no Escape
+  // Fecha o popover com Escape
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
@@ -77,17 +49,10 @@ export function Favorites() {
     return () => document.removeEventListener('keydown', handler)
   }, [open, close])
 
-  const onSubmit = (data: SearchForm) => setSearchQuery(data.query)
-
-  const handleAdd = (track: SpotifyTrack) => {
-    addTrack(track)
-    close()
-  }
-
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
+        {/* Cabeçalho com título e botão de adicionar */}
         <div className="flex items-center justify-between mb-6 pt-6">
           <div>
             <h1 className="text-2xl font-black text-black">{t('nav.favorites')}</h1>
@@ -109,7 +74,7 @@ export function Favorites() {
             </div>
           </div>
 
-          {/* Botão + Popover */}
+          {/* Botão Adicionar + Popover com AddFavoriteForm */}
           <div className="relative">
             <button
               ref={buttonRef}
@@ -157,79 +122,14 @@ export function Favorites() {
                   transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
                   style={{ transformOrigin: 'top right' }}
                 >
-                  <div className="p-4">
-                    <p className="text-xs font-semibold text-black/40 uppercase tracking-wide mb-3">
-                      {t('favorites.addButton')}
-                    </p>
-                    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2 mb-3">
-                      <div className="flex-1">
-                        <input
-                          {...register('query')}
-                          autoFocus
-                          placeholder={t('favorites.searchAddPlaceholder')}
-                          className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors"
-                        />
-                        {errors.query && (
-                          <p className="text-xs text-red-500 mt-1 ml-1">{errors.query.message}</p>
-                        )}
-                      </div>
-                      <button
-                        type="submit"
-                        className="px-3 py-2 bg-black text-white rounded-xl text-sm hover:bg-black/80 transition-colors"
-                      >
-                        <Search size={15} />
-                      </button>
-                    </form>
-
-                    {searchResults.isPending && searchQuery && (
-                      <p className="text-xs text-black/40 text-center py-3" aria-live="polite">
-                        {t('common.loading')}
-                      </p>
-                    )}
-                    {searchResults.data?.length === 0 && searchQuery && (
-                      <p className="text-xs text-red-500 text-center py-3" aria-live="polite">
-                        {t('favorites.notFound')}
-                      </p>
-                    )}
-                    {searchResults.data && searchResults.data.length > 0 && (
-                      <div className="space-y-0.5 max-h-64 overflow-y-auto" aria-live="polite">
-                        {searchResults.data.map((track) => (
-                          <div
-                            key={track.id}
-                            className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-black/5 transition-colors"
-                          >
-                            <img
-                              src={track.album.images[0]?.url}
-                              className="w-8 h-8 rounded-lg object-cover shrink-0"
-                              alt={track.album.name}
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-black truncate">
-                                {track.name}
-                              </p>
-                              <p className="text-[11px] text-black/50 truncate">
-                                {track.artists.map((a) => a.name).join(', ')}
-                              </p>
-                            </div>
-                            <button
-                              onClick={() => handleAdd(track)}
-                              className="p-1.5 rounded-lg bg-black text-white hover:bg-black/80 transition-colors shrink-0"
-                              aria-label={t('favorites.addTrack')}
-                            >
-                              <Plus size={13} />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <AddFavoriteForm tracks={tracks} onAdd={addTrack} onClose={close} />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
 
-        {/* Lista da playlist */}
+        {/* Skeleton exibido enquanto carrega a playlist */}
         {isLoading && (
           <div className="space-y-1">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -251,25 +151,24 @@ export function Favorites() {
           </div>
         )}
 
+        {/* Estado vazio após carregamento */}
         {!isLoading && tracks.length === 0 && (
           <EmptyState message={t('favorites.emptyList')} icon={<Music size={32} />} />
         )}
 
+        {/* Lista de faixas favoritas */}
         {!isLoading && tracks.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {tracks.map((track) => (
-              <div key={track.id} className="flex items-center group">
-                <div className="flex-1">
-                  <TrackRow track={track} isActive={false} onPlay={playTrack} />
-                </div>
-                <button
-                  onClick={() => removeTrack(track.uri)}
-                  className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-600"
-                  aria-label={t('favorites.removeConfirm')}
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
+              <FavoriteTrackRow
+                key={track.id}
+                track={track}
+                note={notes[track.uri] ?? ''}
+                isActive={playerState.currentTrack?.uri === track.uri}
+                onPlay={playTrack}
+                onRemove={removeTrack}
+                onSaveNote={updateNote}
+              />
             ))}
           </div>
         )}
