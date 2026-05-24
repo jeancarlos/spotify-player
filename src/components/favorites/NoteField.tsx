@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -13,6 +13,11 @@ export function NoteField({ uri, note, onSave }: NoteFieldProps) {
   const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(note)
+
+  // Sincroniza o valor editável quando a nota muda externamente (ex: hidratação)
+  useEffect(() => {
+    if (!editing) setValue(note)
+  }, [note, editing])
 
   const commit = () => {
     setEditing(false)
