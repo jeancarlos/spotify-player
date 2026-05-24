@@ -9,6 +9,8 @@ import type { AudioFeatures, SpotifyTrack } from '@/types/spotify'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 import { StatCard } from '@/components/shared/StatCard'
 import { MoodZone } from '@/components/shared/MoodZone'
+import { FlippableCover } from '@/components/shared/FlippableCover'
+import { useAlbumBackCover } from '@/hooks/queries/useAlbumBackCover'
 
 const GENRE_POOL = [
   'pop', 'rock', 'indie', 'electronic', 'r&b', 'hip-hop', 'alternative',
@@ -60,6 +62,9 @@ export function TrackInfoPanel({ track }: Props) {
   const artist = useArtist(track.artists[0]?.id)
   const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
 
+  const artistName = track.artists[0]?.name ?? ''
+  const { backUrl } = useAlbumBackCover(track.album.id, track.album.name, artistName)
+
   const realFeatures = features.data?.[0] ?? null
   const f: AudioFeatures = realFeatures ?? fakeFeatures(track.id)
   const hasRealFeatures = realFeatures !== null
@@ -72,14 +77,12 @@ export function TrackInfoPanel({ track }: Props) {
       <div className="flex flex-col items-center gap-6 px-5 py-4">
 
         {/* Album art */}
-        <div className="relative group">
-          <div className="absolute -inset-4 bg-white/5 rounded-lg blur-2xl transition-all duration-500 group-hover:bg-white/10" />
-          <img
-            src={track.album.images[0]?.url}
-            alt={track.album.name}
-            className="relative w-44 h-44 rounded-lg object-cover shadow-2xl transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
+        <FlippableCover
+          frontUrl={track.album.images[0]?.url}
+          backUrl={backUrl}
+          size={176}
+          name={track.album.name}
+        />
 
         {/* Track metadata */}
         <div className="text-center space-y-1">
