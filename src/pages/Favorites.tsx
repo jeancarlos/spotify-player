@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Music, Plus, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
+import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
@@ -25,29 +26,7 @@ export function Favorites() {
 
   const close = useCallback(() => { setOpen(false); }, [])
 
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: MouseEvent) => {
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(e.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target as Node)
-      )
-        close()
-    }
-    document.addEventListener('mousedown', handler)
-    return () => { document.removeEventListener('mousedown', handler); }
-  }, [open, close])
-
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
-    }
-    document.addEventListener('keydown', handler)
-    return () => { document.removeEventListener('keydown', handler); }
-  }, [open, close])
+  usePopoverDismiss(open, close, buttonRef, popoverRef)
 
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">

@@ -1,10 +1,58 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, Heart, LogOut, Menu, X, Home } from 'lucide-react'
-import { useEffect, useRef, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useUI } from '@/hooks/useUI'
+import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
+
+function MenuToggleIcon({ isOpen }: { isOpen: boolean }) {
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {isOpen ? (
+        <motion.span
+          key="close"
+          initial={{ rotate: -90, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          exit={{ rotate: 90, opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          style={{ display: 'flex' }}
+        >
+          <X size={20} className="text-black/70" />
+        </motion.span>
+      ) : (
+        <motion.span
+          key="menu"
+          initial={{ rotate: 90, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          exit={{ rotate: -90, opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          style={{ display: 'flex' }}
+        >
+          <Menu size={20} className="text-black/70" />
+        </motion.span>
+      )}
+    </AnimatePresence>
+  )
+}
+
+function ProfileAvatar({ avatarUrl, displayName }: { avatarUrl?: string; displayName?: string }) {
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt="avatar"
+        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+      />
+    )
+  }
+  return (
+    <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-black/40 font-bold text-sm flex-shrink-0">
+      {displayName?.[0] ?? '?'}
+    </div>
+  )
+}
 
 export function HamburgerMenu() {
   const { state: uiState, dispatch: uiDispatch } = useUI()
@@ -20,32 +68,7 @@ export function HamburgerMenu() {
   const toggle = () => { uiDispatch({ type: isOpen ? 'CLOSE_SIDEBAR' : 'OPEN_SIDEBAR' }); }
   const close = useCallback(() => { uiDispatch({ type: 'CLOSE_SIDEBAR' }); }, [uiDispatch])
 
-  // Close on outside click
-  useEffect(() => {
-    if (!isOpen) return
-    const handleClick = (e: MouseEvent) => {
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(e.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target as Node)
-      ) {
-        close()
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => { document.removeEventListener('mousedown', handleClick); }
-  }, [isOpen, close])
-
-  // Close on Escape
-  useEffect(() => {
-    if (!isOpen) return
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
-    }
-    document.addEventListener('keydown', handleKey)
-    return () => { document.removeEventListener('keydown', handleKey); }
-  }, [isOpen, close])
+  usePopoverDismiss(isOpen, close, buttonRef, popoverRef)
 
   const handleNav = (path: string) => {
     close()
@@ -71,31 +94,7 @@ export function HamburgerMenu() {
           aria-expanded={isOpen}
           aria-haspopup="true"
         >
-          <AnimatePresence mode="wait" initial={false}>
-            {isOpen ? (
-              <motion.span
-                key="close"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                style={{ display: 'flex' }}
-              >
-                <X size={20} className="text-black/70" />
-              </motion.span>
-            ) : (
-              <motion.span
-                key="menu"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                style={{ display: 'flex' }}
-              >
-                <Menu size={20} className="text-black/70" />
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <MenuToggleIcon isOpen={isOpen} />
         </button>
 
         {/* Popover */}
@@ -113,17 +112,10 @@ export function HamburgerMenu() {
             >
               {/* Profile header */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-black/5">
-                {avatar ? (
-                  <img
-                    src={avatar}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-black/40 font-bold text-sm flex-shrink-0">
-                    {authState.profile?.display_name[0] ?? '?'}
-                  </div>
-                )}
+                <ProfileAvatar
+                  avatarUrl={avatar}
+                  displayName={authState.profile?.display_name}
+                />
                 <span className="text-sm font-semibold text-black truncate">
                   {authState.profile?.display_name ?? ''}
                 </span>
