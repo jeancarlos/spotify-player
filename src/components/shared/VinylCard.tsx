@@ -42,17 +42,14 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           draggable={false}
         />
 
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
-        {/* Play icon on hover */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
             <Play size={14} className="text-white fill-white ml-0.5" />
           </div>
         </div>
 
-        {/* Active sound bars */}
         {isActive && (
           <div className="absolute top-2 right-2 flex items-end gap-[2px] h-3">
             {[0, 150, 300].map((delay) => (
@@ -69,7 +66,6 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           </div>
         )}
 
-        {/* Text at bottom */}
         <div className="absolute inset-x-0 bottom-0 px-3 pb-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
           <p className="text-[11px] font-bold text-white truncate leading-tight drop-shadow-sm">
             {track.name}

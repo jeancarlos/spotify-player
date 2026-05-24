@@ -21,7 +21,7 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
       id={listboxId}
       role="listbox"
       aria-label={label}
-      className="absolute top-full rounded-xl rounded-t-none h-[160px] mt-1 left-0 right-0 bg-white overflow-y-auto max-h-60 z-50 shadow-xl"
+      className="absolute top-full rounded-xl rounded-t-none h-[160px] mt-1 left-0 right-0 bg-white/90 backdrop-blur-sm overflow-y-auto max-h-60 z-50 shadow-xl"
     >
       {results.map((track, i) => (
         <li

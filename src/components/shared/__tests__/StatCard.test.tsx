@@ -17,8 +17,7 @@ describe('StatCard', () => {
   it('does not render label element if label is not provided', () => {
     render(<StatCard value="55" />)
     expect(screen.getByText('55')).toBeInTheDocument()
-    // By checking that only the value is there and no empty span
     const allSpans = screen.getAllByText(/.*/)
-    expect(allSpans.length).toBeGreaterThan(0) // just a sanity check
+    expect(allSpans.length).toBeGreaterThan(0)
   })
 })
