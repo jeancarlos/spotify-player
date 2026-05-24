@@ -135,7 +135,11 @@
     "isFavorite": "♥ FAVORITE",
     "noteCharsLeft": "{{count}}/80",
     "editNote": "Edit note",
-    "clearTrack": "Clear selection"
+    "clearTrack": "Clear selection",
+    "refreshFromSpotify": "Refresh from Spotify",
+    "reorderError": "Reorder failed. Previous order restored.",
+    "refreshError": "Failed to refresh from Spotify.",
+    "reorderPosition": "Edit position of {{name}}"
   },
   "lyrics": {
     "searching": "Searching lyrics...",
