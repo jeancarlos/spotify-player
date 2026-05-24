@@ -39,11 +39,10 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const userId = authState.profile?.id ?? ''
   const isFavorite = useIsTrackFavorite(state.currentTrack?.uri, userId)
 
-  const [notes, setNotes] = useState<Record<string, string>>(() =>
-    userId ? readLocalNotes(userId) : {}
-  )
+  const [notes, setNotes] = useState<Record<string, string>>({})
   useEffect(() => {
     if (!userId) return
+    setNotes(readLocalNotes(userId))
     const handler = () => setNotes(readLocalNotes(userId))
     window.addEventListener('spoter:favorites-changed', handler)
     return () => window.removeEventListener('spoter:favorites-changed', handler)
