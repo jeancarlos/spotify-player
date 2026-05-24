@@ -57,7 +57,7 @@ export function CollectionHeader({
   return (
     <div className="">
       <div
-        className="absolute left-1/2"
+        className="absolute z-1 left-1/2"
         style={{ transform: 'translateX(-50%) translateY(-16px)', top: 0, zIndex: 2 }}
       >
         <motion.div
@@ -77,6 +77,19 @@ export function CollectionHeader({
           </TiltCover>
         </motion.div>
       </div>
+
+      {imageUrl && (
+        <motion.img
+          src={imageUrl}
+          aria-hidden="true"
+          alt={name}
+          className="absolute left-0 right-0 top-[-300px] sepia-[.25] h-[600px] scale-2 opacity-10 w-full blur-3xl z-0"
+          draggable={false}
+          animate={{ opacity: 0.10 }}
+          initial={{ opacity: 0, scale: 1 }}
+          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+        />
+      )}
 
       <motion.div
         className="absolute left-0 right-0 flex flex-col items-center pointer-events-auto"

@@ -68,20 +68,17 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
         </motion.div>
       </div>
 
-      {/* artist image for gradient overlay */}
-      {imageUrl ? (
+      {imageUrl && (
         <motion.img
           src={imageUrl}
           aria-hidden="true"
           alt={name}
-          className="absolute left-0 right-0 top-[-100px] h-[500px] scale-125 opacity-10 w-full blur-3xl z-0"
+          className="absolute left-0 right-0 top-[-100px] h-[500px]  sepia-[.25] scale-125 opacity-10 w-full blur-3xl z-0"
           draggable={false}
-          animate={{ opacity: 0.25 }}
+          animate={{ opacity: 0.10 }}
           initial={{ opacity: 0, scale: 1 }}
           transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
         />
-      ) : (
-        <div className="w-full h-full rounded-full bg-black/10" />
       )}
 
       <motion.div
