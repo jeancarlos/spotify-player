@@ -25,7 +25,7 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
           (val) => val !== null && typeof val === 'object' && 'uri' in val,
           { message: t('favorites.trackRequired') }
         ),
-        note: z.string().max(300, t('favorites.noteTooLong')).default(''),
+        note: z.string().max(80, t('favorites.noteTooLong')).default(''),
       }),
     [t]
   )
@@ -93,7 +93,7 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
         <textarea
           {...register('note')}
           placeholder={t('favorites.notePlaceholder')}
-          maxLength={300}
+          maxLength={80}
           rows={2}
           className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors resize-none"
         />

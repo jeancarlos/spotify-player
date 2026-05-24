@@ -29,9 +29,7 @@ export function VinylDisk({
     ? { duration: 8, ease: 'linear', repeat: Infinity }
     : { duration: 1.2, ease: 'easeOut' }
 
-  const animation = {
-    rotate: isPlaying ? 360 : 0,
-  }
+  const animation = { rotate: isPlaying ? 360 : 0 }
 
   return (
     <div
@@ -48,7 +46,7 @@ export function VinylDisk({
       />
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div
-          className="relative rounded-full overflow-hidden border-0 border-white/30"
+          className="relative rounded-full overflow-hidden"
           style={{ width: '26%', height: '26%' }}
         >
           <motion.img
@@ -67,7 +65,7 @@ export function VinylDisk({
         </div>
       </div>
       {favoriteLabel && px >= 180 && (
-        <ArcTextOverlay label={favoriteLabel} diskPx={px} />
+        <ArcTextOverlay label={favoriteLabel} diskPx={px} isPlaying={isPlaying} />
       )}
     </div>
   )

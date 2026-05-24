@@ -65,7 +65,7 @@ export function Artists() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-3xl mx-auto ">
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
         <SearchBar
           onSearch={handleSearch}

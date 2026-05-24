@@ -103,6 +103,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
         className={cn(
           'w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black',
           'placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors',
+          isOpen ? 'rounded-b-none' : 'rounded-xl',
           error && 'ring-1 ring-red-400'
         )}
         onChange={(e) => {
@@ -130,7 +131,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
           id={listboxId}
           role="listbox"
           aria-label={t('favorites.trackLabel')}
-          className="absolute top-full mt-1 left-0 right-0 bg-white rounded-xl overflow-y-auto max-h-60 z-50 shadow-xl"
+          className="absolute top-full rounded-xl rounded-t-none h-[160px] mt-1 left-0 right-0 bg-white overflow-y-auto max-h-60 z-50 shadow-xl"
         >
           {results.map((track, i) => (
             <li

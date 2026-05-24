@@ -6,6 +6,7 @@ import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useAuth } from '@/hooks/useAuth'
 import { useIsTrackFavorite } from '@/hooks/useIsTrackFavorite'
+import { readLocalNotes } from '@/utils/favStorage'
 
 const PLAYER_CLEARANCE = 136
 
@@ -38,11 +39,22 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const userId = authState.profile?.id ?? ''
   const isFavorite = useIsTrackFavorite(state.currentTrack?.uri, userId)
 
+  const [notes, setNotes] = useState<Record<string, string>>(() =>
+    userId ? readLocalNotes(userId) : {}
+  )
+  useEffect(() => {
+    if (!userId) return
+    const handler = () => setNotes(readLocalNotes(userId))
+    window.addEventListener('spoter:favorites-changed', handler)
+    return () => window.removeEventListener('spoter:favorites-changed', handler)
+  }, [userId])
+
   const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'
 
   const albumArt = state.currentTrack?.album.images[0]?.url
   const albumName = state.currentTrack?.album.name
+  const currentNote = state.currentTrack?.uri ? notes[state.currentTrack.uri] : undefined
 
   const getY = () => {
     if (isLogin) return loginY
@@ -64,7 +76,7 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
           isPlaying={state.isPlaying}
           albumArt={isLogin ? undefined : albumArt}
           albumName={isLogin ? undefined : albumName}
-          favoriteLabel={isFavorite && !isLogin ? t('favorites.isFavorite') : undefined}
+          favoriteLabel={isFavorite && !isLogin ? (currentNote || t('favorites.isFavorite')) : undefined}
         />
       </motion.div>
     </div>
