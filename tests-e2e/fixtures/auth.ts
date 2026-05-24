@@ -61,12 +61,53 @@ async function setupApiRoutes(page: Page) {
   await page.route('**/api.spotify.com/v1/artists/*/albums**', (route) =>
     route.fulfill({ json: pagingOf(mockAlbums) })
   )
+  await page.route('**/api.spotify.com/v1/artists/*/related-artists**', (route) =>
+    route.fulfill({ json: { artists: [] } })
+  )
   await page.route('**/api.spotify.com/v1/artists/*', (route) =>
     route.fulfill({ json: mockArtist() })
   )
-  await page.route('**/api.spotify.com/v1/me/playlists**', (route) =>
-    route.fulfill({ json: pagingOf([]) })
+  await page.route('**/api.spotify.com/v1/me/playlists**', async (route) => {
+    if (route.request().method() === 'POST') {
+      await route.fulfill({
+        json: {
+          id: 'e2e-playlist',
+          name: 'E2E Playlist',
+          public: false,
+          tracks: { total: 0, href: '', items: [] },
+          images: [],
+          owner: { id: 'user1', display_name: 'Test User', uri: '', external_urls: { spotify: '' }, type: 'user', href: '' },
+          uri: 'spotify:playlist:e2e-playlist',
+          type: 'playlist',
+          external_urls: { spotify: '' },
+          href: '',
+          snapshot_id: 'snap1',
+        },
+      })
+    } else {
+      await route.fulfill({ json: pagingOf([]) })
+    }
+  })
+  await page.route('**/api.spotify.com/v1/playlists/*/items**', (route) =>
+    route.fulfill({
+      json: {
+        items: [],
+        limit: 50,
+        offset: 0,
+        total: 0,
+        next: null,
+        previous: null,
+        href: '',
+      },
+    })
   )
+  await page.route('**/api.spotify.com/v1/playlists/**', async (route) => {
+    if (route.request().method() === 'PUT') {
+      await route.fulfill({ status: 202 })
+    } else {
+      await route.fallback()
+    }
+  })
   await page.route('**/api.spotify.com/v1/me/player**', (route) =>
     route.fulfill({
       json: {
