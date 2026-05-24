@@ -76,7 +76,7 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
           isPlaying={state.isPlaying}
           albumArt={isLogin ? undefined : albumArt}
           albumName={isLogin ? undefined : albumName}
-          favoriteLabel={isFavorite && !isLogin ? (currentNote || t('favorites.isFavorite')) : undefined}
+          favoriteLabel={isFavorite && !isLogin && currentNote ? currentNote : undefined}
         />
       </motion.div>
     </div>
