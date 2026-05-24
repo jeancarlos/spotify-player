@@ -26,8 +26,10 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
       localStorage.setItem('spoter_lang', action.payload)
       return { ...state, language: action.payload }
     }
-    case 'OPEN_SIDEBAR': return { ...state, sidebarOpen: true }
-    case 'CLOSE_SIDEBAR': return { ...state, sidebarOpen: false }
+    case 'OPEN_SIDEBAR':
+      return { ...state, sidebarOpen: true }
+    case 'CLOSE_SIDEBAR':
+      return { ...state, sidebarOpen: false }
     default:
       return state
   }

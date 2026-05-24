@@ -14,28 +14,31 @@ import spoterListCover from '@/assets/spoterListCover'
 const LEGACY_KEY = 'spoter_playlist_id'
 
 const storageKey = (userId: string) => `spoter_playlist_${userId}`
-const coverKey   = (userId: string) => `spoter_cover_v2_${userId}`
+const coverKey = (userId: string) => `spoter_cover_v2_${userId}`
 
 export function useSpoterPlaylist() {
   const { t } = useTranslation()
   const { state: authState } = useAuth()
-  const userId      = authState.profile?.id ?? ''
+  const userId = authState.profile?.id ?? ''
   const displayName = authState.profile?.display_name ?? ''
 
   const playlistName = useMemo(
-    () => displayName ? `${displayName.charAt(0).toUpperCase() + displayName.slice(1)}'s ${t('playlist.defaultName')}` : t('playlist.defaultName'),
-    [displayName, t],
+    () =>
+      displayName
+        ? `${displayName.charAt(0).toUpperCase() + displayName.slice(1)}'s ${t('playlist.defaultName')}`
+        : t('playlist.defaultName'),
+    [displayName, t]
   )
 
   const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
-  const coverUploaded   = useRef(false)
+  const coverUploaded = useRef(false)
 
-  const playlists      = useUserPlaylists(!!userId)
+  const playlists = useUserPlaylists(!!userId)
   const createPlaylist = useCreatePlaylist()
   const updatePlaylist = useUpdatePlaylist()
-  const uploadCover    = useUploadPlaylistCover()
-  const addMutation    = useAddToPlaylist()
+  const uploadCover = useUploadPlaylistCover()
+  const addMutation = useAddToPlaylist()
   const removeMutation = useRemoveFromPlaylist()
 
   // Migra chave antiga (shared) para chave por usuário
@@ -59,7 +62,7 @@ export function useSpoterPlaylist() {
     if (saved) return saved
 
     if (playlists.data) {
-      const found = playlists.data.items.find(p => p.name === playlistName)
+      const found = playlists.data.items.find((p) => p.name === playlistName)
       if (found) return found.id
     }
 
@@ -78,22 +81,30 @@ export function useSpoterPlaylist() {
     if (!playlists.isSuccess || playlistId || !userId || createAttempted.current) return
 
     createAttempted.current = true
-    createPlaylist.mutate({ userId, name: playlistName }, {
-      onSuccess: (p) => {
-        localStorage.setItem(storageKey(userId), p.id)
-        setForcedId(p.id)
-        uploadCover.mutate({ playlistId: p.id, base64Jpeg: spoterListCover }, {
-          onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
-        })
-      },
-      onError: () => { createAttempted.current = false },
-    })
+    createPlaylist.mutate(
+      { userId, name: playlistName },
+      {
+        onSuccess: (p) => {
+          localStorage.setItem(storageKey(userId), p.id)
+          setForcedId(p.id)
+          uploadCover.mutate(
+            { playlistId: p.id, base64Jpeg: spoterListCover },
+            {
+              onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
+            }
+          )
+        },
+        onError: () => {
+          createAttempted.current = false
+        },
+      }
+    )
   }, [playlists.isSuccess, playlistId, userId, playlistName, createPlaylist, uploadCover])
 
   const resetStalePlaylist = (uid: string) => {
     localStorage.removeItem(storageKey(uid))
     createAttempted.current = false
-    coverUploaded.current   = false
+    coverUploaded.current = false
     setForcedId(null)
   }
 
@@ -102,7 +113,7 @@ export function useSpoterPlaylist() {
     if (!playlists.isSuccess || !playlistId || !userId) return
 
     // Se o ID salvo não existe mais nas playlists do usuário → resetar
-    const existing = playlists.data?.items.find(p => p.id === playlistId)
+    const existing = playlists.data?.items.find((p) => p.id === playlistId)
     if (!existing) {
       setTimeout(() => resetStalePlaylist(userId), 0)
       return
@@ -114,13 +125,26 @@ export function useSpoterPlaylist() {
 
     if (!coverUploaded.current && !localStorage.getItem(coverKey(userId))) {
       coverUploaded.current = true
-      uploadCover.mutate({ playlistId, base64Jpeg: spoterListCover }, {
-        onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
-        onError:   () => { coverUploaded.current = false },
-      })
+      uploadCover.mutate(
+        { playlistId, base64Jpeg: spoterListCover },
+        {
+          onSuccess: () => localStorage.setItem(coverKey(userId), '1'),
+          onError: () => {
+            coverUploaded.current = false
+          },
+        }
+      )
     }
-   
-  }, [playlists.isSuccess, playlistId, userId, displayName, playlistName, playlists.data, updatePlaylist, uploadCover])
+  }, [
+    playlists.isSuccess,
+    playlistId,
+    userId,
+    displayName,
+    playlistName,
+    playlists.data,
+    updatePlaylist,
+    uploadCover,
+  ])
 
   const tracksQuery = usePlaylistTracks(playlistId, !!playlistId, 1, 50)
 
@@ -128,18 +152,22 @@ export function useSpoterPlaylist() {
     if (tracksQuery.isError && (tracksQuery.error as AxiosError).response?.status === 404) {
       if (userId) localStorage.removeItem(storageKey(userId))
       createAttempted.current = false
-      coverUploaded.current   = false
+      coverUploaded.current = false
       setTimeout(() => setForcedId(''), 0)
     }
   }, [tracksQuery.isError, tracksQuery.error, userId])
 
-  const addTrack    = (uri: string) => { if (playlistId) addMutation.mutate({ playlistId, uris: [uri] }) }
-  const removeTrack = (uri: string) => { if (playlistId) removeMutation.mutate({ playlistId, uris: [uri] }) }
+  const addTrack = (uri: string) => {
+    if (playlistId) addMutation.mutate({ playlistId, uris: [uri] })
+  }
+  const removeTrack = (uri: string) => {
+    if (playlistId) removeMutation.mutate({ playlistId, uris: [uri] })
+  }
 
   return {
     playlistId,
     playlistName,
-    tracks: tracksQuery.data?.items.map(i => i.item) ?? [],
+    tracks: tracksQuery.data?.items.map((i) => i.item) ?? [],
     addTrack,
     removeTrack,
     isLoading: !!userId && (!playlists.isSuccess || (!!playlistId && tracksQuery.isLoading)),

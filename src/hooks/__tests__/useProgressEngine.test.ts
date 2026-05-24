@@ -15,7 +15,7 @@ describe('useProgressEngine', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
-  
+
   afterEach(() => {
     vi.useRealTimers()
     vi.clearAllMocks()
@@ -33,9 +33,9 @@ describe('useProgressEngine', () => {
     vi.mocked(useNowPlaying).mockReturnValue({
       data: { is_playing: false, progress_ms: 5000, timestamp: now },
     } as ReturnType<typeof useNowPlaying>)
-    
+
     const { result } = renderHook(() => useProgressEngine())
-    
+
     act(() => {
       // Execute the setTimeout(update, 0)
       vi.advanceTimersByTime(1)
@@ -50,9 +50,9 @@ describe('useProgressEngine', () => {
     vi.mocked(useNowPlaying).mockReturnValue({
       data: { is_playing: true, progress_ms: 5000, timestamp: now },
     } as ReturnType<typeof useNowPlaying>)
-    
+
     const { result } = renderHook(() => useProgressEngine())
-    
+
     act(() => {
       // First, trigger the initialization
       vi.advanceTimersByTime(1)
@@ -69,13 +69,13 @@ describe('useProgressEngine', () => {
     vi.mocked(useNowPlaying).mockReturnValue({
       data: { is_playing: false, progress_ms: 5000, timestamp: now },
     } as ReturnType<typeof useNowPlaying>)
-    
+
     const { result } = renderHook(() => useProgressEngine())
-    
+
     act(() => {
       result.current.seekTo(30000)
     })
-    
+
     expect(result.current.currentProgress).toBe(30000)
   })
 })

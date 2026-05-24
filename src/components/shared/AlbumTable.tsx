@@ -19,13 +19,19 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
             <th className="text-left py-2 px-3 text-black/30 font-semibold w-10"></th>
             <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('common.name')}</th>
             <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('track.type')}</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('track.releaseYear')}</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('track.trackCount')}</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('common.popularity')}</th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">
+              {t('track.releaseYear')}
+            </th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">
+              {t('track.trackCount')}
+            </th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">
+              {t('common.popularity')}
+            </th>
           </tr>
         </thead>
         <tbody>
-          {albums.map(album => (
+          {albums.map((album) => (
             <tr
               key={album.id}
               className="group hover:bg-black/4 transition-colors cursor-pointer"

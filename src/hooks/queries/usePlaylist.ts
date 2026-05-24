@@ -7,10 +7,9 @@ export function usePlaylist(playlistId: string | undefined) {
     queryKey: ['playlist', playlistId],
     enabled: !!playlistId,
     queryFn: async () => {
-      const { data } = await api.get<SpotifyPlaylist>(
-        `/playlists/${playlistId}`,
-        { params: { fields: 'id,name,description,images,owner,uri,public,snapshot_id,external_urls' } }
-      )
+      const { data } = await api.get<SpotifyPlaylist>(`/playlists/${playlistId}`, {
+        params: { fields: 'id,name,description,images,owner,uri,public,snapshot_id,external_urls' },
+      })
       return data
     },
   })

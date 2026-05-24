@@ -12,8 +12,21 @@ import { MoodZone } from '@/components/shared/MoodZone'
 import { TiltCover } from '@/components/shared/TiltCover'
 
 const GENRE_POOL = [
-  'pop', 'rock', 'indie', 'electronic', 'r&b', 'hip-hop', 'alternative',
-  'soul', 'folk', 'jazz', 'classical', 'metal', 'punk', 'blues', 'country',
+  'pop',
+  'rock',
+  'indie',
+  'electronic',
+  'r&b',
+  'hip-hop',
+  'alternative',
+  'soul',
+  'folk',
+  'jazz',
+  'classical',
+  'metal',
+  'punk',
+  'blues',
+  'country',
 ]
 
 function h(s: string, offset: number): number {
@@ -31,10 +44,10 @@ function fakeFeatures(id: string): AudioFeatures {
     analysis_url: '',
     danceability: 0.25 + h(id, 0) * 0.65,
     energy: 0.25 + h(id, 1) * 0.65,
-    valence: 0.15 + h(id, 2) * 0.70,
+    valence: 0.15 + h(id, 2) * 0.7,
     acousticness: h(id, 3) * 0.85,
     speechiness: h(id, 4) * 0.25,
-    instrumentalness: h(id, 5) * 0.60,
+    instrumentalness: h(id, 5) * 0.6,
     liveness: 0.05 + h(id, 6) * 0.35,
     loudness: -18 + h(id, 7) * 14,
     tempo: 70 + h(id, 8) * 110,
@@ -52,7 +65,9 @@ function fakeGenres(artistId: string): string[] {
   return [...new Set([GENRE_POOL[a], GENRE_POOL[b], GENRE_POOL[c]])].slice(0, 3)
 }
 
-interface Props { track: SpotifyTrack }
+interface Props {
+  track: SpotifyTrack
+}
 
 export function TrackInfoPanel({ track }: Props) {
   const { t } = useTranslation()
@@ -71,20 +86,22 @@ export function TrackInfoPanel({ track }: Props) {
   return (
     <div>
       <div className="flex flex-col items-center gap-6 px-5 py-4">
-
         {/* Album art */}
-        <TiltCover
-          imageUrl={track.album.images[0]?.url}
-          size={176}
-          name={track.album.name}
-        />
+        <TiltCover imageUrl={track.album.images[0]?.url} size={176} name={track.album.name} />
 
         {/* Track metadata */}
         <div className="text-center space-y-1">
           <div className="flex items-center justify-center gap-2">
-            <h2 className="text-xl font-bold text-white tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>{track.name}</h2>
+            <h2
+              className="text-xl font-bold text-white tracking-tight"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {track.name}
+            </h2>
             {track.explicit && (
-              <span className="text-[9px] font-black text-black bg-white/80 rounded px-1 py-0.5 shrink-0">E</span>
+              <span className="text-[9px] font-black text-black bg-white/80 rounded px-1 py-0.5 shrink-0">
+                E
+              </span>
             )}
           </div>
           <div className="flex flex-wrap justify-center gap-1">
@@ -127,11 +144,13 @@ export function TrackInfoPanel({ track }: Props) {
           </Section>
         )}
 
-
         {/* Genre tags */}
         <div className="flex flex-wrap justify-center gap-1.5">
-          {genres.map(g => (
-            <span key={g} className="text-[10px] px-2.5 py-1 rounded-xl bg-white/5 border border-white/5 text-white/60 capitalize font-medium hover:bg-white/10 transition-colors">
+          {genres.map((g) => (
+            <span
+              key={g}
+              className="text-[10px] px-2.5 py-1 rounded-xl bg-white/5 border border-white/5 text-white/60 capitalize font-medium hover:bg-white/10 transition-colors"
+            >
               {g}
             </span>
           ))}
@@ -154,7 +173,9 @@ export function TrackInfoPanel({ track }: Props) {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="w-full max-w-sm">
-      <p className="text-[9px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">{label}</p>
+      <p className="text-[9px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">
+        {label}
+      </p>
       {children}
     </div>
   )

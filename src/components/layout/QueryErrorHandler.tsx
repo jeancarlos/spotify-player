@@ -9,7 +9,7 @@ export function QueryErrorHandler() {
   const { t } = useTranslation()
 
   useEffect(() => {
-    const unsubscribe = queryClient.getQueryCache().subscribe(event => {
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
       // Only fire on the first error transition, not on every polling retry
       if (event.type !== 'updated') return
       if (!('action' in event) || (event.action as { type: string }).type !== 'error') return

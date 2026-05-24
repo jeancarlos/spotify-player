@@ -56,11 +56,7 @@ export function useSearchPaged<T, R>({
       return {
         ...gp(res2.data),
         offset: base,
-        items: [
-          ...r1Items,
-          ...gp(res2.data).items,
-          ...gp(r3.data).items,
-        ],
+        items: [...r1Items, ...gp(res2.data).items, ...gp(r3.data).items],
         r4: gp(r4.data).items,
         limit: PAGE_SIZE,
       }
@@ -92,11 +88,7 @@ export function useSearchPaged<T, R>({
         return {
           ...gp(res2.data),
           offset: nextBase,
-          items: [
-            ...r4Items,
-            ...gp(res2.data).items,
-            ...gp(r3.data).items,
-          ],
+          items: [...r4Items, ...gp(res2.data).items, ...gp(r3.data).items],
           r4: gp(r4.data).items,
           limit: PAGE_SIZE,
         }

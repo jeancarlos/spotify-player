@@ -16,13 +16,24 @@ vi.mock('@/components/ui/toast', () => ({
 import api from '@/lib/axios'
 
 const mockTrack = {
-  id: 't1', uri: 'spotify:track:t1', name: 'Test',
-  duration_ms: 200000, explicit: false, popularity: 80,
-  preview_url: null, type: 'track' as const,
+  id: 't1',
+  uri: 'spotify:track:t1',
+  name: 'Test',
+  duration_ms: 200000,
+  explicit: false,
+  popularity: 80,
+  preview_url: null,
+  type: 'track' as const,
   artists: [{ id: 'a1', name: 'Artist', uri: 'spotify:artist:a1', type: 'artist' as const }],
   album: {
-    id: 'al1', name: 'Album', images: [], release_date: '2024',
-    album_type: 'album' as const, artists: [], uri: 'spotify:album:al1', type: 'album' as const,
+    id: 'al1',
+    name: 'Album',
+    images: [],
+    release_date: '2024',
+    album_type: 'album' as const,
+    artists: [],
+    uri: 'spotify:album:al1',
+    type: 'album' as const,
   },
 }
 

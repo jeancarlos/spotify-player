@@ -18,15 +18,15 @@ export function MediaCard({
   onClick,
   imageClassName,
   className,
-  ariaLabel
+  ariaLabel,
 }: MediaCardProps) {
   return (
     <div
-      className={cn("cursor-pointer focus:outline-none group", className)}
+      className={cn('cursor-pointer focus:outline-none group', className)}
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={e => {
+      onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           onClick()
@@ -39,7 +39,7 @@ export function MediaCard({
           <img
             src={imageUrl}
             alt={title}
-            className={cn("w-full h-full object-cover", imageClassName)}
+            className={cn('w-full h-full object-cover', imageClassName)}
             draggable={false}
           />
         ) : (
@@ -57,9 +57,7 @@ export function MediaCard({
             {title}
           </p>
           {subtitle && (
-            <p className="text-[8px] text-white/60 truncate leading-tight">
-              {subtitle}
-            </p>
+            <p className="text-[8px] text-white/60 truncate leading-tight">{subtitle}</p>
           )}
         </div>
       </div>

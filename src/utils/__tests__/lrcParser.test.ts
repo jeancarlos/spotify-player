@@ -7,7 +7,7 @@ describe('parseLRC', () => {
     const result = parseLRC(lrc)
     expect(result).toEqual([
       { time: 1000, text: 'Line 1' },
-      { time: 2500, text: 'Line 2' }
+      { time: 2500, text: 'Line 2' },
     ])
   })
 
@@ -16,7 +16,7 @@ describe('parseLRC', () => {
     const result = parseLRC(lrc)
     expect(result).toEqual([
       { time: 1000, text: 'Repeated line' },
-      { time: 5000, text: 'Repeated line' }
+      { time: 5000, text: 'Repeated line' },
     ])
   })
 
@@ -41,7 +41,7 @@ describe('parsePlainLyrics', () => {
     const result = parsePlainLyrics(text, durationMs)
     expect(result).toEqual([
       { time: 0, text: 'Line 1' },
-      { time: 5000, text: 'Line 2' }
+      { time: 5000, text: 'Line 2' },
     ])
   })
 })

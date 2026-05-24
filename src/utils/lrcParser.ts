@@ -21,7 +21,7 @@ export function parseLRC(lrc: string): LyricLine[] {
       const seconds = parseInt(match[2], 10)
       const msPart = match[3]
       const milliseconds = parseInt(msPart.padEnd(3, '0'), 10)
-      
+
       const timeInMs = minutes * 60 * 1000 + seconds * 1000 + milliseconds
       timestamps.push(timeInMs)
     }
@@ -44,12 +44,15 @@ export function parseLRC(lrc: string): LyricLine[] {
  * Estimates timestamps based on total duration.
  */
 export function parsePlainLyrics(text: string, durationMs: number): LyricLine[] {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
   if (lines.length === 0) return []
-  
+
   const lineDuration = durationMs / lines.length
   return lines.map((text, i) => ({
     time: i * lineDuration,
-    text
+    text,
   }))
 }

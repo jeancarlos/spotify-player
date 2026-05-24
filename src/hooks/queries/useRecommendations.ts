@@ -15,7 +15,7 @@ export function useRecommendations(seedArtistIds: string[], limit = 20) {
     queryFn: async () => {
       try {
         const params = new URLSearchParams({ limit: String(limit) })
-        seedArtistIds.slice(0, 5).forEach(id => params.append('seed_artists', id))
+        seedArtistIds.slice(0, 5).forEach((id) => params.append('seed_artists', id))
         const { data } = await api.get<RecommendationsResponse>(`/recommendations?${params}`)
         return data.tracks
       } catch (err) {

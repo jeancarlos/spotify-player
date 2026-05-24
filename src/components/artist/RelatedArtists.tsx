@@ -19,19 +19,25 @@ export function RelatedArtists({ artistId }: RelatedArtistsProps) {
   const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
-  const handleNavigate = useCallback((id: string) => {
-    navigate(`/artists/${id}`, { state: { from: location.pathname } })
-  }, [navigate, location.pathname])
+  const handleNavigate = useCallback(
+    (id: string) => {
+      navigate(`/artists/${id}`, { state: { from: location.pathname } })
+    },
+    [navigate, location.pathname]
+  )
 
   useEffect(() => {
     const sentinel = sentinelRef.current
     if (!sentinel || !related.data) return
 
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        setVisibleCount(c => Math.min(c + PAGE_SIZE, related.data!.length))
-      }
-    }, { threshold: 0.1 })
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((c) => Math.min(c + PAGE_SIZE, related.data!.length))
+        }
+      },
+      { threshold: 0.1 }
+    )
 
     observer.observe(sentinel)
     return () => observer.disconnect()
@@ -43,19 +49,15 @@ export function RelatedArtists({ artistId }: RelatedArtistsProps) {
 
   return (
     <section className="mb-8">
-      <h3 className="text-sm font-bold text-black/50 mb-3 px-2">{t('artistDetail.relatedArtists')}</h3>
+      <h3 className="text-sm font-bold text-black/50 mb-3 px-2">
+        {t('artistDetail.relatedArtists')}
+      </h3>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 px-2">
-        {visible.map(artist => (
-          <ArtistCard
-            key={artist.id}
-            artist={artist}
-            onNavigate={handleNavigate}
-          />
+        {visible.map((artist) => (
+          <ArtistCard key={artist.id} artist={artist} onNavigate={handleNavigate} />
         ))}
       </div>
-      {visibleCount < (related.data.length) && (
-        <div ref={sentinelRef} className="h-4 mt-2" />
-      )}
+      {visibleCount < related.data.length && <div ref={sentinelRef} className="h-4 mt-2" />}
     </section>
   )
 }

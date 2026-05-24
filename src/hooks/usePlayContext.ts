@@ -10,14 +10,17 @@ export function usePlayContext() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  return useCallback(async (contextUri: string) => {
-    dispatch({ type: 'SET_PLAYING', payload: true })
-    try {
-      await api.put('/me/player/play', { context_uri: contextUri })
-    } catch (err) {
-      dispatch({ type: 'SET_PLAYING', payload: false })
-      const status = (err as AxiosError).response?.status
-      if (status === 404 || status === 403) toast(t('player.noActiveDevice'), 'info')
-    }
-  }, [dispatch, toast, t])
+  return useCallback(
+    async (contextUri: string) => {
+      dispatch({ type: 'SET_PLAYING', payload: true })
+      try {
+        await api.put('/me/player/play', { context_uri: contextUri })
+      } catch (err) {
+        dispatch({ type: 'SET_PLAYING', payload: false })
+        const status = (err as AxiosError).response?.status
+        if (status === 404 || status === 403) toast(t('player.noActiveDevice'), 'info')
+      }
+    },
+    [dispatch, toast, t]
+  )
 }

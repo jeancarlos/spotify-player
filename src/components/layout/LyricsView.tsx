@@ -2,8 +2,8 @@ import { motion } from 'framer-motion'
 import type { LyricLine } from '@/types/lyrics'
 
 const WINDOW = 4
-const SLOT_OPACITY = [0.05, 0.10, 0.18, 0.35, 1.00, 0.35, 0.18, 0.10, 0.05]
-const SLOT_BLUR    = [4, 3, 2, 1, 0, 1, 2, 3, 4]
+const SLOT_OPACITY = [0.05, 0.1, 0.18, 0.35, 1.0, 0.35, 0.18, 0.1, 0.05]
+const SLOT_BLUR = [4, 3, 2, 1, 0, 1, 2, 3, 4]
 
 interface LyricsViewProps {
   lines: LyricLine[]
@@ -20,7 +20,7 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
     )
   }
 
-  const foundIndex = lines.findLastIndex(line => line.time <= progress)
+  const foundIndex = lines.findLastIndex((line) => line.time <= progress)
   const activeIndex = Math.max(0, foundIndex)
 
   const slots = Array.from({ length: WINDOW * 2 + 1 }, (_, i) => {

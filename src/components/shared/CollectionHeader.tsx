@@ -56,16 +56,13 @@ export function CollectionHeader({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         >
-          <TiltCover
-            imageUrl={imageUrl}
-            size={imgPx}
-            name={name}
-            onClick={onPlay}
-          >
-            <div className={cn(
-              'absolute inset-0 flex items-center justify-center',
-              'bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200',
-            )}>
+          <TiltCover imageUrl={imageUrl} size={imgPx} name={name} onClick={onPlay}>
+            <div
+              className={cn(
+                'absolute inset-0 flex items-center justify-center',
+                'bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+              )}
+            >
               <Play size={48} fill="white" color="white" className="drop-shadow-lg" />
             </div>
           </TiltCover>
@@ -86,13 +83,14 @@ export function CollectionHeader({
           {name}
         </h1>
         <p className="text-sm text-black/50 mt-1">
-          {subtitle}{year ? ` · ${year}` : ''}
+          {subtitle}
+          {year ? ` · ${year}` : ''}
         </p>
         <button
           onClick={onPlay}
           className={cn(
             'mt-4 px-8 py-3 bg-black text-white text-sm font-bold rounded-full',
-            'hover:bg-black/80 active:scale-95 transition-all shadow-lg',
+            'hover:bg-black/80 active:scale-95 transition-all shadow-lg'
           )}
         >
           {playLabel}

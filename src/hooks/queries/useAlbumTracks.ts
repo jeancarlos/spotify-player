@@ -7,10 +7,9 @@ export function useAlbumTracks(albumId: string | undefined, page: number, limit 
     queryKey: ['album-tracks', albumId, page, limit],
     enabled: !!albumId,
     queryFn: async () => {
-      const { data } = await api.get<AlbumTracksResponse>(
-        `/albums/${albumId}/tracks`,
-        { params: { limit, offset: (page - 1) * limit, market: 'BR' } }
-      )
+      const { data } = await api.get<AlbumTracksResponse>(`/albums/${albumId}/tracks`, {
+        params: { limit, offset: (page - 1) * limit, market: 'BR' },
+      })
       return data
     },
   })

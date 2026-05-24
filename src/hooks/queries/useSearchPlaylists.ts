@@ -7,6 +7,6 @@ export function useSearchPlaylists(query: string, page: number) {
     query,
     page,
     apiType: 'playlist',
-    getPage: res => res.playlists,
+    getPage: (res) => res.playlists,
   })
 }

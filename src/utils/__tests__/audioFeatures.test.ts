@@ -3,10 +3,24 @@ import { averageAudioFeatures } from '../audioFeatures'
 import type { AudioFeatures } from '@/types/spotify'
 
 const makeFeature = (v: number): AudioFeatures => ({
-  id: 'x', type: 'audio_features', uri: '', track_href: '', analysis_url: '',
-  danceability: v, energy: v, valence: v, acousticness: v, speechiness: v,
-  instrumentalness: v, liveness: v, loudness: v * -10, tempo: v * 100,
-  duration_ms: 200000, key: 5, mode: 1, time_signature: 4,
+  id: 'x',
+  type: 'audio_features',
+  uri: '',
+  track_href: '',
+  analysis_url: '',
+  danceability: v,
+  energy: v,
+  valence: v,
+  acousticness: v,
+  speechiness: v,
+  instrumentalness: v,
+  liveness: v,
+  loudness: v * -10,
+  tempo: v * 100,
+  duration_ms: 200000,
+  key: 5,
+  mode: 1,
+  time_signature: 4,
 })
 
 describe('averageAudioFeatures', () => {

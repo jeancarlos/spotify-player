@@ -34,12 +34,7 @@ export function AppRoot() {
       </AnimatePresence>
       <PersistentVinylDisk playerHovered={playerHovered} />
       <AnimatePresence>
-        {showPlayer && (
-          <MiniPlayer
-            key="mini-player"
-            onHoverChange={setPlayerHovered}
-          />
-        )}
+        {showPlayer && <MiniPlayer key="mini-player" onHoverChange={setPlayerHovered} />}
       </AnimatePresence>
     </>
   )

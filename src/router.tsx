@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
@@ -6,15 +7,29 @@ import { AppShell } from '@/components/layout/AppShell'
 import { PlayerView } from '@/components/layout/PlayerView'
 
 // Lazy load pages
-const Login = lazy(() => import('@/pages/Login').then(module => ({ default: module.Login })))
-const OAuthCallback = lazy(() => import('@/pages/OAuthCallback').then(module => ({ default: module.OAuthCallback })))
-const Home = lazy(() => import('@/pages/Home').then(module => ({ default: module.Home })))
-const Artists = lazy(() => import('@/pages/Artists').then(module => ({ default: module.Artists })))
-const ArtistDetail = lazy(() => import('@/pages/ArtistDetail').then(module => ({ default: module.ArtistDetail })))
-const AlbumDetail = lazy(() => import('@/pages/AlbumDetail').then(module => ({ default: module.AlbumDetail })))
-const PlaylistDetail = lazy(() => import('@/pages/PlaylistDetail').then(module => ({ default: module.PlaylistDetail })))
-const Favorites = lazy(() => import('@/pages/Favorites').then(module => ({ default: module.Favorites })))
-const Profile = lazy(() => import('@/pages/Profile').then(module => ({ default: module.Profile })))
+const Login = lazy(() => import('@/pages/Login').then((module) => ({ default: module.Login })))
+const OAuthCallback = lazy(() =>
+  import('@/pages/OAuthCallback').then((module) => ({ default: module.OAuthCallback }))
+)
+const Home = lazy(() => import('@/pages/Home').then((module) => ({ default: module.Home })))
+const Artists = lazy(() =>
+  import('@/pages/Artists').then((module) => ({ default: module.Artists }))
+)
+const ArtistDetail = lazy(() =>
+  import('@/pages/ArtistDetail').then((module) => ({ default: module.ArtistDetail }))
+)
+const AlbumDetail = lazy(() =>
+  import('@/pages/AlbumDetail').then((module) => ({ default: module.AlbumDetail }))
+)
+const PlaylistDetail = lazy(() =>
+  import('@/pages/PlaylistDetail').then((module) => ({ default: module.PlaylistDetail }))
+)
+const Favorites = lazy(() =>
+  import('@/pages/Favorites').then((module) => ({ default: module.Favorites }))
+)
+const Profile = lazy(() =>
+  import('@/pages/Profile').then((module) => ({ default: module.Profile }))
+)
 
 // Loading component
 const PageLoader = () => (

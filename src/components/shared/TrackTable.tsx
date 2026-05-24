@@ -22,9 +22,7 @@ export function TrackTable({
   onPlay,
   onAlbumClick,
 }: TrackTableProps) {
-  const featureMap = audioFeatures
-    ? Object.fromEntries(audioFeatures.map(f => [f.id, f]))
-    : {}
+  const featureMap = audioFeatures ? Object.fromEntries(audioFeatures.map((f) => [f.id, f])) : {}
 
   return (
     <div className="overflow-x-auto">
@@ -48,9 +46,8 @@ export function TrackTable({
         <tbody>
           {tracks.map((track, i) => {
             const f = featureMap[track.id]
-            const keyLabel = f && f.key >= 0
-              ? `${KEY_NAMES[f.key]} ${f.mode === 1 ? 'M' : 'm'}`
-              : null
+            const keyLabel =
+              f && f.key >= 0 ? `${KEY_NAMES[f.key]} ${f.mode === 1 ? 'M' : 'm'}` : null
             const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
             const albumId = 'album' in track ? track.album.id : undefined
             const isActive = track.id === activeTrackId
@@ -69,7 +66,10 @@ export function TrackTable({
                   <button
                     className="hidden group-hover:flex items-center justify-center"
                     aria-label={`Tocar ${track.name}`}
-                    onClick={e => { e.stopPropagation(); onPlay?.(track) }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onPlay?.(track)
+                    }}
                   >
                     <Play size={11} className="fill-black text-black" />
                   </button>
@@ -88,21 +88,23 @@ export function TrackTable({
                   {track.name}
                 </td>
                 <td className="py-2 px-3 text-black/50 whitespace-nowrap">
-                  {'artists' in track
-                    ? track.artists.map(a => a.name).join(', ')
-                    : '—'
-                  }
+                  {'artists' in track ? track.artists.map((a) => a.name).join(', ') : '—'}
                 </td>
                 {showAlbumColumn && (
                   <td className="py-2 px-3 text-black/50 whitespace-nowrap">
                     {albumId ? (
                       <button
                         className="hover:text-black hover:underline transition-colors"
-                        onClick={e => { e.stopPropagation(); onAlbumClick?.(albumId) }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onAlbumClick?.(albumId)
+                        }}
                       >
                         {'album' in track ? track.album.name : '—'}
                       </button>
-                    ) : '—'}
+                    ) : (
+                      '—'
+                    )}
                   </td>
                 )}
                 <td className="py-2 px-3 text-right text-black/40 tabular-nums whitespace-nowrap">

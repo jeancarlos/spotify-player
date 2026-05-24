@@ -7,6 +7,6 @@ export function useArtists(query: string, page: number) {
     query,
     page,
     apiType: 'artist',
-    getPage: res => res.artists,
+    getPage: (res) => res.artists,
   })
 }

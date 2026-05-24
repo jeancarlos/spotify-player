@@ -15,15 +15,15 @@ export function useNowPlaying(enabled = true) {
   return useQuery<NowPlayingResponse | null>({
     queryKey: ['now-playing'],
     enabled,
-    refetchInterval: 3000,
+    refetchInterval: 5000,
     refetchIntervalInBackground: false,
-    staleTime: 2000,
+    staleTime: 4000,
     queryFn: async () => {
       const { data, status } = await api.get<NowPlayingResponse>('/me/player', {
-        validateStatus: s => s === 200 || s === 204,
+        validateStatus: (s) => s === 200 || s === 204 || s === 429,
       })
-      // 204 = no active device / nothing playing
-      if (status === 204 || !data) return null
+      // 429 = rate limited — return null to keep last known state, don't throw
+      if (status === 204 || status === 429 || !data) return null
       return data
     },
   })

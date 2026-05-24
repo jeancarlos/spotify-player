@@ -12,9 +12,7 @@ interface Toast {
   variant: ToastVariant
 }
 
-type ToastAction =
-  | { type: 'ADD'; payload: Toast }
-  | { type: 'REMOVE'; payload: string }
+type ToastAction = { type: 'ADD'; payload: Toast } | { type: 'REMOVE'; payload: string }
 
 /* ─── Context ─── */
 
@@ -28,9 +26,12 @@ const ToastContext = createContext<ToastContextValue | null>(null)
 
 function toastReducer(state: Toast[], action: ToastAction): Toast[] {
   switch (action.type) {
-    case 'ADD': return [...state, action.payload]
-    case 'REMOVE': return state.filter(t => t.id !== action.payload)
-    default: return state
+    case 'ADD':
+      return [...state, action.payload]
+    case 'REMOVE':
+      return state.filter((t) => t.id !== action.payload)
+    default:
+      return state
   }
 }
 
@@ -68,7 +69,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {/* Toast viewport */}
       <div className="fixed bottom-24 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
         <AnimatePresence>
-          {toasts.map(t => (
+          {toasts.map((t) => (
             <motion.div
               key={t.id}
               initial={{ opacity: 0, x: 60, scale: 0.95 }}

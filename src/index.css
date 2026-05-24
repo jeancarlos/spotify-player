@@ -8,7 +8,9 @@
   * {
     box-sizing: border-box;
   }
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
     overflow: hidden;
   }
@@ -20,8 +22,11 @@
   }
 }
 
-
 @keyframes soundBar {
-  from { transform: scaleY(0.3); }
-  to   { transform: scaleY(1); }
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
+  }
 }

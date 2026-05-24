@@ -33,12 +33,10 @@ export function ReloadPrompt() {
               {offlineReady ? 'Spoter' : t('pwa.updateAvailable')}
             </p>
             <p className="text-xs text-black/60 mt-0.5 leading-relaxed">
-              {offlineReady 
-                ? t('pwa.readyOffline') 
-                : t('pwa.newVersion')}
+              {offlineReady ? t('pwa.readyOffline') : t('pwa.newVersion')}
             </p>
           </div>
-          <button 
+          <button
             onClick={close}
             className="p-1 rounded-lg hover:bg-black/5 transition-colors"
             aria-label={t('favorites.cancel')}
@@ -46,7 +44,7 @@ export function ReloadPrompt() {
             <X size={16} className="text-black/40" />
           </button>
         </div>
-        
+
         {needRefresh && (
           <button
             onClick={() => updateServiceWorker(true)}

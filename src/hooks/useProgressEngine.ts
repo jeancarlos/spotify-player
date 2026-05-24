@@ -38,7 +38,7 @@ export function useProgressEngine(): {
         time: now,
         isPlaying: data.is_playing,
       }
-      
+
       // We don't call setDisplayProgress here to avoid cascading render warning.
       // Instead, we let the first interval tick or a deferred call handle it.
     }

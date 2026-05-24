@@ -8,7 +8,7 @@ const api = axios.create({
 let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
 
-api.interceptors.request.use(config => {
+api.interceptors.request.use((config) => {
   const token = sessionStorage.getItem('access_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -17,12 +17,12 @@ api.interceptors.request.use(config => {
 })
 
 api.interceptors.response.use(
-  response => response,
-  async error => {
+  (response) => response,
+  async (error) => {
     const originalRequest = error.config
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
-      
+
       try {
         if (!isRefreshing) {
           isRefreshing = true
@@ -31,7 +31,7 @@ api.interceptors.response.use(
             refreshPromise = null
           })
         }
-        
+
         const newToken = await refreshPromise
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`
@@ -69,12 +69,12 @@ async function refreshToken(): Promise<string> {
   if (!res.ok) throw new Error(i18n.t('auth.tokenExchangeFailed'))
 
   const data = (await res.json()) as { access_token: string; refresh_token: string }
-  
+
   sessionStorage.setItem('access_token', data.access_token)
   if (data.refresh_token) {
     localStorage.setItem('refresh_token', data.refresh_token)
   }
-  
+
   return data.access_token
 }
 

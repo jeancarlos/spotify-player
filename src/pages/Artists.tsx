@@ -31,7 +31,7 @@ export function Artists() {
 
   const isArtist = tab === 'artista'
   const isPlaylist = tab === 'playlist'
-  
+
   // Refactor nested ternaries into clearer derivations
   const getSearchData = () => {
     if (isArtist) return artists
@@ -40,12 +40,18 @@ export function Artists() {
   }
 
   const { data, isPending: isLoading } = getSearchData()
-  const hasNext = data ? (data.offset + data.items.length) < data.total : false
+  const hasNext = data ? data.offset + data.items.length < data.total : false
 
-  const handleSearch = useCallback((q: string, t: SearchTab) => {
-    if (!q.trim()) { navigate('/', { replace: true }); return }
-    setSearchParams({ q, tab: t, page: '1' }, { replace: true })
-  }, [navigate, setSearchParams])
+  const handleSearch = useCallback(
+    (q: string, t: SearchTab) => {
+      if (!q.trim()) {
+        navigate('/', { replace: true })
+        return
+      }
+      setSearchParams({ q, tab: t, page: '1' }, { replace: true })
+    },
+    [navigate, setSearchParams]
+  )
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({ q: query, tab, page: String(newPage) }, { replace: true })
@@ -64,7 +70,12 @@ export function Artists() {
     <div className="min-h-screen">
       {/* SearchBar */}
       <div className="fixed top-14 left-0 right-0 z-20 flex justify-center px-4 pt-2">
-        <SearchBar onSearch={handleSearch} defaultTab={tab} defaultQuery={query} className="shadow-sm" />
+        <SearchBar
+          onSearch={handleSearch}
+          defaultTab={tab}
+          defaultQuery={query}
+          className="shadow-sm"
+        />
       </div>
 
       <div className="pt-36 px-6 pb-32">
@@ -77,9 +88,7 @@ export function Artists() {
         )}
 
         {/* Empty state */}
-        {!query && (
-          <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>
-        )}
+        {!query && <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>}
 
         {/* Loading */}
         {isLoading && (
@@ -93,35 +102,44 @@ export function Artists() {
         {/* Results grid */}
         {!isLoading && data && (
           <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {isArtist && artists.data?.items.map(artist => (
-              <MediaCard
-                key={artist.id}
-                title={artist.name}
-                imageUrl={artist.images[0]?.url}
-                subtitle={artist.followers?.total != null ? t('artists.followers', { count: artist.followers.total }) : undefined}
-                onClick={() => navigate(`/artists/${artist.id}`)}
-              />
-            ))}
+            {isArtist &&
+              artists.data?.items.map((artist) => (
+                <MediaCard
+                  key={artist.id}
+                  title={artist.name}
+                  imageUrl={artist.images[0]?.url}
+                  subtitle={
+                    artist.followers?.total != null
+                      ? t('artists.followers', { count: artist.followers.total })
+                      : undefined
+                  }
+                  onClick={() => navigate(`/artists/${artist.id}`)}
+                />
+              ))}
 
-            {tab === 'album' && albums.data?.items.map(album => (
-              <MediaCard
-                key={album.id}
-                title={album.name}
-                imageUrl={album.images[0]?.url}
-                subtitle={album.artists.map((a: { name: string }) => a.name).join(', ')}
-                onClick={() => navigate(`/albums/${album.id}`)}
-              />
-            ))}
+            {tab === 'album' &&
+              albums.data?.items.map((album) => (
+                <MediaCard
+                  key={album.id}
+                  title={album.name}
+                  imageUrl={album.images[0]?.url}
+                  subtitle={album.artists.map((a: { name: string }) => a.name).join(', ')}
+                  onClick={() => navigate(`/albums/${album.id}`)}
+                />
+              ))}
 
-            {isPlaylist && playlists.data?.items.filter((p): p is NonNullable<typeof p> => !!p).map(playlist => (
-              <MediaCard
-                key={playlist.id}
-                title={playlist.name}
-                imageUrl={playlist.images[0]?.url}
-                subtitle={playlist.owner.display_name}
-                onClick={() => navigate(`/playlists/${playlist.id}`)}
-              />
-            ))}
+            {isPlaylist &&
+              playlists.data?.items
+                .filter((p): p is NonNullable<typeof p> => !!p)
+                .map((playlist) => (
+                  <MediaCard
+                    key={playlist.id}
+                    title={playlist.name}
+                    imageUrl={playlist.images[0]?.url}
+                    subtitle={playlist.owner.display_name}
+                    onClick={() => navigate(`/playlists/${playlist.id}`)}
+                  />
+                ))}
           </div>
         )}
 

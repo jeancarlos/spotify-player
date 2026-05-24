@@ -36,7 +36,7 @@ export function ArtistDetail() {
   const topTracks = useArtistTopTracks(id)
   const albums = useArtistAlbums(id, albumPage, 10)
 
-  const topTrackIds = topTracks.data?.slice(0, 5).map(t => t.id) ?? []
+  const topTrackIds = topTracks.data?.slice(0, 5).map((t) => t.id) ?? []
   const audioFeatures = useAudioFeatures(topTrackIds)
   const avgFeatures = (() => {
     if (!audioFeatures.data || audioFeatures.data.length === 0) return null
@@ -44,7 +44,7 @@ export function ArtistDetail() {
   })()
 
   const hasNextAlbums = albums.data
-    ? (albums.data.offset + albums.data.limit) < albums.data.total
+    ? albums.data.offset + albums.data.limit < albums.data.total
     : false
 
   function handleBack() {
@@ -72,14 +72,14 @@ export function ArtistDetail() {
 
     return (
       <div className="space-y-1">
-        {items.map(album => (
+        {items.map((album) => (
           <div
             key={album.id}
             className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-black/5 transition-colors cursor-pointer group focus:outline-none focus:bg-black/5"
             onClick={() => handleAlbumClick(album)}
             role="button"
             tabIndex={0}
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
                 handleAlbumClick(album)
@@ -93,7 +93,9 @@ export function ArtistDetail() {
             />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-black truncate">{album.name}</p>
-              <p className="text-xs text-black/40">{album.release_date ? formatDate(album.release_date, 'year') : ''}</p>
+              <p className="text-xs text-black/40">
+                {album.release_date ? formatDate(album.release_date, 'year') : ''}
+              </p>
             </div>
             <span className="text-xs text-black/30 shrink-0 capitalize">{album.album_type}</span>
           </div>
@@ -129,7 +131,7 @@ export function ArtistDetail() {
                   onClick={() => artist.data?.uri && playContext(artist.data.uri)}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={e => {
+                  onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
                       if (artist.data?.uri) playContext(artist.data.uri)
@@ -151,7 +153,9 @@ export function ArtistDetail() {
                     <p className="text-xs text-black/40 truncate">{track.album?.name}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="text-[10px] text-black/30 tabular-nums">{track.popularity}</span>
+                    <span className="text-[10px] text-black/30 tabular-nums">
+                      {track.popularity}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -162,9 +166,7 @@ export function ArtistDetail() {
         {/* Discography */}
         <section className="mb-8">
           <div className="flex items-center justify-between px-2 mb-3">
-            <h3 className="text-sm font-bold text-black/50">
-              {t('artistDetail.discography')}
-            </h3>
+            <h3 className="text-sm font-bold text-black/50">{t('artistDetail.discography')}</h3>
             <ListTableSwitch view={discView} onChange={setDiscView} />
           </div>
 
@@ -173,8 +175,8 @@ export function ArtistDetail() {
           <Pagination
             page={albumPage}
             hasNext={hasNextAlbums}
-            onPrev={() => setAlbumPage(p => Math.max(1, p - 1))}
-            onNext={() => setAlbumPage(p => p + 1)}
+            onPrev={() => setAlbumPage((p) => Math.max(1, p - 1))}
+            onNext={() => setAlbumPage((p) => p + 1)}
             className="mt-4"
           />
         </section>

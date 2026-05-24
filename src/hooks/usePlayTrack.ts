@@ -11,18 +11,21 @@ export function usePlayTrack() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  return useCallback(async (track: SpotifyTrack, queue: SpotifyTrack[] = []) => {
-    dispatch({ type: 'SET_TRACK', payload: track })
-    dispatch({ type: 'SET_PLAYING', payload: true })
-    if (queue.length > 0) dispatch({ type: 'SET_QUEUE', payload: queue })
+  return useCallback(
+    async (track: SpotifyTrack, queue: SpotifyTrack[] = []) => {
+      dispatch({ type: 'SET_TRACK', payload: track })
+      dispatch({ type: 'SET_PLAYING', payload: true })
+      if (queue.length > 0) dispatch({ type: 'SET_QUEUE', payload: queue })
 
-    try {
-      await api.put('/me/player/play', { uris: [track.uri] })
-    } catch (err) {
-      const status = (err as AxiosError).response?.status
-      if (status === 404 || status === 403) {
-        toast(t('player.noActiveDevice'), 'info')
+      try {
+        await api.put('/me/player/play', { uris: [track.uri] })
+      } catch (err) {
+        const status = (err as AxiosError).response?.status
+        if (status === 404 || status === 403) {
+          toast(t('player.noActiveDevice'), 'info')
+        }
       }
-    }
-  }, [dispatch, toast, t])
+    },
+    [dispatch, toast, t]
+  )
 }

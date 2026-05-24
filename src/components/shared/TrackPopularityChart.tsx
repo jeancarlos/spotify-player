@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function TrackPopularityChart({ tracks, activeTrackId }: Props) {
-  const data = tracks.map(t => ({
+  const data = tracks.map((t) => ({
     id: t.id,
     name: t.name.length > 22 ? t.name.slice(0, 22) + '…' : t.name,
     popularity: t.popularity ?? 0,
@@ -15,11 +15,7 @@ export function TrackPopularityChart({ tracks, activeTrackId }: Props) {
 
   return (
     <ResponsiveContainer width="100%" height={Math.max(180, data.length * 28)}>
-      <BarChart
-        data={data}
-        layout="vertical"
-        margin={{ top: 0, right: 32, left: 0, bottom: 0 }}
-      >
+      <BarChart data={data} layout="vertical" margin={{ top: 0, right: 32, left: 0, bottom: 0 }}>
         <XAxis
           type="number"
           domain={[0, 100]}
@@ -48,11 +44,8 @@ export function TrackPopularityChart({ tracks, activeTrackId }: Props) {
           }}
         />
         <Bar dataKey="popularity" radius={[0, 4, 4, 0]} maxBarSize={14}>
-          {data.map(d => (
-            <Cell
-              key={d.id}
-              fill={d.id === activeTrackId ? '#1DB954' : 'rgba(0,0,0,0.12)'}
-            />
+          {data.map((d) => (
+            <Cell key={d.id} fill={d.id === activeTrackId ? '#1DB954' : 'rgba(0,0,0,0.12)'} />
           ))}
         </Bar>
       </BarChart>

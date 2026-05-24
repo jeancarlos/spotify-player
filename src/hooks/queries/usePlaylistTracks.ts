@@ -15,10 +15,9 @@ export function usePlaylistTracks(
     queryKey: ['playlist-tracks', playlistId, page, limit],
     enabled: enabled && playlistId.length > 0,
     queryFn: async () => {
-      const { data } = await api.get<PlaylistTracksResponse>(
-        `/playlists/${playlistId}/items`,
-        { params: { limit, offset: (page - 1) * limit } }
-      )
+      const { data } = await api.get<PlaylistTracksResponse>(`/playlists/${playlistId}/items`, {
+        params: { limit, offset: (page - 1) * limit },
+      })
       return data
     },
   })

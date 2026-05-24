@@ -13,7 +13,7 @@ interface TrackRowProps {
 
 export function TrackRow({ track, index, isActive = false, onPlay }: TrackRowProps) {
   const { t } = useTranslation()
-  
+
   return (
     <div
       className={cn(
@@ -23,7 +23,7 @@ export function TrackRow({ track, index, isActive = false, onPlay }: TrackRowPro
       onClick={() => onPlay?.(track)}
       role="button"
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && onPlay?.(track)}
+      onKeyDown={(e) => e.key === 'Enter' && onPlay?.(track)}
     >
       {index !== undefined && (
         <span className="w-6 text-xs text-black/30 text-right shrink-0 group-hover:hidden">
@@ -47,11 +47,13 @@ export function TrackRow({ track, index, isActive = false, onPlay }: TrackRowPro
       />
 
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-medium truncate', isActive ? 'text-black' : 'text-black/80')}>
+        <p
+          className={cn('text-sm font-medium truncate', isActive ? 'text-black' : 'text-black/80')}
+        >
           {track.name}
         </p>
         <p className="text-xs text-black/40 truncate">
-          {track.artists.map(a => a.name).join(', ')}
+          {track.artists.map((a) => a.name).join(', ')}
         </p>
       </div>
 

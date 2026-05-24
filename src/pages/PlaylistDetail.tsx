@@ -38,12 +38,10 @@ export function PlaylistDetail() {
   }, [])
 
   const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? [])
-    .map(item => item.track ?? item.item)
+    .map((item) => item.track ?? item.item)
     .filter((t): t is SpotifyTrack => t != null)
 
-  const hasNext = tracks.data
-    ? tracks.data.offset + tracks.data.limit < tracks.data.total
-    : false
+  const hasNext = tracks.data ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
   const ownerName = playlist.data?.owner?.display_name ?? ''
   const subtitle = t('playlistDetail.owner', { name: ownerName })
@@ -62,9 +60,7 @@ export function PlaylistDetail() {
       <div style={{ paddingTop: headerHeight }} className="px-4 pb-32">
         <div className="mt-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-black/80">
-              {t('playlistDetail.tracks')}
-            </h2>
+            <h2 className="text-base font-bold text-black/80">{t('playlistDetail.tracks')}</h2>
             <ListTableSwitch view={view} onChange={setView} />
           </div>
 
@@ -76,7 +72,7 @@ export function PlaylistDetail() {
                   track={track}
                   index={(page - 1) * LIMIT + i}
                   isActive={playerState?.currentTrack?.id === track.id}
-                  onPlay={tr => playTrack(tr, playlistTracks)}
+                  onPlay={(tr) => playTrack(tr, playlistTracks)}
                 />
               ))}
             </div>
@@ -95,8 +91,8 @@ export function PlaylistDetail() {
             <Pagination
               page={page}
               hasNext={hasNext}
-              onPrev={() => setPage(p => Math.max(1, p - 1))}
-              onNext={() => setPage(p => p + 1)}
+              onPrev={() => setPage((p) => Math.max(1, p - 1))}
+              onNext={() => setPage((p) => p + 1)}
             />
           )}
         </div>

@@ -13,7 +13,12 @@ interface PaginationProps {
 export function Pagination({ page, hasNext, onPrev, onNext, className }: PaginationProps) {
   const { t } = useTranslation()
   return (
-    <div className={cn('flex items-center justify-center gap-8 py-6 border-t border-black/8', className)}>
+    <div
+      className={cn(
+        'flex items-center justify-center gap-8 py-6 border-t border-black/8',
+        className
+      )}
+    >
       <button
         onClick={onPrev}
         disabled={page <= 1}

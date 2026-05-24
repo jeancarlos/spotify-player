@@ -7,6 +7,6 @@ export function useSearchAlbums(query: string, page: number) {
     query,
     page,
     apiType: 'album',
-    getPage: res => res.albums,
+    getPage: (res) => res.albums,
   })
 }

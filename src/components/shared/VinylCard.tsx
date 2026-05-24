@@ -10,12 +10,7 @@ interface VinylCardProps {
   size?: 'sm' | 'md'
 }
 
-export function VinylCard({
-  track,
-  isActive = false,
-  onPlay,
-  size = 'md',
-}: VinylCardProps) {
+export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: VinylCardProps) {
   const { t } = useTranslation()
   const dim = size === 'sm' ? 100 : 132
 
@@ -26,7 +21,7 @@ export function VinylCard({
       onClick={() => onPlay?.(track)}
       role="button"
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && onPlay?.(track)}
+      onKeyDown={(e) => e.key === 'Enter' && onPlay?.(track)}
       aria-label={t('player.playTrack', { name: track.name })}
     >
       <div
@@ -36,7 +31,7 @@ export function VinylCard({
           'group-hover:scale-105 group-active:scale-95',
           isActive
             ? 'ring-2 ring-[#1DB954] scale-105 shadow-[0_0_18px_rgba(29,185,84,0.45)]'
-            : 'ring-1 ring-white/10',
+            : 'ring-1 ring-white/10'
         )}
         style={{ width: dim, height: dim, borderRadius: 14 }}
       >
@@ -61,7 +56,7 @@ export function VinylCard({
         {/* Active sound bars */}
         {isActive && (
           <div className="absolute top-2 right-2 flex items-end gap-[2px] h-3">
-            {[0, 150, 300].map(delay => (
+            {[0, 150, 300].map((delay) => (
               <span
                 key={delay}
                 className="w-[3px] rounded-full bg-[#1DB954]"
@@ -81,7 +76,7 @@ export function VinylCard({
             {track.name}
           </p>
           <p className="text-[10px] text-white/70 truncate leading-tight mt-0.5">
-            {track.artists.map(a => a.name).join(', ')}
+            {track.artists.map((a) => a.name).join(', ')}
           </p>
         </div>
       </div>

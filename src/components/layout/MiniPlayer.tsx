@@ -2,8 +2,15 @@
 import { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
-  SkipBack, Play, Pause, SkipForward,
-  Shuffle, Repeat, Repeat1, ListMusic, Heart,
+  SkipBack,
+  Play,
+  Pause,
+  SkipForward,
+  Shuffle,
+  Repeat,
+  Repeat1,
+  ListMusic,
+  Heart,
 } from 'lucide-react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { usePlayer } from '@/hooks/usePlayer'
@@ -61,10 +68,10 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
   const { state, dispatch } = usePlayer()
   const { currentTrack, isPlaying, shuffle, repeat } = state
   const { currentProgress, seekTo: engineSeekTo } = useProgressEngine()
-  
+
   const duration = currentTrack?.duration_ms || 0
   const progress = currentProgress
-  
+
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
@@ -98,41 +105,70 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
     }
   }, [dispatch, isPlaying, toast, t])
 
-  const handleSeek = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const ms = Number(e.target.value)
-    engineSeekTo(ms)
-    dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-    try { await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' }) } catch { /* silent */ }
-  }, [dispatch, engineSeekTo])
+  const handleSeek = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const ms = Number(e.target.value)
+      engineSeekTo(ms)
+      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
+      try {
+        await api.put('/me/player/seek', null, {
+          params: { position_ms: ms },
+          responseType: 'text',
+        })
+      } catch {
+        /* silent */
+      }
+    },
+    [dispatch, engineSeekTo]
+  )
 
   const handlePrev = useCallback(async () => {
-    try { await api.post('/me/player/previous', null, { responseType: 'text' }) } catch { /* silent */ }
+    try {
+      await api.post('/me/player/previous', null, { responseType: 'text' })
+    } catch {
+      /* silent */
+    }
   }, [])
 
   const handleNext = useCallback(async () => {
     engineSeekTo(0)
-    try { await api.post('/me/player/next', null, { responseType: 'text' }) } catch { /* silent */ }
+    try {
+      await api.post('/me/player/next', null, { responseType: 'text' })
+    } catch {
+      /* silent */
+    }
   }, [engineSeekTo])
 
   const toggleShuffle = useCallback(async () => {
     dispatch({ type: 'TOGGLE_SHUFFLE' })
-    try { await api.put('/me/player/shuffle', null, { params: { state: !shuffle }, responseType: 'text' }) } catch { /* silent */ }
+    try {
+      await api.put('/me/player/shuffle', null, {
+        params: { state: !shuffle },
+        responseType: 'text',
+      })
+    } catch {
+      /* silent */
+    }
   }, [dispatch, shuffle])
 
   const cycleRepeat = useCallback(async () => {
     const nextRepeatState: Record<string, 'off' | 'context' | 'track'> = {
       off: 'context',
       context: 'track',
-      track: 'off'
+      track: 'off',
     }
     const next = nextRepeatState[repeat] || 'off'
-    
+
     dispatch({ type: 'SET_REPEAT', payload: next })
-    try { await api.put('/me/player/repeat', null, { params: { state: next }, responseType: 'text' }) } catch { /* silent */ }
+    try {
+      await api.put('/me/player/repeat', null, { params: { state: next }, responseType: 'text' })
+    } catch {
+      /* silent */
+    }
   }, [dispatch, repeat])
 
   const { tracks, addTrack, removeTrack } = useSpoterPlaylist()
-  const isSaved = !!currentTrack && tracks.some(t => t.uri === currentTrack.uri)
+  const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
 
   const handleHeart = useCallback(() => {
     if (!currentTrack) return
@@ -159,11 +195,7 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 
       {currentTrack && (
-        <ProgressBar
-          progress={progress}
-          duration={duration}
-          onChange={handleSeek}
-        />
+        <ProgressBar progress={progress} duration={duration} onChange={handleSeek} />
       )}
 
       {/* Controles */}
@@ -173,13 +205,17 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
           className="flex items-center gap-2.5 flex-1 min-w-0 overflow-hidden cursor-pointer group/track"
           onClick={() => {
             if (isPlayerPage) goBack()
-            else if (currentTrack) navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+            else if (currentTrack)
+              navigate('/player?tab=lyrics', { state: { from: location.pathname } })
           }}
           role="button"
           tabIndex={currentTrack ? 0 : -1}
           onKeyDown={(e) => {
             if (isPlayerPage) handleKeyDown(e, goBack)
-            else if (currentTrack) handleKeyDown(e, () => navigate('/player?tab=lyrics', { state: { from: location.pathname } }))
+            else if (currentTrack)
+              handleKeyDown(e, () =>
+                navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+              )
           }}
           aria-label={currentTrack ? `${t('player.viewTrack')}: ${currentTrack.name}` : undefined}
         >
@@ -217,11 +253,17 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+                    navigate(`/albums/${currentTrack.album.id}`, {
+                      state: { from: location.pathname },
+                    })
                   }}
                   onKeyDown={(e) => {
                     e.stopPropagation()
-                    handleKeyDown(e, () => navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } }))
+                    handleKeyDown(e, () =>
+                      navigate(`/albums/${currentTrack.album.id}`, {
+                        state: { from: location.pathname },
+                      })
+                    )
                   }}
                   className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
                 >
@@ -240,10 +282,7 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
             </>
           ) : (
             <div className="flex items-center gap-2 w-full cursor-default">
-              <VinylDisk
-                size="xs"
-                albumArt={undefined}
-              />
+              <VinylDisk size="xs" albumArt={undefined} />
               <p className="text-xs text-black/70">{t('player.noTrack')}</p>
             </div>
           )}
@@ -257,7 +296,7 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
               aria-label={isSaved ? t('favorites.removeFromList') : t('favorites.addToList')}
               className={cn(
                 'p-1.5 rounded-lg transition-all',
-                isSaved ? 'text-red-500 scale-110' : 'text-black/30 hover:text-red-400',
+                isSaved ? 'text-red-500 scale-110' : 'text-black/30 hover:text-red-400'
               )}
             >
               <Heart size={16} className={isSaved ? 'fill-current' : ''} />
@@ -274,7 +313,10 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
               <button
                 onClick={toggleShuffle}
                 aria-label={t('player.shuffle')}
-                className={cn('p-1.5 rounded-lg transition-colors', shuffle ? 'text-black' : 'text-black/30 hover:text-black/60')}
+                className={cn(
+                  'p-1.5 rounded-lg transition-colors',
+                  shuffle ? 'text-black' : 'text-black/30 hover:text-black/60'
+                )}
               >
                 <Shuffle size={15} />
               </button>
@@ -300,9 +342,11 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
                 aria-label={isPlaying ? t('player.pause') : t('player.play')}
                 className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
               >
-                {isPlaying
-                  ? <Pause size={14} className="fill-white text-white" />
-                  : <Play size={14} className="fill-white text-white ml-0.5" />}
+                {isPlaying ? (
+                  <Pause size={14} className="fill-white text-white" />
+                ) : (
+                  <Play size={14} className="fill-white text-white ml-0.5" />
+                )}
               </button>
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
                 {t('login.hint')}
@@ -326,7 +370,10 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
               <button
                 onClick={cycleRepeat}
                 aria-label={t('player.repeat')}
-                className={cn('p-1.5 rounded-lg transition-colors', repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60')}
+                className={cn(
+                  'p-1.5 rounded-lg transition-colors',
+                  repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60'
+                )}
               >
                 {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
               </button>
@@ -345,12 +392,18 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
                     goBack()
                   }
                 }}
-                aria-label={isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')}
+                aria-label={
+                  isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')
+                }
                 className="p-1.5 rounded-lg transition-colors outline-none text-black/30 hover:text-black"
               >
                 <ListMusic size={15} />
               </button>
-              <Tip label={isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')} />
+              <Tip
+                label={
+                  isPlayerPage && activeTab === 'info' ? t('player.closeQueue') : t('player.queue')
+                }
+              />
             </div>
           </div>
         )}

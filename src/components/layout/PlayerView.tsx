@@ -32,7 +32,12 @@ export function PlayerView() {
   const artistName = currentTrack?.artists[0]?.name ?? ''
   const trackName = currentTrack?.name ?? ''
   const albumName = currentTrack?.album.name
-  const lyrics = useLyrics({ artist: artistName, title: trackName, album: albumName, durationMs: duration })
+  const lyrics = useLyrics({
+    artist: artistName,
+    title: trackName,
+    album: albumName,
+    durationMs: duration,
+  })
   const albumArt = currentTrack?.album.images[0]?.url
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
@@ -44,13 +49,21 @@ export function PlayerView() {
     }
   }, [noLyrics, activeTab, setSearchParams])
 
-  const handleSeek = useCallback(async (ms: number) => {
-    dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-    seekTo(ms)
-    try {
-      await api.put('/me/player/seek', null, { params: { position_ms: ms }, responseType: 'text' })
-    } catch { /* silent */ }
-  }, [dispatch, seekTo])
+  const handleSeek = useCallback(
+    async (ms: number) => {
+      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
+      seekTo(ms)
+      try {
+        await api.put('/me/player/seek', null, {
+          params: { position_ms: ms },
+          responseType: 'text',
+        })
+      } catch {
+        /* silent */
+      }
+    },
+    [dispatch, seekTo]
+  )
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
@@ -87,8 +100,10 @@ export function PlayerView() {
             <button
               onClick={() => handleTabChange('lyrics')}
               className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none",
-                activeTab === 'lyrics' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white/70"
+                'flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none',
+                activeTab === 'lyrics'
+                  ? 'bg-white text-black shadow-lg'
+                  : 'text-white/40 hover:text-white/70'
               )}
             >
               <Music2 size={14} />
@@ -98,8 +113,10 @@ export function PlayerView() {
           <button
             onClick={() => handleTabChange('info')}
             className={cn(
-              "flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none",
-              activeTab === 'info' ? "bg-white text-black shadow-lg" : "text-white/40 hover:text-white/70"
+              'flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all outline-none',
+              activeTab === 'info'
+                ? 'bg-white text-black shadow-lg'
+                : 'text-white/40 hover:text-white/70'
             )}
           >
             <Info size={14} />

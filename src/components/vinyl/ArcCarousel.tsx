@@ -40,7 +40,7 @@ export function ArcCarousel({
   // Inverted: arc curves downward below the container (cy = 0, text at cy + tR*cos)
   const arcPath = inverted
     ? `M ${x1} ${tR * Math.cos(halfRad)} A ${tR} ${tR} 0 0 0 ${x2} ${tR * Math.cos(halfRad)}`
-    : `M ${x1} ${(radius + 70) - tR * Math.cos(halfRad)} A ${tR} ${tR} 0 0 1 ${x2} ${(radius + 70) - tR * Math.cos(halfRad)}`
+    : `M ${x1} ${radius + 70 - tR * Math.cos(halfRad)} A ${tR} ${tR} 0 0 1 ${x2} ${radius + 70 - tR * Math.cos(halfRad)}`
 
   return (
     <div className="relative" style={{ width: radius * 2, height: radius + 70 }}>
@@ -78,14 +78,22 @@ export function ArcCarousel({
 
       {title && (
         <motion.svg
-          className={inverted ? 'absolute bottom-[-120px] inset-x-0 pointer-events-none' : 'absolute top-[-120px] inset-0 pointer-events-none'}
+          className={
+            inverted
+              ? 'absolute bottom-[-120px] inset-x-0 pointer-events-none'
+              : 'absolute top-[-120px] inset-0 pointer-events-none'
+          }
           width={radius * 2}
           height={radius + 120}
           style={{ overflow: 'visible' }}
           overflow="visible"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: baseDelay + items.length * 0.06 + 0.3, duration: 0.6, ease: 'easeOut' }}
+          transition={{
+            delay: baseDelay + items.length * 0.06 + 0.3,
+            duration: 0.6,
+            ease: 'easeOut',
+          }}
         >
           <defs>
             <path id={`arc-${uid}`} d={arcPath} />

@@ -15,14 +15,15 @@ vi.mock('react-i18next', async (importOriginal) => {
           'common.back': 'Voltar',
           'nav.openMenu': 'Abrir menu',
         }
-        
+
         let val = translations[key] || key
-        if ((options as Record<string, unknown>)?.name) val = val.replace('{{name}}', (options as Record<string, unknown>).name as string)
+        if ((options as Record<string, unknown>)?.name)
+          val = val.replace('{{name}}', (options as Record<string, unknown>).name as string)
         return val
       },
-      i18n: { 
+      i18n: {
         changeLanguage: vi.fn(),
-        language: 'pt-BR'
+        language: 'pt-BR',
       },
     }),
     initReactI18next: {
@@ -35,11 +36,11 @@ vi.mock('react-i18next', async (importOriginal) => {
 // Mock de matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(), 
+    addListener: vi.fn(),
     removeListener: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),

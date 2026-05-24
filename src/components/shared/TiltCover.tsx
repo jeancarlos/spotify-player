@@ -58,9 +58,13 @@ export function TiltCover({ imageUrl, size, name, onClick, className, children }
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
-        onKeyDown={onClick ? (e: React.KeyboardEvent) => {
-          if (e.key === 'Enter' || e.key === ' ') onClick()
-        } : undefined}
+        onKeyDown={
+          onClick
+            ? (e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') onClick()
+              }
+            : undefined
+        }
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         style={{
@@ -75,10 +79,18 @@ export function TiltCover({ imageUrl, size, name, onClick, className, children }
         }}
         whileTap={onClick ? { scale: 0.97 } : undefined}
       >
-        {imageUrl
-          ? <img src={imageUrl} alt={name ?? ''} className="w-full h-full object-cover" draggable={false} />
-          : <div className="w-full h-full bg-black/10 flex items-center justify-center"><span className="text-5xl text-black/20">♪</span></div>
-        }
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={name ?? ''}
+            className="w-full h-full object-cover"
+            draggable={false}
+          />
+        ) : (
+          <div className="w-full h-full bg-black/10 flex items-center justify-center">
+            <span className="text-5xl text-black/20">♪</span>
+          </div>
+        )}
         {children}
       </motion.div>
     </div>

@@ -17,12 +17,12 @@ async function fetchWikipediaSummary(title: string): Promise<WikiResult | null> 
   if (!res.ok) return null
   const data: WikiSummary = await res.json()
   if (!data.extract) return null
-  const extract = data.extract.length > 400
-    ? data.extract.slice(0, 400) + '...'
-    : data.extract
+  const extract = data.extract.length > 400 ? data.extract.slice(0, 400) + '...' : data.extract
   return {
     extract,
-    url: data.content_urls?.desktop?.page ?? `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+    url:
+      data.content_urls?.desktop?.page ??
+      `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
   }
 }
 
@@ -37,10 +37,8 @@ export function useTrackWikipedia(trackName: string | undefined, artistName: str
       const searchRes = await fetch(
         `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=3&format=json&origin=*`
       )
-      const [, titles] = await searchRes.json() as [string, string[], string[], string[]]
-      const match = titles.find(t =>
-        t.toLowerCase().includes(trackName.toLowerCase())
-      )
+      const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
+      const match = titles.find((t) => t.toLowerCase().includes(trackName.toLowerCase()))
       if (!match) return null
       return fetchWikipediaSummary(match)
     },

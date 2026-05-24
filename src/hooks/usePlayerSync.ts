@@ -12,7 +12,7 @@ export function usePlayerSync() {
   const queryClient = useQueryClient()
   const { data } = useNowPlaying(authState.isAuthenticated)
   const lastTrackIdRef = useRef<string | null>(null)
-  
+
   // Sincronizar com API Spotify
   useEffect(() => {
     if (!data) return
@@ -49,7 +49,7 @@ export function usePlayerSync() {
     const imageUrl = track.album.images[0]?.url
     if (!imageUrl) return
 
-    extractPalette(imageUrl).then(palette => {
+    extractPalette(imageUrl).then((palette) => {
       if (palette) dispatch({ type: 'SET_PALETTE', payload: palette })
     })
   }, [state.currentTrack, dispatch])

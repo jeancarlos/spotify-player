@@ -10,11 +10,7 @@ export function WaveformBars({ isPlaying }: { isPlaying: boolean }) {
           key={i}
           className="w-[3px] rounded-full bg-black/60"
           style={{ originY: 'center' }}
-          animate={
-            isPlaying
-              ? { scaleY: [h, h * 0.25, h * 0.8, h * 0.4, h] }
-              : { scaleY: 0.2 }
-          }
+          animate={isPlaying ? { scaleY: [h, h * 0.25, h * 0.8, h * 0.4, h] } : { scaleY: 0.2 }}
           transition={
             isPlaying
               ? { duration: 0.7 + i * 0.09, repeat: Infinity, ease: 'easeInOut' }

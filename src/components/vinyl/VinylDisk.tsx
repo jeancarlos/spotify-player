@@ -12,7 +12,13 @@ interface VinylDiskProps {
 
 const SIZE_MAP = { xs: 44, sm: 180, md: 360, lg: 560, xl: 720 } as const
 
-export function VinylDisk({ size = 'md', albumArt, albumName, isPlaying = false, className }: VinylDiskProps) {
+export function VinylDisk({
+  size = 'md',
+  albumArt,
+  albumName,
+  isPlaying = false,
+  className,
+}: VinylDiskProps) {
   const px = SIZE_MAP[size]
   const { t } = useTranslation()
 
@@ -44,7 +50,7 @@ export function VinylDisk({ size = 'md', albumArt, albumName, isPlaying = false,
         >
           <motion.img
             src={albumArt ?? '/spoter-logo-cor-small.svg'}
-            alt={albumName ? `${t('favorites.album')}: ${albumName}` : ""}
+            alt={albumName ? `${t('favorites.album')}: ${albumName}` : ''}
             className="w-full h-full object-cover"
             animate={animation}
             transition={transition}

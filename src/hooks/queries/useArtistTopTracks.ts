@@ -10,10 +10,9 @@ export function useArtistTopTracks(artistId: string | undefined) {
     retry: false,
     queryFn: async () => {
       try {
-        const { data } = await api.get<ArtistTopTracksResponse>(
-          `/artists/${artistId}/top-tracks`,
-          { params: { market: 'BR' } }
-        )
+        const { data } = await api.get<ArtistTopTracksResponse>(`/artists/${artistId}/top-tracks`, {
+          params: { market: 'BR' },
+        })
         return data.tracks
       } catch (err) {
         if (axios.isAxiosError(err) && err.response?.status === 403) return []

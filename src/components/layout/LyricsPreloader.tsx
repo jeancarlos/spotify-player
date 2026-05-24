@@ -15,7 +15,7 @@ export function LyricsPreloader() {
     // Preload lyrics for the first 2 tracks in the queue
     const tracksToPreload = queueData.queue.slice(0, 2)
 
-    tracksToPreload.forEach(track => {
+    tracksToPreload.forEach((track) => {
       const artist = track.artists[0]?.name
       const title = track.name
       const album = track.album.name

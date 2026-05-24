@@ -45,7 +45,8 @@ export function ArtistHeroSection({
   carouselTitle,
 }: ArtistHeroSectionProps) {
   const uid = useId()
-  const { diskPx, translateY, arcRadius, arcDeg, arcContainerTop, fixedZoneHeight } = useArtistLayout()
+  const { diskPx, translateY, arcRadius, arcDeg, arcContainerTop, fixedZoneHeight } =
+    useArtistLayout()
 
   useEffect(() => {
     onLayout(fixedZoneHeight)
@@ -72,7 +73,10 @@ export function ArtistHeroSection({
       <motion.button
         onClick={onBack}
         className="pointer-events-auto absolute flex items-center justify-center w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm text-black/60 hover:text-black hover:bg-white/90 transition-all shadow-sm"
-        style={{ left: Math.max(16, backBtnViewportX - 16), top: Math.max(16, backBtnViewportY - 16) }}
+        style={{
+          left: Math.max(16, backBtnViewportX - 16),
+          top: Math.max(16, backBtnViewportY - 16),
+        }}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
@@ -117,11 +121,7 @@ export function ArtistHeroSection({
             <defs>
               <path id={`name-arc-${uid}`} d={nameArcPath} />
             </defs>
-            <text
-              fontFamily="Inter, sans-serif"
-              fontWeight="900"
-              letterSpacing="3"
-            >
+            <text fontFamily="Inter, sans-serif" fontWeight="900" letterSpacing="3">
               <textPath
                 href={`#name-arc-${uid}`}
                 startOffset="50%"

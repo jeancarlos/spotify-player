@@ -17,12 +17,12 @@ async function fetchWikipediaSummary(title: string): Promise<WikiResult | null> 
   if (!res.ok) return null
   const data: WikiSummary = await res.json()
   if (!data.extract) return null
-  const extract = data.extract.length > 500
-    ? data.extract.slice(0, 500) + '...'
-    : data.extract
+  const extract = data.extract.length > 500 ? data.extract.slice(0, 500) + '...' : data.extract
   return {
     extract,
-    url: data.content_urls?.desktop?.page ?? `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+    url:
+      data.content_urls?.desktop?.page ??
+      `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
   }
 }
 
@@ -36,10 +36,8 @@ export function useArtistBio(artistName: string | undefined) {
       const searchRes = await fetch(
         `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(artistName)}&limit=3&format=json&origin=*`
       )
-      const [, titles] = await searchRes.json() as [string, string[], string[], string[]]
-      const match = titles.find(t =>
-        t.toLowerCase().includes(artistName.toLowerCase())
-      )
+      const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
+      const match = titles.find((t) => t.toLowerCase().includes(artistName.toLowerCase()))
       if (!match) return null
       return fetchWikipediaSummary(match)
     },

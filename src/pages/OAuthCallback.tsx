@@ -26,7 +26,7 @@ export function OAuthCallback() {
     handleCallback(code, state)
       .then(() => navigate('/'))
       .catch(() => navigate('/login'))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

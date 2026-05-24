@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/axios'
 
-interface AddVars { playlistId: string; uris: string[] }
+interface AddVars {
+  playlistId: string
+  uris: string[]
+}
 
 export function useAddToPlaylist() {
   const qc = useQueryClient()

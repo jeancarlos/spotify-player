@@ -35,7 +35,7 @@ export function AlbumDetail() {
   const playTrack = usePlayTrack()
   const { state: playerState } = usePlayer()
 
-  const trackIds = (tracks.data?.items ?? []).map(t => t.id)
+  const trackIds = (tracks.data?.items ?? []).map((t) => t.id)
   const audioFeatures = useAudioFeatures(trackIds)
   const fullTracks = useTracks(trackIds)
 
@@ -52,36 +52,35 @@ export function AlbumDetail() {
     setHeaderHeight(h)
   }, [])
 
-  const enrichTrack = useCallback((track: SpotifyAlbumTrack): SpotifyTrack => ({
-    ...track,
-    type: 'track',
-    album: {
-      id: album.data?.id ?? '',
-      name: album.data?.name ?? '',
-      images: album.data?.images ?? [],
-      release_date: album.data?.release_date ?? '',
-      album_type: album.data?.album_type ?? 'album',
-      artists: album.data?.artists ?? [],
-      uri: album.data?.uri ?? '',
-      type: 'album',
-    },
-    popularity: 0,
-  }), [album.data])
+  const enrichTrack = useCallback(
+    (track: SpotifyAlbumTrack): SpotifyTrack => ({
+      ...track,
+      type: 'track',
+      album: {
+        id: album.data?.id ?? '',
+        name: album.data?.name ?? '',
+        images: album.data?.images ?? [],
+        release_date: album.data?.release_date ?? '',
+        album_type: album.data?.album_type ?? 'album',
+        artists: album.data?.artists ?? [],
+        uri: album.data?.uri ?? '',
+        type: 'album',
+      },
+      popularity: 0,
+    }),
+    [album.data]
+  )
 
   const albumItems = tracks.data?.items ?? []
   const enrichedTracks: SpotifyTrack[] = albumItems.map(enrichTrack)
 
-  const hasNext = tracks.data
-    ? tracks.data.offset + tracks.data.limit < tracks.data.total
-    : false
+  const hasNext = tracks.data ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
   const albumYear = album.data?.release_date
     ? formatDate(album.data.release_date, 'year')
     : undefined
 
-  const albumSubtitle = album.data
-    ? album.data.artists.map(a => a.name).join(', ')
-    : ''
+  const albumSubtitle = album.data ? album.data.artists.map((a) => a.name).join(', ') : ''
 
   return (
     <div className="min-h-screen">
@@ -99,9 +98,7 @@ export function AlbumDetail() {
         {/* Tracks section */}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-black/80">
-              {t('albumDetail.tracks')}
-            </h2>
+            <h2 className="text-base font-bold text-black/80">{t('albumDetail.tracks')}</h2>
             <ListTableSwitch view={view} onChange={setView} />
           </div>
 
@@ -113,7 +110,7 @@ export function AlbumDetail() {
                   track={track}
                   index={(page - 1) * LIMIT + i}
                   isActive={playerState?.currentTrack?.id === track.id}
-                  onPlay={t => playTrack(t, enrichedTracks)}
+                  onPlay={(t) => playTrack(t, enrichedTracks)}
                 />
               ))}
             </div>
@@ -134,8 +131,8 @@ export function AlbumDetail() {
             <Pagination
               page={page}
               hasNext={hasNext}
-              onPrev={() => setPage(p => Math.max(1, p - 1))}
-              onNext={() => setPage(p => p + 1)}
+              onPrev={() => setPage((p) => Math.max(1, p - 1))}
+              onNext={() => setPage((p) => p + 1)}
             />
           )}
         </div>

@@ -18,7 +18,12 @@ export interface FetchLyricsParams {
   durationMs?: number
 }
 
-export async function fetchLyrics({ artist, title, album, durationMs }: FetchLyricsParams): Promise<LyricLine[]> {
+export async function fetchLyrics({
+  artist,
+  title,
+  album,
+  durationMs,
+}: FetchLyricsParams): Promise<LyricLine[]> {
   const cleanedTitle = cleanTitle(title)
   const url = new URL('https://lrclib.net/api/get')
   url.searchParams.set('artist_name', artist)
@@ -29,17 +34,17 @@ export async function fetchLyrics({ artist, title, album, durationMs }: FetchLyr
   try {
     const res = await fetch(url.toString())
     if (!res.ok) return []
-    
-    const data = (await res.json()) as { 
-      syncedLyrics?: string; 
-      plainLyrics?: string;
-      error?: string 
+
+    const data = (await res.json()) as {
+      syncedLyrics?: string
+      plainLyrics?: string
+      error?: string
     }
 
     if (data.syncedLyrics) {
       return parseLRC(data.syncedLyrics)
     }
-    
+
     if (data.plainLyrics && durationMs) {
       return parsePlainLyrics(data.plainLyrics, durationMs)
     }
@@ -55,7 +60,7 @@ export type UseLyricsParams = FetchLyricsParams
 
 export function useLyrics(params: UseLyricsParams) {
   const cleanedTitle = cleanTitle(params.title)
-  
+
   return useQuery<LyricLine[]>({
     queryKey: ['lyrics', params.artist, cleanedTitle, params.durationMs],
     enabled: !!params.artist && !!params.title,

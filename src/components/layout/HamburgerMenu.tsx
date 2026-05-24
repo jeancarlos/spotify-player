@@ -40,13 +40,22 @@ export function HamburgerMenu() {
   // Close on Escape
   useEffect(() => {
     if (!isOpen) return
-    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+    }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [isOpen, close])
 
-  const handleNav = (path: string) => { close(); navigate(path) }
-  const handleLogout = () => { close(); logout(); navigate('/login') }
+  const handleNav = (path: string) => {
+    close()
+    navigate(path)
+  }
+  const handleLogout = () => {
+    close()
+    logout()
+    navigate('/login')
+  }
 
   const avatar = authState.profile?.images[0]?.url
 
@@ -105,7 +114,11 @@ export function HamburgerMenu() {
               {/* Profile header */}
               <div className="flex items-center gap-3 px-4 py-3 border-b border-black/5">
                 {avatar ? (
-                  <img src={avatar} alt="avatar" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  <img
+                    src={avatar}
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-black/40 font-bold text-sm flex-shrink-0">
                     {authState.profile?.display_name?.[0] ?? '?'}

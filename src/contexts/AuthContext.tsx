@@ -16,12 +16,18 @@ interface AuthContextValue {
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
 const SCOPES = [
-  'user-read-private', 'user-read-email',
-  'user-top-read', 'user-read-recently-played',
-  'user-library-read', 'user-follow-read',
-  'user-read-playback-state', 'user-modify-playback-state',
-  'streaming', 'playlist-read-private',
-  'playlist-modify-private', 'playlist-modify-public',
+  'user-read-private',
+  'user-read-email',
+  'user-top-read',
+  'user-read-recently-played',
+  'user-library-read',
+  'user-follow-read',
+  'user-read-playback-state',
+  'user-modify-playback-state',
+  'streaming',
+  'playlist-read-private',
+  'playlist-modify-private',
+  'playlist-modify-public',
   'ugc-image-upload',
 ].join(' ')
 
@@ -29,10 +35,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialAuthState, () => {
     const accessToken = sessionStorage.getItem('access_token')
     const refreshToken = localStorage.getItem('refresh_token')
+    const cachedProfile = (() => {
+      try {
+        const raw = localStorage.getItem('user_profile')
+        return raw ? JSON.parse(raw) : null
+      } catch { return null }
+    })()
     return {
       accessToken,
       refreshToken,
-      profile: null,
+      profile: cachedProfile,
       isAuthenticated: !!accessToken,
     }
   })
@@ -41,12 +53,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!state.isAuthenticated || state.profile) return
-    api.get<SpotifyUser>('/me')
-      .then(res => dispatch({ type: 'SET_PROFILE', payload: res.data }))
+    api
+      .get<SpotifyUser>('/me')
+      .then((res) => dispatch({ type: 'SET_PROFILE', payload: res.data }))
       .catch((err) => {
         if (err?.response?.status === 429) {
           // Rate-limited: token still valid, retry after back-off
-          setTimeout(() => setProfileRetry(n => n + 1), 15_000)
+          setTimeout(() => setProfileRetry((n) => n + 1), 15_000)
         } else {
           // Truly unauthorized — clear storage before dispatching LOGOUT
           // so the reducer init can't resurrect a stale token on remount
@@ -77,10 +90,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     const authUrl = `https://accounts.spotify.com/authorize?${params}`
-    const w = 500, h = 700
+    const w = 500,
+      h = 700
     const left = Math.round(screen.width / 2 - w / 2)
     const top = Math.round(screen.height / 2 - h / 2)
-    const popup = window.open(authUrl, 'spotify_login', `width=${w},height=${h},left=${left},top=${top}`)
+    const popup = window.open(
+      authUrl,
+      'spotify_login',
+      `width=${w},height=${h},left=${left},top=${top}`
+    )
 
     if (!popup) {
       // Popup blocked — fallback to same-tab redirect
@@ -92,7 +110,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event.origin !== window.location.origin) return
       if (event.data?.type !== 'SPOTIFY_AUTH_TOKENS') return
       window.removeEventListener('message', onMessage)
-      const { accessToken, refreshToken } = event.data as { type: string; accessToken: string; refreshToken: string }
+      const { accessToken, refreshToken } = event.data as {
+        type: string
+        accessToken: string
+        refreshToken: string
+      }
       sessionStorage.setItem('access_token', accessToken)
       localStorage.setItem('refresh_token', refreshToken)
       localStorage.removeItem('pkce_verifier')
@@ -136,8 +158,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (window.opener) {
       // Popup mode: hand tokens to the main window and close
       window.opener.postMessage(
-        { type: 'SPOTIFY_AUTH_TOKENS', accessToken: data.access_token, refreshToken: data.refresh_token },
-        window.location.origin,
+        {
+          type: 'SPOTIFY_AUTH_TOKENS',
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+        },
+        window.location.origin
       )
       window.close()
       return
@@ -146,7 +172,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Same-tab fallback
     sessionStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
-    dispatch({ type: 'SET_TOKENS', payload: { accessToken: data.access_token, refreshToken: data.refresh_token } })
+    dispatch({
+      type: 'SET_TOKENS',
+      payload: { accessToken: data.access_token, refreshToken: data.refresh_token },
+    })
   }, [])
 
   const logout = useCallback(() => {

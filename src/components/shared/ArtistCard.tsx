@@ -15,9 +15,10 @@ export function ArtistCard({ artist, onNavigate }: ArtistCardProps) {
     if (onNavigate) onNavigate(artist.id)
   }
 
-  const subtitle = artist.followers?.total != null
-    ? t('artists.followers', { count: artist.followers.total })
-    : undefined
+  const subtitle =
+    artist.followers?.total != null
+      ? t('artists.followers', { count: artist.followers.total })
+      : undefined
 
   return (
     <MediaCard

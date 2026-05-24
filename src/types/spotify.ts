@@ -227,7 +227,14 @@ export interface SpotifyPlaylist {
   name: string
   description: string | null
   images: SpotifyImage[]
-  owner: { id: string; display_name: string; uri?: string; href?: string; type?: 'user'; external_urls?: SpotifyExternalUrls }
+  owner: {
+    id: string
+    display_name: string
+    uri?: string
+    href?: string
+    type?: 'user'
+    external_urls?: SpotifyExternalUrls
+  }
   items: { total: number; href: string }
   /** @deprecated Use items instead */
   tracks: { total: number; href: string }
@@ -242,7 +249,13 @@ export interface SpotifyPlaylist {
 
 export interface SpotifyPlaylistTrack {
   added_at: string | null
-  added_by?: { id: string; type: 'user'; uri: string; href: string; external_urls: SpotifyExternalUrls } | null
+  added_by?: {
+    id: string
+    type: 'user'
+    uri: string
+    href: string
+    external_urls: SpotifyExternalUrls
+  } | null
   is_local?: boolean
   item: SpotifyTrack
   /** @deprecated Use item instead */

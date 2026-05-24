@@ -20,16 +20,25 @@ export function Favorites() {
   const [searchQuery, setSearchQuery] = useState('')
   const [open, setOpen] = useState(false)
 
-  const buttonRef  = useRef<HTMLButtonElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const searchSchema = useMemo(() => z.object({
-    query: z.string().min(2, t('favorites.minQuery')),
-  }), [t])
+  const searchSchema = useMemo(
+    () =>
+      z.object({
+        query: z.string().min(2, t('favorites.minQuery')),
+      }),
+    [t]
+  )
 
   type SearchForm = z.infer<typeof searchSchema>
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<SearchForm>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<SearchForm>({
     resolver: zodResolver(searchSchema),
     defaultValues: { query: '' },
   })
@@ -47,9 +56,12 @@ export function Favorites() {
     if (!open) return
     const handler = (e: MouseEvent) => {
       if (
-        popoverRef.current && !popoverRef.current.contains(e.target as Node) &&
-        buttonRef.current  && !buttonRef.current.contains(e.target as Node)
-      ) close()
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      )
+        close()
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -58,7 +70,9 @@ export function Favorites() {
   // Fecha no Escape
   useEffect(() => {
     if (!open) return
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+    }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
   }, [open, close])
@@ -99,18 +113,32 @@ export function Favorites() {
           <div className="relative">
             <button
               ref={buttonRef}
-              onClick={() => setOpen(v => !v)}
+              onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-haspopup="true"
               className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"
             >
               <AnimatePresence mode="wait" initial={false}>
                 {open ? (
-                  <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }} style={{ display: 'flex' }}>
+                  <motion.span
+                    key="x"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    style={{ display: 'flex' }}
+                  >
                     <X size={16} />
                   </motion.span>
                 ) : (
-                  <motion.span key="plus" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }} style={{ display: 'flex' }}>
+                  <motion.span
+                    key="plus"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    style={{ display: 'flex' }}
+                  >
                     <Plus size={16} />
                   </motion.span>
                 )}
@@ -154,14 +182,18 @@ export function Favorites() {
                     </form>
 
                     {searchResults.isPending && searchQuery && (
-                      <p className="text-xs text-black/40 text-center py-3" aria-live="polite">{t('common.loading')}</p>
+                      <p className="text-xs text-black/40 text-center py-3" aria-live="polite">
+                        {t('common.loading')}
+                      </p>
                     )}
                     {searchResults.data?.length === 0 && searchQuery && (
-                      <p className="text-xs text-red-500 text-center py-3" aria-live="polite">{t('favorites.notFound')}</p>
+                      <p className="text-xs text-red-500 text-center py-3" aria-live="polite">
+                        {t('favorites.notFound')}
+                      </p>
                     )}
                     {searchResults.data && searchResults.data.length > 0 && (
                       <div className="space-y-0.5 max-h-64 overflow-y-auto" aria-live="polite">
-                        {searchResults.data.map(track => (
+                        {searchResults.data.map((track) => (
                           <div
                             key={track.id}
                             className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-black/5 transition-colors"
@@ -172,9 +204,11 @@ export function Favorites() {
                               alt={track.album.name}
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-black truncate">{track.name}</p>
+                              <p className="text-xs font-medium text-black truncate">
+                                {track.name}
+                              </p>
                               <p className="text-[11px] text-black/50 truncate">
-                                {track.artists.map(a => a.name).join(', ')}
+                                {track.artists.map((a) => a.name).join(', ')}
                               </p>
                             </div>
                             <button
@@ -202,8 +236,14 @@ export function Favorites() {
               <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-xl animate-pulse">
                 <div className="w-9 h-9 rounded-lg bg-black/10 shrink-0" />
                 <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="h-3 rounded-full bg-black/10" style={{ width: `${55 + (i * 17) % 35}%` }} />
-                  <div className="h-2.5 rounded-full bg-black/[0.06]" style={{ width: `${30 + (i * 11) % 25}%` }} />
+                  <div
+                    className="h-3 rounded-full bg-black/10"
+                    style={{ width: `${55 + ((i * 17) % 35)}%` }}
+                  />
+                  <div
+                    className="h-2.5 rounded-full bg-black/[0.06]"
+                    style={{ width: `${30 + ((i * 11) % 25)}%` }}
+                  />
                 </div>
                 <div className="w-7 h-3 rounded-full bg-black/[0.06] shrink-0" />
               </div>
@@ -217,7 +257,7 @@ export function Favorites() {
 
         {!isLoading && tracks.length > 0 && (
           <div className="space-y-1">
-            {tracks.map(track => (
+            {tracks.map((track) => (
               <div key={track.id} className="flex items-center group">
                 <div className="flex-1">
                   <TrackRow track={track} isActive={false} onPlay={playTrack} />

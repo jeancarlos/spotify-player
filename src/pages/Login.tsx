@@ -67,7 +67,6 @@ export function Login() {
       >
         {t('login.button')}
       </motion.button>
-
     </div>
   )
 }

@@ -9,7 +9,14 @@ export function useArtistAlbums(artistId: string | undefined, page: number, limi
     queryFn: async () => {
       const { data } = await api.get<PagingObject<SpotifyAlbumSimple>>(
         `/artists/${artistId}/albums`,
-        { params: { limit, offset: (page - 1) * limit, include_groups: 'album,single', market: 'BR' } }
+        {
+          params: {
+            limit,
+            offset: (page - 1) * limit,
+            include_groups: 'album,single',
+            market: 'BR',
+          },
+        }
       )
       return data
     },
