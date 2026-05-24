@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TrackRow } from '../TrackRow'
 import type { SpotifyTrack } from '@/types/spotify'
@@ -37,7 +37,6 @@ describe('TrackRow', () => {
 
   it('shows play icon always when no index', () => {
     render(<TrackRow track={track} />)
-    // PlayCell only renders the Play icon if index is undefined
     const playIcon = document.querySelector('.lucide-play')
     expect(playIcon).toBeInTheDocument()
     expect(screen.queryByText('01')).toBeNull()
@@ -65,8 +64,12 @@ describe('TrackRow', () => {
 
   it('calls onRemove and not onPlay when trash clicked', async () => {
     const onRemove = vi.fn()
+    const onPlay = vi.fn()
     render(<TrackRow track={track} onPlay={onPlay} onRemove={onRemove} />)
-    await userEvent.click(screen.getByRole('button', { name: /favorites\.removeConfirm/i }))
+    
+    const removeBtn = screen.getByRole('button', { name: /favorites\.removeConfirm/i })
+    fireEvent.click(removeBtn)
+    
     expect(onRemove).toHaveBeenCalledWith('spotify:track:t1')
     expect(onPlay).not.toHaveBeenCalled()
   })
@@ -74,6 +77,5 @@ describe('TrackRow', () => {
   it('renders note text in DOM when note provided', () => {
     render(<TrackRow track={track} note="This is a note" />)
     expect(screen.getByText('Test Track')).toBeInTheDocument()
-    // Tooltip trigger usually wraps the text
   })
 })
