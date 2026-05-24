@@ -104,6 +104,10 @@ export function ArcCarousel({
             fontWeight="600"
             letterSpacing="1.5"
             fontFamily="monospace"
+            paintOrder="stroke fill"
+            stroke="white"
+            strokeWidth="8"
+            strokeLinejoin="round"
           >
             <textPath href={`#arc-${uid}`} startOffset="50%" textAnchor="middle">
               {title.toUpperCase()}
