@@ -12,7 +12,7 @@ import { ArtistHeroSection } from '@/components/artist/ArtistHeroSection'
 import { ArtistBio } from '@/components/artist/ArtistBio'
 import { RelatedArtists } from '@/components/artist/RelatedArtists'
 import { ArtistDiscography } from '@/components/artist/ArtistDiscography'
-import { ArtistTopTracksList } from '@/components/artist/ArtistTopTracksList'
+import { TrackRow } from '@/components/shared/TrackRow'
 import { MusicalProfileCharts } from '@/components/shared/MusicalProfileCharts'
 import { averageAudioFeatures } from '@/utils/audioFeatures'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
@@ -76,12 +76,32 @@ export function ArtistDetail() {
       />
 
       <div style={{ paddingTop: fixedZoneHeight }} className="px-4 pb-32">
-        <ArtistTopTracksList
-          tracks={topTracks.data ?? []}
-          artistUri={artist.data?.uri}
-          onPlayTrack={(t) => playTrack(t, topTracks.data ?? [])}
-          onPlayContext={playContext}
-        />
+        {(topTracks.data ?? []).length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xs font-bold text-black/40 uppercase tracking-wider px-2 mb-3">
+              {t('artistDetail.topTracks')}
+            </h2>
+            <div className="space-y-0.5">
+              {(topTracks.data ?? []).map((track, i) => (
+                <TrackRow
+                  key={track.id}
+                  track={track}
+                  index={i}
+                  isActive={state.currentTrack?.id === track.id}
+                  onPlay={(t) => playTrack(t as SpotifyTrack, topTracks.data ?? [])}
+                />
+              ))}
+            </div>
+            {artist.data?.uri && (
+              <button
+                onClick={() => playContext(artist.data!.uri)}
+                className="text-[10px] font-bold text-black/40 hover:text-black uppercase tracking-wider px-2 pt-2 transition-colors outline-none"
+              >
+                {t('player.play')} {t('artistDetail.topTracks')}
+              </button>
+            )}
+          </section>
+        )}
 
         <ArtistBio artistName={artist.data?.name} />
 
