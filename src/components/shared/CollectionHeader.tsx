@@ -19,6 +19,7 @@ interface CollectionHeaderProps {
   onPlay: () => void
   onLayout: (height: number) => void
   onArtistClick?: (id: string) => void
+  imageRound?: boolean
   className?: string
 }
 
@@ -47,6 +48,7 @@ export function CollectionHeader({
   onPlay,
   onLayout,
   onArtistClick,
+  imageRound = false,
 }: CollectionHeaderProps) {
   const { imgPx, headerHeight } = useCollectionLayout()
 
@@ -65,16 +67,47 @@ export function CollectionHeader({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         >
-          <TiltCover imageUrl={imageUrl} size={imgPx} name={name} onClick={onPlay}>
-            <div
-              className={cn(
-                'absolute inset-0 flex items-center justify-center',
-                'bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
-              )}
+          {imageRound ? (
+            <motion.div
+              className="relative select-none group cursor-pointer"
+              style={{ width: imgPx, height: imgPx }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={onPlay}
             >
-              <Play size={48} fill="white" color="white" className="drop-shadow-lg" />
-            </div>
-          </TiltCover>
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={name}
+                  className="w-full h-full object-cover rounded-full shadow-xl"
+                  draggable={false}
+                />
+              ) : (
+                <div className="w-full h-full rounded-full bg-black/10 flex items-center justify-center">
+                  <span className="text-5xl text-black/20">♪</span>
+                </div>
+              )}
+              <div
+                className={cn(
+                  'absolute inset-0 rounded-full flex items-center justify-center',
+                  'bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+                )}
+              >
+                <Play size={48} fill="white" color="white" className="drop-shadow-lg" />
+              </div>
+            </motion.div>
+          ) : (
+            <TiltCover imageUrl={imageUrl} size={imgPx} name={name} onClick={onPlay}>
+              <div
+                className={cn(
+                  'absolute inset-0 flex items-center justify-center',
+                  'bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+                )}
+              >
+                <Play size={48} fill="white" color="white" className="drop-shadow-lg" />
+              </div>
+            </TiltCover>
+          )}
         </motion.div>
       </div>
 

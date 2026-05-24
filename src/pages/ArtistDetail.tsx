@@ -1,20 +1,20 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Play } from 'lucide-react'
 import { useArtist } from '@/hooks/queries/useArtist'
-import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscographyTracks'
 import { usePlayContext } from '@/hooks/usePlayContext'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { ArtistHeroSection } from '@/components/artist/ArtistHeroSection'
+import { CollectionHeader } from '@/components/shared/CollectionHeader'
 import { ArtistBio } from '@/components/artist/ArtistBio'
 import { RelatedArtists } from '@/components/artist/RelatedArtists'
 import { ArtistDiscography } from '@/components/artist/ArtistDiscography'
 import { ArtistTopTracksChart } from '@/components/artist/ArtistTopTracksChart'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
-import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
+import type { SpotifyAlbumSimple } from '@/types/spotify'
 
 export function ArtistDetail() {
   const { id } = useParams<{ id: string }>()
@@ -27,10 +27,9 @@ export function ArtistDetail() {
 
   const [albumPage, setAlbumPage] = useState(1)
   const [discView, setDiscView] = useState<ViewMode>('list')
-  const [heroHeight, setHeroHeight] = useState(340)
+  const [headerHeight, setHeaderHeight] = useState(0)
 
   const artist = useArtist(id)
-  const topTracks = useArtistTopTracks(id)
   const albums = useArtistAlbums(id, albumPage, 10)
   const discographyTracks = useArtistDiscographyTracks(id)
 
@@ -38,44 +37,40 @@ export function ArtistDetail() {
     ? albums.data.offset + albums.data.limit < albums.data.total
     : false
 
+  const handleLayout = useCallback((h: number) => setHeaderHeight(h), [])
+
   function handleAlbumClick(album: SpotifyAlbumSimple) {
     navigate(`/albums/${album.id}`, { state: { from: location.pathname } })
   }
 
-  function handleTrackPlay(track: SpotifyTrack) {
-    if (artist.data?.uri) {
-      playContext(artist.data.uri)
-    } else {
-      playTrack(track)
-    }
-  }
+  const artistSubtitle = artist.data?.genres?.slice(0, 2).join(' · ') ?? ''
 
   return (
     <div className="min-h-screen">
-      <ArtistHeroSection
-        artist={artist.data}
-        topTracks={topTracks.data}
-        activeTrackId={state.currentTrack?.id}
-        onTrackPlay={handleTrackPlay}
-        onLayout={setHeroHeight}
-        carouselTitle={t('artistDetail.topTracks')}
+      <CollectionHeader
+        imageUrl={artist.data?.images?.[0]?.url}
+        name={artist.data?.name ?? ''}
+        subtitle={artistSubtitle}
+        playLabel={t('player.play')}
+        onPlay={() => artist.data?.uri && playContext(artist.data.uri)}
+        onLayout={handleLayout}
+        imageRound
       />
 
-      <div style={{ paddingTop: heroHeight }} className="pb-32">
+      <div style={{ paddingTop: headerHeight }} className="pb-32">
         <div className="max-w-3xl mx-auto px-4">
           <ArtistBio artistName={artist.data?.name} />
 
           {discographyTracks.data.length > 0 && (
             <section className="mb-8">
               <div className="flex items-center justify-between px-2 mb-3">
-                <h2 className="text-xs font-bold text-black/40 uppercase tracking-wider">
-                  {t('artistDetail.topTracksRanked')}
-                </h2>
+                <h3 className="text-sm font-bold text-black/50">{t('artistDetail.topTracksRanked')}</h3>
                 {artist.data?.uri && (
                   <button
                     onClick={() => playContext(artist.data!.uri)}
-                    className="text-[10px] font-bold text-black/35 hover:text-black uppercase tracking-wider transition-colors outline-none"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono border border-black/15 bg-white/60 backdrop-blur-sm text-black/50 hover:bg-black hover:text-white hover:border-black transition-colors outline-none"
                   >
+                    <Play size={11} />
                     {t('player.play')}
                   </button>
                 )}
