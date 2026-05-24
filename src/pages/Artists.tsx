@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useArtists } from '@/hooks/queries/useArtists'
@@ -87,24 +88,39 @@ export function Artists() {
           <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>
         )}
 
-        {isLoading && (
-          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3">
-            {Array.from({ length: 21 }).map((_, i) => (
-              <CardSkeleton key={i} />
-            ))}
-          </div>
-        )}
-
-        {!isLoading && data && (
-          <SearchResultsGrid
-            tab={tab}
-            artists={artists.data?.items}
-            albums={albums.data?.items}
-            playlists={playlists.data?.items}
-            hasNext={hasNext}
-            onNextPage={() => handlePageChange(page + 1)}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3"
+            >
+              {Array.from({ length: 21 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
+            </motion.div>
+          ) : data ? (
+            <motion.div
+              key={`${query}-${tab}-${page}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <SearchResultsGrid
+                tab={tab}
+                artists={artists.data?.items}
+                albums={albums.data?.items}
+                playlists={playlists.data?.items}
+                hasNext={hasNext}
+                onNextPage={() => handlePageChange(page + 1)}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         {!isLoading && query && data?.items.length === 0 && (
           <p className="text-center text-black/30 mt-20">{t('artists.noResults')}</p>
