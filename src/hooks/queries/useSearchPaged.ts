@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import type { PagingObject } from '@/types/spotify'
 
-// Spotify documents a max limit of 50, but apps in development mode / restricted quota
-// reject with 400 "Invalid limit" above 15. Do not change without enabling extended quota first.
-export const PAGE_SIZE = 15
+// Spotify dev quota rejects limit > 10. Two parallel calls of 10 give 20 results per page.
+const CHUNK_SIZE = 10
+export const PAGE_SIZE = CHUNK_SIZE * 2
 
 interface UseSearchPagedOptions<T, R> {
   queryKeyPrefix: string
@@ -26,10 +26,18 @@ export function useSearchPaged<T, R>({
     enabled: query.trim().length > 0,
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
-      const { data } = await api.get<R>('/search', {
-        params: { q: query, type: apiType, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE },
-      })
-      return getPage(data)
+      const baseOffset = (page - 1) * PAGE_SIZE
+      const [first, second] = await Promise.all([
+        api.get<R>('/search', {
+          params: { q: query, type: apiType, limit: CHUNK_SIZE, offset: baseOffset },
+        }),
+        api.get<R>('/search', {
+          params: { q: query, type: apiType, limit: CHUNK_SIZE, offset: baseOffset + CHUNK_SIZE },
+        }),
+      ])
+      const p1 = getPage(first.data)
+      const p2 = getPage(second.data)
+      return { ...p1, items: [...p1.items, ...p2.items], limit: PAGE_SIZE }
     },
   })
 }
