@@ -4,14 +4,21 @@ import { Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TiltCover } from './TiltCover'
 
+interface ArtistLink {
+  id: string
+  name: string
+}
+
 interface CollectionHeaderProps {
   imageUrl: string | undefined
   name: string
   subtitle: string
+  artists?: ArtistLink[]
   year?: string
   playLabel: string
   onPlay: () => void
   onLayout: (height: number) => void
+  onArtistClick?: (id: string) => void
   className?: string
 }
 
@@ -34,10 +41,12 @@ export function CollectionHeader({
   imageUrl,
   name,
   subtitle,
+  artists,
   year,
   playLabel,
   onPlay,
   onLayout,
+  onArtistClick,
 }: CollectionHeaderProps) {
   const { imgPx, headerHeight } = useCollectionLayout()
 
@@ -83,7 +92,23 @@ export function CollectionHeader({
           {name}
         </h1>
         <p className="text-sm text-black/50 mt-1">
-          {subtitle}
+          {artists && onArtistClick ? (
+            <>
+              {artists.map((a, i) => (
+                <span key={a.id}>
+                  {i > 0 && ', '}
+                  <button
+                    onClick={() => onArtistClick(a.id)}
+                    className="hover:text-black transition-colors underline underline-offset-2 decoration-black/20 hover:decoration-black/60"
+                  >
+                    {a.name}
+                  </button>
+                </span>
+              ))}
+            </>
+          ) : (
+            subtitle
+          )}
           {year ? ` · ${year}` : ''}
         </p>
         <button

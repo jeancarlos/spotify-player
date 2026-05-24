@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
@@ -18,6 +18,8 @@ const LIMIT = 20
 
 export function AlbumDetail() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const location = useLocation()
   const { t } = useTranslation()
 
   const [page, setPage] = useState(1)
@@ -74,10 +76,14 @@ export function AlbumDetail() {
         imageUrl={album.data?.images?.[0]?.url}
         name={album.data?.name ?? ''}
         subtitle={albumSubtitle}
+        artists={album.data?.artists}
         year={albumYear}
         playLabel={t('albumDetail.playAlbum')}
         onPlay={handlePlay}
         onLayout={handleLayout}
+        onArtistClick={(artistId) =>
+          navigate(`/artists/${artistId}`, { state: { from: location.pathname } })
+        }
       />
 
       <div style={{ paddingTop: headerHeight }} className="pb-32">
