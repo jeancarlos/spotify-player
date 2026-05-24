@@ -9,35 +9,36 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
-  build_site:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: 22
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: yarn build
         env:
           VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
           VITE_SPOTIFY_REDIRECT_URI: ${{ secrets.VITE_SPOTIFY_REDIRECT_URI }}
 
-      - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist/'
+          path: dist/
 
   deploy:
-    needs: build_site
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
