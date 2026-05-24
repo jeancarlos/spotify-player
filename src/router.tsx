@@ -1,37 +1,52 @@
 /* eslint-disable react-refresh/only-export-components */
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
 import { AppRoot } from '@/components/layout/AppRoot'
 import { AppShell } from '@/components/layout/AppShell'
 import { PlayerView } from '@/components/layout/PlayerView'
+import { lazyWithRetry } from '@/utils/lazyWithRetry'
 
-// Lazy load pages
-const Login = lazy(() => import('@/pages/Login').then((module) => ({ default: module.Login })))
-const OAuthCallback = lazy(() =>
-  import('@/pages/OAuthCallback').then((module) => ({ default: module.OAuthCallback }))
+// Lazy load pages — uses retry + auto-reload to handle stale chunks after deploys
+const Login = lazyWithRetry(
+  () => import('@/pages/Login').then((m) => ({ default: m.Login })),
+  'Login'
 )
-const AuthError = lazy(() =>
-  import('@/pages/AuthError').then((module) => ({ default: module.AuthError }))
+const OAuthCallback = lazyWithRetry(
+  () => import('@/pages/OAuthCallback').then((m) => ({ default: m.OAuthCallback })),
+  'OAuthCallback'
 )
-const Home = lazy(() => import('@/pages/Home').then((module) => ({ default: module.Home })))
-const Artists = lazy(() =>
-  import('@/pages/Artists').then((module) => ({ default: module.Artists }))
+const AuthError = lazyWithRetry(
+  () => import('@/pages/AuthError').then((m) => ({ default: m.AuthError })),
+  'AuthError'
 )
-const ArtistDetail = lazy(() =>
-  import('@/pages/ArtistDetail').then((module) => ({ default: module.ArtistDetail }))
+const Home = lazyWithRetry(
+  () => import('@/pages/Home').then((m) => ({ default: m.Home })),
+  'Home'
 )
-const AlbumDetail = lazy(() =>
-  import('@/pages/AlbumDetail').then((module) => ({ default: module.AlbumDetail }))
+const Artists = lazyWithRetry(
+  () => import('@/pages/Artists').then((m) => ({ default: m.Artists })),
+  'Artists'
 )
-const PlaylistDetail = lazy(() =>
-  import('@/pages/PlaylistDetail').then((module) => ({ default: module.PlaylistDetail }))
+const ArtistDetail = lazyWithRetry(
+  () => import('@/pages/ArtistDetail').then((m) => ({ default: m.ArtistDetail })),
+  'ArtistDetail'
 )
-const Favorites = lazy(() =>
-  import('@/pages/Favorites').then((module) => ({ default: module.Favorites }))
+const AlbumDetail = lazyWithRetry(
+  () => import('@/pages/AlbumDetail').then((m) => ({ default: m.AlbumDetail })),
+  'AlbumDetail'
 )
-const Profile = lazy(() =>
-  import('@/pages/Profile').then((module) => ({ default: module.Profile }))
+const PlaylistDetail = lazyWithRetry(
+  () => import('@/pages/PlaylistDetail').then((m) => ({ default: m.PlaylistDetail })),
+  'PlaylistDetail'
+)
+const Favorites = lazyWithRetry(
+  () => import('@/pages/Favorites').then((m) => ({ default: m.Favorites })),
+  'Favorites'
+)
+const Profile = lazyWithRetry(
+  () => import('@/pages/Profile').then((m) => ({ default: m.Profile })),
+  'Profile'
 )
 
 // Loading component
