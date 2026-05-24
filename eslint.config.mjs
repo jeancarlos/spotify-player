@@ -25,7 +25,6 @@ export default tseslint.config(
       prettier,
     ],
     files: ['**/*.{ts,tsx}'],
-    ignores: ['tests-e2e/**'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -104,30 +103,15 @@ export default tseslint.config(
       'react-refresh/only-export-components': 'off',
     },
   },
-  // E2E tests — relaxed rules, no strict TS checking
-  {
-    files: ['tests-e2e/**'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-floating-promises': 'off',
-      '@typescript-eslint/promise-function-async': 'off',
-      'no-console': 'off',
-      complexity: 'off',
-    },
-  },
   // Testes podem usar any e non-null assertions mais livremente
   {
-    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', 'src/test-setup.ts', 'src/mocks/**'],
+    files: [
+      '**/*.test.{ts,tsx}',
+      '**/*.spec.{ts,tsx}',
+      'src/test-setup.ts',
+      'src/mocks/**',
+      'tests-e2e/**',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
