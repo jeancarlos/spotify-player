@@ -23,17 +23,20 @@ export function usePlaylistDetailPage() {
   const tracks = usePlaylistTracks(id ?? '', !!id, page, PLAYLIST_LIMIT)
   const playContext = usePlayContext()
   const playTrack = usePlayTrack()
-  const { state: playerState } = usePlayer()
+  const { state: playerState, dispatch } = usePlayer()
+
+  const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? []).map((item) => item.item)
 
   const handlePlay = useCallback(() => {
-    if (playlist.data?.uri) void playContext(playlist.data.uri)
-  }, [playlist.data, playContext])
+    if (!playlist.data?.uri) return
+    void playContext(playlist.data.uri)
+    if (playlistTracks.length > 0) dispatch({ type: 'SET_QUEUE', payload: playlistTracks })
+  }, [playlist.data, playContext, playlistTracks, dispatch])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)
   }, [])
 
-  const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? []).map((item) => item.item)
   const hasNext = tracks.data ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
   const ownerName = playlist.data?.owner.display_name ?? ''
   const subtitle = t('playlistDetail.owner', { name: ownerName })

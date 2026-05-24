@@ -15,7 +15,11 @@ export function usePlayTrack() {
     async (track: SpotifyTrack, queue: SpotifyTrack[] = []) => {
       dispatch({ type: 'SET_TRACK', payload: track })
       dispatch({ type: 'SET_PLAYING', payload: true })
-      if (queue.length > 0) dispatch({ type: 'SET_QUEUE', payload: queue })
+      if (queue.length > 0) {
+        const startIdx = queue.findIndex((t) => t.id === track.id)
+        const upcomingQueue = startIdx >= 0 ? queue.slice(startIdx) : queue
+        dispatch({ type: 'SET_QUEUE', payload: upcomingQueue })
+      }
 
       try {
         await api.put('/me/player/play', { uris: [track.uri] })
