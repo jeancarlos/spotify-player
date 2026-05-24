@@ -15,14 +15,17 @@ export function useNowPlaying(enabled = true) {
   return useQuery<NowPlayingResponse | null>({
     queryKey: ['now-playing'],
     enabled,
-    refetchInterval: 5000,
+    refetchInterval: (query) => {
+      const data = query.state.data as NowPlayingResponse | null | undefined
+      return data?.is_playing === false ? 30_000 : 10_000
+    },
     refetchIntervalInBackground: false,
-    staleTime: 4000,
+    staleTime: 8000,
     queryFn: async () => {
       const { data, status } = await api.get<NowPlayingResponse>('/me/player', {
-        validateStatus: (s) => s === 200 || s === 204 || s === 429,
+        validateStatus: (s) => s === 200 || s === 204,
       })
-      if (status === 204 || status === 429) return null
+      if (status === 204) return null
       return data
     },
   })

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useDebounce } from '@/hooks/useDebounce'
 import { cn } from '@/lib/utils'
@@ -21,7 +21,8 @@ export function SearchBar({
   const { t } = useTranslation()
   const [query, setQuery] = useState(defaultQuery)
   const [tab, setTab] = useState<SearchTab>(defaultTab)
-  const debouncedQuery = useDebounce(query, 400)
+  const debouncedQuery = useDebounce(query, 700)
+  const isPending = query !== debouncedQuery
   const mounted = useRef(false)
   const onSearchRef = useRef(onSearch)
   useEffect(() => {
@@ -50,7 +51,11 @@ export function SearchBar({
         className
       )}
     >
-      <Search size={15} className="text-black/40 shrink-0" />
+      {isPending ? (
+        <Loader2 size={15} className="text-black/40 shrink-0 animate-spin" />
+      ) : (
+        <Search size={15} className="text-black/40 shrink-0" />
+      )}
       <label htmlFor="global-search" className="sr-only">
         {t('artists.searchPlaceholder')}
       </label>

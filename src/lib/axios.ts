@@ -7,12 +7,16 @@ const api = axios.create({
 
 let isRefreshing = false
 let refreshPromise: Promise<string> | null = null
+let backoffUntil = 0
 
 interface RetryableConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
 }
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
+  const wait = backoffUntil - Date.now()
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait))
+
   const token = sessionStorage.getItem('access_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -24,6 +28,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryableConfig | undefined
+    if (error.response?.status === 429 && originalRequest) {
+      const retryAfter = Number(error.response.headers['retry-after'] ?? 10)
+      backoffUntil = Date.now() + retryAfter * 1000
+      await new Promise((r) => setTimeout(r, retryAfter * 1000))
+      return api(originalRequest)
+    }
+
     if (originalRequest && error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
