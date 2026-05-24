@@ -1,6 +1,8 @@
-# Spoter
+# Spoter (Hiring Challenge)
 
-Spoter é um player de música web imersivo integrado com a API do Spotify, utilizando React, TypeScript, Vite, Tailwind CSS e Shadcn/UI com Glassmorphism.
+Spoter é um player de música web imersivo integrado com a API do Spotify, utilizando React, TypeScript, Vite, Tailwind CSS e Shadcn/UI com "Glassmorfismo".
+
+**Link:** https://spoter.jeansouza.dev/ pra ver online
 
 ## Configuração do Spotify (Obtendo o Client ID)
 
@@ -11,7 +13,8 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 
 2. **Crie uma aplicação (Create app):**
    - Preencha o nome (ex: `Spoter Local`) e a descrição.
-   - Em **Redirect URIs**, insira exatamente: `https://localhost:5175/callback`
+   - Em **Redirect URIs**, insira exatamente: `http://127.0.0.1:5173/callback`
+     - `https://localhost...` não funciona pois o spotify não aceita `localhost` apenas `127.0.0.1`
    - Marque as opções necessárias e aceite os termos para criar o app.
 
 3. **Copie o Client ID:**
@@ -22,7 +25,7 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 
    ```bash
    VITE_SPOTIFY_CLIENT_ID=cole_seu_client_id_aqui
-   VITE_SPOTIFY_REDIRECT_URI=https://localhost:5175/callback
+   VITE_SPOTIFY_REDIRECT_URI=http://127.0.0.1:5173/callback
    ```
 
 ## Executando o Projeto
@@ -71,17 +74,6 @@ graph TD
     Auth --> Favs[Gerenciamento de Favoritos]
     Favs --> Form(Formulário com Validação)
     Form --> Storage(Persistência LocalStorage)
-```
-
-### Gráfico de Cobertura Funcional
-
-```mermaid
-pie title Cobertura E2E por Módulo
-    "Pesquisa & Listagem" : 35
-    "Detalhes do Artista" : 25
-    "Favoritos (CRUD)" : 20
-    "Internacionalização" : 15
-    "Sanidade (Smoke)" : 5
 ```
 
 | Módulo | Funcionalidades Testadas |
