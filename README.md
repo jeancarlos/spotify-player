@@ -49,8 +49,6 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
    yarn dev
    ```
 
-> **Aviso de HTTPS Local:** O projeto usa o `@vitejs/plugin-basic-ssl` para gerar um certificado autoassinado (obrigatório para algumas APIs web e integrações OAuth avançadas). O navegador exibirá um aviso de "Sua conexão não é privada". Clique em **Avançado** e **Ir para localhost (não seguro)**.
-
 ## Scripts Úteis
 
 - `yarn dev`: Inicia o servidor local.
