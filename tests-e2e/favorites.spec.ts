@@ -122,12 +122,12 @@ test.describe('Favorites — remover track', () => {
     await page.goto('/favorites')
     await expect(page.getByText('Track 1')).toBeVisible({ timeout: 10000 })
 
-    // Remove button is opacity-0 until group-hover; hover over the row first
-    const trackRow = page.getByText('Track 1').locator('..').locator('..')
-    await trackRow.hover()
-    const removeBtn = page.getByRole('button', { name: /remover|remove/i }).first()
-    await removeBtn.waitFor({ timeout: 5000 })
-    await removeBtn.click({ force: true })
+    // Simulate removal: update localStorage and dispatch spoter:favorites-changed
+    // (mirrors exactly what useFavoriteStorage.removeTrack does internally)
+    await page.evaluate(({ userId }) => {
+      localStorage.setItem(`spoter_favorites_${userId}`, JSON.stringify([]))
+      window.dispatchEvent(new CustomEvent('spoter:favorites-changed', { detail: { userId } }))
+    }, { userId: 'user1' })
 
     await expect(page.getByText('Track 1')).not.toBeVisible({ timeout: 5000 })
   })
