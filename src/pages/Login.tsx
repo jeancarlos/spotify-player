@@ -67,6 +67,19 @@ export function Login() {
       >
         {t('login.button')}
       </motion.button>
+
+      <motion.a
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.45, duration: 0.4 }}
+        href="https://github.com/jeancarlos/spotify-player"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative z-10 translate-y-[-14px] text-black no-underline hover:underline"
+        style={{ fontSize: '11px' }}
+      >
+        Ver no Github
+      </motion.a>
     </div>
   )
 }
