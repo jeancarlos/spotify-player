@@ -54,3 +54,77 @@ test.describe('Favorites form', () => {
     ).toBeVisible({ timeout: 5000 })
   })
 })
+
+test.describe('Favorites — estado vazio', () => {
+  test('exibe mensagem de lista vazia quando não há favoritos', async ({ page }) => {
+    await page.goto('/favorites')
+    // t('favorites.emptyList') = "Nenhum favorito ainda" (PT) / "No favorites yet" (EN)
+    await expect(
+      page.getByText(/nenhum favorito|no favorites yet/i)
+    ).toBeVisible({ timeout: 10000 })
+  })
+})
+
+test.describe('Favorites — fluxo completo de adicionar', () => {
+  test('adicionar uma música via formulário faz ela aparecer na lista', async ({ page }) => {
+    await page.goto('/favorites')
+
+    // Wait for lazy-loaded page then open popover
+    await page.getByRole('button', { name: /adicionar favorito|add favorite/i }).click({ timeout: 10000 })
+
+    const combobox = page.getByRole('combobox')
+    await combobox.waitFor({ timeout: 5000 })
+    await combobox.fill('Track')
+
+    const firstOption = page.getByRole('listbox').getByRole('option').first()
+    await firstOption.waitFor({ timeout: 5000 })
+    await firstOption.click()
+
+    // t('favorites.addConfirm') = "Adicionar ao favorito" (PT) / "Add to favorites" (EN)
+    await page.getByRole('button', { name: /adicionar ao favorito|add to favorites/i }).click()
+
+    await expect(page.getByText('Track 1')).toBeVisible({ timeout: 5000 })
+  })
+})
+
+test.describe('Favorites — remover track', () => {
+  test('remover track da lista faz ela desaparecer', async ({ page }) => {
+    const trackJson = {
+      id: 'track-1',
+      name: 'Track 1',
+      uri: 'spotify:track:track-1',
+      duration_ms: 210000,
+      explicit: false,
+      popularity: 80,
+      preview_url: null,
+      type: 'track',
+      artists: [{ id: 'artist-1', name: 'Mock Artist', uri: 'spotify:artist:artist-1', type: 'artist' }],
+      album: {
+        id: 'album-1',
+        name: 'Mock Album',
+        images: [{ url: 'https://picsum.photos/300', width: 300, height: 300 }],
+        release_date: '2024-01-01',
+        album_type: 'album',
+        artists: [],
+        uri: 'spotify:album:album-1',
+        type: 'album',
+      },
+    }
+
+    await page.addInitScript(
+      ({ trackData, userId }) => {
+        localStorage.setItem(`spoter_favorites_${userId}`, JSON.stringify([trackData]))
+        localStorage.setItem(`spoter_playlist_${userId}`, 'e2e-playlist')
+      },
+      { trackData: trackJson, userId: 'user1' }
+    )
+
+    await page.goto('/favorites')
+    await expect(page.getByText('Track 1')).toBeVisible({ timeout: 10000 })
+
+    // Click remove button on the track row — aria-label is t('favorites.removeConfirm') = "Remover"
+    await page.getByRole('button', { name: /remover|remove/i }).first().click()
+
+    await expect(page.getByText('Track 1')).not.toBeVisible({ timeout: 5000 })
+  })
+})
