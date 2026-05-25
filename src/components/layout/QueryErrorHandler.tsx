@@ -15,7 +15,6 @@ export function QueryErrorHandler() {
       if (!('action' in event) || (event.action as { type: string }).type !== 'error') return
 
       const err = event.query.state.error as { response?: { status: number } } | null
-      // Don't toast on 401 — axios interceptor handles auth refresh/redirect
       if (err?.response?.status === 401) return
       toast(t('common.error'), 'error')
     })

@@ -122,8 +122,12 @@ test.describe('Favorites — remover track', () => {
     await page.goto('/favorites')
     await expect(page.getByText('Track 1')).toBeVisible({ timeout: 10000 })
 
-    // Click remove button on the track row — aria-label is t('favorites.removeConfirm') = "Remover"
-    await page.getByRole('button', { name: /remover|remove/i }).first().click()
+    // Remove button is opacity-0 until group-hover; hover over the row first
+    const trackRow = page.getByText('Track 1').locator('..').locator('..')
+    await trackRow.hover()
+    const removeBtn = page.getByRole('button', { name: /remover|remove/i }).first()
+    await removeBtn.waitFor({ timeout: 5000 })
+    await removeBtn.click({ force: true })
 
     await expect(page.getByText('Track 1')).not.toBeVisible({ timeout: 5000 })
   })
