@@ -20,7 +20,6 @@ export function formatDate(date: string, precision?: Precision): string {
 
   if (prec === 'year') return date.slice(0, 4)
 
-  // Append day 01 for dates without day and force UTC to avoid timezone off-by-one
   const iso = prec === 'month' ? `${date}-01` : date
   const d = new Date(`${iso}T00:00:00Z`)
   if (isNaN(d.getTime())) return date

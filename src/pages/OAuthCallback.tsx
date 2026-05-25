@@ -31,6 +31,8 @@ export function OAuthCallback() {
         const errCode = (err as { code?: string }).code ?? 'unknown'
         navigate(`/auth-error?reason=${errCode}`, { replace: true })
       })
+    // Intentional: this effect handles the OAuth redirect and must strictly run only once on mount.
+    // Ignoring dependencies prevents multiple token exchanges.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

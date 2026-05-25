@@ -25,7 +25,6 @@ const mockTrack: SpotifyTrack = {
   },
 }
 
-// Stub TrackAutocomplete: renders a button that, when clicked, calls onChange(mockTrack)
 vi.mock('@/components/favorites/TrackAutocomplete', () => ({
   TrackAutocomplete: ({
     onChange,
@@ -123,7 +122,6 @@ describe('AddFavoriteForm', () => {
     const user = userEvent.setup()
     renderForm()
     await user.click(screen.getByRole('button', { name: /selecionar música/i }))
-    // The counter renders t('favorites.noteCharsLeft') which returns the key as-is
     expect(screen.getByText(/favorites\.noteCharsLeft/i)).toBeInTheDocument()
   })
 })

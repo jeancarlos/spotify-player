@@ -3,10 +3,8 @@ export interface FavCookieEntry {
   note: string
 }
 
-// ─── EDIT HERE: cookie limits ───────────────────────────────────────────────
-const NOTE_TRUNCATE = 80 // max chars for the note in the cookie
-const COOKIE_BYTE_LIMIT = 3500 // bytes before omitting notes
-// ─────────────────────────────────────────────────────────────────────────────
+const NOTE_TRUNCATE = 80
+const COOKIE_BYTE_LIMIT = 3500
 
 const cookieKey = (userId: string) => `spoter_fav_v1_${userId}`
 
