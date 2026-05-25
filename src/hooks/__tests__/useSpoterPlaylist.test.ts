@@ -1,16 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Mocks must be declared before imports (Vitest hoisting)
 vi.mock('@/hooks/queries/useUserPlaylists', () => ({
-  useUserPlaylists: () => ({
+  useUserPlaylists: vi.fn(() => ({
     isSuccess: true,
     data: { items: [{ id: 'pl-123', name: "User's Spoter List", owner: { id: 'user-1' } }] },
-  }),
+  })),
 }))
 vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
   usePlaylistTracks: () => ({ isSuccess: false, data: null }),
 }))
+
+const mockCreateMutate = vi.fn()
 vi.mock('@/hooks/mutations/useCreatePlaylist', () => ({
-  useCreatePlaylist: () => ({ mutate: vi.fn() }),
+  useCreatePlaylist: () => ({ mutate: mockCreateMutate }),
 }))
 vi.mock('@/hooks/mutations/useUpdatePlaylist', () => ({
   useUpdatePlaylist: () => ({ mutate: vi.fn() }),
@@ -18,8 +21,10 @@ vi.mock('@/hooks/mutations/useUpdatePlaylist', () => ({
 vi.mock('@/hooks/mutations/useUploadPlaylistCover', () => ({
   useUploadPlaylistCover: () => ({ mutate: vi.fn() }),
 }))
+
+const mockAddMutate = vi.fn()
 vi.mock('@/hooks/mutations/useAddToPlaylist', () => ({
-  useAddToPlaylist: () => ({ mutate: vi.fn() }),
+  useAddToPlaylist: () => ({ mutate: mockAddMutate }),
 }))
 vi.mock('@/hooks/mutations/useRemoveFromPlaylist', () => ({
   useRemoveFromPlaylist: () => ({ mutate: vi.fn() }),
@@ -39,6 +44,7 @@ vi.mock('@/utils/favHydration', () => ({
 
 import { renderHook, act } from '@testing-library/react'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
+import { useUserPlaylists } from '@/hooks/queries/useUserPlaylists'
 import { writeLocalTracks } from '@/utils/favStorage'
 import type { SpotifyTrack } from '@/types/spotify'
 
@@ -69,9 +75,15 @@ beforeEach(() => {
   document.cookie.split(';').forEach((c) => {
     document.cookie = c.replace(/=.*/, '=;max-age=0;path=/')
   })
+  vi.clearAllMocks()
+  // Restore default mock: playlist found by name
+  vi.mocked(useUserPlaylists).mockReturnValue({
+    isSuccess: true,
+    data: { items: [{ id: 'pl-123', name: "User's Spoter List", owner: { id: 'user-1' } }] },
+  } as ReturnType<typeof useUserPlaylists>)
 })
 
-describe('useSpoterPlaylist', () => {
+describe('useSpoterPlaylist — encontra playlist existente', () => {
   it('encontra a playlist existente pelo nome e dono', () => {
     const { result } = renderHook(() => useSpoterPlaylist())
     expect(result.current.playlistId).toBe('pl-123')
@@ -111,5 +123,49 @@ describe('useSpoterPlaylist', () => {
       result.current.removeTrack('spotify:track:t4')
     })
     expect(result.current.tracks).toHaveLength(0)
+  })
+})
+
+describe('useSpoterPlaylist — criação lazy (sem playlist existente)', () => {
+  beforeEach(() => {
+    vi.mocked(useUserPlaylists).mockReturnValue({
+      isSuccess: true,
+      data: { items: [] },
+    } as ReturnType<typeof useUserPlaylists>)
+  })
+
+  it('não há playlistId quando nenhuma playlist é encontrada', () => {
+    const { result } = renderHook(() => useSpoterPlaylist())
+    expect(result.current.playlistId).toBe('')
+  })
+
+  it('addTrack sem playlistId chama createPlaylist.mutate', () => {
+    const { result } = renderHook(() => useSpoterPlaylist())
+    act(() => {
+      result.current.addTrack(mockTrack('new1'))
+    })
+    expect(mockCreateMutate).toHaveBeenCalledWith(
+      { userId: 'user-1', name: expect.stringContaining('Spoter') },
+      expect.objectContaining({ onSuccess: expect.any(Function) })
+    )
+  })
+
+  it('addTrack adiciona a track localmente mesmo antes da criação completar', () => {
+    const { result } = renderHook(() => useSpoterPlaylist())
+    act(() => {
+      result.current.addTrack(mockTrack('new2'))
+    })
+    expect(result.current.tracks).toHaveLength(1)
+    expect(result.current.tracks[0].id).toBe('new2')
+  })
+
+  it('após playlistId existente, addTrack usa addMutation sem criar de novo', () => {
+    localStorage.setItem('spoter_playlist_user-1', 'existing-pl')
+    const { result } = renderHook(() => useSpoterPlaylist())
+    act(() => {
+      result.current.addTrack(mockTrack('t5'))
+    })
+    expect(mockCreateMutate).not.toHaveBeenCalled()
+    expect(mockAddMutate).toHaveBeenCalledWith({ playlistId: 'existing-pl', uris: ['spotify:track:t5'] })
   })
 })
