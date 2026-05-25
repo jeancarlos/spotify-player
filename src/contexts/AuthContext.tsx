@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           localStorage.setItem(STORAGE_KEYS.userProfile, JSON.stringify(res.data))
         } catch {
-          /* quota */
+          /* ignore */
         }
         dispatch({ type: 'SET_PROFILE', payload: res.data })
       })

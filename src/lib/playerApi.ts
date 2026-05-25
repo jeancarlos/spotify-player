@@ -7,6 +7,6 @@ export async function seekRequest(ms: number): Promise<void> {
       responseType: 'text',
     })
   } catch {
-    /* silent — local progress engine already updated optimistically */
+    /* ignore */
   }
 }

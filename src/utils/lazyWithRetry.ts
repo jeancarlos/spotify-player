@@ -43,7 +43,7 @@ async function retryImport<T extends ComponentType<unknown>>(
       sessionStorage.setItem(storageKey, '1')
       window.location.reload()
       return new Promise(() => {
-        /* intentionally never resolves */
+        /* ignore */
       })
     }
 
