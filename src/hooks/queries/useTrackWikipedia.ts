@@ -47,7 +47,7 @@ async function searchAndFetch(
     const match = titles.find((t) => t.toLowerCase().includes(trackName.toLowerCase()))
     if (!match) return null
 
-    return fetchWikipediaSummary(match, lang)
+    return await fetchWikipediaSummary(match, lang)
   } catch {
     return null
   }

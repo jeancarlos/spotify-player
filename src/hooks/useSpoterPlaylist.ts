@@ -53,6 +53,10 @@ export function useSpoterPlaylist() {
     return cookieEntries.some((e) => !currentTracks.some((t) => t.uri === e.uri))
   })
 
+  const [storedPlaylistId, setStoredPlaylistId] = useState<string>(
+    () => (userId ? (localStorage.getItem(storageKey(userId)) ?? '') : '')
+  )
+
   const tracksRef = useRef(localTracks)
   const notesRef = useRef(localNotes)
   useEffect(() => {
@@ -68,6 +72,7 @@ export function useSpoterPlaylist() {
     prevUserId.current = userId
     setLocalTracks(readLocalTracks(userId))
     setLocalNotes(readLocalNotes(userId))
+    setStoredPlaylistId(localStorage.getItem(storageKey(userId)) ?? '')
   }, [userId])
 
   // Keep multiple hook instances in sync when another instance writes to localStorage
@@ -82,14 +87,6 @@ export function useSpoterPlaylist() {
     }
   }, [userId])
 
-  const [storedPlaylistId, setStoredPlaylistId] = useState<string>(
-    () => (userId ? (localStorage.getItem(storageKey(userId)) ?? '') : '')
-  )
-
-  useEffect(() => {
-    setStoredPlaylistId(userId ? (localStorage.getItem(storageKey(userId)) ?? '') : '')
-  }, [userId])
-
   useEffect(() => {
     if (!userId) return
     const key = storageKey(userId)
@@ -97,7 +94,9 @@ export function useSpoterPlaylist() {
       if (e.key === key) setStoredPlaylistId(e.newValue ?? '')
     }
     window.addEventListener('storage', handler)
-    return () => window.removeEventListener('storage', handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+    }
   }, [userId])
 
   const [forcedId, setForcedId] = useState<string | null>(null)
@@ -123,7 +122,6 @@ export function useSpoterPlaylist() {
       if (legacy) {
         localStorage.setItem(key, legacy)
         localStorage.removeItem(LEGACY_KEY)
-        setStoredPlaylistId(legacy)
       }
     }
   }, [userId])
@@ -151,10 +149,7 @@ export function useSpoterPlaylist() {
   useEffect(() => {
     if (!userId || !playlistId) return
     const key = storageKey(userId)
-    if (!localStorage.getItem(key)) {
-      localStorage.setItem(key, playlistId)
-      setStoredPlaylistId(playlistId)
-    }
+    if (!localStorage.getItem(key)) localStorage.setItem(key, playlistId)
   }, [userId, playlistId])
 
   useEffect(() => {

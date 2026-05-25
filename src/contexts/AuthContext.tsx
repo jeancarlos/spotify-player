@@ -214,21 +214,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
     }
 
-    let pollId: ReturnType<typeof setInterval>
-    let authTimeout: ReturnType<typeof setTimeout>
+    const handles: {
+      pollId: ReturnType<typeof setInterval> | undefined
+      authTimeout: ReturnType<typeof setTimeout> | undefined
+    } = { pollId: undefined, authTimeout: undefined }
 
     const cleanup = () => {
       window.removeEventListener('message', onMessage)
-      clearInterval(pollId)
-      clearTimeout(authTimeout)
+      clearInterval(handles.pollId)
+      clearTimeout(handles.authTimeout)
       activeLoginCleanupRef.current = null
     }
 
-    pollId = setInterval(() => {
+    handles.pollId = setInterval(() => {
       if (popup.closed) cleanup()
     }, 1000)
 
-    authTimeout = setTimeout(cleanup, 5 * 60 * 1000)
+    handles.authTimeout = setTimeout(cleanup, 5 * 60 * 1000)
     activeLoginCleanupRef.current = cleanup
     window.addEventListener('message', onMessage)
   }, [])
