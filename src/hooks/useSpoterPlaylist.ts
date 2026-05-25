@@ -82,13 +82,30 @@ export function useSpoterPlaylist() {
     }
   }, [userId])
 
+  const [storedPlaylistId, setStoredPlaylistId] = useState<string>(
+    () => (userId ? (localStorage.getItem(storageKey(userId)) ?? '') : '')
+  )
+
+  useEffect(() => {
+    setStoredPlaylistId(userId ? (localStorage.getItem(storageKey(userId)) ?? '') : '')
+  }, [userId])
+
+  useEffect(() => {
+    if (!userId) return
+    const key = storageKey(userId)
+    const handler = (e: StorageEvent) => {
+      if (e.key === key) setStoredPlaylistId(e.newValue ?? '')
+    }
+    window.addEventListener('storage', handler)
+    return () => window.removeEventListener('storage', handler)
+  }, [userId])
+
   const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
   const coverUploaded = useRef(false)
   const hydrationAttempted = useRef(false)
 
-  // Skip playlist fetch when we already have the ID in localStorage.
-  const hasStoredId = !!userId && !!localStorage.getItem(storageKey(userId))
+  const hasStoredId = !!userId && !!storedPlaylistId
   const playlists = useUserPlaylists(!!userId && !hasStoredId)
   const createPlaylist = useCreatePlaylist()
   const updatePlaylist = useUpdatePlaylist()
@@ -106,6 +123,7 @@ export function useSpoterPlaylist() {
       if (legacy) {
         localStorage.setItem(key, legacy)
         localStorage.removeItem(LEGACY_KEY)
+        setStoredPlaylistId(legacy)
       }
     }
   }, [userId])
@@ -113,14 +131,13 @@ export function useSpoterPlaylist() {
   const playlistId = useMemo(() => {
     if (forcedId !== null) return forcedId
     if (!userId) return ''
-    const saved = localStorage.getItem(storageKey(userId))
-    if (saved) return saved
+    if (storedPlaylistId) return storedPlaylistId
     if (playlists.data) {
       const found = playlists.data.items.find((p) => p.name === playlistName && p.owner.id === userId)
       if (found) return found.id
     }
     return ''
-  }, [forcedId, userId, playlists.data, playlistName])
+  }, [forcedId, userId, storedPlaylistId, playlists.data, playlistName])
 
   // Seed local tracks from Spotify when localStorage is empty — no playlists.isSuccess needed
   // when the ID was already stored locally.
@@ -134,7 +151,10 @@ export function useSpoterPlaylist() {
   useEffect(() => {
     if (!userId || !playlistId) return
     const key = storageKey(userId)
-    if (!localStorage.getItem(key)) localStorage.setItem(key, playlistId)
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, playlistId)
+      setStoredPlaylistId(playlistId)
+    }
   }, [userId, playlistId])
 
   useEffect(() => {
@@ -145,6 +165,7 @@ export function useSpoterPlaylist() {
       {
         onSuccess: (p) => {
           localStorage.setItem(storageKey(userId), p.id)
+          setStoredPlaylistId(p.id)
           setForcedId(p.id)
           uploadCover.mutate(
             { playlistId: p.id, base64Jpeg: spoterListCover },

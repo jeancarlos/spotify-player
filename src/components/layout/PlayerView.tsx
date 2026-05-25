@@ -10,24 +10,13 @@ import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
-import api from '@/lib/axios'
+import { seekRequest } from '@/lib/playerApi'
 import { getFromPath } from '@/utils/routerState'
 import type { SpotifyTrack } from '@/types/spotify'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { LyricLine } from '@/types/lyrics'
 
 type PlayerTab = 'lyrics' | 'info' | 'queue'
-
-async function seekRequest(ms: number) {
-  try {
-    await api.put('/me/player/seek', null, {
-      params: { position_ms: ms },
-      responseType: 'text',
-    })
-  } catch {
-    /* silent */
-  }
-}
 
 function usePlayerSeek() {
   const { dispatch } = usePlayer()

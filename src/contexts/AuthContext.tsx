@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useEffect, useCallback, useState } from 'react'
+import React, { createContext, useReducer, useEffect, useCallback, useState, useRef } from 'react'
 import type { SpotifyUser } from '@/types/spotify'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/lib/pkce'
 import api from '@/lib/axios'
@@ -46,6 +46,7 @@ async function requestPkceFromOpener(
     const handler = (
       ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>
     ) => {
+      if (!ALLOWED_OPENER_ORIGINS.has(ev.origin)) return
       if (ev.data.type !== 'PKCE_DATA') return
       clearTimeout(timer)
       window.removeEventListener('message', handler)
@@ -118,6 +119,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   const [profileRetry, setProfileRetry] = useState(0)
+  const activeLoginCleanupRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    return () => {
+      activeLoginCleanupRef.current?.()
+    }
+  }, [])
 
   useEffect(() => {
     if (!state.isAuthenticated || state.profile) return
@@ -206,15 +214,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
     }
 
-    const pollId = setInterval(() => {
-      if (popup.closed) cleanup()
-    }, 1000)
+    let pollId: ReturnType<typeof setInterval>
+    let authTimeout: ReturnType<typeof setTimeout>
 
     const cleanup = () => {
       window.removeEventListener('message', onMessage)
       clearInterval(pollId)
+      clearTimeout(authTimeout)
+      activeLoginCleanupRef.current = null
     }
 
+    pollId = setInterval(() => {
+      if (popup.closed) cleanup()
+    }, 1000)
+
+    authTimeout = setTimeout(cleanup, 5 * 60 * 1000)
+    activeLoginCleanupRef.current = cleanup
     window.addEventListener('message', onMessage)
   }, [])
 

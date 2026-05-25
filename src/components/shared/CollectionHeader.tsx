@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -54,7 +54,10 @@ export function CollectionHeader({
 }: CollectionHeaderProps) {
   const { imgPx, headerHeight } = useCollectionLayout()
 
+  const lastHeightRef = useRef<number>(0)
   useEffect(() => {
+    if (headerHeight === lastHeightRef.current) return
+    lastHeightRef.current = headerHeight
     onLayout(headerHeight)
   }, [headerHeight, onLayout])
 

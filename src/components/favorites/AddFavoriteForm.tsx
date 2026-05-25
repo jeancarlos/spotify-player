@@ -46,7 +46,6 @@ export function AddFavoriteForm({ tracks, onAdd, onClose }: AddFavoriteFormProps
     defaultValues: { note: '' },
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const watchedTrack = watch('track')
   const watchedNote = watch('note')
   const isAlreadyFavorite = !!watchedTrack && tracks.some((tr) => tr.uri === watchedTrack.uri)

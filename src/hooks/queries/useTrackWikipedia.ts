@@ -36,17 +36,21 @@ async function searchAndFetch(
   artistName: string,
   lang: string
 ): Promise<WikiResult | null> {
-  const query = `${trackName} ${artistName} song`
-  const searchRes = await fetch(
-    `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=3&format=json&origin=*`
-  )
-  if (!searchRes.ok) return null
+  try {
+    const query = `${trackName} ${artistName} song`
+    const searchRes = await fetch(
+      `https://${lang}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=3&format=json&origin=*`
+    )
+    if (!searchRes.ok) return null
 
-  const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
-  const match = titles.find((t) => t.toLowerCase().includes(trackName.toLowerCase()))
-  if (!match) return null
+    const [, titles] = (await searchRes.json()) as [string, string[], string[], string[]]
+    const match = titles.find((t) => t.toLowerCase().includes(trackName.toLowerCase()))
+    if (!match) return null
 
-  return fetchWikipediaSummary(match, lang)
+    return fetchWikipediaSummary(match, lang)
+  } catch {
+    return null
+  }
 }
 
 export function useTrackWikipedia(trackName: string | undefined, artistName: string | undefined) {

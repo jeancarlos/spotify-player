@@ -4,7 +4,7 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { useProgressEngine } from '@/hooks/useProgressEngine'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { useTranslation } from 'react-i18next'
-import api from '@/lib/axios'
+import { seekRequest } from '@/lib/playerApi'
 import { ProgressBar } from './mini-player/ProgressBar'
 import { TrackInfo } from './mini-player/TrackInfo'
 import { PlaybackControls } from './mini-player/PlaybackControls'
@@ -27,14 +27,7 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
       const ms = Number(e.target.value)
       engineSeekTo(ms)
       dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-      try {
-        await api.put('/me/player/seek', null, {
-          params: { position_ms: ms },
-          responseType: 'text',
-        })
-      } catch {
-        /* silent */
-      }
+      await seekRequest(ms)
     },
     [dispatch, engineSeekTo]
   )

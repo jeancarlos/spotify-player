@@ -16,7 +16,8 @@ export async function hydrateFromApi(uris: string[]): Promise<SpotifyTrack[]> {
       params: { ids: ids.join(',') },
     })
     return data.tracks.filter((t): t is SpotifyTrack => t !== null)
-  } catch {
+  } catch (err) {
+    console.error('[favHydration] failed to fetch tracks from API:', err)
     return []
   }
 }
