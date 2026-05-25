@@ -65,6 +65,25 @@ async function setupApiRoutes(page: Page) {
         json: { playlists: pagingOf(slice, filteredPlaylists.length, offset) },
       })
     }
+    if (type.includes('track')) {
+      const filteredTracks = mockTracks.filter((t) =>
+        t.name.toLowerCase().includes(q.toLowerCase())
+      )
+      const slice = filteredTracks.slice(offset, offset + limit)
+      return route.fulfill({
+        json: {
+          tracks: {
+            items: slice,
+            total: filteredTracks.length,
+            limit,
+            offset,
+            next: null,
+            previous: null,
+            href: '',
+          },
+        },
+      })
+    }
     const filtered = mockArtists.filter((a) => a.name.toLowerCase().includes(q.toLowerCase()))
     return route.fulfill({
       json: {
@@ -112,19 +131,15 @@ async function setupApiRoutes(page: Page) {
       await route.fulfill({ json: pagingOf([]) })
     }
   })
-  await page.route('**/api.spotify.com/v1/playlists/*/items**', (route) =>
-    route.fulfill({
-      json: {
-        items: [],
-        limit: 50,
-        offset: 0,
-        total: 0,
-        next: null,
-        previous: null,
-        href: '',
-      },
-    })
-  )
+  await page.route('**/api.spotify.com/v1/playlists/*/items**', async (route) => {
+    if (route.request().method() === 'POST') {
+      await route.fulfill({ status: 201, json: { snapshot_id: 'snap-after-add' } })
+    } else {
+      await route.fulfill({
+        json: { items: [], limit: 50, offset: 0, total: 0, next: null, previous: null, href: '' },
+      })
+    }
+  })
   await page.route('**/api.spotify.com/v1/playlists/**', async (route) => {
     if (route.request().method() === 'PUT') {
       await route.fulfill({ status: 202 })
