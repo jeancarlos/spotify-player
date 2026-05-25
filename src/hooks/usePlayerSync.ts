@@ -44,7 +44,7 @@ export function usePlayerSync() {
       queryClient.setQueriesData<RecentlyPlayedItem[]>({ queryKey: ['recently-played'] }, (old) => {
         if (!old) return old
         const entry: RecentlyPlayedItem = { track: remote, played_at: new Date().toISOString() }
-        return [entry, ...old.filter((i) => i.track.id !== remote.id)].slice(0, old.length)
+        return [entry, ...old.filter((i) => i.track.id !== remote.id)].slice(0, 10)
       })
     }
 

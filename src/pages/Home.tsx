@@ -52,7 +52,7 @@ export function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const playTrack = usePlayTrack()
-  const recentlyPlayed = useRecentlyPlayed(50)
+  const recentlyPlayed = useRecentlyPlayed(10)
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
 
   const isLoading = recentlyPlayed.isPending

@@ -65,7 +65,7 @@ export function useSpoterPlaylist() {
   }, [userId])
 
   const [forcedId, setForcedId] = useState<string | null>(null)
-  const createAttempted = useRef(false)
+  const justCreated = useRef(false)
   const coverUploaded = useRef(false)
 
   const hasStoredId = !!userId && !!storedPlaylistId
@@ -118,35 +118,9 @@ export function useSpoterPlaylist() {
     if (!localStorage.getItem(key)) localStorage.setItem(key, playlistId)
   }, [userId, playlistId])
 
-  useEffect(() => {
-    if (!playlists.isSuccess || playlistId || !userId || createAttempted.current) return
-    createAttempted.current = true
-    createPlaylist.mutate(
-      { userId, name: playlistName },
-      {
-        onSuccess: (p) => {
-          localStorage.setItem(storageKey(userId), p.id)
-          setStoredPlaylistId(p.id)
-          setForcedId(p.id)
-          uploadCover.mutate(
-            { playlistId: p.id, base64Jpeg: spoterListCover },
-            {
-              onSuccess: () => {
-                localStorage.setItem(coverKey(userId), '1')
-              },
-            }
-          )
-        },
-        onError: () => {
-          createAttempted.current = false
-        },
-      }
-    )
-  }, [playlists.isSuccess, playlistId, userId, playlistName, createPlaylist, uploadCover])
-
   const resetStalePlaylist = (uid: string) => {
     localStorage.removeItem(storageKey(uid))
-    createAttempted.current = false
+    justCreated.current = false
     coverUploaded.current = false
     setForcedId(null)
   }
@@ -155,6 +129,10 @@ export function useSpoterPlaylist() {
     if (!playlists.isSuccess || !playlistId || !userId) return
     const existing = playlists.data.items.find((p) => p.id === playlistId)
     if (!existing) {
+      // justCreated guards against resetting a playlist that was just created:
+      // playlists.data is stale at this point (the new playlist hasn't appeared in
+      // the cache yet), so "not found" is a false alarm, not a deleted playlist.
+      if (justCreated.current) return
       const id = setTimeout(() => {
         resetStalePlaylist(userId)
       }, 0)
@@ -207,9 +185,36 @@ export function useSpoterPlaylist() {
   const addTrack = useCallback(
     (track: SpotifyTrack, note?: string) => {
       const addedLocally = addLocalTrack(track, note)
-      if (addedLocally && playlistId) addMutation.mutate({ playlistId, uris: [track.uri] })
+      if (!addedLocally) return
+
+      if (playlistId) {
+        addMutation.mutate({ playlistId, uris: [track.uri] })
+        return
+      }
+
+      // First add: create the playlist, then sync the track and cover.
+      createPlaylist.mutate(
+        { userId, name: playlistName },
+        {
+          onSuccess: (p) => {
+            justCreated.current = true
+            localStorage.setItem(storageKey(userId), p.id)
+            setStoredPlaylistId(p.id)
+            setForcedId(p.id)
+            addMutation.mutate({ playlistId: p.id, uris: [track.uri] })
+            uploadCover.mutate(
+              { playlistId: p.id, base64Jpeg: spoterListCover },
+              {
+                onSuccess: () => {
+                  localStorage.setItem(coverKey(userId), '1')
+                },
+              }
+            )
+          },
+        }
+      )
     },
-    [playlistId, addMutation, addLocalTrack]
+    [playlistId, userId, playlistName, addLocalTrack, addMutation, createPlaylist, uploadCover]
   )
 
   const removeTrack = useCallback(

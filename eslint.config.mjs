@@ -96,14 +96,14 @@ export default tseslint.config(
       ],
     },
   },
-  // Contextos React exportam createContext + Provider juntos — padrão aceito
+  // React contexts export createContext + Provider together — accepted pattern
   {
     files: ['src/contexts/**/*.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },
   },
-  // Testes podem usar any e non-null assertions mais livremente
+  // Tests can use any and non-null assertions more freely
   {
     files: [
       '**/*.test.{ts,tsx}',
