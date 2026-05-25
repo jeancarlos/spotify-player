@@ -35,7 +35,11 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 
 ## Executando o Projeto
 
-1. Instale as dependências:
+1. Obtenha o ClientID do Spotify seguindo os passos acima
+   - https://developer.spotify.com/dashboard
+   - Copie e coloque no .env
+
+2. Instale as dependências:
    ```bash
    yarn
    ```
