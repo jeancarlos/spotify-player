@@ -13,7 +13,6 @@ export function calcArcPositions(
   if (count === 0) return []
 
   const half = arcDeg / 2
-  // Avoids division by zero if count === 1
   const step = count > 1 ? arcDeg / (count - 1) : 0
   const startDeg = count > 1 ? -half : 0
 
