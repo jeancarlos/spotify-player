@@ -33,18 +33,6 @@ export interface SpotifyAlbumSimple {
   available_markets?: string[]
 }
 
-export interface LinkedTrack {
-  external_urls: SpotifyExternalUrls
-  href: string
-  id: string
-  type: 'track'
-  uri: string
-}
-
-export interface TrackRestrictions {
-  reason: 'market' | 'product' | 'explicit'
-}
-
 export interface SpotifyTrack {
   id: string
   name: string
@@ -61,8 +49,6 @@ export interface SpotifyTrack {
   track_number?: number
   is_local?: boolean
   is_playable?: boolean
-  linked_from?: LinkedTrack
-  restrictions?: TrackRestrictions
   external_urls?: SpotifyExternalUrls
   external_ids?: { isrc?: string; ean?: string; upc?: string }
   available_markets?: string[]
@@ -81,11 +67,6 @@ export interface SpotifyArtist {
   external_urls?: SpotifyExternalUrls
 }
 
-export interface SpotifyExplicitContent {
-  filter_enabled: boolean
-  filter_locked: boolean
-}
-
 export interface SpotifyUser {
   id: string
   display_name: string
@@ -97,7 +78,6 @@ export interface SpotifyUser {
   href?: string
   uri?: string
   type?: 'user'
-  explicit_content?: SpotifyExplicitContent
   external_urls?: SpotifyExternalUrls
 }
 
@@ -131,31 +111,6 @@ export interface RecentlyPlayedResponse {
   limit: number
   cursors: { before: string; after: string }
   next: string | null
-}
-
-export interface NewReleasesResponse {
-  albums: PagingObject<SpotifyAlbumSimple>
-}
-
-export interface AudioFeatures {
-  id: string
-  type: 'audio_features'
-  uri: string
-  track_href: string
-  analysis_url: string
-  danceability: number
-  energy: number
-  valence: number
-  acousticness: number
-  speechiness: number
-  instrumentalness: number
-  liveness: number
-  loudness: number
-  tempo: number
-  duration_ms: number
-  key: number
-  mode: number
-  time_signature: number
 }
 
 export interface SearchArtistsResponse {
@@ -289,18 +244,6 @@ export interface SearchTracksResponse {
 export interface SpotifyQueueResponse {
   currently_playing: SpotifyTrack | null
   queue: SpotifyTrack[]
-}
-
-export interface SpotifyRecommendationsResponse {
-  seeds: {
-    afterFilteringSize: number
-    afterRelinkingSize: number
-    href: string
-    id: string
-    initialPoolSize: number
-    type: 'ARTIST' | 'TRACK' | 'GENRE'
-  }[]
-  tracks: SpotifyTrack[]
 }
 
 export interface SpotifyAlbumTrack {
