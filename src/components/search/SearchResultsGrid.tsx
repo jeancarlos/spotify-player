@@ -50,7 +50,7 @@ export function SearchResultsGrid({
             key={album.id}
             title={album.name}
             imageUrl={album.images[0]?.url}
-            subtitle={album.artists.map((a: { name: string }) => a.name).join(', ')}
+            subtitle={album.artists.map((a) => a.name).join(', ')}
             onClick={() => {
               navigate(`/albums/${album.id}`)
             }}

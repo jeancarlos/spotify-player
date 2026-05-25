@@ -72,7 +72,7 @@ export interface SpotifyUser {
   display_name: string
   email: string
   images: SpotifyImage[]
-  product: string
+  product: 'free' | 'open' | 'premium'
   followers: { href: string | null; total: number }
   country: string
   href?: string

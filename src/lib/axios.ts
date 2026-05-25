@@ -1,5 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import i18n from '@/lib/i18n'
+import { STORAGE_KEYS } from '@/lib/storageKeys'
 
 const api = axios.create({
   baseURL: 'https://api.spotify.com/v1',
@@ -15,9 +16,9 @@ interface RetryableConfig extends InternalAxiosRequestConfig {
 
 api.interceptors.request.use(async (config) => {
   const wait = backoffUntil - Date.now()
-  if (wait > 0) await new Promise((r) => setTimeout(r, wait))
+  if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait))
 
-  const token = sessionStorage.getItem('access_token')
+  const token = sessionStorage.getItem(STORAGE_KEYS.accessToken)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -40,8 +41,8 @@ async function handleUnauthorized(originalRequest: RetryableConfig) {
       return await api(originalRequest)
     }
   } catch (refreshError) {
-    sessionStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    sessionStorage.removeItem(STORAGE_KEYS.accessToken)
+    localStorage.removeItem(STORAGE_KEYS.refreshToken)
     window.location.href = '/login'
     return Promise.reject(
       refreshError instanceof Error ? refreshError : new Error('Refresh failed')
@@ -72,14 +73,14 @@ api.interceptors.response.use(
 )
 
 async function refreshToken(): Promise<string> {
-  const refresh_token = localStorage.getItem('refresh_token')
-  if (!refresh_token) {
+  const currentRefreshToken = localStorage.getItem(STORAGE_KEYS.refreshToken)
+  if (!currentRefreshToken) {
     throw new Error('No refresh token available')
   }
 
   const params = new URLSearchParams({
     grant_type: 'refresh_token',
-    refresh_token,
+    refresh_token: currentRefreshToken,
     client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
   })
 
@@ -93,9 +94,9 @@ async function refreshToken(): Promise<string> {
 
   const data = (await res.json()) as { access_token: string; refresh_token: string }
 
-  sessionStorage.setItem('access_token', data.access_token)
+  sessionStorage.setItem(STORAGE_KEYS.accessToken, data.access_token)
   if (data.refresh_token) {
-    localStorage.setItem('refresh_token', data.refresh_token)
+    localStorage.setItem(STORAGE_KEYS.refreshToken, data.refresh_token)
   }
 
   return data.access_token

@@ -3,6 +3,7 @@ import type { SpotifyUser } from '@/types/spotify'
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/lib/pkce'
 import api from '@/lib/axios'
 import i18n from '@/lib/i18n'
+import { STORAGE_KEYS } from '@/lib/storageKeys'
 import { authReducer, initialAuthState, type AuthState } from './authReducer'
 
 interface AuthContextValue {
@@ -100,11 +101,11 @@ async function exchangeCodeForTokens(
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialAuthState, () => {
-    const accessToken = sessionStorage.getItem('access_token')
-    const refreshToken = localStorage.getItem('refresh_token')
+    const accessToken = sessionStorage.getItem(STORAGE_KEYS.accessToken)
+    const refreshToken = localStorage.getItem(STORAGE_KEYS.refreshToken)
     const cachedProfile = (() => {
       try {
-        const raw = localStorage.getItem('user_profile')
+        const raw = localStorage.getItem(STORAGE_KEYS.userProfile)
         return raw ? (JSON.parse(raw) as SpotifyUser) : null
       } catch {
         return null
@@ -133,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .get<SpotifyUser>('/me')
       .then((res) => {
         try {
-          localStorage.setItem('user_profile', JSON.stringify(res.data))
+          localStorage.setItem(STORAGE_KEYS.userProfile, JSON.stringify(res.data))
         } catch {
           /* quota */
         }
@@ -143,11 +144,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const axiosErr = err as { response?: { status?: number } }
         if (axiosErr.response?.status === 429) {
           setTimeout(() => {
-            setProfileRetry((n) => n + 1)
+            setProfileRetry((prevCount) => prevCount + 1)
           }, 15_000)
         } else {
-          sessionStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
+          sessionStorage.removeItem(STORAGE_KEYS.accessToken)
+          localStorage.removeItem(STORAGE_KEYS.refreshToken)
           dispatch({ type: 'LOGOUT' })
         }
       })
@@ -158,8 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const challenge = await generateCodeChallenge(verifier)
     const nonce = generateState()
 
-    localStorage.setItem('pkce_verifier', verifier)
-    localStorage.setItem('pkce_state', nonce)
+    localStorage.setItem(STORAGE_KEYS.pkceVerifier, verifier)
+    localStorage.setItem(STORAGE_KEYS.pkceState, nonce)
 
     const statePayload = btoa(JSON.stringify({ n: nonce, o: window.location.origin }))
 
@@ -174,14 +175,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     const authUrl = `https://accounts.spotify.com/authorize?${params}`
-    const w = 500,
-      h = 700
-    const left = Math.round(screen.width / 2 - w / 2)
-    const top = Math.round(screen.height / 2 - h / 2)
+    const POPUP_WIDTH = 500
+    const POPUP_HEIGHT = 700
+    const left = Math.round(screen.width / 2 - POPUP_WIDTH / 2)
+    const top = Math.round(screen.height / 2 - POPUP_HEIGHT / 2)
     const popup = window.open(
       authUrl,
       'spotify_login',
-      `width=${w},height=${h},left=${left},top=${top}`
+      `width=${POPUP_WIDTH},height=${POPUP_HEIGHT},left=${left},top=${top}`
     )
 
     if (!popup) {
@@ -196,9 +197,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof event.data !== 'object') return
 
       if (event.data.type === 'REQUEST_PKCE_DATA') {
-        const v = localStorage.getItem('pkce_verifier')
-        const n = localStorage.getItem('pkce_state')
-        popup.postMessage({ type: 'PKCE_DATA', verifier: v, nonce: n }, REDIRECT_ORIGIN)
+        const pkceVerifier = localStorage.getItem(STORAGE_KEYS.pkceVerifier)
+        const pkceNonce = localStorage.getItem(STORAGE_KEYS.pkceState)
+        popup.postMessage({ type: 'PKCE_DATA', verifier: pkceVerifier, nonce: pkceNonce }, REDIRECT_ORIGIN)
         return
       }
 
@@ -207,10 +208,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!accessToken || !refreshToken) return
 
       cleanup()
-      sessionStorage.setItem('access_token', accessToken)
-      localStorage.setItem('refresh_token', refreshToken)
-      localStorage.removeItem('pkce_verifier')
-      localStorage.removeItem('pkce_state')
+      sessionStorage.setItem(STORAGE_KEYS.accessToken, accessToken)
+      localStorage.setItem(STORAGE_KEYS.refreshToken, refreshToken)
+      localStorage.removeItem(STORAGE_KEYS.pkceVerifier)
+      localStorage.removeItem(STORAGE_KEYS.pkceState)
       dispatch({ type: 'SET_TOKENS', payload: { accessToken, refreshToken } })
     }
 
@@ -238,8 +239,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleCallback = useCallback(async (code: string, receivedState: string) => {
     const { nonce, openerOrigin } = parseReceivedState(receivedState)
 
-    let savedNonce = localStorage.getItem('pkce_state')
-    let verifier = localStorage.getItem('pkce_verifier')
+    let savedNonce = localStorage.getItem(STORAGE_KEYS.pkceState)
+    let verifier = localStorage.getItem(STORAGE_KEYS.pkceVerifier)
 
     if (window.opener && (!savedNonce || !verifier)) {
       const pkce = await requestPkceFromOpener(window.opener as Window, openerOrigin)
@@ -253,8 +254,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const data = await exchangeCodeForTokens(code, verifier)
 
-    localStorage.removeItem('pkce_verifier')
-    localStorage.removeItem('pkce_state')
+    localStorage.removeItem(STORAGE_KEYS.pkceVerifier)
+    localStorage.removeItem(STORAGE_KEYS.pkceState)
 
     if (window.opener) {
       const opener = window.opener as Window
@@ -270,8 +271,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    sessionStorage.setItem('access_token', data.access_token)
-    localStorage.setItem('refresh_token', data.refresh_token)
+    sessionStorage.setItem(STORAGE_KEYS.accessToken, data.access_token)
+    localStorage.setItem(STORAGE_KEYS.refreshToken, data.refresh_token)
     dispatch({
       type: 'SET_TOKENS',
       payload: { accessToken: data.access_token, refreshToken: data.refresh_token },
@@ -279,9 +280,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
-    sessionStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    localStorage.removeItem('user_profile')
+    sessionStorage.removeItem(STORAGE_KEYS.accessToken)
+    localStorage.removeItem(STORAGE_KEYS.refreshToken)
+    localStorage.removeItem(STORAGE_KEYS.userProfile)
     dispatch({ type: 'LOGOUT' })
   }, [])
 

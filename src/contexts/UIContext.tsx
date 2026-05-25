@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useEffect } from 'react'
 import { uiReducer, initialUIState, type UIState, type UIAction } from './uiReducer'
+import { STORAGE_KEYS } from '@/lib/storageKeys'
 import i18n from '@/lib/i18n'
 
 interface UIContextValue {
@@ -16,7 +17,7 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     if (i18n.language !== state.language) {
       void i18n.changeLanguage(state.language)
     }
-    localStorage.setItem('spoter_lang', state.language)
+    localStorage.setItem(STORAGE_KEYS.language, state.language)
   }, [state.language])
 
   return <UIContext.Provider value={{ state, dispatch }}>{children}</UIContext.Provider>

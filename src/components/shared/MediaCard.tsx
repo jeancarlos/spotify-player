@@ -5,7 +5,6 @@ interface MediaCardProps {
   title: string
   subtitle?: string
   onClick: () => void
-  onSecondaryAction?: () => void
   imageClassName?: string
   className?: string
   ariaLabel?: string

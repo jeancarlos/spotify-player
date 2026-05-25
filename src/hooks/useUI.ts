@@ -3,6 +3,6 @@ import { UIContext } from '@/contexts/UIContext'
 
 export function useUI() {
   const ctx = useContext(UIContext)
-  if (!ctx) throw new Error('useUI deve ser usado dentro do UIProvider')
+  if (!ctx) throw new Error('useUI must be used inside UIProvider')
   return ctx
 }
