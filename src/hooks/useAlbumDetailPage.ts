@@ -107,7 +107,7 @@ export function useAlbumDetailPage() {
   const hasNext =
     tracks.data != null ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
-  const enrichTrackInline = useCallback(
+  const toPlayableTrack = useCallback(
     (track: SpotifyAlbumTrack): SpotifyTrack => ({
       ...track,
       type: 'track' as const,
@@ -117,10 +117,17 @@ export function useAlbumDetailPage() {
     [meta.albumSimple]
   )
 
+  const handleTrackPlay = useCallback(
+    async (track: SpotifyTrack | SpotifyAlbumTrack) => {
+      await playTrack('album' in track ? track : toPlayableTrack(track), enrichedTracks)
+    },
+    [playTrack, enrichedTracks, toPlayableTrack]
+  )
+
   return {
     albumItems,
     enrichedTracks,
-    enrichTrackInline,
+    handleTrackPlay,
     playerState,
     view,
     setView,
@@ -131,7 +138,6 @@ export function useAlbumDetailPage() {
     handlePlay,
     handleLayout,
     handleArtistClick,
-    playTrack,
     t,
     ...meta,
   }

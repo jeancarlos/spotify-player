@@ -1,11 +1,13 @@
 import { useMemo } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { TrackAutocomplete } from './TrackAutocomplete'
 import { cn } from '@/lib/utils'
 import type { SpotifyTrack } from '@/types/spotify'
+
+const MAX_NOTE_LENGTH = 80
 
 interface AddFavoriteFormProps {
   existingFavorites: SpotifyTrack[]
@@ -28,7 +30,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
           (val) => val !== null && typeof val === 'object' && 'uri' in val,
           { message: t('favorites.trackRequired') }
         ),
-        note: z.string().max(80, t('favorites.noteTooLong')).default(''),
+        note: z.string().max(MAX_NOTE_LENGTH, t('favorites.noteTooLong')).default(''),
       }),
     [t]
   )
@@ -37,7 +39,6 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
     control,
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors, isValid, isSubmitting },
   } = useForm<FormValues>({
@@ -46,10 +47,10 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
     defaultValues: { note: '' },
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const watchedTrack = watch('track')
-  const watchedNote = watch('note')
-  const isAlreadyFavorite = !!watchedTrack && existingFavorites.some((fav) => fav.uri === watchedTrack.uri)
+  const watchedTrack = useWatch({ control, name: 'track' })
+  const watchedNote = useWatch({ control, name: 'note' })
+  const isAlreadyFavorite =
+    !!watchedTrack && existingFavorites.some((fav) => fav.uri === watchedTrack.uri)
   const noteLength = watchedNote.length
 
   const onSubmit = handleSubmit(({ track, note }) => {
@@ -96,7 +97,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
         <textarea
           {...register('note')}
           placeholder={t('favorites.notePlaceholder')}
-          maxLength={80}
+          maxLength={MAX_NOTE_LENGTH}
           rows={2}
           className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors resize-none"
         />
@@ -105,7 +106,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
           <span
             className={cn(
               'text-[11px] tabular-nums',
-              noteLength > 280 ? 'text-red-500' : 'text-black/30'
+              errors.note ? 'text-red-500' : 'text-black/30'
             )}
           >
             {t('favorites.noteCharsLeft', { count: noteLength })}

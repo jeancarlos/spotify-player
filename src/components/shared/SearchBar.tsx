@@ -23,17 +23,20 @@ export function SearchBar({
   const [tab, setTab] = useState<SearchTab>(defaultTab)
   const debouncedQuery = useDebounce(query, 700)
   const isPending = query !== debouncedQuery
-  const mounted = useRef(false)
+  const lastSubmittedSearch = useRef(`${defaultQuery}\u0000${defaultTab}`)
   const onSearchRef = useRef(onSearch)
+
   useEffect(() => {
     onSearchRef.current = onSearch
   }, [onSearch])
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true
+    const searchKey = `${debouncedQuery}\u0000${tab}`
+    if (searchKey === lastSubmittedSearch.current) {
       return
     }
+
+    lastSubmittedSearch.current = searchKey
     saveLastSearch(debouncedQuery, tab)
     onSearchRef.current(debouncedQuery, tab)
   }, [debouncedQuery, tab])
@@ -52,9 +55,19 @@ export function SearchBar({
       )}
     >
       {isPending ? (
-        <Loader2 size={15} className="text-black/40 shrink-0 animate-spin" data-testid="search-spinner" aria-hidden="true" />
+        <Loader2
+          size={15}
+          className="text-black/40 shrink-0 animate-spin"
+          data-testid="search-spinner"
+          aria-hidden="true"
+        />
       ) : (
-        <Search size={15} className="text-black/40 shrink-0" data-testid="search-icon" aria-hidden="true" />
+        <Search
+          size={15}
+          className="text-black/40 shrink-0"
+          data-testid="search-icon"
+          aria-hidden="true"
+        />
       )}
       <label htmlFor="global-search" className="sr-only">
         {t('artists.searchPlaceholder')}

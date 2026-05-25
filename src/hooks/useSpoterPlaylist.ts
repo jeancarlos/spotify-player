@@ -10,15 +10,9 @@ import { useRemoveFromPlaylist } from '@/hooks/mutations/useRemoveFromPlaylist'
 import { useUploadPlaylistCover } from '@/hooks/mutations/useUploadPlaylistCover'
 import { useToast } from '@/components/ui/toast'
 import api from '@/lib/axios'
-import {
-  readLocalTracks,
-  writeLocalTracks,
-  readLocalNotes,
-  writeLocalNotes,
-} from '@/utils/favStorage'
-import { readFavCookie, writeFavCookie } from '@/utils/favCookie'
-import { hydrateFromApi } from '@/utils/favHydration'
+import { readLocalTracks } from '@/utils/favStorage'
 import spoterListCover from '@/assets/spoterListCover'
+import { useFavoriteStorage } from '@/hooks/useFavoriteStorage'
 import type { SpotifyTrack, PlaylistTracksResponse } from '@/types/spotify'
 
 const LEGACY_KEY = 'spoter_playlist_id'
@@ -30,6 +24,14 @@ export function useSpoterPlaylist() {
   const { state: authState } = useAuth()
   const userId = authState.profile?.id ?? ''
   const displayName = authState.profile?.display_name ?? ''
+  const {
+    tracks,
+    notes,
+    addTrack: addLocalTrack,
+    removeTrack: removeLocalTrack,
+    replaceTracks,
+    isHydrating,
+  } = useFavoriteStorage(userId)
 
   const playlistName = useMemo(
     () =>
@@ -39,52 +41,15 @@ export function useSpoterPlaylist() {
     [displayName, t]
   )
 
-  const [localTracks, setLocalTracks] = useState<SpotifyTrack[]>(() =>
-    userId ? readLocalTracks(userId) : []
+  const [storedPlaylistId, setStoredPlaylistId] = useState<string>(() =>
+    userId ? (localStorage.getItem(storageKey(userId)) ?? '') : ''
   )
-  const [localNotes, setLocalNotes] = useState<Record<string, string>>(() =>
-    userId ? readLocalNotes(userId) : {}
-  )
-  const [isHydrating, setIsHydrating] = useState(() => {
-    if (!userId) return false
-    const cookieEntries = readFavCookie(userId)
-    if (cookieEntries.length === 0) return false
-    const currentTracks = readLocalTracks(userId)
-    return cookieEntries.some((e) => !currentTracks.some((t) => t.uri === e.uri))
-  })
-
-  const [storedPlaylistId, setStoredPlaylistId] = useState<string>(
-    () => (userId ? (localStorage.getItem(storageKey(userId)) ?? '') : '')
-  )
-
-  const tracksRef = useRef(localTracks)
-  const notesRef = useRef(localNotes)
-  useEffect(() => {
-    tracksRef.current = localTracks
-  }, [localTracks])
-  useEffect(() => {
-    notesRef.current = localNotes
-  }, [localNotes])
 
   const prevUserId = useRef('')
   useEffect(() => {
     if (!userId || userId === prevUserId.current) return
     prevUserId.current = userId
-    setLocalTracks(readLocalTracks(userId))
-    setLocalNotes(readLocalNotes(userId))
     setStoredPlaylistId(localStorage.getItem(storageKey(userId)) ?? '')
-  }, [userId])
-
-  // Keep multiple hook instances in sync when another instance writes to localStorage
-  useEffect(() => {
-    if (!userId) return
-    const handler = () => {
-      setLocalTracks(readLocalTracks(userId))
-    }
-    window.addEventListener('spoter:favorites-changed', handler)
-    return () => {
-      window.removeEventListener('spoter:favorites-changed', handler)
-    }
   }, [userId])
 
   useEffect(() => {
@@ -102,7 +67,6 @@ export function useSpoterPlaylist() {
   const [forcedId, setForcedId] = useState<string | null>(null)
   const createAttempted = useRef(false)
   const coverUploaded = useRef(false)
-  const hydrationAttempted = useRef(false)
 
   const hasStoredId = !!userId && !!storedPlaylistId
   const playlists = useUserPlaylists(!!userId && !hasStoredId)
@@ -131,7 +95,9 @@ export function useSpoterPlaylist() {
     if (!userId) return ''
     if (storedPlaylistId) return storedPlaylistId
     if (playlists.data) {
-      const found = playlists.data.items.find((p) => p.name === playlistName && p.owner.id === userId)
+      const found = playlists.data.items.find(
+        (p) => p.name === playlistName && p.owner.id === userId
+      )
       if (found) return found.id
     }
     return ''
@@ -141,7 +107,7 @@ export function useSpoterPlaylist() {
   // when the ID was already stored locally.
   const seedQuery = usePlaylistTracks(
     playlistId,
-    playlistId.length > 0 && localTracks.length === 0,
+    playlistId.length > 0 && tracks.length === 0,
     1,
     50
   )
@@ -224,89 +190,34 @@ export function useSpoterPlaylist() {
     uploadCover,
   ])
 
-  useEffect(() => {
-    if (!userId || hydrationAttempted.current) return
-    hydrationAttempted.current = true
-
-    const cookieEntries = readFavCookie(userId)
-    if (cookieEntries.length === 0) return
-
-    const currentTracks = readLocalTracks(userId)
-    const missingUris = cookieEntries
-      .filter((e) => !currentTracks.some((t) => t.uri === e.uri))
-      .map((e) => e.uri)
-
-    if (missingUris.length === 0) return
-
-    void hydrateFromApi(missingUris).then((fetched) => {
-      if (fetched.length > 0) {
-        setLocalTracks((prev) => {
-          const merged = [...prev, ...fetched.filter((ft) => !prev.some((p) => p.uri === ft.uri))]
-          writeLocalTracks(userId, merged)
-          return merged
-        })
-      }
-      setIsHydrating(false)
-    })
-  }, [userId])
-
   // Seed local tracks from Spotify playlist when localStorage and cookie are both empty.
   // writeLocalTracks dispatches spoter:favorites-changed; the sync handler above picks it up.
   useEffect(() => {
-    if (!seedQuery.isSuccess || !userId || localTracks.length > 0) return
+    if (!seedQuery.isSuccess || !userId || tracks.length > 0) return
     const fetched = seedQuery.data.items.map((item) => item.item)
     if (fetched.length === 0) return
     const id = setTimeout(() => {
-      if (readLocalTracks(userId).length === 0) writeLocalTracks(userId, fetched)
+      if (readLocalTracks(userId).length === 0) replaceTracks(fetched)
     }, 0)
     return () => {
       clearTimeout(id)
     }
-  }, [seedQuery.isSuccess, seedQuery.data, userId, localTracks.length])
+  }, [seedQuery.isSuccess, seedQuery.data, userId, tracks.length, replaceTracks])
 
   const addTrack = useCallback(
     (track: SpotifyTrack, note?: string) => {
-      if (tracksRef.current.some((t) => t.uri === track.uri)) return
-
-      const newTracks = [...tracksRef.current, track]
-      const newNotes = note?.trim()
-        ? { ...notesRef.current, [track.uri]: note.trim() }
-        : notesRef.current
-
-      writeLocalTracks(userId, newTracks)
-      if (note?.trim()) writeLocalNotes(userId, newNotes)
-      writeFavCookie(
-        userId,
-        newTracks.map((t) => ({ uri: t.uri, note: newNotes[t.uri] ?? '' }))
-      )
-
-      setLocalTracks(newTracks)
-      if (note?.trim()) setLocalNotes(newNotes)
-
-      if (playlistId) addMutation.mutate({ playlistId, uris: [track.uri] })
+      const addedLocally = addLocalTrack(track, note)
+      if (addedLocally && playlistId) addMutation.mutate({ playlistId, uris: [track.uri] })
     },
-    [userId, playlistId, addMutation]
+    [playlistId, addMutation, addLocalTrack]
   )
 
   const removeTrack = useCallback(
     (uri: string) => {
-      const newTracks = tracksRef.current.filter((t) => t.uri !== uri)
-      const { [uri]: _removed, ...rest } = notesRef.current
-      const newNotes = rest
-
-      writeLocalTracks(userId, newTracks)
-      writeLocalNotes(userId, newNotes)
-      writeFavCookie(
-        userId,
-        newTracks.map((t) => ({ uri: t.uri, note: newNotes[t.uri] ?? '' }))
-      )
-
-      setLocalTracks(newTracks)
-      setLocalNotes(newNotes)
-
-      if (playlistId) removeMutation.mutate({ playlistId, uris: [uri] })
+      const removedLocally = removeLocalTrack(uri)
+      if (removedLocally && playlistId) removeMutation.mutate({ playlistId, uris: [uri] })
     },
-    [userId, playlistId, removeMutation]
+    [playlistId, removeMutation, removeLocalTrack]
   )
 
   const refresh = useCallback(async () => {
@@ -317,25 +228,24 @@ export function useSpoterPlaylist() {
         params: { limit: 50, offset: 0 },
       })
       const refreshedTracks = data.items.map((item) => item.item)
-      writeLocalTracks(userId, refreshedTracks)
-      setLocalTracks(refreshedTracks)
+      replaceTracks(refreshedTracks)
     } catch {
       toast(t('favorites.refreshError'), 'error')
     } finally {
       setIsRefreshing(false)
     }
-  }, [playlistId, userId, toast, t])
+  }, [playlistId, userId, toast, t, replaceTracks])
 
   return {
     playlistId,
     playlistName,
-    tracks: localTracks,
-    notes: localNotes,
+    tracks,
+    notes,
     addTrack,
     removeTrack,
     refresh,
     isRefreshing,
-    isLoading: isHydrating && localTracks.length === 0,
-    isLocallyStored: localTracks.length > 0,
+    isLoading: isHydrating && tracks.length === 0,
+    isLocallyStored: tracks.length > 0,
   }
 }

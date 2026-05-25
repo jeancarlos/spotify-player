@@ -1,5 +1,14 @@
 import { test as base, type Page } from '@playwright/test'
-import { mockUser, mockArtists, mockTracks, mockAlbums, mockPlaylists, mockAlbum, pagingOf, mockArtist } from './mock-data'
+import {
+  mockUser,
+  mockArtists,
+  mockTracks,
+  mockAlbums,
+  mockPlaylists,
+  mockAlbum,
+  pagingOf,
+  mockArtist,
+} from './mock-data'
 
 async function setupAuth(page: Page) {
   await page.addInitScript(() => {
@@ -13,9 +22,7 @@ async function setupAuth(page: Page) {
 }
 
 async function setupApiRoutes(page: Page) {
-  await page.route('**/api.spotify.com/v1/me', (route) =>
-    route.fulfill({ json: mockUser })
-  )
+  await page.route('**/api.spotify.com/v1/me', (route) => route.fulfill({ json: mockUser }))
   await page.route('**/api.spotify.com/v1/me/top/artists**', (route) =>
     route.fulfill({ json: { artists: pagingOf(mockArtists, 40) } })
   )
@@ -58,9 +65,7 @@ async function setupApiRoutes(page: Page) {
         json: { playlists: pagingOf(slice, filteredPlaylists.length, offset) },
       })
     }
-    const filtered = mockArtists.filter((a) =>
-      a.name.toLowerCase().includes(q.toLowerCase())
-    )
+    const filtered = mockArtists.filter((a) => a.name.toLowerCase().includes(q.toLowerCase()))
     return route.fulfill({
       json: {
         artists: pagingOf(filtered.slice(offset, offset + limit), filtered.length, offset),
@@ -88,7 +93,14 @@ async function setupApiRoutes(page: Page) {
           public: false,
           tracks: { total: 0, href: '', items: [] },
           images: [],
-          owner: { id: 'user1', display_name: 'Test User', uri: '', external_urls: { spotify: '' }, type: 'user', href: '' },
+          owner: {
+            id: 'user1',
+            display_name: 'Test User',
+            uri: '',
+            external_urls: { spotify: '' },
+            type: 'user',
+            href: '',
+          },
           uri: 'spotify:playlist:e2e-playlist',
           type: 'playlist',
           external_urls: { spotify: '' },
@@ -127,7 +139,10 @@ async function setupApiRoutes(page: Page) {
     const id = new URL(request.url()).pathname.split('/').pop() ?? 'album-1'
     return route.fulfill({ json: { ...mockAlbum, id, name: `Album ${id.replace('album-', '')}` } })
   })
-  await page.route('**/api.spotify.com/v1/me/player**', (route) =>
+  await page.route('**/api.spotify.com/v1/me/player/queue**', (route) =>
+    route.fulfill({ json: { currently_playing: null, queue: [] } })
+  )
+  await page.route(/^https:\/\/api\.spotify\.com\/v1\/me\/player(?:\?.*)?$/, (route) =>
     route.fulfill({
       json: {
         is_playing: false,

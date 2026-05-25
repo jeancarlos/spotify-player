@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
@@ -93,21 +93,21 @@ export default defineConfig(() => ({
         manualChunks(id: string) {
           if (id.includes('node_modules')) {
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-              return 'vendor-react';
+              return 'vendor-react'
             }
             if (id.includes('recharts')) {
-              return 'vendor-charts';
+              return 'vendor-charts'
             }
             if (id.includes('framer-motion') || id.includes('@base-ui/react')) {
-              return 'vendor-ui';
+              return 'vendor-ui'
             }
             if (id.includes('@tanstack/react-query')) {
-              return 'vendor-query';
+              return 'vendor-query'
             }
             if (id.includes('lucide-react')) {
-              return 'vendor-icons';
+              return 'vendor-icons'
             }
-            return 'vendor-others';
+            return 'vendor-others'
           }
         },
       },
@@ -127,4 +127,4 @@ export default defineConfig(() => ({
     exclude: ['node_modules', '.claude/**', 'tests-e2e/**'],
     coverage: { provider: 'v8', include: ['src/**/*.{ts,tsx}'] },
   },
-} as any))
+}))

@@ -4,13 +4,12 @@ import { ListTableSwitch } from '@/components/shared/ListTableSwitch'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackTable } from '@/components/shared/TrackTable'
 import { Pagination } from '@/components/shared/Pagination'
-import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
 
 export function AlbumDetail() {
   const {
     albumItems,
     enrichedTracks,
-    enrichTrackInline,
+    handleTrackPlay,
     playerState,
     view,
     setView,
@@ -26,7 +25,6 @@ export function AlbumDetail() {
     handlePlay,
     handleLayout,
     handleArtistClick,
-    playTrack,
     t,
   } = useAlbumDetailPage()
 
@@ -60,9 +58,7 @@ export function AlbumDetail() {
                     track={track}
                     index={(page - 1) * ALBUM_LIMIT + i}
                     isActive={playerState.currentTrack?.id === track.id}
-                    onPlay={async (tr) => {
-                      await playTrack(tr as SpotifyTrack, enrichedTracks)
-                    }}
+                    onPlay={handleTrackPlay}
                   />
                 ))}
               </div>
@@ -72,7 +68,7 @@ export function AlbumDetail() {
                 showAlbumColumn={false}
                 activeTrackId={playerState.currentTrack?.id}
                 onPlay={(track) => {
-                  void playTrack(enrichTrackInline(track as SpotifyAlbumTrack), enrichedTracks)
+                  void handleTrackPlay(track)
                 }}
               />
             )}

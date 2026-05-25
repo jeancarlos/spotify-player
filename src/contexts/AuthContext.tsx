@@ -4,6 +4,14 @@ import { generateCodeVerifier, generateCodeChallenge, generateState } from '@/li
 import api from '@/lib/axios'
 import i18n from '@/lib/i18n'
 import { STORAGE_KEYS } from '@/lib/storageKeys'
+import {
+  buildSpotifyAuthorizeUrl,
+  exchangeCodeForTokens,
+  getAllowedAuthOrigins,
+  getSpotifyAuthConfig,
+  parseReceivedState,
+  requestPkceFromOpener,
+} from '@/lib/spotifyAuth'
 import { authReducer, initialAuthState, type AuthState } from './authReducer'
 
 interface AuthContextValue {
@@ -14,90 +22,6 @@ interface AuthContextValue {
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
-
-const REDIRECT_ORIGIN = new URL(import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string).origin
-const ALLOWED_OPENER_ORIGINS = new Set([window.location.origin, REDIRECT_ORIGIN])
-
-const SCOPES = [
-  'user-read-private',
-  'user-read-email',
-  'user-top-read',
-  'user-read-recently-played',
-  'user-library-read',
-  'user-follow-read',
-  'user-read-playback-state',
-  'user-modify-playback-state',
-  'streaming',
-  'playlist-read-private',
-  'playlist-modify-private',
-  'playlist-modify-public',
-  'ugc-image-upload',
-].join(' ')
-
-async function requestPkceFromOpener(
-  opener: Window,
-  openerOrigin: string
-): Promise<{ nonce: string | null; verifier: string | null }> {
-  return new Promise((resolve) => {
-    const timer = setTimeout(() => {
-      window.removeEventListener('message', handler)
-      resolve({ nonce: null, verifier: null })
-    }, 3000)
-
-    const handler = (
-      ev: MessageEvent<{ type?: string; nonce?: string | null; verifier?: string | null }>
-    ) => {
-      if (!ALLOWED_OPENER_ORIGINS.has(ev.origin)) return
-      if (ev.data.type !== 'PKCE_DATA') return
-      clearTimeout(timer)
-      window.removeEventListener('message', handler)
-      resolve({ nonce: ev.data.nonce ?? null, verifier: ev.data.verifier ?? null })
-    }
-
-    window.addEventListener('message', handler)
-    opener.postMessage({ type: 'REQUEST_PKCE_DATA' }, openerOrigin)
-  })
-}
-
-function parseReceivedState(receivedState: string): { nonce: string; openerOrigin: string } {
-  let nonce = receivedState
-  let openerOrigin = window.location.origin
-  try {
-    const decoded = JSON.parse(atob(receivedState)) as { n?: string; o?: string }
-    if (decoded.n && decoded.o) {
-      nonce = decoded.n
-      openerOrigin = ALLOWED_OPENER_ORIGINS.has(decoded.o) ? decoded.o : window.location.origin
-    }
-  } catch {
-    /* plain state — same-tab flow */
-  }
-  return { nonce, openerOrigin }
-}
-
-async function exchangeCodeForTokens(
-  code: string,
-  verifier: string
-): Promise<{ access_token: string; refresh_token: string }> {
-  const params = new URLSearchParams({
-    grant_type: 'authorization_code',
-    code,
-    redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string,
-    client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
-    code_verifier: verifier,
-  })
-
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params,
-  })
-
-  if (!res.ok) {
-    throw Object.assign(new Error(i18n.t('auth.tokenExchangeFailed')), { code: 'token_error' })
-  }
-
-  return res.json() as Promise<{ access_token: string; refresh_token: string }>
-}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialAuthState, () => {
@@ -155,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [state.isAuthenticated, state.profile, profileRetry])
 
   const login = useCallback(async () => {
+    const authConfig = getSpotifyAuthConfig()
     const verifier = generateCodeVerifier()
     const challenge = await generateCodeChallenge(verifier)
     const nonce = generateState()
@@ -162,19 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(STORAGE_KEYS.pkceVerifier, verifier)
     localStorage.setItem(STORAGE_KEYS.pkceState, nonce)
 
-    const statePayload = btoa(JSON.stringify({ n: nonce, o: window.location.origin }))
-
-    const params = new URLSearchParams({
-      client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID as string,
-      response_type: 'code',
-      redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string,
-      scope: SCOPES,
-      code_challenge_method: 'S256',
-      code_challenge: challenge,
-      state: statePayload,
-    })
-
-    const authUrl = `https://accounts.spotify.com/authorize?${params}`
+    const authUrl = buildSpotifyAuthorizeUrl({ challenge, nonce, config: authConfig })
     const POPUP_WIDTH = 500
     const POPUP_HEIGHT = 700
     const left = Math.round(screen.width / 2 - POPUP_WIDTH / 2)
@@ -199,7 +112,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event.data.type === 'REQUEST_PKCE_DATA') {
         const pkceVerifier = localStorage.getItem(STORAGE_KEYS.pkceVerifier)
         const pkceNonce = localStorage.getItem(STORAGE_KEYS.pkceState)
-        popup.postMessage({ type: 'PKCE_DATA', verifier: pkceVerifier, nonce: pkceNonce }, REDIRECT_ORIGIN)
+        popup.postMessage(
+          { type: 'PKCE_DATA', verifier: pkceVerifier, nonce: pkceNonce },
+          authConfig.redirectOrigin
+        )
         return
       }
 
@@ -237,13 +153,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const handleCallback = useCallback(async (code: string, receivedState: string) => {
-    const { nonce, openerOrigin } = parseReceivedState(receivedState)
+    const authConfig = getSpotifyAuthConfig()
+    const allowedOrigins = getAllowedAuthOrigins(authConfig.redirectOrigin)
+    const { nonce, openerOrigin } = parseReceivedState(receivedState, allowedOrigins)
 
     let savedNonce = localStorage.getItem(STORAGE_KEYS.pkceState)
     let verifier = localStorage.getItem(STORAGE_KEYS.pkceVerifier)
 
     if (window.opener && (!savedNonce || !verifier)) {
-      const pkce = await requestPkceFromOpener(window.opener as Window, openerOrigin)
+      const pkce = await requestPkceFromOpener(
+        window.opener as Window,
+        openerOrigin,
+        allowedOrigins
+      )
       savedNonce = pkce.nonce
       verifier = pkce.verifier
     }
@@ -252,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw Object.assign(new Error(i18n.t('auth.invalidState')), { code: 'state_mismatch' })
     }
 
-    const data = await exchangeCodeForTokens(code, verifier)
+    const data = await exchangeCodeForTokens(code, verifier, authConfig)
 
     localStorage.removeItem(STORAGE_KEYS.pkceVerifier)
     localStorage.removeItem(STORAGE_KEYS.pkceState)
