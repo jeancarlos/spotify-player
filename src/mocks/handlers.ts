@@ -88,6 +88,11 @@ export const handlers = [
   http.get('https://api.spotify.com/v1/search', ({ request }) => {
     const url = new URL(request.url)
     const type = url.searchParams.get('type')
+    const offset = Number(url.searchParams.get('offset') ?? 0)
+    if (offset > 0) {
+      if (type === 'artist') return HttpResponse.json({ artists: pagingWrapper([]) })
+      return HttpResponse.json({ albums: pagingWrapper([]) })
+    }
     if (type === 'artist') return HttpResponse.json({ artists: pagingWrapper([artist]) })
     return HttpResponse.json({ albums: pagingWrapper([album]) })
   }),

@@ -19,7 +19,6 @@ interface CollectionHeaderProps {
   onPlay: () => void
   onLayout: (height: number) => void
   onArtistClick?: (id: string) => void
-  className?: string
 }
 
 function useCollectionLayout() {
@@ -38,7 +37,7 @@ function useCollectionLayout() {
   const translateY = Math.round(imgPx * 0.25)
   const headerHeight = imgPx - translateY + 184
 
-  return { imgPx, translateY, headerHeight }
+  return { imgPx, headerHeight }
 }
 
 export function CollectionHeader({
