@@ -126,7 +126,10 @@ describe('useFavoriteStorage', () => {
     expect(result.current.tracks).toHaveLength(1)
 
     act(() => {
-      localStorage.setItem('spoter_favorites_u1', JSON.stringify([mockTrack('ext1'), mockTrack('ext2')]))
+      localStorage.setItem(
+        'spoter_favorites_u1',
+        JSON.stringify([mockTrack('ext1'), mockTrack('ext2')])
+      )
       window.dispatchEvent(new CustomEvent('spoter:favorites-changed'))
     })
     expect(result.current.tracks).toHaveLength(2)

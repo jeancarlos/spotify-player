@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { TIME_60_MINUTES } from '@/utils/constants'
 import { useTranslation } from 'react-i18next'
 
 interface WikiResult {
@@ -60,7 +61,7 @@ export function useTrackWikipedia(trackName: string | undefined, artistName: str
   return useQuery<WikiResult | null>({
     queryKey: ['track-wikipedia', trackName, artistName, currentLang],
     enabled: !!trackName && !!artistName,
-    staleTime: 1000 * 60 * 60,
+    staleTime: TIME_60_MINUTES,
     queryFn: async () => {
       if (!trackName || !artistName) return null
 

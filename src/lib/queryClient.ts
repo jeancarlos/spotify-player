@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { TIME_5_MINUTES } from '@/utils/constants'
 
 interface MaybeAxiosError {
   response?: { status?: number; headers?: Record<string, string> }
@@ -7,7 +8,7 @@ interface MaybeAxiosError {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
+      staleTime: TIME_5_MINUTES,
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
         const status = (error as MaybeAxiosError).response?.status

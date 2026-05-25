@@ -2,6 +2,7 @@ export interface FavCookieEntry {
   uri: string
   note: string
 }
+import { TIME_1_YEAR_SECONDS } from '@/utils/constants'
 
 const NOTE_TRUNCATE = 80
 const COOKIE_BYTE_LIMIT = 3500
@@ -32,5 +33,5 @@ export function writeFavCookie(userId: string, entries: FavCookieEntry[]): void 
   }
 
   const key = cookieKey(userId)
-  document.cookie = `${key}=${encodeURIComponent(payload)}; max-age=31536000; path=/; SameSite=Strict`
+  document.cookie = `${key}=${encodeURIComponent(payload)}; max-age=${TIME_1_YEAR_SECONDS}; path=/; SameSite=Strict`
 }

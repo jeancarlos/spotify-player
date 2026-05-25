@@ -1,4 +1,5 @@
 import { useQueries } from '@tanstack/react-query'
+import { TIME_60_MINUTES } from '@/utils/constants'
 import { useMemo } from 'react'
 import api from '@/lib/axios'
 import { useArtistAlbums } from './useArtistAlbums'
@@ -53,7 +54,7 @@ export function useArtistDiscographyTracks(
     queries: albumList.map((album) => ({
       queryKey: ['album-tracks', album.id, 1, 20] as [string, string, number, number],
       enabled: !!album.id,
-      staleTime: 1000 * 60 * 60,
+      staleTime: TIME_60_MINUTES,
       queryFn: async (): Promise<PagingObject<SpotifyAlbumTrack>> => {
         const { data: res } = await api.get<PagingObject<SpotifyAlbumTrack>>(
           `/albums/${album.id}/tracks`,
@@ -61,7 +62,8 @@ export function useArtistDiscographyTracks(
         )
         return res
       },
-      select: (data: PagingObject<SpotifyAlbumTrack>) => data.items.map((t) => enrichTrack(t, album)),
+      select: (data: PagingObject<SpotifyAlbumTrack>) =>
+        data.items.map((t) => enrichTrack(t, album)),
     })),
   })
 
@@ -81,4 +83,3 @@ export function useArtistDiscographyTracks(
 
   return result
 }
-

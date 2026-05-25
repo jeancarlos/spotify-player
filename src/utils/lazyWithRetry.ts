@@ -42,7 +42,9 @@ async function retryImport<T extends ComponentType<unknown>>(
     if (!hasReloaded) {
       sessionStorage.setItem(storageKey, '1')
       window.location.reload()
-      return new Promise(() => { /* intentionally never resolves */ })
+      return new Promise(() => {
+        /* intentionally never resolves */
+      })
     }
 
     sessionStorage.removeItem(storageKey)

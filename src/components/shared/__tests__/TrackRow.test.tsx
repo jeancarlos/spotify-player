@@ -66,10 +66,10 @@ describe('TrackRow', () => {
     const onRemove = vi.fn()
     const onPlay = vi.fn()
     render(<TrackRow track={track} onPlay={onPlay} onRemove={onRemove} />)
-    
+
     const removeBtn = screen.getByRole('button', { name: /favorites\.removeConfirm/i })
     fireEvent.click(removeBtn)
-    
+
     expect(onRemove).toHaveBeenCalledWith('spotify:track:t1')
     expect(onPlay).not.toHaveBeenCalled()
   })

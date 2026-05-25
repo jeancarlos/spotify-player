@@ -38,7 +38,12 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
     value ? (
       <div data-testid="selected-track">{value.name}</div>
     ) : (
-      <button type="button" onClick={() => { onChange(mockTrack) }}>
+      <button
+        type="button"
+        onClick={() => {
+          onChange(mockTrack)
+        }}
+      >
         Selecionar música
       </button>
     ),
@@ -55,11 +60,7 @@ beforeEach(() => {
 
 function renderForm(existingFavorites: SpotifyTrack[] = []) {
   return render(
-    <AddFavoriteForm
-      existingFavorites={existingFavorites}
-      onAdd={onAdd}
-      onClose={onClose}
-    />
+    <AddFavoriteForm existingFavorites={existingFavorites} onAdd={onAdd} onClose={onClose} />
   )
 }
 

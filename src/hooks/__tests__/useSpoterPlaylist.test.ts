@@ -80,7 +80,7 @@ beforeEach(() => {
   vi.mocked(useUserPlaylists).mockReturnValue({
     isSuccess: true,
     data: { items: [{ id: 'pl-123', name: "User's Spoter List", owner: { id: 'user-1' } }] },
-  } as ReturnType<typeof useUserPlaylists>)
+  } as unknown as ReturnType<typeof useUserPlaylists>)
 })
 
 describe('useSpoterPlaylist — encontra playlist existente', () => {
@@ -131,7 +131,7 @@ describe('useSpoterPlaylist — criação lazy (sem playlist existente)', () => 
     vi.mocked(useUserPlaylists).mockReturnValue({
       isSuccess: true,
       data: { items: [] },
-    } as ReturnType<typeof useUserPlaylists>)
+    } as unknown as ReturnType<typeof useUserPlaylists>)
   })
 
   it('não há playlistId quando nenhuma playlist é encontrada', () => {
@@ -166,6 +166,9 @@ describe('useSpoterPlaylist — criação lazy (sem playlist existente)', () => 
       result.current.addTrack(mockTrack('t5'))
     })
     expect(mockCreateMutate).not.toHaveBeenCalled()
-    expect(mockAddMutate).toHaveBeenCalledWith({ playlistId: 'existing-pl', uris: ['spotify:track:t5'] })
+    expect(mockAddMutate).toHaveBeenCalledWith({
+      playlistId: 'existing-pl',
+      uris: ['spotify:track:t5'],
+    })
   })
 })

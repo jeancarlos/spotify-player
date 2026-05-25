@@ -24,14 +24,18 @@ function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const close = useCallback(() => { setOpen(false) }, [])
+  const close = useCallback(() => {
+    setOpen(false)
+  }, [])
   usePopoverDismiss(open, close, buttonRef, popoverRef)
 
   return (
     <div className="relative">
       <button
         ref={buttonRef}
-        onClick={() => { setOpen((v) => !v) }}
+        onClick={() => {
+          setOpen((v) => !v)
+        }}
         aria-expanded={open}
         aria-haspopup="true"
         className="flex items-center gap-2 px-4 py-2 glass rounded-full text-sm font-medium text-black/70 hover:bg-black/5 transition-colors"
@@ -131,7 +135,9 @@ export function Favorites() {
           <div className="flex items-center gap-2">
             <Tooltip content={t('favorites.refreshFromSpotify')}>
               <button
-                onClick={() => { void refresh() }}
+                onClick={() => {
+                  void refresh()
+                }}
                 disabled={isRefreshing}
                 className="p-2 glass rounded-full text-black/50 hover:text-black/80 transition-colors disabled:opacity-40"
                 aria-label={t('favorites.refreshFromSpotify')}
@@ -161,6 +167,7 @@ export function Favorites() {
                 isActive={playerState.currentTrack?.uri === track.uri}
                 onPlay={async (track) => playTrack(track as SpotifyTrack)}
                 onRemove={removeTrack}
+                disableRemove={tracks.length === 1}
               />
             ))}
           </div>

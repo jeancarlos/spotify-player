@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { TIME_30_MINUTES } from '@/utils/constants'
 import axios from 'axios'
 import api from '@/lib/axios'
 import type { ArtistTopTracksResponse, SpotifyTrack } from '@/types/spotify'
@@ -7,7 +8,7 @@ export function useArtistTopTracks(artistId: string | undefined) {
   return useQuery<SpotifyTrack[]>({
     queryKey: ['artist-top-tracks', artistId],
     enabled: !!artistId,
-    staleTime: 1000 * 60 * 30,
+    staleTime: TIME_30_MINUTES,
     retry: false,
     queryFn: async () => {
       try {

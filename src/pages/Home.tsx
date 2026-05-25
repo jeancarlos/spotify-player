@@ -59,7 +59,11 @@ export function Home() {
   const isError = recentlyPlayed.isError
 
   const uniqueTracks: SpotifyTrack[] = recentlyPlayed.data
-    ? [...new Map(recentlyPlayed.data.map((playedItem) => [playedItem.track.id, playedItem.track])).values()]
+    ? [
+        ...new Map(
+          recentlyPlayed.data.map((playedItem) => [playedItem.track.id, playedItem.track])
+        ).values(),
+      ]
     : []
   const tracks = uniqueTracks.slice(0, MAX_CAROUSEL_TRACKS)
 

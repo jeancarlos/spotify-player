@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { TIME_60_MINUTES } from '@/utils/constants'
 import { useTranslation } from 'react-i18next'
 
 interface WikiResult {
@@ -56,7 +57,7 @@ export function useArtistBio(artistName: string | undefined) {
   return useQuery<WikiResult | null>({
     queryKey: ['artist-bio', artistName, i18n.language],
     enabled: !!artistName,
-    staleTime: 1000 * 60 * 60,
+    staleTime: TIME_60_MINUTES,
     queryFn: async () => (artistName ? fetchArtistBio(artistName, preferPt) : null),
   })
 }

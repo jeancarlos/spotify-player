@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { TIME_30_MINUTES } from '@/utils/constants'
 import api from '@/lib/axios'
 import type { PagingObject } from '@/types/spotify'
 
@@ -24,7 +25,7 @@ export function useSearchPaged<T, R>({
   return useQuery<PagingObject<T>>({
     queryKey: [queryKeyPrefix, query, page],
     enabled: query.trim().length > 0,
-    staleTime: 1000 * 60 * 30,
+    staleTime: TIME_30_MINUTES,
     queryFn: async () => {
       const baseOffset = (page - 1) * PAGE_SIZE
       const [first, second] = await Promise.all([

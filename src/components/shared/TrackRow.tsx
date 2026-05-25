@@ -10,6 +10,7 @@ interface TrackRowProps {
   isActive?: boolean
   onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
   onRemove?: (uri: string) => void
+  disableRemove?: boolean
   note?: string
   index?: number
   theme?: 'light' | 'dark'
@@ -95,7 +96,10 @@ function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellPr
     <button
       className="w-6 shrink-0 flex items-center justify-center focus:outline-none"
       aria-label={t('player.playTrack', { name: trackName })}
-      onClick={(e) => { e.stopPropagation(); onPlay?.(track) }}
+      onClick={(e) => {
+        e.stopPropagation()
+        onPlay?.(track)
+      }}
     >
       {index !== undefined ? (
         <>
@@ -114,6 +118,7 @@ export function TrackRow({
   isActive = false,
   onPlay,
   onRemove,
+  disableRemove,
   note,
   index,
   theme = 'light',
@@ -133,13 +138,7 @@ export function TrackRow({
 
   return (
     <div className={styles.row}>
-      <PlayCell
-        trackName={track.name}
-        index={index}
-        theme={styles}
-        onPlay={onPlay}
-        track={track}
-      />
+      <PlayCell trackName={track.name} index={index} theme={styles} onPlay={onPlay} track={track} />
 
       <div
         className="flex-1 min-w-0 flex items-center gap-3 cursor-pointer"
@@ -160,10 +159,14 @@ export function TrackRow({
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onRemove(track.uri)
+            if (!disableRemove) onRemove(track.uri)
           }}
+          disabled={disableRemove}
           aria-label={t('favorites.removeConfirm')}
-          className={styles.remove}
+          className={cn(
+            styles.remove,
+            disableRemove && 'cursor-not-allowed opacity-50 group-hover:opacity-50'
+          )}
         >
           <Trash2 size={14} />
         </button>

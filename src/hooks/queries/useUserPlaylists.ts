@@ -1,4 +1,5 @@
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { TIME_15_MINUTES } from '@/utils/constants'
 import api from '@/lib/axios'
 import type { UserPlaylistsResponse } from '@/types/spotify'
 
@@ -10,7 +11,7 @@ export function useUserPlaylists(
     ...options,
     queryKey: ['user-playlists'],
     enabled,
-    staleTime: 1000 * 60 * 15,
+    staleTime: TIME_15_MINUTES,
     queryFn: async () => {
       const { data } = await api.get<UserPlaylistsResponse>('/me/playlists', {
         params: { limit: 20 },

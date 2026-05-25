@@ -8,7 +8,9 @@ vi.mock('@/hooks/useDebounce', () => ({
 }))
 
 vi.mock('@/hooks/useKeyboardNav', () => ({
-  useKeyboardNav: () => () => { /* noop */ },
+  useKeyboardNav: () => () => {
+    /* noop */
+  },
 }))
 
 const mockSearchResults: SpotifyTrack[] = [
@@ -92,18 +94,14 @@ describe('TrackAutocomplete', () => {
   })
 
   it('quando value está definido, renderiza SelectedTrack em vez do input', () => {
-    render(
-      <TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />
-    )
+    render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(screen.getByText('Resultado Um')).toBeInTheDocument()
   })
 
   it('botão de limpar chama onChange(null)', async () => {
     const user = userEvent.setup()
-    render(
-      <TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />
-    )
+    render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
     await user.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
     expect(onChange).toHaveBeenCalledWith(null)
   })

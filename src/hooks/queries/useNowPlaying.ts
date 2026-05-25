@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { TIME_8_SECONDS } from '@/utils/constants'
 import api from '@/lib/axios'
 import type { SpotifyTrack } from '@/types/spotify'
 
@@ -20,7 +21,7 @@ export function useNowPlaying(enabled = true) {
       return data?.is_playing === false ? 30_000 : 10_000
     },
     refetchIntervalInBackground: false,
-    staleTime: 8000,
+    staleTime: TIME_8_SECONDS,
     queryFn: async () => {
       const { data, status } = await api.get<NowPlayingResponse>('/me/player', {
         validateStatus: (s) => s === 200 || s === 204,

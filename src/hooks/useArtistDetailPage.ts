@@ -38,7 +38,7 @@ export function useArtistDetailPage(id: string | undefined) {
 
   const artist = useArtist(id)
   const albums = useArtistAlbums(id, albumPage, 10)
-  
+
   const albumPageItems = useMemo(() => albums.data?.items ?? [], [albums.data?.items])
   const discographyTracks = useArtistDiscographyTracks(id, 10, albumPageItems)
 
