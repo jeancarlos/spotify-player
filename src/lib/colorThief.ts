@@ -1,4 +1,3 @@
-// src/lib/colorThief.ts
 // Returns colors as "r,g,b" (no wrapper) so callers can use rgba(${color},alpha) in CSS.
 export async function extractPalette(imageUrl: string): Promise<[string, string] | null> {
   try {

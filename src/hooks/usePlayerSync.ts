@@ -61,7 +61,6 @@ export function usePlayerSync() {
     }
   }, [data, dispatch, queryClient])
 
-  // Sync the queue
   useEffect(() => {
     if (queueData?.queue) {
       dispatch({ type: 'SET_QUEUE', payload: queueData.queue })

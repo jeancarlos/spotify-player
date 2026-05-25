@@ -49,7 +49,6 @@ describe('Tooltip', () => {
         <span>trigger</span>
       </Tooltip>
     )
-    // wrapper is the parent span of the tooltip content
     const wrapper = screen.getByText('trigger').parentElement
     expect(wrapper?.className).toContain('flex-1')
   })

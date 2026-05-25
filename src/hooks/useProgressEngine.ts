@@ -24,9 +24,7 @@ export function useProgressEngine(): {
 
   const [displayProgress, setDisplayProgress] = useState(0)
 
-  // Unified effect to handle both API sync and timer ticker
   useEffect(() => {
-    // 1. Sync baseline with incoming data
     if (data && data.progress_ms !== null) {
       const now = Date.now()
       const adjusted = data.is_playing
@@ -43,7 +41,6 @@ export function useProgressEngine(): {
       // Instead, we let the first interval tick or a deferred call handle it.
     }
 
-    // 2. Start ticker
     const update = () => {
       const b = baselineRef.current
       if (b.time === 0) return

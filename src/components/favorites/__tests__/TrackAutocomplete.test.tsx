@@ -8,7 +8,7 @@ vi.mock('@/hooks/useDebounce', () => ({
 }))
 
 vi.mock('@/hooks/useKeyboardNav', () => ({
-  useKeyboardNav: () => () => {},
+  useKeyboardNav: () => () => { /* noop */ },
 }))
 
 const mockSearchResults: SpotifyTrack[] = [

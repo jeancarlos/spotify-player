@@ -37,7 +37,6 @@ describe('useProgressEngine', () => {
     const { result } = renderHook(() => useProgressEngine())
 
     act(() => {
-      // Execute the setTimeout(update, 0)
       vi.advanceTimersByTime(1)
     })
 
@@ -54,9 +53,7 @@ describe('useProgressEngine', () => {
     const { result } = renderHook(() => useProgressEngine())
 
     act(() => {
-      // First, trigger the initialization
       vi.advanceTimersByTime(1)
-      // Then advance 2 seconds
       vi.advanceTimersByTime(2000)
     })
 

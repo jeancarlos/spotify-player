@@ -51,7 +51,6 @@ export function useArtistDiscographyTracks(
 
   const trackQueriesResults = useQueries({
     queries: albumList.map((album) => ({
-      // Same key as useAlbumTracks(id, 1, 20) — shares cache when user navigates to album page.
       queryKey: ['album-tracks', album.id, 1, 20] as [string, string, number, number],
       enabled: !!album.id,
       staleTime: 1000 * 60 * 60,
