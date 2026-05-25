@@ -36,15 +36,11 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 
 1. Instale as dependências:
    ```bash
-   npm install
-   # ou
    yarn
    ```
 
 2. Inicie o servidor de desenvolvimento:
    ```bash
-   npm run dev
-   # ou
    yarn dev
    ```
 
@@ -52,11 +48,11 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 
 ## Scripts Úteis
 
-- `npm run dev`: Inicia o servidor local.
-- `npm run build`: Gera a build de produção.
-- `npm run lint`: Executa a verificação de código.
-- `npm test`: Roda a suíte de testes com o Vitest.
-- `npm run test:e2e`: Executa os testes de ponta a ponta (E2E) com Playwright.
+- `yarn dev`: Inicia o servidor local.
+- `yarn build`: Gera a build de produção.
+- `yarn lint`: Executa a verificação de código.
+- `yarn test`: Roda a suíte de testes com o Vitest.
+- `yarn test:e2e`: Executa os testes de ponta a ponta (E2E) com Playwright.
 
 ## Testes End-to-End (E2E)
 
@@ -101,7 +97,7 @@ Para rodar os testes localmente:
 npx playwright install
 
 # Executar testes em modo headless
-npm run test:e2e
+yarn test:e2e
 
 # Executar testes com interface visual (UI Mode)
 npx playwright test --ui
