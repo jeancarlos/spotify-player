@@ -327,8 +327,4 @@ export interface SpotifyAlbumFull extends SpotifyAlbumSimple {
   external_ids?: { upc?: string; ean?: string }
 }
 
-export interface RelatedArtistsResponse {
-  artists: SpotifyArtist[]
-}
-
 export type AlbumTracksResponse = PagingObject<SpotifyAlbumTrack>
