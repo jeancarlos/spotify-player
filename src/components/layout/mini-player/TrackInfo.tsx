@@ -2,22 +2,21 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { Info } from 'lucide-react'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useTranslation } from 'react-i18next'
-import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { formatDuration } from '@/utils/formatDuration'
 import { getFromPath } from '@/utils/routerState'
 
 interface TrackInfoProps {
   progress: number
+  notes: Record<string, string>
 }
 
-export function TrackInfo({ progress }: TrackInfoProps) {
+export function TrackInfo({ progress, notes }: TrackInfoProps) {
   const { state } = usePlayer()
   const { currentTrack } = state
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { notes } = useSpoterPlaylist()
 
   const isPlayerPage = location.pathname === '/player'
   const duration = currentTrack?.duration_ms ?? 0

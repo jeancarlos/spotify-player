@@ -13,7 +13,7 @@ export function useUserPlaylists(
     staleTime: 1000 * 60 * 15,
     queryFn: async () => {
       const { data } = await api.get<UserPlaylistsResponse>('/me/playlists', {
-        params: { limit: 50 },
+        params: { limit: 20 },
       })
       return data
     },

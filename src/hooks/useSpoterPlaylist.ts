@@ -87,7 +87,9 @@ export function useSpoterPlaylist() {
   const coverUploaded = useRef(false)
   const hydrationAttempted = useRef(false)
 
-  const playlists = useUserPlaylists(!!userId)
+  // Skip playlist fetch when we already have the ID in localStorage.
+  const hasStoredId = !!userId && !!localStorage.getItem(storageKey(userId))
+  const playlists = useUserPlaylists(!!userId && !hasStoredId)
   const createPlaylist = useCreatePlaylist()
   const updatePlaylist = useUpdatePlaylist()
   const uploadCover = useUploadPlaylistCover()
@@ -120,9 +122,11 @@ export function useSpoterPlaylist() {
     return ''
   }, [forcedId, userId, playlists.data, playlistName])
 
+  // Seed local tracks from Spotify when localStorage is empty — no playlists.isSuccess needed
+  // when the ID was already stored locally.
   const seedQuery = usePlaylistTracks(
     playlistId,
-    playlistId.length > 0 && localTracks.length === 0 && playlists.isSuccess,
+    playlistId.length > 0 && localTracks.length === 0,
     1,
     50
   )
@@ -316,5 +320,6 @@ export function useSpoterPlaylist() {
     refresh,
     isRefreshing,
     isLoading: isHydrating && localTracks.length === 0,
+    isLocallyStored: localTracks.length > 0,
   }
 }

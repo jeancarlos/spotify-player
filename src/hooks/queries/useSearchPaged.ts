@@ -24,7 +24,7 @@ export function useSearchPaged<T, R>({
   return useQuery<PagingObject<T>>({
     queryKey: [queryKeyPrefix, query, page],
     enabled: query.trim().length > 0,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 30,
     queryFn: async () => {
       const baseOffset = (page - 1) * PAGE_SIZE
       const [first, second] = await Promise.all([

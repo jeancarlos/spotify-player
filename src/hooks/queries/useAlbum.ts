@@ -6,6 +6,7 @@ export function useAlbum(albumId: string | undefined) {
   return useQuery<SpotifyAlbumFull>({
     queryKey: ['album', albumId],
     enabled: !!albumId,
+    staleTime: 1000 * 60 * 60,
     queryFn: async () => {
       const { data } = await api.get<SpotifyAlbumFull>(`/albums/${albumId}`)
       return data

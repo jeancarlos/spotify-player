@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useProgressEngine } from '@/hooks/useProgressEngine'
+import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { useTranslation } from 'react-i18next'
 import api from '@/lib/axios'
 import { ProgressBar } from './mini-player/ProgressBar'
@@ -17,6 +18,8 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
   const { state, dispatch } = usePlayer()
   const { currentTrack } = state
   const { currentProgress, seekTo: engineSeekTo } = useProgressEngine()
+  const { tracks, notes, addTrack, removeTrack } = useSpoterPlaylist()
+  const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
   const { t } = useTranslation()
 
   const handleSeek = useCallback(
@@ -58,8 +61,8 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
       )}
 
       <div className="relative px-4 py-3 flex items-center gap-3">
-        <TrackInfo progress={currentProgress} />
-        <FavoriteButton />
+        <TrackInfo progress={currentProgress} notes={notes} />
+        <FavoriteButton isSaved={isSaved} addTrack={addTrack} removeTrack={removeTrack} />
         <PlaybackControls />
       </div>
     </motion.aside>

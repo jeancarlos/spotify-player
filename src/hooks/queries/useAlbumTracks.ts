@@ -6,6 +6,7 @@ export function useAlbumTracks(albumId: string | undefined, page: number, limit 
   return useQuery<AlbumTracksResponse>({
     queryKey: ['album-tracks', albumId, page, limit],
     enabled: !!albumId,
+    staleTime: 1000 * 60 * 60,
     queryFn: async () => {
       const { data } = await api.get<AlbumTracksResponse>(`/albums/${albumId}/tracks`, {
         params: { limit, offset: (page - 1) * limit, market: 'BR' },

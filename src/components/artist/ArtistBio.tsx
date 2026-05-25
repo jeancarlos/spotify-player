@@ -1,4 +1,5 @@
 import { useArtistBio } from '@/hooks/queries/useArtistBio'
+import { useDebounce } from '@/hooks/useDebounce'
 import { useTranslation } from 'react-i18next'
 
 interface ArtistBioProps {
@@ -7,7 +8,8 @@ interface ArtistBioProps {
 
 export function ArtistBio({ artistName }: ArtistBioProps) {
   const { t } = useTranslation()
-  const bio = useArtistBio(artistName)
+  const debouncedName = useDebounce(artistName, 400)
+  const bio = useArtistBio(debouncedName)
 
   if (!bio.data) return null
 

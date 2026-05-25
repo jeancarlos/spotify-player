@@ -3,18 +3,21 @@ import { Heart } from 'lucide-react'
 import { usePlayer } from '@/hooks/usePlayer'
 import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
-import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { cn } from '@/lib/utils'
 import { ControlTip } from './PlaybackControls'
+import type { SpotifyTrack } from '@/types/spotify'
 
-export function FavoriteButton() {
+interface FavoriteButtonProps {
+  isSaved: boolean
+  addTrack: (track: SpotifyTrack) => void
+  removeTrack: (uri: string) => void
+}
+
+export function FavoriteButton({ isSaved, addTrack, removeTrack }: FavoriteButtonProps) {
   const { state } = usePlayer()
   const { currentTrack } = state
   const { toast } = useToast()
   const { t } = useTranslation()
-  const { tracks, addTrack, removeTrack } = useSpoterPlaylist()
-
-  const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
 
   const handleHeart = useCallback(() => {
     if (!currentTrack) return

@@ -45,27 +45,30 @@ export function useArtistDiscographyTracks(
   const internalAlbums = useArtistAlbums(artistId, 1, 10)
 
   const albumList = useMemo(() => {
-    if (externalAlbums && externalAlbums.length > 0) return externalAlbums.slice(0, 5)
-    return internalAlbums.data?.items.slice(0, 5) ?? []
+    if (externalAlbums && externalAlbums.length > 0) return externalAlbums.slice(0, 3)
+    return internalAlbums.data?.items.slice(0, 3) ?? []
   }, [externalAlbums, internalAlbums.data?.items])
 
   const trackQueriesResults = useQueries({
     queries: albumList.map((album) => ({
-      queryKey: ['album-tracks-disc', album.id],
+      // Same key as useAlbumTracks(id, 1, 20) — shares cache when user navigates to album page.
+      queryKey: ['album-tracks', album.id, 1, 20] as [string, string, number, number],
       enabled: !!album.id,
-      staleTime: 1000 * 60 * 60, // 1 hour
-      queryFn: async (): Promise<SpotifyTrack[]> => {
+      staleTime: 1000 * 60 * 60,
+      queryFn: async (): Promise<PagingObject<SpotifyAlbumTrack>> => {
         const { data: res } = await api.get<PagingObject<SpotifyAlbumTrack>>(
           `/albums/${album.id}/tracks`,
-          { params: { limit: 10, offset: 0, market: 'BR' } }
+          { params: { limit: 20, offset: 0, market: 'BR' } }
         )
-        return res.items.map((t) => enrichTrack(t, album))
+        return res
       },
+      select: (data: PagingObject<SpotifyAlbumTrack>) => data.items.map((t) => enrichTrack(t, album)),
     })),
   })
 
   const isLoading =
-    (!externalAlbums && internalAlbums.isLoading) || trackQueriesResults.some((q) => q.isLoading)
+    ((!externalAlbums || externalAlbums.length === 0) && internalAlbums.isLoading) ||
+    trackQueriesResults.some((q) => q.isLoading)
 
   const data = useMemo(() => {
     if (!trackQueriesResults.length) return []
