@@ -6,7 +6,8 @@
 
 Spoter é um player de música web imersivo integrado com a API do Spotify, utilizando React, TypeScript, Vite, Tailwind CSS e Shadcn/UI com "Glassmorfismo".
 
-**Link:** https://spoter.jeansouza.dev/ pra ver online
+**Link:** https://spoter.jeansouza.dev/
+(se for testar aqui, me mande o email cadastrado no spotify para liberação)
 
 ## Configuração do Spotify (Obtendo o Client ID)
 

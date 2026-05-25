@@ -72,12 +72,12 @@ export function useArtistsPage() {
   const headerLabel = useMemo(() => getHeaderLabel(tab, t), [tab, t])
 
   const handleSearch = useCallback(
-    (q: string, nextTab: SearchTab) => {
-      if (!q.trim()) {
+    (searchQuery: string, nextTab: SearchTab) => {
+      if (!searchQuery.trim()) {
         navigate('/', { replace: true })
         return
       }
-      setSearchParams({ q, tab: nextTab, page: '1' }, { replace: true })
+      setSearchParams({ q: searchQuery, tab: nextTab, page: '1' }, { replace: true })
     },
     [navigate, setSearchParams]
   )

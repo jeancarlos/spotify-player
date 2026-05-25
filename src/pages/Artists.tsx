@@ -6,6 +6,8 @@ import { SearchResultsGrid } from '@/components/search/SearchResultsGrid'
 import { useArtistsPage } from '@/hooks/useArtistsPage'
 import { useTranslation } from 'react-i18next'
 
+const SKELETON_CARD_COUNT = 21
+
 export function Artists() {
   const { t } = useTranslation()
   const {
@@ -34,7 +36,7 @@ export function Artists() {
           transition={{ duration: 0.15 }}
           className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-3"
         >
-          {Array.from({ length: 21 }).map((_, i) => (
+          {Array.from({ length: SKELETON_CARD_COUNT }).map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </motion.div>

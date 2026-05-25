@@ -10,19 +10,20 @@ import { SearchBar } from '@/components/shared/SearchBar'
 import type { SearchTab } from '@/utils/search'
 import type { SpotifyTrack } from '@/types/spotify'
 
-const DISK_DONE_DELAY = 0.75
+const DISK_ENTRY_DELAY_S = 0.75
+const MAX_CAROUSEL_TRACKS = 5
 
 function useDiskLayout() {
   const [vw, setVw] = useState(() => window.innerWidth)
   const [vh, setVh] = useState(() => window.innerHeight)
   useEffect(() => {
-    const fn = () => {
+    const handleResize = () => {
       setVw(window.innerWidth)
       setVh(window.innerHeight)
     }
-    window.addEventListener('resize', fn)
+    window.addEventListener('resize', handleResize)
     return () => {
-      window.removeEventListener('resize', fn)
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 
@@ -57,10 +58,10 @@ export function Home() {
   const isLoading = recentlyPlayed.isPending
   const isError = recentlyPlayed.isError
 
-  const allTracks: SpotifyTrack[] = recentlyPlayed.data
-    ? [...new Map(recentlyPlayed.data.map((i) => [i.track.id, i.track])).values()]
+  const uniqueTracks: SpotifyTrack[] = recentlyPlayed.data
+    ? [...new Map(recentlyPlayed.data.map((playedItem) => [playedItem.track.id, playedItem.track])).values()]
     : []
-  const tracks = allTracks.slice(0, 5)
+  const tracks = uniqueTracks.slice(0, MAX_CAROUSEL_TRACKS)
 
   const handleSearch = useCallback(
     (query: string, tab: SearchTab) => {
@@ -92,7 +93,7 @@ export function Home() {
           }))}
           radius={arcRadius}
           arcDeg={arcDeg}
-          baseDelay={DISK_DONE_DELAY}
+          baseDelay={DISK_ENTRY_DELAY_S}
           title={t('home.recentlyPlayed')}
         />
       </div>
@@ -114,7 +115,7 @@ export function Home() {
           style={{ top: hintTop }}
         >
           <p className="text-center text-[12px] text-black/30 leading-relaxed max-w-xs">
-            {t('login.hint')}
+            {t('home.hint')}
           </p>
         </motion.div>
       )}

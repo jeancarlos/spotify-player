@@ -64,11 +64,11 @@ interface NameAreaProps {
   artistNames: string
 }
 
-function NameArea({ track, note, theme: s, artistNames }: NameAreaProps) {
+function NameArea({ track, note, theme: styles, artistNames }: NameAreaProps) {
   const nameBlock = (
     <>
-      <p className={s.text}>{track.name}</p>
-      <p className={s.subtext}>{artistNames}</p>
+      <p className={styles.text}>{track.name}</p>
+      <p className={styles.subtext}>{artistNames}</p>
     </>
   )
   if (note) {
@@ -89,7 +89,7 @@ interface PlayCellProps {
   track: SpotifyTrack | SpotifyAlbumTrack
 }
 
-function PlayCell({ trackName, index, theme: s, onPlay, track }: PlayCellProps) {
+function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellProps) {
   const { t } = useTranslation()
   return (
     <button
@@ -99,11 +99,11 @@ function PlayCell({ trackName, index, theme: s, onPlay, track }: PlayCellProps) 
     >
       {index !== undefined ? (
         <>
-          <span className={s.number}>{String(index + 1).padStart(2, '0')}</span>
-          <Play size={12} className={cn('hidden group-hover:block', s.icon)} />
+          <span className={styles.number}>{String(index + 1).padStart(2, '0')}</span>
+          <Play size={12} className={cn('hidden group-hover:block', styles.icon)} />
         </>
       ) : (
-        <Play size={12} className={s.icon} />
+        <Play size={12} className={styles.icon} />
       )}
     </button>
   )
@@ -119,7 +119,7 @@ export function TrackRow({
   theme = 'light',
 }: TrackRowProps) {
   const { t } = useTranslation()
-  const s = buildTrackTheme(theme === 'dark', isActive)
+  const styles = buildTrackTheme(theme === 'dark', isActive)
 
   const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
   const artistNames = 'artists' in track ? track.artists.map((a) => a.name).join(', ') : ''
@@ -132,11 +132,11 @@ export function TrackRow({
   }
 
   return (
-    <div className={s.row}>
+    <div className={styles.row}>
       <PlayCell
         trackName={track.name}
         index={index}
-        theme={s}
+        theme={styles}
         onPlay={onPlay}
         track={track}
       />
@@ -151,10 +151,10 @@ export function TrackRow({
         {albumImage && (
           <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
         )}
-        <NameArea track={track} note={note} theme={s} artistNames={artistNames} />
+        <NameArea track={track} note={note} theme={styles} artistNames={artistNames} />
       </div>
 
-      <span className={s.duration}>{formatDuration(track.duration_ms)}</span>
+      <span className={styles.duration}>{formatDuration(track.duration_ms)}</span>
 
       {onRemove && (
         <button
@@ -163,7 +163,7 @@ export function TrackRow({
             onRemove(track.uri)
           }}
           aria-label={t('favorites.removeConfirm')}
-          className={s.remove}
+          className={styles.remove}
         >
           <Trash2 size={14} />
         </button>

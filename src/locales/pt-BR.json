@@ -13,7 +13,8 @@
     "recentlyPlayed": "Tocadas Recentemente",
     "newReleases": "Novos Lançamentos",
     "recommendations": "Recomendados para Você",
-    "seeMore": "Ver mais"
+    "seeMore": "Ver mais",
+    "hint": "Essa é uma experiencia interativa, abra o Spotify no celular, de play e mantenha aberto enquanto usa o Spoter"
   },
   "login": {
     "title": "Spoter",

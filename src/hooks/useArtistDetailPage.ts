@@ -33,21 +33,20 @@ export function useArtistDetailPage(id: string | undefined) {
   const playTrack = usePlayTrack()
 
   const [albumPage, setAlbumPage] = useState(1)
-  const [discView, setDiscView] = useState<ViewMode>('list')
+  const [discographyView, setDiscographyView] = useState<ViewMode>('list')
   const [headerHeight, setHeaderHeight] = useState(0)
 
   const artist = useArtist(id)
   const albums = useArtistAlbums(id, albumPage, 10)
   
-  // Only pass the first few albums for discography tracks calculation
-  const initialAlbums = useMemo(() => albums.data?.items ?? [], [albums.data?.items])
-  const discographyTracks = useArtistDiscographyTracks(id, 10, initialAlbums)
+  const albumPageItems = useMemo(() => albums.data?.items ?? [], [albums.data?.items])
+  const discographyTracks = useArtistDiscographyTracks(id, 10, albumPageItems)
 
   const hasNextAlbums =
     albums.data != null ? albums.data.offset + albums.data.limit < albums.data.total : false
 
-  const handleLayout = useCallback((h: number) => {
-    setHeaderHeight(h)
+  const handleHeaderHeightChange = useCallback((height: number) => {
+    setHeaderHeight(height)
   }, [])
 
   const handleAlbumClick = useCallback(
@@ -64,13 +63,13 @@ export function useArtistDetailPage(id: string | undefined) {
   return useMemo(
     () => ({
       discographyTracks,
-      discView,
-      setDiscView,
+      discographyView,
+      setDiscographyView,
       albumPage,
       setAlbumPage,
       headerHeight,
       hasNextAlbums,
-      handleLayout,
+      handleHeaderHeightChange,
       handleAlbumClick,
       playTrack,
       albumItems,
@@ -79,13 +78,13 @@ export function useArtistDetailPage(id: string | undefined) {
     }),
     [
       discographyTracks,
-      discView,
-      setDiscView,
+      discographyView,
+      setDiscographyView,
       albumPage,
       setAlbumPage,
       headerHeight,
       hasNextAlbums,
-      handleLayout,
+      handleHeaderHeightChange,
       handleAlbumClick,
       playTrack,
       albumItems,

@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
 import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
@@ -38,6 +39,7 @@ function TrackTableRow({
   onPlay,
   onAlbumClick,
 }: TrackTableRowProps) {
+  const { t } = useTranslation()
   const { albumImage, albumId, albumName, artistNames, popularity } = resolveTrackMeta(track)
 
   return (
@@ -52,7 +54,7 @@ function TrackTableRow({
         <span className="group-hover:hidden">{index + 1}</span>
         <button
           className="hidden group-hover:flex items-center justify-center"
-          aria-label={`Tocar ${track.name}`}
+          aria-label={t('player.playTrack', { name: track.name })}
           onClick={(e) => {
             e.stopPropagation()
             onPlay?.(track)
@@ -112,21 +114,22 @@ export function TrackTable({
   onPlay,
   onAlbumClick,
 }: TrackTableProps) {
+  const { t } = useTranslation()
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs border-collapse" style={{ minWidth: 560 }}>
         <thead>
           <tr className="border-b border-black/8">
-            <th className="text-left py-2 px-3 text-black/30 font-semibold w-8">#</th>
+            <th className="text-left py-2 px-3 text-black/30 font-semibold w-8">{t('track.trackNumber')}</th>
             <th className="text-left py-2 px-3 text-black/30 font-semibold w-10"></th>
-            <th className="text-left py-2 px-3 text-black/30 font-semibold">Nome</th>
-            <th className="text-left py-2 px-3 text-black/30 font-semibold">Artista</th>
+            <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('common.name')}</th>
+            <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('track.artistCol')}</th>
             {showAlbumColumn && (
-              <th className="text-left py-2 px-3 text-black/30 font-semibold">Álbum</th>
+              <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('track.albumCol')}</th>
             )}
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">Duração</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">Pop.</th>
-            <th className="text-center py-2 px-3 text-black/30 font-semibold">E</th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('track.duration')}</th>
+            <th className="text-right py-2 px-3 text-black/30 font-semibold">{t('common.popularity')}</th>
+            <th className="text-center py-2 px-3 text-black/30 font-semibold">{t('track.explicit')}</th>
           </tr>
         </thead>
         <tbody>

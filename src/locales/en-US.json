@@ -13,7 +13,8 @@
     "recentlyPlayed": "Recently Played",
     "newReleases": "New Releases",
     "recommendations": "Recommended for You",
-    "seeMore": "See more"
+    "seeMore": "See more",
+    "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
   },
   "login": {
     "title": "Spoter",

@@ -12,13 +12,13 @@ export function ArtistDetail() {
 
   const {
     discographyTracks,
-    discView,
-    setDiscView,
+    discographyView,
+    setDiscographyView,
     albumPage,
     setAlbumPage,
     headerHeight,
     hasNextAlbums,
-    handleLayout,
+    handleHeaderHeightChange,
     handleAlbumClick,
     playTrack,
     artistSubtitle,
@@ -34,7 +34,7 @@ export function ArtistDetail() {
         imageUrl={artistImageUrl}
         name={artistName}
         subtitle={artistSubtitle}
-        onLayout={handleLayout}
+        onLayout={handleHeaderHeightChange}
       />
 
       <div style={{ paddingTop: headerHeight }} className="pb-32">
@@ -58,16 +58,16 @@ export function ArtistDetail() {
 
           <ArtistDiscography
             albums={albumItems}
-            view={discView}
-            onViewChange={setDiscView}
+            view={discographyView}
+            onViewChange={setDiscographyView}
             onAlbumClick={handleAlbumClick}
             page={albumPage}
             hasNext={hasNextAlbums}
             onPrevPage={() => {
-              setAlbumPage((p) => Math.max(1, p - 1))
+              setAlbumPage((prevPage) => Math.max(1, prevPage - 1))
             }}
             onNextPage={() => {
-              setAlbumPage((p) => p + 1)
+              setAlbumPage((prevPage) => prevPage + 1)
             }}
           />
         </div>

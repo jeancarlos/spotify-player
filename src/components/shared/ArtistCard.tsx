@@ -4,15 +4,15 @@ import type { SpotifyArtist } from '@/types/spotify'
 
 interface ArtistCardProps {
   artist: SpotifyArtist
-  onNavigate?: (id: string) => void
+  onArtistSelect?: (artistId: string) => void
 }
 
-export function ArtistCard({ artist, onNavigate }: ArtistCardProps) {
+export function ArtistCard({ artist, onArtistSelect }: ArtistCardProps) {
   const { t } = useTranslation()
   const imageUrl = artist.images[0]?.url
 
   const handleClick = () => {
-    if (onNavigate) onNavigate(artist.id)
+    if (onArtistSelect) onArtistSelect(artist.id)
   }
 
   const subtitle =

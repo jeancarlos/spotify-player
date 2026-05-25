@@ -14,11 +14,11 @@ import { TrackRowSkeleton } from '@/components/shared/TrackRowSkeleton'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface AddButtonProps {
-  tracks: SpotifyTrack[]
+  existingFavorites: SpotifyTrack[]
   onAdd: (track: SpotifyTrack, note?: string) => void
 }
 
-function AddButton({ tracks, onAdd }: AddButtonProps) {
+function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -75,7 +75,7 @@ function AddButton({ tracks, onAdd }: AddButtonProps) {
             transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
             style={{ transformOrigin: 'top right' }}
           >
-            <AddFavoriteForm tracks={tracks} onAdd={onAdd} onClose={close} />
+            <AddFavoriteForm existingFavorites={existingFavorites} onAdd={onAdd} onClose={close} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -140,7 +140,7 @@ export function Favorites() {
               </button>
             </Tooltip>
 
-            <AddButton tracks={tracks} onAdd={addTrack} />
+            <AddButton existingFavorites={tracks} onAdd={addTrack} />
           </div>
         </div>
 
@@ -159,7 +159,7 @@ export function Favorites() {
                 index={i}
                 note={notes[track.uri] ?? undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={async (tr) => playTrack(tr as SpotifyTrack)}
+                onPlay={async (track) => playTrack(track as SpotifyTrack)}
                 onRemove={removeTrack}
               />
             ))}

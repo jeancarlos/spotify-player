@@ -104,8 +104,12 @@ function uiReducer(state: PlayerState, action: UiAction): PlayerState {
 }
 
 export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
-  return uiReducer(
-    playbackReducer(queueReducer(state, action as QueueAction), action as PlaybackAction),
-    action as UiAction
-  )
+  const { type } = action
+  if (type === 'SET_TRACK' || type === 'SET_QUEUE' || type === 'SET_SEEK_TIME') {
+    return queueReducer(state, action)
+  }
+  if (type === 'TOGGLE_FULLSCREEN' || type === 'SET_PALETTE') {
+    return uiReducer(state, action)
+  }
+  return playbackReducer(state, action)
 }
