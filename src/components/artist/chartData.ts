@@ -1,3 +1,4 @@
+import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
 
 export interface ChartEntry {
@@ -26,4 +27,8 @@ export function toChartData(tracks: SpotifyTrack[]): ChartEntry[] {
       rank: t.rank,
       track: t,
     }))
+}
+
+export function playEntry(entry: ChartEntry, onPlay?: (track: SpotifyTrack) => void) {
+  if (isPlayable(entry.track)) onPlay?.(entry.track)
 }

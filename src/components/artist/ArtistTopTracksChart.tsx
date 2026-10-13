@@ -11,8 +11,9 @@ import {
   LabelList,
   ResponsiveContainer,
 } from 'recharts'
+import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
-import { toChartData, type ChartEntry } from './chartData'
+import { toChartData, playEntry, type ChartEntry } from './chartData'
 import { CustomTooltip } from './ArtistChartTooltip'
 
 interface Props {
@@ -59,15 +60,17 @@ interface BarShapeProps {
   width?: number
   height?: number
   fill?: string
+  cursor?: string
 }
 
-function RoundedBar({ x = 0, y = 0, width = 0, height = 0, fill }: BarShapeProps) {
-  if (width <= 2) return <rect x={x} y={y} width={width} height={height} fill={fill} />
+function RoundedBar({ x = 0, y = 0, width = 0, height = 0, fill, cursor }: BarShapeProps) {
+  if (width <= 2) return <rect x={x} y={y} width={width} height={height} fill={fill} cursor={cursor} />
   const r = Math.min(5, height / 2)
   return (
     <path
       d={`M${x},${y} L${x + width - r},${y} Q${x + width},${y} ${x + width},${y + r} L${x + width},${y + height - r} Q${x + width},${y + height} ${x + width - r},${y + height} L${x},${y + height} Z`}
       fill={fill}
+      cursor={cursor}
     />
   )
 }
@@ -115,12 +118,11 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
           <Bar
             dataKey="rank"
             shape={<RoundedBar />}
-            cursor="pointer"
             maxBarSize={28}
             isAnimationActive
             animationDuration={700}
             animationEasing="ease-out"
-            onClick={(entry: ChartEntry) => onPlay?.(entry.track)}
+            onClick={(entry: ChartEntry) => { playEntry(entry, onPlay); }}
           >
             <LabelList
               dataKey="rank"
@@ -130,7 +132,9 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
             />
             {chartData.map((entry, i) => {
               const fill = getBarFill(entry.id, i, activeTrackId)
-              return <Cell key={entry.id} fill={fill} />
+              return (
+                <Cell key={entry.id} fill={fill} cursor={isPlayable(entry.track) ? 'pointer' : 'default'} />
+              )
             })}
           </Bar>
         </BarChart>

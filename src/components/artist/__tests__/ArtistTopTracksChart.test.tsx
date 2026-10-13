@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CustomTooltip } from '../ArtistChartTooltip'
-import { toChartData } from '../chartData'
+import { toChartData, playEntry } from '../chartData'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const track = (id: string, rank?: number) =>
@@ -38,5 +38,16 @@ describe('CustomTooltip', () => {
     render(<CustomTooltip active payload={[{ payload: entry }] as never} />)
     expect(screen.getByText('artistDetail.deezerRank')).toBeInTheDocument()
     expect(screen.getByText((1234567).toLocaleString('pt-BR'))).toBeInTheDocument()
+  })
+})
+
+describe('playEntry', () => {
+  it('plays playable entries and ignores unplayable ones', () => {
+    const onPlay = vi.fn()
+    const [ok] = toChartData([track('a', 1)])
+    const [dead] = toChartData([{ ...track('b', 1), is_playable: false }])
+    playEntry(ok, onPlay)
+    playEntry(dead, onPlay)
+    expect(onPlay).toHaveBeenCalledTimes(1)
   })
 })

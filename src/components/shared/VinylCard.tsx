@@ -1,6 +1,7 @@
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface VinylCardProps {
@@ -10,20 +11,31 @@ interface VinylCardProps {
   size?: 'sm' | 'md'
 }
 
+function resolvePlay(track: SpotifyTrack, onPlay?: (track: SpotifyTrack) => void) {
+  return isPlayable(track) ? onPlay : undefined
+}
+
+function stateClass(play: unknown): string {
+  return play ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'
+}
+
 export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: VinylCardProps) {
   const { t } = useTranslation()
   const dim = size === 'sm' ? 100 : 132
+  const play = resolvePlay(track, onPlay)
 
   return (
     <div
-      className="cursor-pointer shrink-0 focus:outline-none group"
+      className={cn('shrink-0 focus:outline-none group', stateClass(play))}
       style={{ width: dim }}
-      onClick={() => onPlay?.(track)}
+      onClick={() => play?.(track)}
       role="button"
+      aria-disabled={play ? undefined : true}
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onPlay?.(track)}
+      onKeyDown={(e) => e.key === 'Enter' && play?.(track)}
       aria-label={t('player.playTrack', { name: track.name })}
     >
+      {!play && <span className="sr-only">{t('track.noPreview')}</span>}
       <div
         className={cn(
           'relative overflow-hidden transition-all duration-200',

@@ -7,7 +7,7 @@ import type { SpotifyTrack } from '@/types/spotify'
 
 const playTrack = vi.fn()
 const tracks = [
-  { id: '1', uri: 'u1', preview_url: null },
+  { id: '1', uri: 'u1', is_playable: false },
   { id: '2', uri: 'u2', preview_url: 'http://p/2' },
 ] as unknown as SpotifyTrack[]
 

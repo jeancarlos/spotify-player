@@ -45,7 +45,7 @@ describe('TrackTable', () => {
 
   it('disables unplayable rows and only plays playable ones', () => {
     const onPlay = vi.fn()
-    const dead = { ...fullTrack, id: 'dead', name: 'Dead Track', preview_url: null }
+    const dead = { ...fullTrack, id: 'dead', name: 'Dead Track', is_playable: false }
     render(<TrackTable tracks={[albumTrack, dead]} onPlay={onPlay} />)
     const deadRow = screen.getByText('Dead Track').closest('tr') as HTMLElement
     expect(deadRow).toHaveAttribute('aria-disabled', 'true')

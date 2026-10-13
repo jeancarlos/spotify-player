@@ -82,7 +82,7 @@ describe('TrackRow', () => {
   it('disables an unplayable track and never calls onPlay', async () => {
     const user = userEvent.setup()
     const onPlay = vi.fn()
-    const dead = { ...track, preview_url: null }
+    const dead = { ...track, is_playable: false }
     render(<TrackRow track={dead} onPlay={onPlay} index={0} />)
     expect(screen.getByText('track.noPreview')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeDisabled()
@@ -94,6 +94,12 @@ describe('TrackRow', () => {
     await user.keyboard('{Enter}')
     await user.click(screen.getByRole('button', { name: /player\.playTrack/i }))
     expect(onPlay).not.toHaveBeenCalled()
+  })
+
+  it('keeps a stored-shape track enabled', () => {
+    render(<TrackRow track={{ ...track, is_playable: true, preview_url: null }} onPlay={vi.fn()} />)
+    expect(document.querySelector('[aria-disabled="true"]')).toBeNull()
+    expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeEnabled()
   })
 
   it('flags readable:false tracks as disabled', () => {

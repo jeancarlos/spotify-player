@@ -162,7 +162,7 @@ export function toTrack(t: DzTrack, album?: SpotifyAlbumSimple): SpotifyTrack {
           }),
     track_number: t.track_position,
     disc_number: t.disk_number,
-    is_playable: t.readable,
+    is_playable: t.readable !== false && !!t.preview,
     rank: t.rank,
     link: t.link,
   }
@@ -207,5 +207,5 @@ export function toPage<R, T>(
 }
 
 export function isPlayable(t: SpotifyTrack): boolean {
-  return t.is_playable !== false && !!t.preview_url
+  return t.is_playable !== false
 }

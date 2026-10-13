@@ -252,4 +252,13 @@ describe('PlayerProvider', () => {
     expect(audio().src).toBe(src)
     expect(deezerMock).not.toHaveBeenCalled()
   })
+
+  it('plays a stored-shape track that has no preview url', async () => {
+    const stored = { ...track('5'), is_playable: true, preview_url: null }
+    deezerMock.mockResolvedValue(fresh(stored))
+    await act(() => controls.playTrack(stored))
+    expect(deezerMock).toHaveBeenCalledWith('track/5')
+    expect(audio().src).toBe('https://fresh.test/5.mp3')
+    expect(latest.currentTrack?.id).toBe('5')
+  })
 })

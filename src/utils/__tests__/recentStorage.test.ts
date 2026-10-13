@@ -31,6 +31,7 @@ describe('recentStorage', () => {
     const stored = readRecent()
     expect(stored).toHaveLength(1)
     expect(stored[0].preview_url).toBeNull()
+    expect(stored[0].is_playable).toBe(true)
     expect(eventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'spoter:recent-changed' }))
   })
 

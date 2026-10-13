@@ -109,10 +109,15 @@ describe('deezerMappers', () => {
     expect(map.mock.calls).toEqual([[1], [2], [3]])
   })
 
-  it('isPlayable needs a preview and a non-false is_playable', () => {
+  it('maps is_playable from readable and a non-empty preview', () => {
+    expect(toTrack({ ...tracks[0], readable: true, preview: 'https://p/1.mp3' }).is_playable).toBe(true)
+    expect(toTrack({ ...tracks[0], readable: true, preview: '' }).is_playable).toBe(false)
+    expect(toTrack(noPreview).is_playable).toBe(false)
+  })
+  it('isPlayable only depends on is_playable', () => {
     const base = toTrack(tracks[0])
     expect(isPlayable(base)).toBe(true)
-    expect(isPlayable({ ...base, preview_url: null })).toBe(false)
+    expect(isPlayable({ ...base, preview_url: null })).toBe(true)
     expect(isPlayable({ ...base, is_playable: false })).toBe(false)
     expect(isPlayable(toTrack(noPreview))).toBe(false)
   })
