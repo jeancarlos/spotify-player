@@ -34,9 +34,13 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
       {slots.map((line, i) => {
         const isActive = i === WINDOW
 
+        const seekable = Boolean(line && onSeek)
+        const Line = seekable ? motion.button : motion.div
+
         return (
-          <motion.div
+          <Line
             key={i}
+            {...(seekable ? { type: 'button' as const } : {})}
             animate={{
               opacity: SLOT_OPACITY[i],
               filter: `blur(${SLOT_BLUR[i]}px)`,
@@ -53,10 +57,10 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
               isActive
                 ? 'text-white font-bold text-2xl md:text-3xl'
                 : 'text-white text-lg md:text-xl'
-            } ${line && onSeek ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+            } ${seekable ? 'cursor-pointer hover:opacity-80 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none' : 'cursor-default'}`}
           >
             {line?.text ?? ''}
-          </motion.div>
+          </Line>
         )
       })}
     </div>

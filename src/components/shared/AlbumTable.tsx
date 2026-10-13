@@ -46,7 +46,16 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
                 />
               </td>
               <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[200px] truncate">
-                {album.name}
+                <button
+                  type="button"
+                  className="max-w-full truncate text-left rounded focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onClick(album)
+                  }}
+                >
+                  {album.name}
+                </button>
               </td>
               <td className="py-2 px-3 text-black/50 capitalize">{album.album_type}</td>
               <td className="py-2 px-3 text-right text-black/40 tabular-nums">

@@ -6,7 +6,7 @@ import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface TrackTableProps {
-  tracks: (SpotifyTrack)[]
+  tracks: SpotifyTrack[]
   showAlbumColumn?: boolean
   activeTrackId?: string
   startIndex?: number
@@ -58,9 +58,9 @@ function TrackTableRow({
       onClick={() => playable && onPlay?.(track)}
     >
       <td className="py-2 px-3 text-black/30 tabular-nums">
-        <span className="group-hover:hidden">{index + 1}</span>
+        <span className="group-hover:hidden group-focus-within:hidden">{index + 1}</span>
         <button
-          className="hidden group-hover:flex items-center justify-center disabled:cursor-not-allowed"
+          className="sr-only group-hover:not-sr-only group-hover:flex group-focus-within:not-sr-only group-focus-within:flex items-center justify-center rounded disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
           disabled={!playable}
           aria-label={t('player.playTrack', { name: track.name })}
           onClick={(e) => {
@@ -106,9 +106,7 @@ function TrackTableRow({
       <td className="py-2 px-3 text-right text-black/40 tabular-nums whitespace-nowrap">
         {formatDuration(track.duration_ms)}
       </td>
-      {showRank && (
-        <td className="py-2 px-3 text-right text-black/40 tabular-nums">{rank}</td>
-      )}
+      {showRank && <td className="py-2 px-3 text-right text-black/40 tabular-nums">{rank}</td>}
       <td className="py-2 px-3 text-center">
         {track.explicit && (
           <span className="text-[8px] font-black bg-black/10 rounded px-1 py-0.5">E</span>

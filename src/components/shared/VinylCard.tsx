@@ -26,13 +26,21 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
 
   return (
     <div
-      className={cn('shrink-0 focus:outline-none group', stateClass(play))}
+      className={cn(
+        'shrink-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-black/40 group',
+        stateClass(play)
+      )}
       style={{ width: dim }}
       onClick={() => play?.(track)}
       role="button"
       aria-disabled={play ? undefined : true}
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && play?.(track)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          play?.(track)
+        }
+      }}
       aria-label={t('player.playTrack', { name: track.name })}
     >
       {!play && <span className="sr-only">{t('track.noPreview')}</span>}

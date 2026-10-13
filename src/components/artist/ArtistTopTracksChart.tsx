@@ -64,7 +64,8 @@ interface BarShapeProps {
 }
 
 function RoundedBar({ x = 0, y = 0, width = 0, height = 0, fill, cursor }: BarShapeProps) {
-  if (width <= 2) return <rect x={x} y={y} width={width} height={height} fill={fill} cursor={cursor} />
+  if (width <= 2)
+    return <rect x={x} y={y} width={width} height={height} fill={fill} cursor={cursor} />
   const r = Math.min(5, height / 2)
   return (
     <path
@@ -82,63 +83,82 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 }
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const chartData = useMemo(() => toChartData(tracks), [tracks])
 
   if (chartData.length === 0) return null
 
   return (
-    <div style={{ width: '100%', height: chartData.length * 46 + 28 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={chartData}
-          layout="vertical"
-          margin={{ top: 4, right: 64, bottom: 4, left: 152 }}
-        >
-          <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.04)" />
-
-          <XAxis
-            type="number"
-            tick={false}
-            axisLine={false}
-            tickLine={false}
-          />
-
-          <YAxis
-            type="category"
-            dataKey="label"
-            width={144}
-            tick={<CustomYTick />}
-            axisLine={false}
-            tickLine={false}
-          />
-
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.025)', rx: 6 }} />
-
-          <Bar
-            dataKey="rank"
-            shape={<RoundedBar />}
-            maxBarSize={28}
-            isAnimationActive
-            animationDuration={700}
-            animationEasing="ease-out"
-            onClick={(entry: ChartEntry) => { playEntry(entry, onPlay); }}
+    <>
+      <div style={{ width: '100%', height: chartData.length * 46 + 28 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={chartData}
+            layout="vertical"
+            margin={{ top: 4, right: 64, bottom: 4, left: 152 }}
           >
-            <LabelList
-              dataKey="rank"
-              position="right"
-              formatter={(n: number) => n.toLocaleString(i18n.language)}
-              style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
+            <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.04)" />
+
+            <XAxis type="number" tick={false} axisLine={false} tickLine={false} />
+
+            <YAxis
+              type="category"
+              dataKey="label"
+              width={144}
+              tick={<CustomYTick />}
+              axisLine={false}
+              tickLine={false}
             />
-            {chartData.map((entry, i) => {
-              const fill = getBarFill(entry.id, i, activeTrackId)
-              return (
-                <Cell key={entry.id} fill={fill} cursor={isPlayable(entry.track) ? 'pointer' : 'default'} />
-              )
-            })}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.025)', rx: 6 }} />
+
+            <Bar
+              dataKey="rank"
+              shape={<RoundedBar />}
+              maxBarSize={28}
+              isAnimationActive
+              animationDuration={700}
+              animationEasing="ease-out"
+              onClick={(entry: ChartEntry) => {
+                playEntry(entry, onPlay)
+              }}
+            >
+              <LabelList
+                dataKey="rank"
+                position="right"
+                formatter={(n: number) => n.toLocaleString(i18n.language)}
+                style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
+              />
+              {chartData.map((entry, i) => {
+                const fill = getBarFill(entry.id, i, activeTrackId)
+                return (
+                  <Cell
+                    key={entry.id}
+                    fill={fill}
+                    cursor={isPlayable(entry.track) ? 'pointer' : 'default'}
+                  />
+                )
+              })}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="sr-only focus-within:not-sr-only focus-within:flex focus-within:flex-wrap focus-within:gap-2 focus-within:mt-2">
+        {chartData.map((entry) => (
+          <li key={entry.id}>
+            <button
+              type="button"
+              disabled={!isPlayable(entry.track)}
+              onClick={() => {
+                playEntry(entry, onPlay)
+              }}
+              className="px-2 py-1 rounded-lg bg-black/5 text-xs text-black/70 disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
+            >
+              {t('player.playTrack', { name: entry.name })}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }
