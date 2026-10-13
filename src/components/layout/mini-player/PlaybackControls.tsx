@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import {
   SkipBack,
   Play,
@@ -10,14 +9,10 @@ import {
   ListMusic,
 } from 'lucide-react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
-import { usePlayer } from '@/hooks/usePlayer'
-import { useProgressEngine } from '@/hooks/useProgressEngine'
-import { useToast } from '@/components/ui/toast'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
-import api from '@/lib/axios'
 import { getFromPath } from '@/utils/routerState'
-import type { AxiosError } from 'axios'
 
 export function ControlTip({ label }: { label: string }) {
   return (
@@ -27,16 +22,9 @@ export function ControlTip({ label }: { label: string }) {
   )
 }
 
-function isDeviceError(err: unknown): boolean {
-  const status = (err as AxiosError).response?.status
-  return status === 404 || status === 403
-}
-
 export function PlaybackControls() {
-  const { state, dispatch } = usePlayer()
+  const { state, controls } = usePlayer()
   const { isPlaying, shuffle, repeat, currentTrack } = state
-  const { seekTo: engineSeekTo } = useProgressEngine()
-  const { toast } = useToast()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -45,60 +33,13 @@ export function PlaybackControls() {
   const isPlayerPage = location.pathname === '/player'
   const activeTab = (searchParams.get('tab') ?? 'lyrics') as 'lyrics' | 'info' | 'queue'
 
-  const handlePlayPause = useCallback(async () => {
-    const next = !isPlaying
-    dispatch({ type: 'SET_PLAYING', payload: next })
-    try {
-      await api.put(next ? '/me/player/play' : '/me/player/pause')
-    } catch (err) {
-      dispatch({ type: 'SET_PLAYING', payload: isPlaying })
-      if (isDeviceError(err)) toast(t('player.noActiveDevice'), 'info')
-    }
-  }, [dispatch, isPlaying, toast, t])
-
-  const handlePrev = useCallback(async () => {
-    try {
-      await api.post('/me/player/previous', null, { responseType: 'text' })
-    } catch (err) {
-      if (isDeviceError(err)) toast(t('player.noActiveDevice'), 'info')
-    }
-  }, [toast, t])
-
-  const handleNext = useCallback(async () => {
-    engineSeekTo(0)
-    try {
-      await api.post('/me/player/next', null, { responseType: 'text' })
-    } catch (err) {
-      if (isDeviceError(err)) toast(t('player.noActiveDevice'), 'info')
-    }
-  }, [engineSeekTo, toast, t])
-
-  const toggleShuffle = useCallback(async () => {
-    const next = !shuffle
-    dispatch({ type: 'SET_SHUFFLE', payload: next })
-    try {
-      await api.put('/me/player/shuffle', null, { params: { state: next }, responseType: 'text' })
-    } catch (err) {
-      dispatch({ type: 'SET_SHUFFLE', payload: shuffle })
-      if (isDeviceError(err)) toast(t('player.noActiveDevice'), 'info')
-    }
-  }, [dispatch, shuffle, toast, t])
-
-  const cycleRepeat = useCallback(async () => {
-    const nextRepeatState: Record<string, 'off' | 'context' | 'track'> = {
-      off: 'context',
-      context: 'track',
-      track: 'off',
-    }
-    const next = nextRepeatState[repeat]
-    dispatch({ type: 'SET_REPEAT', payload: next })
-    try {
-      await api.put('/me/player/repeat', null, { params: { state: next }, responseType: 'text' })
-    } catch (err) {
-      dispatch({ type: 'SET_REPEAT', payload: repeat })
-      if (isDeviceError(err)) toast(t('player.noActiveDevice'), 'info')
-    }
-  }, [dispatch, repeat, toast, t])
+  const playLabel = isPlaying ? t('player.pause') : t('player.play')
+  const queueLabel = isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')
+  const toggleQueue = () => {
+    if (!isPlayerPage) navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+    else if (activeTab === 'lyrics') navigate('/player?tab=info', { replace: true })
+    else navigate(getFromPath(location.state))
+  }
 
   if (!currentTrack) return null
 
@@ -106,7 +47,9 @@ export function PlaybackControls() {
     <div className="flex items-center gap-1.5 shrink-0">
       <div className="relative group hidden sm:block">
         <button
-          onClick={toggleShuffle}
+          onClick={() => { controls.setShuffle(!shuffle); }}
+          aria-label={t('player.shuffle')}
+          aria-pressed={shuffle}
           className={cn(
             'p-1.5 rounded-lg transition-colors',
             shuffle ? 'text-black' : 'text-black/30 hover:text-black/60'
@@ -119,7 +62,8 @@ export function PlaybackControls() {
 
       <div className="relative group hidden min-[400px]:block">
         <button
-          onClick={handlePrev}
+          onClick={() => { controls.previous(); }}
+          aria-label={t('player.previous')}
           className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
         >
           <SkipBack size={18} className="fill-current" />
@@ -129,7 +73,8 @@ export function PlaybackControls() {
 
       <div className="relative group/play">
         <button
-          onClick={handlePlayPause}
+          onClick={() => { controls.toggle(); }}
+          aria-label={playLabel}
           className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
         >
           {isPlaying ? (
@@ -139,13 +84,14 @@ export function PlaybackControls() {
           )}
         </button>
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
-          {t('login.hint')}
+          {playLabel}
         </div>
       </div>
 
       <div className="relative group hidden min-[400px]:block">
         <button
-          onClick={handleNext}
+          onClick={() => { controls.next(); }}
+          aria-label={t('player.next')}
           className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
         >
           <SkipForward size={18} className="fill-current" />
@@ -155,7 +101,9 @@ export function PlaybackControls() {
 
       <div className="relative group hidden sm:block">
         <button
-          onClick={cycleRepeat}
+          onClick={() => { controls.cycleRepeat(); }}
+          aria-label={t('player.repeat')}
+          aria-pressed={repeat !== 'off'}
           className={cn(
             'p-1.5 rounded-lg transition-colors',
             repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60'
@@ -168,18 +116,14 @@ export function PlaybackControls() {
 
       <div className="relative group hidden sm:block">
         <button
-          onClick={() => {
-            if (!isPlayerPage)
-              navigate('/player?tab=lyrics', { state: { from: location.pathname } })
-            else if (activeTab === 'lyrics') navigate('/player?tab=info', { replace: true })
-            else navigate(getFromPath(location.state))
-          }}
+          onClick={toggleQueue}
+          aria-label={queueLabel}
           className="p-1.5 rounded-lg transition-colors outline-none text-black/30 hover:text-black"
         >
           <ListMusic size={15} />
         </button>
         <ControlTip
-          label={isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')}
+          label={queueLabel}
         />
       </div>
     </div>
