@@ -15,16 +15,15 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
-vi.mock('@/hooks/usePlayer', () => ({
+const playTrackMock = vi.fn()
+vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({
     state: { currentTrack: null, isPlaying: false },
     dispatch: vi.fn(),
+    controls: { playTrack: playTrackMock },
   }),
 }))
 
-vi.mock('@/hooks/usePlayTrack', () => ({
-  usePlayTrack: () => vi.fn(),
-}))
 
 vi.mock('@/hooks/usePopoverDismiss', () => ({
   usePopoverDismiss: vi.fn(),

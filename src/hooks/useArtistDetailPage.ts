@@ -3,9 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
-import { usePlayer } from '@/hooks/usePlayer'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
-import type { SpotifyAlbumSimple, SpotifyArtist } from '@/types/spotify'
+import { usePlayer } from '@/contexts/PlayerContext'
+import type { SpotifyAlbumSimple, SpotifyArtist, SpotifyTrack } from '@/types/spotify'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 interface ArtistMeta {
@@ -29,8 +28,13 @@ function deriveArtistMeta(data: SpotifyArtist | undefined): ArtistMeta {
 export function useArtistDetailPage(id: string | undefined) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { state } = usePlayer()
-  const playTrack = usePlayTrack()
+  const { state, controls } = usePlayer()
+  const playTrack = useCallback(
+    async (track: SpotifyTrack, list?: SpotifyTrack[]) => {
+      await controls.playTrack(track, list)
+    },
+    [controls]
+  )
 
   const [albumPage, setAlbumPage] = useState(1)
   const [discographyView, setDiscographyView] = useState<ViewMode>('list')

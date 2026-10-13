@@ -3,9 +3,8 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
-import { usePlayContext } from '@/hooks/usePlayContext'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer } from '@/contexts/PlayerContext'
+import { isPlayable } from '@/lib/deezerMappers'
 import { formatDate } from '@/utils/formatDate'
 import type {
   SpotifyTrack,
@@ -69,13 +68,7 @@ export function useAlbumDetailPage() {
 
   const album = useAlbum(id)
   const tracks = useAlbumTracks(id, page, ALBUM_LIMIT)
-  const playContext = usePlayContext()
-  const playTrack = usePlayTrack()
-  const { state: playerState } = usePlayer()
-
-  const handlePlay = useCallback(() => {
-    if (album.data?.uri) void playContext(album.data.uri)
-  }, [album.data, playContext])
+  const { state: playerState, controls } = usePlayer()
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)
@@ -99,10 +92,15 @@ export function useAlbumDetailPage() {
 
   const handleTrackPlay = useCallback(
     async (track: SpotifyTrack) => {
-      await playTrack(track, albumItems)
+      await controls.playTrack(track, albumItems)
     },
-    [playTrack, albumItems]
+    [controls, albumItems]
   )
+
+  const handlePlay = useCallback(() => {
+    const first = albumItems.find(isPlayable)
+    if (first) void controls.playTrack(first, albumItems)
+  }, [albumItems, controls])
 
   return {
     albumItems,

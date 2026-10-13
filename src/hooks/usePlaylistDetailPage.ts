@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePlaylist } from '@/hooks/queries/usePlaylist'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
-import { usePlayContext } from '@/hooks/usePlayContext'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer } from '@/contexts/PlayerContext'
+import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
@@ -21,17 +20,21 @@ export function usePlaylistDetailPage() {
 
   const playlist = usePlaylist(id)
   const tracks = usePlaylistTracks(id ?? '', !!id, page, PLAYLIST_LIMIT)
-  const playContext = usePlayContext()
-  const playTrack = usePlayTrack()
-  const { state: playerState, dispatch } = usePlayer()
+  const { state: playerState, controls } = usePlayer()
 
   const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? []).map((item) => item.item)
 
+  const playTrack = useCallback(
+    async (track: SpotifyTrack, list?: SpotifyTrack[]) => {
+      await controls.playTrack(track, list)
+    },
+    [controls]
+  )
+
   const handlePlay = useCallback(() => {
-    if (!playlist.data?.uri) return
-    void playContext(playlist.data.uri)
-    if (playlistTracks.length > 0) dispatch({ type: 'SET_QUEUE', payload: playlistTracks })
-  }, [playlist.data, playContext, playlistTracks, dispatch])
+    const first = playlistTracks.find(isPlayable)
+    if (first) void controls.playTrack(first, playlistTracks)
+  }, [playlistTracks, controls])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)

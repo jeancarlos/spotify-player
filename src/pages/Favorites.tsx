@@ -2,9 +2,8 @@ import { useState, useRef, useCallback } from 'react'
 import { Music, Plus, X, RefreshCw } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
 import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { Tooltip } from '@/components/shared/Tooltip'
@@ -89,7 +88,7 @@ function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
 
 export function Favorites() {
   const { t } = useTranslation()
-  const { state: playerState } = usePlayer()
+  const { state: playerState, controls } = usePlayer()
   const {
     tracks,
     notes,
@@ -101,7 +100,6 @@ export function Favorites() {
     playlistId,
     playlistName,
   } = useSpoterPlaylist()
-  const playTrack = usePlayTrack()
 
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">
@@ -165,7 +163,7 @@ export function Favorites() {
                 index={i}
                 note={notes[track.uri] ?? undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={async (track) => playTrack(track)}
+                onPlay={async (track) => controls.playTrack(track, tracks)}
                 onRemove={removeTrack}
                 disableRemove={tracks.length === 1}
               />
