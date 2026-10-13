@@ -38,13 +38,14 @@ function extractTrackFields(track: SpotifyTrack | null): TrackFields {
 function useTabRedirect(
   noLyrics: boolean,
   activeTab: PlayerTab,
-  setSearchParams: ReturnType<typeof useSearchParams>[1]
+  setSearchParams: ReturnType<typeof useSearchParams>[1],
+  state: unknown
 ) {
   useEffect(() => {
     if (noLyrics && activeTab === 'lyrics') {
-      setSearchParams({ tab: 'info' }, { replace: true })
+      setSearchParams({ tab: 'info' }, { replace: true, state })
     }
-  }, [noLyrics, activeTab, setSearchParams])
+  }, [noLyrics, activeTab, setSearchParams, state])
 }
 
 interface PlayerTabBarProps {
@@ -170,7 +171,7 @@ export function PlayerView() {
   const activeTab = (searchParams.get('tab') ?? 'lyrics') as PlayerTab
 
   const handleTabChange = (tab: PlayerTab) => {
-    setSearchParams({ tab }, { replace: true })
+    setSearchParams({ tab }, { replace: true, state: location.state as unknown })
   }
 
   const { artistName, trackName, albumName, albumArt } = extractTrackFields(currentTrack)
@@ -183,7 +184,7 @@ export function PlayerView() {
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
 
-  useTabRedirect(noLyrics, activeTab, setSearchParams)
+  useTabRedirect(noLyrics, activeTab, setSearchParams, location.state as unknown)
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">

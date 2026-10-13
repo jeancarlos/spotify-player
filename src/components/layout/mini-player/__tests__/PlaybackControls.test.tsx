@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { PlaybackControls } from '../PlaybackControls'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
@@ -67,5 +67,47 @@ describe('PlaybackControls', () => {
     expect(btn).toHaveAttribute('aria-pressed', 'true')
     fireEvent.click(btn)
     expect(controls.cycleRepeat).toHaveBeenCalledOnce()
+  })
+})
+
+function Probe() {
+  const l = useLocation()
+  return <output data-testid="loc">{JSON.stringify({ p: l.pathname + l.search, s: l.state })}</output>
+}
+
+function setupAt(entry: Parameters<typeof MemoryRouter>[0]['initialEntries']) {
+  render(
+    <MemoryRouter initialEntries={entry}>
+      <PlayerContext.Provider
+        value={{
+          state: { ...initialPlayerState, currentTrack: { id: '1', name: 'Song' } as SpotifyTrack },
+          controls: {},
+        } as never}
+      >
+        <PlaybackControls />
+        <Probe />
+      </PlayerContext.Provider>
+    </MemoryRouter>
+  )
+  return () => JSON.parse(screen.getByTestId('loc').textContent) as { p: string; s: unknown }
+}
+
+describe('PlaybackControls queue toggle', () => {
+  it('opens the queue tab and remembers the full path with its query', () => {
+    const loc = setupAt(['/playlists/9?page=2'])
+    fireEvent.click(screen.getByRole('button', { name: 'player.queue' }))
+    expect(loc()).toEqual({ p: '/player?tab=queue', s: { from: '/playlists/9?page=2' } })
+  })
+
+  it('reaches the queue from the lyrics tab keeping the state', () => {
+    const loc = setupAt([{ pathname: '/player', search: '?tab=lyrics', state: { from: '/x?y=1' } }])
+    fireEvent.click(screen.getByRole('button', { name: 'player.queue' }))
+    expect(loc()).toEqual({ p: '/player?tab=queue', s: { from: '/x?y=1' } })
+  })
+
+  it('closes the queue back to where the player was opened', () => {
+    const loc = setupAt([{ pathname: '/player', search: '?tab=queue', state: { from: '/x?y=1' } }])
+    fireEvent.click(screen.getByRole('button', { name: 'player.closeQueue' }))
+    expect(loc().p).toBe('/x?y=1')
   })
 })

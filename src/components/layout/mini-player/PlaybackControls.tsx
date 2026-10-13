@@ -12,7 +12,7 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
-import { getFromPath } from '@/utils/routerState'
+import { currentPath, getFromPath } from '@/utils/routerState'
 
 export function ControlTip({ label }: { label: string }) {
   return (
@@ -36,8 +36,8 @@ export function PlaybackControls() {
   const playLabel = isPlaying ? t('player.pause') : t('player.play')
   const queueLabel = isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')
   const toggleQueue = () => {
-    if (!isPlayerPage) navigate('/player?tab=lyrics', { state: { from: location.pathname } })
-    else if (activeTab === 'lyrics') navigate('/player?tab=info', { replace: true })
+    if (!isPlayerPage) navigate('/player?tab=queue', { state: { from: currentPath(location) } })
+    else if (activeTab !== 'queue') navigate('/player?tab=queue', { replace: true, state: location.state as unknown })
     else navigate(getFromPath(location.state))
   }
 

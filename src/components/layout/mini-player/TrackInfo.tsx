@@ -4,7 +4,7 @@ import { usePlayer, useProgress } from '@/contexts/PlayerContext'
 import { useTranslation } from 'react-i18next'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { formatDuration } from '@/utils/formatDuration'
-import { getFromPath } from '@/utils/routerState'
+import { currentPath, getFromPath } from '@/utils/routerState'
 
 interface TrackInfoProps {
   notes: Record<string, string>
@@ -25,7 +25,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
     if (isPlayerPage) {
       navigate(getFromPath(location.state))
     } else if (currentTrack) {
-      navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+      navigate('/player?tab=lyrics', { state: { from: currentPath(location) } })
     }
   }
 
@@ -100,7 +100,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
             </div>
             <button
               onClick={() => {
-                navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+                navigate(`/albums/${currentTrack.album.id}`, { state: { from: currentPath(location) } })
               }}
               className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
             >
