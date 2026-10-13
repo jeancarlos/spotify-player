@@ -49,7 +49,7 @@ export function ArtistDetail() {
                 </h3>
               </div>
               <ArtistTopTracksChart
-                tracks={(topTracks.data ?? [])}
+                tracks={topTracks.data ?? []}
                 activeTrackId={activeTrackId}
                 onPlay={async (track) => playTrack(track, (topTracks.data ?? []))}
               />

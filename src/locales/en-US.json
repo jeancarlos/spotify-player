@@ -88,7 +88,8 @@
     "bio": "About the artist",
     "relatedArtists": "Similar Artists",
     "loadMore": "Load more",
-    "topTracksRanked": "Most played",
+    "topTracksRanked": "Top tracks on Deezer",
+    "deezerRank": "Deezer rank",
     "musicalProfile": "Musical Profile"
   },
   "albumDetail": {

@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   BarChart,
   Bar,
@@ -14,13 +15,6 @@ import {
 import type { SpotifyTrack } from '@/types/spotify'
 import { toChartData, type ChartEntry } from './chartData'
 
-function formatRank(n: number | undefined): string {
-  if (n === undefined) return ''
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${Math.round(n / 1_000)}K`
-  return n.toLocaleString()
-}
-
 interface Props {
   tracks: SpotifyTrack[]
   activeTrackId?: string
@@ -28,6 +22,7 @@ interface Props {
 }
 
 function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
+  const { t, i18n } = useTranslation()
   if (!active || !payload?.[0]) return null
   const e = payload[0].payload as ChartEntry
   return (
@@ -44,9 +39,9 @@ function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
         <div className="flex items-center gap-3 mt-2 pt-2 border-t border-black/[0.06]">
           <div>
             <p className="text-[13px] font-black tabular-nums text-black leading-none">
-              {formatRank(e.rank)}
+              {e.rank.toLocaleString(i18n.language)}
             </p>
-            <p className="text-[7px] uppercase tracking-widest text-black/30 mt-0.5">rank</p>
+            <p className="text-[7px] uppercase tracking-widest text-black/30 mt-0.5">{t('artistDetail.deezerRank')}</p>
           </div>
         </div>
       </div>
@@ -112,6 +107,7 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 }
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
+  const { i18n } = useTranslation()
   const chartData = useMemo(() => toChartData(tracks), [tracks])
 
   if (chartData.length === 0) return null
@@ -128,8 +124,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
 
           <XAxis
             type="number"
-            tickFormatter={formatRank}
-            tick={{ fontSize: 9, fill: 'rgba(0,0,0,0.3)' }}
+            tick={false}
             axisLine={false}
             tickLine={false}
           />
@@ -158,7 +153,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
             <LabelList
               dataKey="rank"
               position="right"
-              formatter={formatRank}
+              formatter={(n: number) => n.toLocaleString(i18n.language)}
               style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
             />
             {chartData.map((entry, i) => {
