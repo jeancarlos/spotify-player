@@ -42,14 +42,20 @@ export async function deezer<T>(
     const settle = () => {
       clearTimeout(timer)
       script.remove()
-      Reflect.deleteProperty(callbacks, callbackName)
+    }
+    const retire = () => {
+      settle()
+      callbacks[callbackName] = () => {
+        Reflect.deleteProperty(callbacks, callbackName)
+      }
     }
     const timer = setTimeout(() => {
-      settle()
+      retire()
       reject(new DeezerError(DEEZER_TIMEOUT_CODE, 'timeout'))
     }, timeoutMs)
     callbacks[callbackName] = (data: unknown) => {
       settle()
+      Reflect.deleteProperty(callbacks, callbackName)
       if (isErrorBody(data)) {
         reject(new DeezerError(data.error.code ?? 0, data.error.message ?? 'Deezer error'))
       } else {
@@ -57,7 +63,7 @@ export async function deezer<T>(
       }
     }
     script.onerror = () => {
-      settle()
+      retire()
       reject(new DeezerError(DEEZER_TIMEOUT_CODE, 'network'))
     }
     script.src = url.toString()

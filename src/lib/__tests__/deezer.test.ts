@@ -48,8 +48,9 @@ describe('deezer', () => {
     vi.advanceTimersByTime(1000)
     await expect(promise).rejects.toEqual(new DeezerError(DEEZER_TIMEOUT_CODE, 'timeout'))
     expect(script.isConnected).toBe(false)
-    expect(callbacks[name]).toBeUndefined()
+    expect(typeof callbacks[name]).toBe('function')
     expect(() => callbacks[name]?.({ data: [] })).not.toThrow()
+    expect(callbacks[name]).toBeUndefined()
   })
 
   it('rejects when the script fails to load', async () => {
