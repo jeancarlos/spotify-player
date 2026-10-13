@@ -20,7 +20,10 @@ export function ProgressBar() {
           controls.seek(Number(e.target.value))
         }}
         aria-label={t('player.seek')}
-        aria-valuetext={`${formatDuration(progress)} de ${formatDuration(duration)}`}
+        aria-valuetext={t('player.progressText', {
+          current: formatDuration(progress),
+          total: formatDuration(duration),
+        })}
         className="w-full h-[1px] group-hover/miniplayer:h-[2px] group-hover/miniplayer:rounded-b-full appearance-none cursor-pointer pointer-events-auto transition-all [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#1DB954] [&::-webkit-slider-thumb]:scale-0 [&::-webkit-slider-thumb]:transition-transform group-hover/miniplayer:[&::-webkit-slider-thumb]:scale-100 active:[&::-webkit-slider-thumb]:scale-100 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#1DB954] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:scale-0 [&::-moz-range-thumb]:transition-transform group-hover/miniplayer:[&::-moz-range-thumb]:scale-100 active:[&::-moz-range-thumb]:scale-100"
         style={{ background }}
       />

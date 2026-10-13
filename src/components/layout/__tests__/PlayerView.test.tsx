@@ -55,7 +55,7 @@ describe('PlayerView', () => {
 
   it('back returns to the full from path with its query', () => {
     setup()
-    fireEvent.click(screen.getByRole('button', { name: 'back' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Voltar' }))
     expect(JSON.parse(screen.getByTestId('loc').textContent).p).toBe('/playlists/9?page=2')
   })
 

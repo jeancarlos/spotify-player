@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import type { LyricLine } from '@/types/lyrics'
 
 const WINDOW = 4
@@ -12,10 +13,11 @@ interface LyricsViewProps {
 }
 
 export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
+  const { t } = useTranslation()
   if (lines.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-white/20 text-sm">Sem letra disponível</p>
+        <p className="text-white/20 text-sm">{t('lyrics.noLyricsAvailable')}</p>
       </div>
     )
   }

@@ -29,7 +29,8 @@
     "play": "Reproduzir",
     "pause": "Pausar",
     "seek": "Buscar",
-    "playTrack": "Tocar {{name}}"
+    "playTrack": "Tocar {{name}}",
+    "progressText": "{{current}} de {{total}}"
   },
   "common": {
     "loading": "Carregando...",
@@ -143,7 +144,8 @@
     "releaseDate": "Lançamento",
     "popularity": "Popularidade",
     "duration": "Duração",
-    "nowPlaying": "Tocando agora"
+    "nowPlaying": "Tocando agora",
+    "noLyricsAvailable": "Sem letra disponível"
   },
   "trackRow": {
     "popularity": "Popularidade"

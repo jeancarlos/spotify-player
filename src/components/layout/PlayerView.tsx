@@ -167,6 +167,7 @@ export function PlayerView() {
   const { state, controls } = usePlayer()
   const { currentTrack } = state
   const { progressMs: currentProgress } = useProgress()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -211,7 +212,7 @@ export function PlayerView() {
             navigate(getFromPath(location.state))
           }}
           className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-          aria-label="back"
+          aria-label={t('common.back')}
         >
           <ArrowLeft size={20} className="text-white" />
         </button>

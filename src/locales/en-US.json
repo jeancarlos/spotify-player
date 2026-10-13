@@ -29,7 +29,8 @@
     "play": "Play",
     "pause": "Pause",
     "seek": "Seek",
-    "playTrack": "Play {{name}}"
+    "playTrack": "Play {{name}}",
+    "progressText": "{{current}} of {{total}}"
   },
   "common": {
     "loading": "Loading...",
@@ -143,7 +144,8 @@
     "releaseDate": "Release date",
     "popularity": "Popularity",
     "duration": "Duration",
-    "nowPlaying": "Now playing"
+    "nowPlaying": "Now playing",
+    "noLyricsAvailable": "No lyrics available"
   },
   "trackRow": {
     "popularity": "Popularity"
