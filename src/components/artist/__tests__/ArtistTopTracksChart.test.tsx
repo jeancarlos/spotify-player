@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { CustomTooltip } from '../ArtistChartTooltip'
 import { toChartData } from '../chartData'
 import type { SpotifyTrack } from '@/types/spotify'
 
@@ -27,5 +29,14 @@ describe('toChartData', () => {
     expect(out).toHaveLength(10)
     expect(out[0].id).toBe('t11')
     expect(out.some((e) => e.id === 'none')).toBe(false)
+  })
+})
+
+describe('CustomTooltip', () => {
+  it('shows the grouped rank with the Deezer rank caption', () => {
+    const [entry] = toChartData([track('a', 1234567)])
+    render(<CustomTooltip active payload={[{ payload: entry }] as never} />)
+    expect(screen.getByText('artistDetail.deezerRank')).toBeInTheDocument()
+    expect(screen.getByText((1234567).toLocaleString('pt-BR'))).toBeInTheDocument()
   })
 })
