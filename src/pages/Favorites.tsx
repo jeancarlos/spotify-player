@@ -3,6 +3,7 @@ import { Music, Plus, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { usePlayer } from '@/contexts/PlayerContext'
+import { useCatalogHealth } from '@/hooks/useCatalogHealth'
 import { useFavorites } from '@/hooks/useFavorites'
 import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -89,6 +90,7 @@ export function Favorites() {
   const { t } = useTranslation()
   const { state: playerState, controls } = usePlayer()
   const { toast } = useToast()
+  const { unavailable } = useCatalogHealth()
   const { tracks, notes, addTrack, removeTrack, playlistName } = useFavorites()
 
   const handleAdd = (track: SpotifyTrack, note?: string) => {
@@ -135,7 +137,7 @@ export function Favorites() {
                 index={i}
                 note={notes[track.uri] ?? undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={async (track) => controls.playTrack(track, tracks)}
+                onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks)}
                 onRemove={handleRemove}
               />
             ))}

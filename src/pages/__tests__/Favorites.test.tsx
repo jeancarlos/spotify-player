@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import type { SpotifyTrack } from '@/types/spotify'
@@ -22,7 +22,6 @@ vi.mock('@/contexts/PlayerContext', () => ({
     controls: { playTrack: playTrackMock },
   }),
 }))
-
 
 vi.mock('@/hooks/usePopoverDismiss', () => ({
   usePopoverDismiss: vi.fn(),
@@ -62,6 +61,10 @@ vi.mock('@/hooks/useFavorites', () => ({
   useFavorites: () => mockFavorites,
 }))
 
+let mockUnavailable = false
+vi.mock('@/hooks/useCatalogHealth', () => ({
+  useCatalogHealth: () => ({ unavailable: mockUnavailable }),
+}))
 import { Favorites } from '@/pages/Favorites'
 
 const mockTrack = (id: string): SpotifyTrack => ({
@@ -96,10 +99,22 @@ function renderFavorites() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockUnavailable = false
   mockFavorites.tracks = []
 })
 
 describe('Favorites', () => {
+  it('disables play while the catalog is unavailable but keeps the rows', () => {
+    mockFavorites.tracks = [mockTrack('t1')]
+    renderFavorites()
+    expect(screen.getByRole('button', { name: /player\.playTrack/ })).toBeEnabled()
+    cleanup()
+    mockUnavailable = true
+    renderFavorites()
+    expect(screen.getByText('Track t1')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /player\.playTrack/ })).toBeDisabled()
+  })
+
   it('mostra EmptyState quando tracks está vazio', () => {
     renderFavorites()
     expect(screen.getByText('favorites.emptyList')).toBeInTheDocument()

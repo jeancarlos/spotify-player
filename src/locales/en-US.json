@@ -32,6 +32,9 @@
     "playTrack": "Play {{name}}",
     "progressText": "{{current}} of {{total}}"
   },
+  "catalog": {
+    "unavailable": "The Deezer catalog is unreachable. Favorites and recently played are still listed, but playback is paused."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

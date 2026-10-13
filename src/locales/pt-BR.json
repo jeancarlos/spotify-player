@@ -32,6 +32,9 @@
     "playTrack": "Tocar {{name}}",
     "progressText": "{{current}} de {{total}}"
   },
+  "catalog": {
+    "unavailable": "O catálogo do Deezer está inacessível. Favoritos e tocadas recentemente continuam listados, mas a reprodução está pausada."
+  },
   "common": {
     "loading": "Carregando...",
     "error": "Algo deu errado",

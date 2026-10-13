@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useRecentlyPlayed } from '@/hooks/useRecentlyPlayed'
+import { useCatalogHealth } from '@/hooks/useCatalogHealth'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
@@ -52,6 +53,7 @@ export function Home() {
   const navigate = useNavigate()
   const { controls } = usePlayer()
   const recentlyPlayed = useRecentlyPlayed(10)
+  const { unavailable } = useCatalogHealth()
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
 
   const tracks = recentlyPlayed.data.slice(0, MAX_CAROUSEL_TRACKS)
@@ -72,7 +74,7 @@ export function Home() {
         <ArcCarousel
           items={tracks.map((track) => ({
             id: track.id,
-            content: <VinylCard track={track} onPlay={async (track) => controls.playTrack(track, tracks)} size="sm" />,
+            content: <VinylCard track={track} onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks)} size="sm" />,
           }))}
           radius={arcRadius}
           arcDeg={arcDeg}
