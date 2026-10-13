@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { renderHook, act, screen } from '@testing-library/react'
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useAlbumDetailPage } from '../useAlbumDetailPage'
 import type { SpotifyTrack } from '@/types/spotify'
 
@@ -24,10 +24,31 @@ vi.mock('@/hooks/queries/useAlbumTracks', () => ({
 
 const wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter>{children}</MemoryRouter>
 
+
+function Probe() {
+  return <p data-testid="probe">{JSON.stringify(useLocation().state)}</p>
+}
+
 describe('useAlbumDetailPage playback', () => {
   it('Play starts the first playable track with the full list', () => {
     const { result } = renderHook(() => useAlbumDetailPage(), { wrapper })
     result.current.handlePlay()
     expect(playTrack).toHaveBeenCalledWith(tracks[1], tracks)
+  })
+
+  it('navigates with the full current path, query included, as from', () => {
+    const routedWrapper = ({ children }: { children: ReactNode }) => (
+      <MemoryRouter initialEntries={['/albums/3?page=2']}>
+        <Routes>
+          <Route path="/albums/:id" element={children} />
+          <Route path="*" element={<Probe />} />
+        </Routes>
+      </MemoryRouter>
+    )
+    const { result } = renderHook(() => useAlbumDetailPage(), { wrapper: routedWrapper })
+    act(() => {
+      result.current.handleArtistClick('ar1')
+    })
+    expect(screen.getByTestId('probe').textContent).toBe(JSON.stringify({ from: '/albums/3?page=2' }))
   })
 })

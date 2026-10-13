@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { currentPath } from '@/utils/routerState'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
@@ -54,9 +55,9 @@ export function useArtistDetailPage(id: string | undefined) {
 
   const handleAlbumClick = useCallback(
     (album: SpotifyAlbumSimple) => {
-      navigate(`/albums/${album.id}`, { state: { from: location.pathname } })
+      navigate(`/albums/${album.id}`, { state: { from: currentPath(location) } })
     },
-    [navigate, location.pathname]
+    [navigate, location]
   )
 
   const meta = useMemo(() => deriveArtistMeta(artist.data), [artist.data])

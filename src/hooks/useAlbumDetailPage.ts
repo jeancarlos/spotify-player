@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { currentPath } from '@/utils/routerState'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
@@ -76,9 +77,9 @@ export function useAlbumDetailPage() {
 
   const handleArtistClick = useCallback(
     (artistId: string) => {
-      navigate(`/artists/${artistId}`, { state: { from: location.pathname } })
+      navigate(`/artists/${artistId}`, { state: { from: currentPath(location) } })
     },
-    [navigate, location.pathname]
+    [navigate, location]
   )
 
   const meta = useMemo(() => deriveAlbumMeta(album.data), [album.data])
