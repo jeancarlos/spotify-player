@@ -17,10 +17,9 @@ interface VinylDiskDisplayProps {
 function getVinylDiskProps(
   track: SpotifyTrack | null,
   notes: Record<string, string>,
-  isFavorite: boolean,
-  isLogin: boolean
+  isFavorite: boolean
 ): VinylDiskDisplayProps {
-  if (isLogin || !track) return {}
+  if (!track) return {}
   const albumArt = track.album.images[0]?.url
   const albumName = track.album.name
   const currentNote = notes[track.uri]
@@ -29,18 +28,15 @@ function getVinylDiskProps(
 }
 
 interface VinylPositions {
-  loginY: number
   homeY: number
   otherY: number
 }
 
 function getVinylY(
-  isLogin: boolean,
   isHome: boolean,
   playerHovered: boolean,
   pos: VinylPositions
 ): number {
-  if (isLogin) return pos.loginY
   if (isHome) return pos.homeY
   if (playerHovered) return pos.homeY
   return pos.otherY
@@ -59,7 +55,6 @@ function useVinylY() {
   }, [])
   const diskPx = Math.min(720, vw)
   return {
-    loginY: Math.round(diskPx * 0.5),
     homeY: Math.round(diskPx * 0.28),
     otherY: diskPx - PLAYER_CLEARANCE,
   }
@@ -72,16 +67,15 @@ interface PersistentVinylDiskProps {
 export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDiskProps) {
   const location = useLocation()
   const { state } = usePlayer()
-  const { loginY, homeY, otherY } = useVinylY()
+  const { homeY, otherY } = useVinylY()
 
   const { tracks, notes } = useFavorites()
   const isFavorite = tracks.some((t) => t.uri === state.currentTrack?.uri)
 
-  const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'
 
-  const y = getVinylY(isLogin, isHome, playerHovered, { loginY, homeY, otherY })
-  const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite, isLogin)
+  const y = getVinylY(isHome, playerHovered, { homeY, otherY })
+  const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite)
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[15] pointer-events-none flex justify-center">

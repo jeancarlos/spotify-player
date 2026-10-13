@@ -98,7 +98,7 @@ export default defineConfig(() => ({
             if (id.includes('recharts')) {
               return 'vendor-charts'
             }
-            if (id.includes('framer-motion') || id.includes('@base-ui/react')) {
+            if (id.includes('framer-motion')) {
               return 'vendor-ui'
             }
             if (id.includes('@tanstack/react-query')) {
