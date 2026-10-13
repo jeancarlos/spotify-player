@@ -13,6 +13,7 @@ import {
 import { playerReducer, initialPlayerState, type PlayerAction, type PlayerState } from './playerReducer'
 import { deezer } from '@/lib/deezer'
 import { isPlayable, toTrack, type DzTrack } from '@/lib/deezerMappers'
+import { pushRecent } from '@/utils/recentStorage'
 import type { SpotifyTrack } from '@/types/spotify'
 
 export interface PlayerControls {
@@ -71,6 +72,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const track = queue[index]
     if (!audio) return
     const request = ++requestRef.current
+    audio.pause()
     stateRef.current = { ...stateRef.current, queue, queueIndex: index, currentTrack: track }
     dispatch({ type: 'SET_QUEUE', payload: queue })
     dispatch({ type: 'SET_QUEUE_INDEX', payload: index })
@@ -85,6 +87,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       await audio.play()
       if (request !== requestRef.current) return
       dispatch({ type: 'SET_PLAYING', payload: true })
+      pushRecent(track)
     } catch {
       if (request === requestRef.current) dispatch({ type: 'SET_PLAYING', payload: false })
     } finally {
@@ -152,6 +155,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setShuffle = useCallback((on: boolean) => {
+    stateRef.current = { ...stateRef.current, shuffle: on }
     dispatch({ type: 'SET_SHUFFLE', payload: on })
   }, [])
 

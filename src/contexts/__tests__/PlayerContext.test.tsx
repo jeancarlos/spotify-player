@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { PlayerProvider, usePlayer, useProgress, type PlayerControls } from '../PlayerContext'
 import { deezer } from '@/lib/deezer'
+import { readRecent } from '@/utils/recentStorage'
 import type { SpotifyTrack } from '@/types/spotify'
 
 vi.mock('@/lib/deezer', () => ({ deezer: vi.fn() }))
@@ -74,6 +75,7 @@ describe('PlayerProvider', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     deezerMock.mockReset()
+    localStorage.clear()
   })
 
   it('fetches a fresh preview before playing', async () => {
@@ -180,10 +182,12 @@ describe('PlayerProvider', () => {
       fireEvent(el, new Event('timeupdate'))
     })
     expect(screen.getByTestId('progress').textContent).toBe('12500')
+    deezerMock.mockClear()
     act(() => {
       controls.seek(20000)
     })
     expect(el.currentTime).toBe(20)
+    expect(deezerMock).not.toHaveBeenCalled()
     expect(screen.getByTestId('progress').textContent).toBe('20000')
   })
 
@@ -202,5 +206,34 @@ describe('PlayerProvider', () => {
     await waitFor(() => {
       expect(latest.currentTrack?.id).toBe('1')
     })
+  })
+
+  it('records a successful play in recently played without the preview url', async () => {
+    await act(() => controls.playTrack(track('7')))
+    expect(readRecent()[0]).toMatchObject({ id: '7', preview_url: null })
+  })
+
+  it('does not record a play the browser blocked', async () => {
+    play.mockRejectedValueOnce(new DOMException('blocked', 'NotAllowedError'))
+    await act(() => controls.playTrack(track('8')))
+    expect(readRecent().some((t) => t.id === '8')).toBe(false)
+  })
+
+  it('pauses the current audio when switching tracks', async () => {
+    await act(() => controls.playTrack(track('1')))
+    pause.mockClear()
+    await act(() => controls.playTrack(track('2')))
+    expect(pause).toHaveBeenCalled()
+  })
+
+  it('setShuffle updates the ref before the next read', async () => {
+    const list = [track('1'), track('2')]
+    await act(() => controls.playTrack(list[0], list))
+    act(() => {
+      controls.setShuffle(true)
+      controls.next()
+    })
+    await waitFor(() => { expect(latest.currentTrack?.id).toBe('2'); })
+    expect(latest.shuffle).toBe(true)
   })
 })
