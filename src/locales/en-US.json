@@ -2,10 +2,8 @@
   "nav": {
     "home": "Home",
     "artists": "Artists",
-    "profile": "Profile",
     "favorites": "Favorites",
     "collapse": "Collapse",
-    "logout": "Sign out",
     "openMenu": "Open menu",
     "languageSwitcher": "Language switcher"
   },
@@ -14,12 +12,6 @@
     "newReleases": "New Releases",
     "recommendations": "Recommended for You",
     "seeMore": "See more",
-    "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
-  },
-  "login": {
-    "title": "Spoter",
-    "subtitle": "Your immersive music experience",
-    "button": "Sign in with Spotify",
     "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
   },
   "player": {
@@ -154,39 +146,6 @@
   },
   "trackRow": {
     "popularity": "Popularity"
-  },
-  "profile": {
-    "followers_one": "{{count}} follower",
-    "followers_other": "{{count}} followers",
-    "followers_label_one": "follower",
-    "followers_label_other": "followers",
-    "topArtists": "Top Artists",
-    "topTracks": "Top Tracks",
-    "audioProfile": "Audio Profile",
-    "fourWeeks": "4 weeks",
-    "sixMonths": "6 months",
-    "allTime": "All time",
-    "mostPlayedAlbums": "Most Played Albums",
-    "tracks_one": "{{count}} track",
-    "tracks_other": "{{count}} tracks",
-    "tracks_label_one": "track",
-    "tracks_label_other": "tracks",
-    "listenMore": "Listen to more songs to see your profile",
-    "plan": "Plan"
-  },
-  "auth": {
-    "authenticating": "Authenticating...",
-    "invalidState": "Invalid OAuth state or verifier missing",
-    "tokenExchangeFailed": "Token exchange failed"
-  },
-  "authError": {
-    "title": "Authentication failed",
-    "stateMismatch": "Session security data expired or was lost.",
-    "tokenError": "Could not complete the authorization exchange with Spotify.",
-    "unknown": "An unexpected error occurred during authentication.",
-    "hint": "This can happen if the window took too long to respond or the browser blocked session access.",
-    "retry": "Try again",
-    "close": "Close window"
   },
   "track": {
     "noPreview": "Preview unavailable",

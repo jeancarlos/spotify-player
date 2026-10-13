@@ -1,9 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Heart, LogOut, Menu, X, Home } from 'lucide-react'
+import { ArrowLeft, Heart, Menu, X, Home } from 'lucide-react'
 import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
 import { useUI } from '@/hooks/useUI'
 import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 
@@ -37,26 +36,8 @@ function MenuToggleIcon({ isOpen }: { isOpen: boolean }) {
   )
 }
 
-function ProfileAvatar({ avatarUrl, displayName }: { avatarUrl?: string; displayName?: string }) {
-  if (avatarUrl) {
-    return (
-      <img
-        src={avatarUrl}
-        alt="avatar"
-        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-      />
-    )
-  }
-  return (
-    <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-black/40 font-bold text-sm flex-shrink-0">
-      {displayName?.[0] ?? '?'}
-    </div>
-  )
-}
-
 export function HamburgerMenu() {
   const { state: uiState, dispatch: uiDispatch } = useUI()
-  const { state: authState, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const { t } = useTranslation()
@@ -78,14 +59,6 @@ export function HamburgerMenu() {
     close()
     navigate(path)
   }
-
-  const handleLogout = () => {
-    close()
-    logout()
-    navigate('/login')
-  }
-
-  const avatar = authState.profile?.images[0]?.url
 
   return (
     <div className="fixed top-4 left-4 z-40 flex items-center gap-2">
@@ -113,12 +86,6 @@ export function HamburgerMenu() {
               transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
               style={{ transformOrigin: 'top left' }}
             >
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-black/5">
-                <ProfileAvatar avatarUrl={avatar} displayName={authState.profile?.display_name} />
-                <span className="text-sm font-semibold text-black truncate">
-                  {authState.profile?.display_name ?? ''}
-                </span>
-              </div>
 
               <div className="flex flex-col py-1.5">
                 <button
@@ -143,14 +110,6 @@ export function HamburgerMenu() {
                   <span className="text-sm text-black/70">{t('nav.favorites')}</span>
                 </button>
 
-                <button
-                  role="menuitem"
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
-                >
-                  <LogOut size={16} className="text-black/50 flex-shrink-0" />
-                  <span className="text-sm text-black/70">{t('nav.logout')}</span>
-                </button>
               </div>
             </motion.div>
           )}

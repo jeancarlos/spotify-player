@@ -1,18 +1,10 @@
 import { useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { PersistentVinylDisk } from '@/components/vinyl/PersistentVinylDisk'
 import { MiniPlayer } from './MiniPlayer'
 
-const HIDE_PLAYER_ROUTES = ['/login', '/callback']
-
-function routeGroup(pathname: string) {
-  return HIDE_PLAYER_ROUTES.includes(pathname) ? pathname : 'app'
-}
-
 export function AppRoot() {
-  const location = useLocation()
-  const showPlayer = !HIDE_PLAYER_ROUTES.includes(location.pathname)
   const [playerHovered, setPlayerHovered] = useState(false)
 
 
@@ -20,7 +12,7 @@ export function AppRoot() {
     <>
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={routeGroup(location.pathname)}
+          key="app"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -32,7 +24,7 @@ export function AppRoot() {
       </AnimatePresence>
       <PersistentVinylDisk playerHovered={playerHovered} />
       <AnimatePresence>
-        {showPlayer && <MiniPlayer key="mini-player" onHoverChange={setPlayerHovered} />}
+        <MiniPlayer key="mini-player" onHoverChange={setPlayerHovered} />
       </AnimatePresence>
     </>
   )
