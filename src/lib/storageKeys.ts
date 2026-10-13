@@ -5,4 +5,5 @@ export const STORAGE_KEYS = {
   pkceVerifier: 'pkce_verifier',
   pkceState: 'pkce_state',
   language: 'spoter_lang',
+  favorites: 'spoter_favorites_v2',
 } as const
