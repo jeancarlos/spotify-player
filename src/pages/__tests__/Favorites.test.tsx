@@ -70,7 +70,7 @@ const mockTrack = (id: string): SpotifyTrack => ({
   name: `Track ${id}`,
   duration_ms: 180000,
   explicit: false,
-  popularity: 50,
+  rank: 50,
   preview_url: null,
   type: 'track',
   artists: [{ id: 'a1', name: 'Artista', uri: 'spotify:artist:a1', type: 'artist' }],

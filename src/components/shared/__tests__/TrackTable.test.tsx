@@ -20,7 +20,7 @@ const fullTrack: SpotifyTrack = {
   ...albumTrack,
   id: 't2',
   name: 'Full Track',
-  popularity: 73,
+  rank: 73,
   album: {
     id: 'alb1',
     name: 'Test Album',
@@ -34,7 +34,7 @@ const fullTrack: SpotifyTrack = {
 }
 
 describe('TrackTable', () => {
-  it('omits the popularity column when no track has popularity data', () => {
+  it('omits the rank column when no track has rank', () => {
     render(<TrackTable tracks={[albumTrack]} showAlbumColumn={false} />)
     const withoutData = screen.getAllByRole('columnheader').length
     render(<TrackTable tracks={[fullTrack]} showAlbumColumn={false} />)

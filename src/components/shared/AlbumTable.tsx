@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
 import { useTranslation } from 'react-i18next'
 import type { SpotifyAlbumSimple } from '@/types/spotify'
@@ -10,6 +9,7 @@ interface AlbumTableProps {
 
 export function AlbumTable({ albums, onClick }: AlbumTableProps) {
   const { t } = useTranslation()
+  const showTrackCount = albums.some((album) => album.total_tracks != null)
 
   return (
     <div className="overflow-x-auto">
@@ -22,12 +22,11 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
             <th className="text-right py-2 px-3 text-black/30 font-semibold">
               {t('track.releaseYear')}
             </th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">
-              {t('track.trackCount')}
-            </th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">
-              {t('common.popularity')}
-            </th>
+            {showTrackCount && (
+              <th className="text-right py-2 px-3 text-black/30 font-semibold">
+                {t('track.trackCount')}
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -53,10 +52,11 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
               <td className="py-2 px-3 text-right text-black/40 tabular-nums">
                 {album.release_date ? formatDate(album.release_date, 'year') : ''}
               </td>
-              <td className={cn('py-2 px-3 text-right text-black/40 tabular-nums')}>
-                {album.total_tracks ?? '—'}
-              </td>
-              <td className="py-2 px-3 text-right text-black/40 tabular-nums">—</td>
+              {showTrackCount && (
+                <td className="py-2 px-3 text-right text-black/40 tabular-nums">
+                  {album.total_tracks ?? '—'}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -21,7 +21,7 @@ const track: SpotifyTrack = {
     type: 'album',
   },
   explicit: false,
-  popularity: 80,
+  rank: 80,
   preview_url: null,
   type: 'track',
 }

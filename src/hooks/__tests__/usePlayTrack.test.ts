@@ -20,7 +20,7 @@ const mockTrack = {
   name: 'Test',
   duration_ms: 200000,
   explicit: false,
-  popularity: 80,
+  rank: 80,
   preview_url: null,
   type: 'track' as const,
   artists: [{ id: 'a1', name: 'Artist', uri: 'spotify:artist:a1', type: 'artist' as const }],

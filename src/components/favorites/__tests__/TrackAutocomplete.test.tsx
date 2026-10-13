@@ -20,7 +20,7 @@ const mockSearchResults: SpotifyTrack[] = [
     name: 'Resultado Um',
     duration_ms: 200000,
     explicit: false,
-    popularity: 70,
+    rank: 70,
     preview_url: null,
     type: 'track',
     artists: [{ id: 'a1', name: 'Artista A', uri: 'spotify:artist:a1', type: 'artist' }],

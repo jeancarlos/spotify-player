@@ -39,7 +39,6 @@ export interface SpotifyTrack {
   name: string
   duration_ms: number
   explicit: boolean
-  popularity?: number
   rank?: number
   preview_url: string | null
   uri: string

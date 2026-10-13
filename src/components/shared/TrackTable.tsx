@@ -17,7 +17,7 @@ interface TrackTableRowProps {
   index: number
   isActive: boolean
   showAlbumColumn: boolean
-  showPopularity: boolean
+  showRank: boolean
   onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
   onAlbumClick?: (albumId: string) => void
 }
@@ -28,7 +28,7 @@ function resolveTrackMeta(track: SpotifyTrack | SpotifyAlbumTrack) {
     albumId: 'album' in track ? track.album.id : undefined,
     albumName: 'album' in track ? track.album.name : '—',
     artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '—',
-    popularity: ('popularity' in track ? track.popularity : undefined) ?? '—',
+    rank: ('rank' in track ? track.rank : undefined) ?? '—',
   }
 }
 
@@ -37,12 +37,12 @@ function TrackTableRow({
   index,
   isActive,
   showAlbumColumn,
-  showPopularity,
+  showRank,
   onPlay,
   onAlbumClick,
 }: TrackTableRowProps) {
   const { t } = useTranslation()
-  const { albumImage, albumId, albumName, artistNames, popularity } = resolveTrackMeta(track)
+  const { albumImage, albumId, albumName, artistNames, rank } = resolveTrackMeta(track)
 
   return (
     <tr
@@ -99,8 +99,8 @@ function TrackTableRow({
       <td className="py-2 px-3 text-right text-black/40 tabular-nums whitespace-nowrap">
         {formatDuration(track.duration_ms)}
       </td>
-      {showPopularity && (
-        <td className="py-2 px-3 text-right text-black/40 tabular-nums">{popularity}</td>
+      {showRank && (
+        <td className="py-2 px-3 text-right text-black/40 tabular-nums">{rank}</td>
       )}
       <td className="py-2 px-3 text-center">
         {track.explicit && (
@@ -118,7 +118,7 @@ export function TrackTable({
   onPlay,
   onAlbumClick,
 }: TrackTableProps) {
-  const showPopularity = tracks.some((track) => 'popularity' in track && track.popularity != null)
+  const showRank = tracks.some((track) => 'rank' in track && track.rank != null)
   const { t } = useTranslation()
   return (
     <div className="overflow-x-auto">
@@ -141,9 +141,9 @@ export function TrackTable({
             <th className="text-right py-2 px-3 text-black/30 font-semibold">
               {t('track.duration')}
             </th>
-            {showPopularity && (
+            {showRank && (
               <th className="text-right py-2 px-3 text-black/30 font-semibold">
-                {t('common.popularity')}
+                {t('common.rank')}
               </th>
             )}
             <th className="text-center py-2 px-3 text-black/30 font-semibold">
@@ -159,7 +159,7 @@ export function TrackTable({
               index={i}
               isActive={track.id === activeTrackId}
               showAlbumColumn={showAlbumColumn}
-              showPopularity={showPopularity}
+              showRank={showRank}
               onPlay={onPlay}
               onAlbumClick={onAlbumClick}
             />

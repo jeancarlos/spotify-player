@@ -7,7 +7,7 @@ const mockTrack: SpotifyTrack = {
   name: 'Track 1',
   duration_ms: 210000,
   explicit: false,
-  popularity: 80,
+  rank: 80,
   preview_url: null,
   uri: 'spotify:track:t1',
   type: 'track',
