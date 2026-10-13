@@ -79,14 +79,10 @@ export function Artists() {
       </div>
 
       <div className="pt-36 px-6 pb-32">
-        {query && (
-          <p className="text-sm text-black/40 mb-6" aria-live="polite">
-            {headerLabel}
-            {data && ` — ${t('artists.result', { count: data.total })}`}
-          </p>
-        )}
-
-        {!query && <p className="text-center text-black/30 mt-20">{t('artists.searchPrompt')}</p>}
+        <p className="text-sm text-black/40 mb-6" aria-live="polite">
+          {headerLabel}
+          {data && ` — ${t('artists.result', { count: data.total })}`}
+        </p>
 
         <AnimatePresence mode="wait">{renderResults()}</AnimatePresence>
 
@@ -94,7 +90,7 @@ export function Artists() {
           <p className="text-center text-black/30 mt-20">{t('artists.noResults')}</p>
         )}
 
-        {data && data.items.length > 0 && (
+        {query && data && data.items.length > 0 && (
           <Pagination
             page={page}
             hasNext={hasNext}

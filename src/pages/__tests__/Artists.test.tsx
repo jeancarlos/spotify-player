@@ -9,6 +9,7 @@ import { deezer } from '@/lib/deezer'
 import { PlayerProvider } from '@/contexts/PlayerContext'
 import { ToastProvider } from '@/components/ui/toast'
 import searchArtist from '@/mocks/fixtures/deezer/search-artist.json'
+import chartArtists from '@/mocks/fixtures/deezer/chart-artists.json'
 import { Artists } from '../Artists'
 
 vi.mock('@/lib/deezer', async (importOriginal) => ({
@@ -24,7 +25,9 @@ beforeAll(() => {
 beforeEach(() => {
   localStorage.clear()
   deezerMock.mockReset()
-  deezerMock.mockResolvedValue(searchArtist)
+  deezerMock.mockImplementation((path: string) =>
+    Promise.resolve(path === 'chart/0/artists' ? chartArtists : searchArtist)
+  )
 })
 afterEach(() => {
   server.resetHandlers()
@@ -66,8 +69,24 @@ describe('Artists page', () => {
     expect(deezerMock).toHaveBeenCalledWith('search/artist', { q: 'coldplay', index: 0, limit: 20 })
   })
 
-  it('shows search prompt when query is empty', () => {
+  it('shows the artist chart when the query is empty', async () => {
     renderArtists()
-    expect(screen.getByText(/Digite para buscar|Type to search/i)).toBeInTheDocument()
+    expect(screen.getByText(/artists\.charts/)).toBeInTheDocument()
+    expect(await screen.findByText(chartArtists.data[0]?.name ?? '')).toBeInTheDocument()
+    expect(deezerMock).toHaveBeenCalledWith('chart/0/artists', { limit: 20 })
+    expect(deezerMock).not.toHaveBeenCalledWith('search/artist', expect.anything())
+    expect(screen.queryByRole('button', { name: 'artists.next' })).not.toBeInTheDocument()
+  })
+
+  it('goes back to the chart when the query is cleared', async () => {
+    renderArtists()
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: 'coldplay' } })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })
+    fireEvent.change(input, { target: { value: '' } })
+    expect(
+      await screen.findByText(chartArtists.data[0]?.name ?? '', {}, { timeout: 3000 })
+    ).toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 })

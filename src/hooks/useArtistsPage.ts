@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useCallback, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { useArtists } from '@/hooks/queries/useArtists'
 import { useSearchAlbums } from '@/hooks/queries/useSearchAlbums'
 import { useSearchPlaylists } from '@/hooks/queries/useSearchPlaylists'
+import { useChartAlbums, useChartArtists, useChartPlaylists } from '@/hooks/queries/useChart'
 import { loadLastSearch, type SearchTab } from '@/utils/search'
 
 interface PageParams {
@@ -45,19 +46,24 @@ function getHeaderLabel(tab: SearchTab, t: TFunction): string {
 
 export function useArtistsPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const saved = loadLastSearch()
   const { query, tab, page } = extractPageParams(searchParams, saved)
 
-  useEffect(() => {
-    if (!query.trim()) navigate('/', { replace: true })
-  }, [query, navigate])
+  const isSearch = query.trim().length > 0
+  const chartTab = isSearch ? null : tab
 
-  const artists = useArtists(tab === 'artist' ? query : '', page)
-  const albums = useSearchAlbums(tab === 'album' ? query : '', page)
-  const playlists = useSearchPlaylists(tab === 'playlist' ? query : '', page)
+  const searchArtists = useArtists(tab === 'artist' ? query : '', page)
+  const searchAlbums = useSearchAlbums(tab === 'album' ? query : '', page)
+  const searchPlaylists = useSearchPlaylists(tab === 'playlist' ? query : '', page)
+  const chartArtists = useChartArtists(chartTab === 'artist')
+  const chartAlbums = useChartAlbums(chartTab === 'album')
+  const chartPlaylists = useChartPlaylists(chartTab === 'playlist')
+
+  const artists = isSearch ? searchArtists : chartArtists
+  const albums = isSearch ? searchAlbums : chartAlbums
+  const playlists = isSearch ? searchPlaylists : chartPlaylists
 
   const activeQuery = useMemo(
     () => getActiveQuery(tab, artists, albums, playlists),
@@ -69,17 +75,16 @@ export function useArtistsPage() {
     () => (data ? data.offset + data.items.length < data.total : false),
     [data]
   )
-  const headerLabel = useMemo(() => getHeaderLabel(tab, t), [tab, t])
+  const headerLabel = useMemo(
+    () => (isSearch ? getHeaderLabel(tab, t) : t('artists.charts')),
+    [isSearch, tab, t]
+  )
 
   const handleSearch = useCallback(
     (searchQuery: string, nextTab: SearchTab) => {
-      if (!searchQuery.trim()) {
-        navigate('/', { replace: true })
-        return
-      }
       setSearchParams({ q: searchQuery, tab: nextTab, page: '1' }, { replace: true })
     },
-    [navigate, setSearchParams]
+    [setSearchParams]
   )
 
   const handlePageChange = useCallback(
