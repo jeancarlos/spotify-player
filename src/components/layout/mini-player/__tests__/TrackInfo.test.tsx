@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { TrackInfo } from '../TrackInfo'
 import type { SpotifyTrack } from '@/types/spotify'
 
@@ -17,7 +18,41 @@ vi.mock('@/contexts/PlayerContext', () => ({
   useProgress: () => ({ progressMs: 12000, durationMs: 30000 }),
 }))
 
+function Where() {
+  const l = useLocation()
+  return <output data-testid="where">{l.pathname + l.search}</output>
+}
 describe('TrackInfo', () => {
+  it('has no fake role=button wrapper and opens the lyrics once from the keyboard', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <TrackInfo notes={{}} />
+        <Where />
+      </MemoryRouter>
+    )
+    expect(container.querySelector('div[role="button"]')).toBeNull()
+    await user.tab()
+    expect(screen.getAllByRole('button', { name: /Song/ })[0]).toHaveFocus()
+    await user.tab()
+    expect(screen.getAllByRole('button', { name: /Song/ })[1]).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
+  })
+  it('opens the lyrics with Space on the title button', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <TrackInfo notes={{}} />
+        <Where />
+      </MemoryRouter>
+    )
+    await user.tab()
+    await user.tab()
+    await user.keyboard(' ')
+    expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
+  })
+
   it('shows the track and the useProgress times', () => {
     render(
       <MemoryRouter>

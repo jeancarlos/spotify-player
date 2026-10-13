@@ -34,10 +34,12 @@ export function PlaybackControls() {
   const activeTab = (searchParams.get('tab') ?? 'lyrics') as 'lyrics' | 'info' | 'queue'
 
   const playLabel = isPlaying ? t('player.pause') : t('player.play')
-  const queueLabel = isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')
+  const queueLabel =
+    isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')
   const toggleQueue = () => {
     if (!isPlayerPage) navigate('/player?tab=queue', { state: { from: currentPath(location) } })
-    else if (activeTab !== 'queue') navigate('/player?tab=queue', { replace: true, state: location.state as unknown })
+    else if (activeTab !== 'queue')
+      navigate('/player?tab=queue', { replace: true, state: location.state as unknown })
     else navigate(getFromPath(location.state))
   }
 
@@ -47,7 +49,9 @@ export function PlaybackControls() {
     <div className="flex items-center gap-1.5 shrink-0">
       <div className="relative group hidden sm:block">
         <button
-          onClick={() => { controls.setShuffle(!shuffle); }}
+          onClick={() => {
+            controls.setShuffle(!shuffle)
+          }}
           aria-label={t('player.shuffle')}
           aria-pressed={shuffle}
           className={cn(
@@ -62,7 +66,9 @@ export function PlaybackControls() {
 
       <div className="relative group hidden min-[400px]:block">
         <button
-          onClick={() => { controls.previous(); }}
+          onClick={() => {
+            controls.previous()
+          }}
           aria-label={t('player.previous')}
           className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
         >
@@ -73,7 +79,9 @@ export function PlaybackControls() {
 
       <div className="relative group/play">
         <button
-          onClick={() => { controls.toggle(); }}
+          onClick={() => {
+            controls.toggle()
+          }}
           aria-label={playLabel}
           className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
         >
@@ -90,7 +98,9 @@ export function PlaybackControls() {
 
       <div className="relative group hidden min-[400px]:block">
         <button
-          onClick={() => { controls.next(); }}
+          onClick={() => {
+            controls.next()
+          }}
           aria-label={t('player.next')}
           className="p-1.5 rounded-lg text-black/60 hover:text-black transition-colors"
         >
@@ -101,7 +111,9 @@ export function PlaybackControls() {
 
       <div className="relative group hidden sm:block">
         <button
-          onClick={() => { controls.cycleRepeat(); }}
+          onClick={() => {
+            controls.cycleRepeat()
+          }}
           aria-label={t('player.repeat')}
           aria-pressed={repeat !== 'off'}
           className={cn(
@@ -118,13 +130,11 @@ export function PlaybackControls() {
         <button
           onClick={toggleQueue}
           aria-label={queueLabel}
-          className="p-1.5 rounded-lg transition-colors outline-none text-black/30 hover:text-black"
+          className="p-1.5 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-black/40 text-black/30 hover:text-black"
         >
           <ListMusic size={15} />
         </button>
-        <ControlTip
-          label={queueLabel}
-        />
+        <ControlTip label={queueLabel} />
       </div>
     </div>
   )

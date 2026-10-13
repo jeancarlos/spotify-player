@@ -67,7 +67,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
       </p>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-black/60">
+        <label htmlFor="favorite-track" className="text-xs font-medium text-black/60">
           {t('favorites.trackLabel')}{' '}
           <span aria-hidden className="text-black/30">
             *
@@ -78,6 +78,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
           control={control}
           render={({ field, fieldState }) => (
             <TrackAutocomplete
+              id="favorite-track"
               value={field.value ?? null}
               onChange={field.onChange}
               onBlur={field.onBlur}
@@ -93,13 +94,16 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-black/60">{t('favorites.noteLabel')}</label>
+        <label htmlFor="favorite-note" className="text-xs font-medium text-black/60">
+          {t('favorites.noteLabel')}
+        </label>
         <textarea
+          id="favorite-note"
           {...register('note')}
           placeholder={t('favorites.notePlaceholder')}
           maxLength={MAX_NOTE_LENGTH}
           rows={2}
-          className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors resize-none"
+          className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors resize-none"
         />
         <div className="flex items-center justify-between">
           {errors.note ? <p className="text-xs text-red-500">{errors.note.message}</p> : <span />}

@@ -29,7 +29,9 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
   TrackAutocomplete: ({
     onChange,
     value,
+    id,
   }: {
+    id?: string
     onChange: (t: SpotifyTrack | null) => void
     value: SpotifyTrack | null
     onBlur: () => void
@@ -39,6 +41,7 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
       <div data-testid="selected-track">{value.name}</div>
     ) : (
       <button
+        data-input-id={id}
         type="button"
         onClick={() => {
           onChange(mockTrack)
@@ -65,6 +68,18 @@ function renderForm(existingFavorites: SpotifyTrack[] = []) {
 }
 
 describe('AddFavoriteForm', () => {
+  it('associates both labels with their controls', () => {
+    renderForm()
+    expect(screen.getByRole('button', { name: /selecionar música/i })).toHaveAttribute(
+      'data-input-id',
+      'favorite-track'
+    )
+    expect(screen.getByText(/favorites\.trackLabel/).closest('label')).toHaveAttribute(
+      'for',
+      'favorite-track'
+    )
+    expect(screen.getByLabelText(/favorites\.noteLabel/).tagName).toBe('TEXTAREA')
+  })
   it('botão de submit está desabilitado sem track selecionada', () => {
     renderForm()
     expect(screen.getByRole('button', { name: /favorites\.addConfirm/i })).toBeDisabled()

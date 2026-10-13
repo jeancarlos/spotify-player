@@ -29,10 +29,6 @@ export function TrackInfo({ notes }: TrackInfoProps) {
     }
   }
 
-  const handleEnterTrack = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') handleTrackClick()
-  }
-
   if (!currentTrack) {
     return (
       <div className="flex items-center gap-2 w-full cursor-default flex-1">
@@ -44,12 +40,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
 
   return (
     <div className="flex ml-[-5px] items-center gap-2.5 flex-1 min-w-0  group/track">
-      <div
-        className="flex items-center gap-2.5 min-w-0 cursor-pointer"
-        role="button"
-        tabIndex={0}
-        aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
-      >
+      <div className="flex items-center gap-2.5 min-w-0">
         <div className="relative shrink-0">
           {personalNote && (
             <div className="group/note absolute top-0 left-0 z-10">
@@ -66,19 +57,23 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               </span>
             </div>
           )}
-          <img
-            src={currentTrack.album.images[0]?.url}
-            alt={currentTrack.album.name}
-            className="w-12 h-12 rounded-full"
+          <button
+            type="button"
             onClick={handleTrackClick}
-            onKeyDown={handleEnterTrack}
-          />
+            aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
+            className="block rounded-full focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
+          >
+            <img
+              src={currentTrack.album.images[0]?.url}
+              alt=""
+              className="w-12 h-12 rounded-full"
+            />
+          </button>
         </div>
         <div className="min-w-0 flex flex-col justify-center">
           <button
             onClick={handleTrackClick}
-            onKeyDown={handleEnterTrack}
-            className="text-xs text-left font-bold text-black truncate hover:underline cursor-pointer"
+            className="text-xs text-left font-bold text-black truncate hover:underline cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
             aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
           >
             {currentTrack.name}
@@ -88,7 +83,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               {currentTrack.artists.map((a, i) => (
                 <button
                   key={a.id}
-                  className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none focus:text-black focus:underline"
+                  className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
                   onClick={() => {
                     navigate(`/artists/${a.id}`)
                   }}
@@ -100,9 +95,11 @@ export function TrackInfo({ notes }: TrackInfoProps) {
             </div>
             <button
               onClick={() => {
-                navigate(`/albums/${currentTrack.album.id}`, { state: { from: currentPath(location) } })
+                navigate(`/albums/${currentTrack.album.id}`, {
+                  state: { from: currentPath(location) },
+                })
               }}
-              className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
+              className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
             >
               {currentTrack.album.name}
             </button>

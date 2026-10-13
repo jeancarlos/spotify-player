@@ -58,7 +58,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
   const { t } = useTranslation()
   const tabClass = (tab: PlayerTab) =>
     cn(
-      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
+      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-white/60',
       activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/70'
     )
   return (
@@ -210,7 +210,7 @@ export function PlayerView() {
           onClick={() => {
             navigate(getFromPath(location.state))
           }}
-          className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none"
+          className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           aria-label="back"
         >
           <ArrowLeft size={20} className="text-white" />

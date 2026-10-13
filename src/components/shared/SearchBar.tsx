@@ -50,7 +50,7 @@ export function SearchBar({
   return (
     <div
       className={cn(
-        'glass flex items-center gap-2 px-4 py-2.5 rounded-full max-w-lg w-full',
+        'glass flex items-center gap-2 px-4 py-2.5 rounded-full max-w-lg w-full focus-within:ring-2 focus-within:ring-black/40',
         className
       )}
     >

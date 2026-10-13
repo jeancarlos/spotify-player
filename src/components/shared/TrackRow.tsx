@@ -32,10 +32,17 @@ function resolveTextColor(dark: boolean, isActive: boolean): string {
   return isActive ? 'text-black' : 'text-black/80'
 }
 
+function focusRing(dark: boolean): string {
+  return dark
+    ? 'focus-visible:ring-2 focus-visible:ring-white/60'
+    : 'focus-visible:ring-2 focus-visible:ring-black/40'
+}
+
 function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
   return {
     row: cn(
-      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group focus:outline-none',
+      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group outline-none',
+      focusRing(dark),
       dark
         ? cn('hover:bg-white/5', isActive && 'bg-white/10')
         : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
@@ -49,7 +56,8 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
     subtext: cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40'),
     duration: cn('text-xs tabular-nums shrink-0', dark ? 'text-white/20' : 'text-black/30'),
     remove: cn(
-      'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 focus:outline-none focus:opacity-100',
+      'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
+      focusRing(dark),
       dark ? 'text-white/30 hover:text-red-400' : 'text-black/30 hover:text-red-500'
     ),
   }
@@ -109,7 +117,7 @@ function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellPr
   const { t } = useTranslation()
   return (
     <button
-      className="w-6 shrink-0 flex items-center justify-center focus:outline-none disabled:cursor-not-allowed"
+      className="w-6 shrink-0 flex items-center justify-center rounded outline-none focus-visible:ring-2 focus-visible:ring-black/40 disabled:cursor-not-allowed"
       disabled={!onPlay}
       aria-label={t('player.playTrack', { name: trackName })}
       onClick={(e) => {

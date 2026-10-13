@@ -40,4 +40,14 @@ describe('TrackAutocomplete aria-activedescendant with the real keyboard hook', 
     })
     expect(input).not.toHaveAttribute('aria-activedescendant')
   })
+
+  it('is labelled by the id it receives', () => {
+    render(
+      <>
+        <label htmlFor="favorite-track">Faixa</label>
+        <TrackAutocomplete id="favorite-track" value={null} onChange={vi.fn()} onBlur={vi.fn()} />
+      </>
+    )
+    expect(screen.getByLabelText('Faixa')).toBe(screen.getByRole('combobox'))
+  })
 })

@@ -86,6 +86,7 @@ function SelectedTrack({ track, onClear, clearLabel }: SelectedTrackProps) {
 }
 
 interface TrackSearchInputProps {
+  id?: string
   inputRef: React.RefObject<HTMLInputElement | null>
   blurTimerRef: React.RefObject<number>
   query: string
@@ -112,6 +113,7 @@ function activeOptionId(listboxId: string, isOpen: boolean, index: number, count
 }
 
 function TrackSearchInput({
+  id,
   inputRef,
   blurTimerRef,
   query,
@@ -145,6 +147,7 @@ function TrackSearchInput({
     <div className="relative">
       <input
         ref={inputRef}
+        id={id}
         type="text"
         value={query}
         autoFocus
@@ -158,7 +161,7 @@ function TrackSearchInput({
         placeholder={placeholder}
         className={cn(
           'w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black',
-          'placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors',
+          'placeholder:text-black/30 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors',
           isOpen ? 'rounded-b-none' : 'rounded-xl',
           error && 'ring-1 ring-red-400'
         )}
@@ -206,9 +209,10 @@ export interface TrackAutocompleteProps {
   onChange: (track: SpotifyTrack | null) => void
   onBlur: () => void
   error?: string
+  id?: string
 }
 
-export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutocompleteProps) {
+export function TrackAutocomplete({ value, onChange, onBlur, error, id }: TrackAutocompleteProps) {
   const { t } = useTranslation()
   const uid = useId()
   const listboxId = `${uid}-listbox`
@@ -255,6 +259,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
 
   return (
     <TrackSearchInput
+      id={id}
       inputRef={inputRef}
       blurTimerRef={blurTimerRef}
       query={query}
