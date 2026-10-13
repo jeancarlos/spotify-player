@@ -117,12 +117,6 @@ export interface RecentlyPlayedResponse {
   next: string | null
 }
 
-export interface ArtistTopTracksResponse {
-  tracks: SpotifyTrack[]
-}
-
-export type ArtistAlbumsResponse = PagingObject<SpotifyAlbumSimple>
-
 export interface SpotifyDevice {
   id: string | null
   is_active: boolean
