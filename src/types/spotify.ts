@@ -31,6 +31,7 @@ export interface SpotifyAlbumSimple {
   total_tracks?: number
   external_urls?: SpotifyExternalUrls
   available_markets?: string[]
+  link?: string
 }
 
 export interface SpotifyTrack {
@@ -39,6 +40,7 @@ export interface SpotifyTrack {
   duration_ms: number
   explicit: boolean
   popularity?: number
+  rank?: number
   preview_url: string | null
   uri: string
   type: 'track'
@@ -52,6 +54,7 @@ export interface SpotifyTrack {
   external_urls?: SpotifyExternalUrls
   external_ids?: { isrc?: string; ean?: string; upc?: string }
   available_markets?: string[]
+  link?: string
 }
 
 export interface SpotifyArtist {
@@ -65,6 +68,7 @@ export interface SpotifyArtist {
   type: 'artist'
   href?: string
   external_urls?: SpotifyExternalUrls
+  link?: string
 }
 
 export interface SpotifyUser {
@@ -200,6 +204,7 @@ export interface SpotifyPlaylist {
   type?: 'playlist'
   href?: string
   external_urls?: SpotifyExternalUrls
+  link?: string
 }
 
 export interface SpotifyPlaylistTrack {
