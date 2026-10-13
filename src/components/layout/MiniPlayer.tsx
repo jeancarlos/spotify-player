@@ -1,10 +1,7 @@
-import { useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { usePlayer } from '@/hooks/usePlayer'
-import { useProgressEngine } from '@/hooks/useProgressEngine'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
 import { useTranslation } from 'react-i18next'
-import { seekRequest } from '@/lib/playerApi'
 import { ProgressBar } from './mini-player/ProgressBar'
 import { TrackInfo } from './mini-player/TrackInfo'
 import { PlaybackControls } from './mini-player/PlaybackControls'
@@ -15,22 +12,11 @@ interface MiniPlayerProps {
 }
 
 export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
-  const { state, dispatch } = usePlayer()
+  const { state } = usePlayer()
   const { currentTrack } = state
-  const { currentProgress, seekTo: engineSeekTo } = useProgressEngine()
   const { tracks, notes, addTrack, removeTrack } = useSpoterPlaylist()
   const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
   const { t } = useTranslation()
-
-  const handleSeek = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const ms = Number(e.target.value)
-      engineSeekTo(ms)
-      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-      await seekRequest(ms)
-    },
-    [dispatch, engineSeekTo]
-  )
 
   return (
     <motion.aside
@@ -45,16 +31,10 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
     >
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 
-      {currentTrack && (
-        <ProgressBar
-          progress={currentProgress}
-          duration={currentTrack.duration_ms}
-          onChange={handleSeek}
-        />
-      )}
+      {currentTrack && <ProgressBar />}
 
       <div className="relative px-4 py-3 flex items-center gap-3">
-        <TrackInfo progress={currentProgress} notes={notes} />
+        <TrackInfo notes={notes} />
         <FavoriteButton isSaved={isSaved} addTrack={addTrack} removeTrack={removeTrack} />
         <PlaybackControls />
       </div>
