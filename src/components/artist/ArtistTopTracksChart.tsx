@@ -9,39 +9,16 @@ import {
   Cell,
   LabelList,
   ResponsiveContainer,
-  ReferenceLine,
   type TooltipProps,
 } from 'recharts'
 import type { SpotifyTrack } from '@/types/spotify'
+import { toChartData, type ChartEntry } from './chartData'
 
-function seededFraction(seed: string): number {
-  let h = 0
-  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0
-  return (Math.abs(h) % 1000) / 1000
-}
-
-function estimateStreams(popularity = 0, trackId: string): number {
-  const base = popularity > 0 ? popularity : Math.round(15 + seededFraction(trackId) * 30)
-  return Math.round(50_000 + (base / 100) ** 2 * 4_950_000)
-}
-
-function formatStreams(n: number | undefined): string {
+function formatRank(n: number | undefined): string {
   if (n === undefined) return ''
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000) return `${Math.round(n / 1_000)}K`
   return n.toLocaleString()
-}
-
-interface ChartEntry {
-  id: string
-  label: string
-  name: string
-  artists: string
-  albumName: string
-  albumArt: string
-  streams: number
-  popularity?: number
-  track: SpotifyTrack
 }
 
 interface Props {
@@ -67,16 +44,9 @@ function CustomTooltip({ active, payload }: TooltipProps<number, string>) {
         <div className="flex items-center gap-3 mt-2 pt-2 border-t border-black/[0.06]">
           <div>
             <p className="text-[13px] font-black tabular-nums text-black leading-none">
-              {formatStreams(e.streams)}
+              {formatRank(e.rank)}
             </p>
-            <p className="text-[7px] uppercase tracking-widest text-black/30 mt-0.5">plays est.</p>
-          </div>
-          <div className="w-px h-5 bg-black/[0.08]" />
-          <div>
-            <p className="text-[13px] font-black tabular-nums text-black leading-none">
-              {e.popularity}
-            </p>
-            <p className="text-[7px] uppercase tracking-widest text-black/30 mt-0.5">score</p>
+            <p className="text-[7px] uppercase tracking-widest text-black/30 mt-0.5">rank</p>
           </div>
         </div>
       </div>
@@ -92,7 +62,7 @@ interface TickProps {
 }
 
 function CustomYTick({ x = 0, y = 0, index = 0, payload }: TickProps) {
-  const rank = String(index + 1).padStart(2, '0')
+  const position = String(index + 1).padStart(2, '0')
   const raw = payload?.value ?? ''
   const name = raw.length > 20 ? raw.slice(0, 20) + '…' : raw
   return (
@@ -107,7 +77,7 @@ function CustomYTick({ x = 0, y = 0, index = 0, payload }: TickProps) {
         fontFamily="monospace"
         letterSpacing={1}
       >
-        {rank}
+        {position}
       </text>
       <text x={-8} y={8} textAnchor="end" fontSize={11} fill="rgba(0,0,0,0.72)" fontWeight={600}>
         {name}
@@ -142,25 +112,7 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 }
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
-  const chartData = useMemo<ChartEntry[]>(() => {
-    const sorted = [...tracks].slice(0, 10).sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
-    return sorted.map((t) => ({
-      id: t.id,
-      label: t.name,
-      name: t.name,
-      artists: t.artists.map((a) => a.name).join(', '),
-      albumName: t.album.name,
-      albumArt: (t.album.images.at(1) ?? t.album.images.at(0))?.url ?? '',
-      streams: estimateStreams(t.popularity, t.id),
-      popularity: t.popularity,
-      track: t,
-    }))
-  }, [tracks])
-
-  const avgStreams = useMemo(
-    () => Math.round(chartData.reduce((s, e) => s + e.streams, 0) / Math.max(chartData.length, 1)),
-    [chartData]
-  )
+  const chartData = useMemo(() => toChartData(tracks), [tracks])
 
   if (chartData.length === 0) return null
 
@@ -176,7 +128,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
 
           <XAxis
             type="number"
-            tickFormatter={formatStreams}
+            tickFormatter={formatRank}
             tick={{ fontSize: 9, fill: 'rgba(0,0,0,0.3)' }}
             axisLine={false}
             tickLine={false}
@@ -193,21 +145,8 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
 
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.025)', rx: 6 }} />
 
-          <ReferenceLine
-            x={avgStreams}
-            stroke="rgba(0,0,0,0.13)"
-            strokeDasharray="4 3"
-            label={{
-              value: 'média',
-              position: 'insideTopRight',
-              fontSize: 8,
-              fill: 'rgba(0,0,0,0.28)',
-              dy: -4,
-            }}
-          />
-
           <Bar
-            dataKey="streams"
+            dataKey="rank"
             shape={<RoundedBar />}
             cursor="pointer"
             maxBarSize={28}
@@ -217,9 +156,9 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
             onClick={(entry: ChartEntry) => onPlay?.(entry.track)}
           >
             <LabelList
-              dataKey="streams"
+              dataKey="rank"
               position="right"
-              formatter={formatStreams}
+              formatter={formatRank}
               style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
             />
             {chartData.map((entry, i) => {

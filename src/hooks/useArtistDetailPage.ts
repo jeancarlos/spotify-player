@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
-import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscographyTracks'
+import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { usePlayer } from '@/hooks/usePlayer'
 import { usePlayTrack } from '@/hooks/usePlayTrack'
 import type { SpotifyAlbumSimple, SpotifyArtist } from '@/types/spotify'
@@ -39,8 +39,7 @@ export function useArtistDetailPage(id: string | undefined) {
   const artist = useArtist(id)
   const albums = useArtistAlbums(id, albumPage, 10)
 
-  const albumPageItems = useMemo(() => albums.data?.items ?? [], [albums.data?.items])
-  const discographyTracks = useArtistDiscographyTracks(id, 10, albumPageItems)
+  const topTracks = useArtistTopTracks(id, 10)
 
   const hasNextAlbums =
     albums.data != null ? albums.data.offset + albums.data.limit < albums.data.total : false
@@ -62,7 +61,7 @@ export function useArtistDetailPage(id: string | undefined) {
 
   return useMemo(
     () => ({
-      discographyTracks,
+      topTracks,
       discographyView,
       setDiscographyView,
       albumPage,
@@ -77,7 +76,7 @@ export function useArtistDetailPage(id: string | undefined) {
       ...meta,
     }),
     [
-      discographyTracks,
+      topTracks,
       discographyView,
       setDiscographyView,
       albumPage,

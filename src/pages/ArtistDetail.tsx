@@ -11,7 +11,7 @@ export function ArtistDetail() {
   const { t } = useTranslation()
 
   const {
-    discographyTracks,
+    topTracks,
     discographyView,
     setDiscographyView,
     albumPage,
@@ -41,7 +41,7 @@ export function ArtistDetail() {
         <div className="max-w-3xl mx-auto px-4">
           <ArtistBio artistName={artistName} />
 
-          {discographyTracks.data.length > 0 && (
+          {(topTracks.data?.length ?? 0) > 0 && (
             <section className="mb-8">
               <div className="flex items-center justify-between px-2 mb-3">
                 <h3 className="text-sm font-bold text-black/50">
@@ -49,9 +49,9 @@ export function ArtistDetail() {
                 </h3>
               </div>
               <ArtistTopTracksChart
-                tracks={discographyTracks.data}
+                tracks={(topTracks.data ?? [])}
                 activeTrackId={activeTrackId}
-                onPlay={async (track) => playTrack(track, discographyTracks.data)}
+                onPlay={async (track) => playTrack(track, (topTracks.data ?? []))}
               />
             </section>
           )}
