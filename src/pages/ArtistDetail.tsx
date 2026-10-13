@@ -24,6 +24,7 @@ export function ArtistDetail() {
     artistSubtitle,
     artistImageUrl,
     artistName,
+    artistLink,
     albumItems,
     activeTrackId,
   } = useArtistDetailPage(id)
@@ -34,6 +35,7 @@ export function ArtistDetail() {
         imageUrl={artistImageUrl}
         name={artistName}
         subtitle={artistSubtitle}
+        link={artistLink}
         onLayout={handleHeaderHeightChange}
       />
 

@@ -34,6 +34,7 @@ interface AlbumMeta {
   imageUrl: string | undefined
   albumName: string
   albumArtists: SpotifyAlbumSimple['artists'] | undefined
+  albumLink: string | undefined
 }
 
 function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
@@ -45,6 +46,7 @@ function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
       imageUrl: undefined,
       albumName: '',
       albumArtists: undefined,
+      albumLink: undefined,
     }
   }
   return {
@@ -54,6 +56,7 @@ function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
     imageUrl: data.images[0]?.url,
     albumName: data.name,
     albumArtists: data.artists,
+    albumLink: data.link,
   }
 }
 

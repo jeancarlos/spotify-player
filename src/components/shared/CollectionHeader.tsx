@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { DeezerAttribution } from './DeezerAttribution'
 import { TiltCover } from './TiltCover'
 
 interface ArtistLink {
@@ -19,9 +21,10 @@ interface CollectionHeaderProps {
   onPlay: () => void
   onLayout: (height: number) => void
   onArtistClick?: (id: string) => void
+  link?: string
 }
 
-function useCollectionLayout() {
+function useCollectionLayout(hasLink: boolean) {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
     const fn = () => {
@@ -35,7 +38,7 @@ function useCollectionLayout() {
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
   const translateY = Math.round(imgPx * 0.25)
-  const headerHeight = imgPx - translateY + 184
+  const headerHeight = imgPx - translateY + 184 + (hasLink ? 28 : 0)
 
   return { imgPx, headerHeight }
 }
@@ -50,8 +53,10 @@ export function CollectionHeader({
   onPlay,
   onLayout,
   onArtistClick,
+  link,
 }: CollectionHeaderProps) {
-  const { imgPx, headerHeight } = useCollectionLayout()
+  const { t } = useTranslation()
+  const { imgPx, headerHeight } = useCollectionLayout(!!link)
 
   const lastHeightRef = useRef<number>(0)
   useEffect(() => {
@@ -132,6 +137,7 @@ export function CollectionHeader({
           )}
           {year ? ` · ${year}` : ''}
         </p>
+        {link && <DeezerAttribution href={link} label={t('common.openOnDeezer')} className="mt-2" />}
         <button
           onClick={onPlay}
           className={cn(

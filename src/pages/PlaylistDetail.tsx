@@ -38,6 +38,7 @@ export function PlaylistDetail() {
         playLabel={t('playlistDetail.playPlaylist')}
         onPlay={handlePlay}
         onLayout={handleLayout}
+        link={playlist.data?.link}
       />
 
       <div style={{ paddingTop: headerHeight }} className="px-4 pb-32">

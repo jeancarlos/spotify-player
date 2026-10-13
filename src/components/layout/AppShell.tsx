@@ -3,6 +3,7 @@ import { HamburgerMenu } from './HamburgerMenu'
 import { LyricsPreloader } from './LyricsPreloader'
 import { QueryErrorHandler } from './QueryErrorHandler'
 import { ReloadPrompt } from './ReloadPrompt'
+import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher'
 import { SkipLink } from '@/components/ui/SkipLink'
 
@@ -22,6 +23,7 @@ export function AppShell() {
         <div className="pointer-events-auto">
           <HamburgerMenu />
           <LanguageSwitcher className="fixed top-4 right-4 z-40" />
+          <DeezerAttribution className="fixed top-5 right-28 z-40" />
         </div>
       </header>
       <main id="main-content" className="relative z-[1] h-full overflow-y-auto" tabIndex={-1}>

@@ -21,6 +21,7 @@ export function AlbumDetail() {
     imageUrl,
     albumName,
     albumArtists,
+    albumLink,
     handlePlay,
     handleLayout,
     handleArtistClick,
@@ -39,6 +40,7 @@ export function AlbumDetail() {
         onPlay={handlePlay}
         onLayout={handleLayout}
         onArtistClick={handleArtistClick}
+        link={albumLink}
       />
 
       <div style={{ paddingTop: headerHeight }} className="pb-32">

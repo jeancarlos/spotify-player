@@ -12,17 +12,19 @@ interface ArtistMeta {
   artistSubtitle: string
   artistImageUrl: string | undefined
   artistName: string
+  artistLink: string | undefined
 }
 
 function deriveArtistMeta(data: SpotifyArtist | undefined): ArtistMeta {
   if (!data) {
-    return { artistSubtitle: '', artistImageUrl: undefined, artistName: '' }
+    return { artistSubtitle: '', artistImageUrl: undefined, artistName: '', artistLink: undefined }
   }
   const genres = data.genres?.slice(0, 2) ?? []
   return {
     artistSubtitle: genres.join(' · '),
     artistImageUrl: data.images[0]?.url,
     artistName: data.name,
+    artistLink: data.link,
   }
 }
 
