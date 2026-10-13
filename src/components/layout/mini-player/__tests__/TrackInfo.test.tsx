@@ -39,6 +39,22 @@ describe('TrackInfo', () => {
     await user.keyboard('{Enter}')
     expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
   })
+  it('makes the note button focusable and reveals its text on focus', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <TrackInfo notes={{ u1: 'my note' }} />
+      </MemoryRouter>
+    )
+    const note = screen.getByRole('button', { name: 'my note' })
+    expect(note).not.toHaveAttribute('tabindex')
+    await user.tab()
+    expect(note).toHaveFocus()
+    expect(note.className).toContain('focus-visible:ring-2')
+    expect(screen.getByText('my note', { selector: 'span' }).className).toContain(
+      'group-focus-within/note:opacity-100'
+    )
+  })
   it('opens the lyrics with Space on the title button', async () => {
     const user = userEvent.setup()
     render(

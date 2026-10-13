@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Tooltip } from '../Tooltip'
 
 describe('Tooltip', () => {
@@ -51,5 +52,17 @@ describe('Tooltip', () => {
     )
     const wrapper = screen.getByText('trigger').parentElement
     expect(wrapper?.className).toContain('flex-1')
+  })
+  it('shows the content when a child has keyboard focus', async () => {
+    render(
+      <Tooltip content="Texto de ajuda">
+        <button>Foco</button>
+      </Tooltip>
+    )
+    await userEvent.tab()
+    expect(screen.getByText('Foco')).toHaveFocus()
+    const tip = screen.getByRole('tooltip')
+    expect(tip).toHaveTextContent('Texto de ajuda')
+    expect(tip.className).toContain('group-focus-within/tooltip:opacity-100')
   })
 })

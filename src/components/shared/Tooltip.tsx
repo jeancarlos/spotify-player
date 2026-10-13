@@ -23,9 +23,10 @@ export function Tooltip({
     <span className={cn('relative group/tooltip inline-block', className)}>
       {children}
       <span
+        role="tooltip"
         className={cn(
           'pointer-events-none absolute bottom-full mb-1 rounded-md bg-black/80 px-2 py-1',
-          'text-xs text-white opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-150 z-50',
+          'text-xs text-white opacity-0 group-hover/tooltip:opacity-100 group-focus-within/tooltip:opacity-100 transition-opacity duration-150 z-50',
           alignClass,
           widthClass
         )}

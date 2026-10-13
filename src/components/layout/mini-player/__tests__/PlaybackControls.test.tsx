@@ -22,13 +22,11 @@ function setup(overrides: Partial<typeof initialPlayerState> = {}) {
     ...overrides,
   }
   render(
-    
-      <MemoryRouter>
-        <PlayerContext.Provider value={{ state, controls }}>
-          <PlaybackControls />
-        </PlayerContext.Provider>
-      </MemoryRouter>
-    
+    <MemoryRouter>
+      <PlayerContext.Provider value={{ state, controls }}>
+        <PlaybackControls />
+      </PlayerContext.Provider>
+    </MemoryRouter>
   )
   return controls
 }
@@ -72,17 +70,24 @@ describe('PlaybackControls', () => {
 
 function Probe() {
   const l = useLocation()
-  return <output data-testid="loc">{JSON.stringify({ p: l.pathname + l.search, s: l.state })}</output>
+  return (
+    <output data-testid="loc">{JSON.stringify({ p: l.pathname + l.search, s: l.state })}</output>
+  )
 }
 
 function setupAt(entry: Parameters<typeof MemoryRouter>[0]['initialEntries']) {
   render(
     <MemoryRouter initialEntries={entry}>
       <PlayerContext.Provider
-        value={{
-          state: { ...initialPlayerState, currentTrack: { id: '1', name: 'Song' } as SpotifyTrack },
-          controls: {},
-        } as never}
+        value={
+          {
+            state: {
+              ...initialPlayerState,
+              currentTrack: { id: '1', name: 'Song' } as SpotifyTrack,
+            },
+            controls: {},
+          } as never
+        }
       >
         <PlaybackControls />
         <Probe />
