@@ -31,8 +31,8 @@ vi.mock('@/components/ui/toast', () => ({
 }))
 
 const mockPlayerState = { currentTrack: mockTrack as SpotifyTrack | null, isPlaying: false }
-vi.mock('@/hooks/usePlayer', () => ({
-  usePlayer: () => ({ state: mockPlayerState, dispatch: vi.fn() }),
+vi.mock('@/contexts/PlayerContext', () => ({
+  usePlayer: () => ({ state: mockPlayerState }),
 }))
 
 vi.mock('@/components/layout/mini-player/PlaybackControls', () => ({

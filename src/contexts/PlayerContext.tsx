@@ -7,10 +7,9 @@ import {
   useReducer,
   useRef,
   useState,
-  type Dispatch,
   type ReactNode,
 } from 'react'
-import { playerReducer, initialPlayerState, type PlayerAction, type PlayerState } from './playerReducer'
+import { playerReducer, initialPlayerState, type PlayerState } from './playerReducer'
 import { deezer } from '@/lib/deezer'
 import { isPlayable, toTrack, type DzTrack } from '@/lib/deezerMappers'
 import { pushRecent } from '@/utils/recentStorage'
@@ -28,7 +27,6 @@ export interface PlayerControls {
 
 interface PlayerContextValue {
   state: PlayerState
-  dispatch: Dispatch<PlayerAction>
   controls: PlayerControls
 }
 
@@ -197,7 +195,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     () => ({ playTrack, toggle, next, previous, seek, setShuffle, cycleRepeat }),
     [playTrack, toggle, next, previous, seek, setShuffle, cycleRepeat]
   )
-  const value = useMemo(() => ({ state, dispatch, controls }), [state, controls])
+  const value = useMemo(() => ({ state, controls }), [state, controls])
 
   return (
     <PlayerContext.Provider value={value}>

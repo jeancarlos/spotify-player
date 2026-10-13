@@ -33,7 +33,6 @@ function renderQueue(queue: SpotifyTrack[], queueIndex: number) {
   const playTrack = vi.fn()
   const value = {
     state: { currentTrack: queue[queueIndex] ?? null, queue, queueIndex, isPlaying: true },
-    dispatch: vi.fn(),
     controls: { playTrack },
   } as never
   render(

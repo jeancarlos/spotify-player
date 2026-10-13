@@ -161,7 +161,7 @@ function PlayerContentPane({
 
 export function PlayerView() {
   const { state, controls } = usePlayer()
-  const { currentTrack, duration } = state
+  const { currentTrack } = state
   const { progressMs: currentProgress } = useProgress()
   const navigate = useNavigate()
   const location = useLocation()
@@ -178,7 +178,7 @@ export function PlayerView() {
     artist: artistName,
     title: trackName,
     album: albumName,
-    durationMs: duration,
+    durationMs: currentTrack?.duration_ms ?? 0,
   })
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)

@@ -13,7 +13,7 @@ const track = {
 
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({
-    state: { currentTrack: track, duration: 90000 },
+    state: { currentTrack: track },
     controls: { seek },
   }),
   useProgress: () => ({ progressMs: 12000, durationMs: 90000 }),

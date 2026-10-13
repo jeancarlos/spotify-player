@@ -19,7 +19,6 @@ const playTrackMock = vi.fn()
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({
     state: { currentTrack: null, isPlaying: false },
-    dispatch: vi.fn(),
     controls: { playTrack: playTrackMock },
   }),
 }))

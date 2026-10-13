@@ -24,7 +24,7 @@ function setup(overrides: Partial<typeof initialPlayerState> = {}) {
   render(
     
       <MemoryRouter>
-        <PlayerContext.Provider value={{ state, dispatch: vi.fn(), controls }}>
+        <PlayerContext.Provider value={{ state, controls }}>
           <PlaybackControls />
         </PlayerContext.Provider>
       </MemoryRouter>

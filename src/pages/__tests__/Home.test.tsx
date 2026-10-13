@@ -42,9 +42,6 @@ function renderHome() {
           <PlayerContext.Provider
             value={{
               state: initialPlayerState,
-              dispatch: () => {
-                /* noop */
-              },
               controls: {
                 playTrack,
                 toggle: () => undefined,

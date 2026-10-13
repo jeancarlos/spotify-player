@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { Heart } from 'lucide-react'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'

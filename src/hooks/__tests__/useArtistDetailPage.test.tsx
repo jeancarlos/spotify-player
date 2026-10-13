@@ -9,7 +9,7 @@ const playTrack = vi.fn()
 const top = [{ id: '1', uri: 'u1', preview_url: 'http://p/1' }] as unknown as SpotifyTrack[]
 
 vi.mock('@/contexts/PlayerContext', () => ({
-  usePlayer: () => ({ state: {}, dispatch: vi.fn(), controls: { playTrack } }),
+  usePlayer: () => ({ state: {}, controls: { playTrack } }),
 }))
 vi.mock('@/hooks/queries/useArtist', () => ({ useArtist: () => ({ data: undefined }) }))
 vi.mock('@/hooks/queries/useArtistAlbums', () => ({ useArtistAlbums: () => ({ data: undefined }) }))
