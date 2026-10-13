@@ -80,3 +80,11 @@ describe('playerReducer', () => {
     expect(state.lastSeekTime).toBe(now)
   })
 })
+
+describe('SET_QUEUE_INDEX', () => {
+  it('stores the index of the playing track in the queue', () => {
+    const next = playerReducer(initialPlayerState, { type: 'SET_QUEUE_INDEX', payload: 3 })
+    expect(next.queueIndex).toBe(3)
+    expect(initialPlayerState.queueIndex).toBe(0)
+  })
+})

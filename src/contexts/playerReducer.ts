@@ -3,6 +3,7 @@ import type { SpotifyTrack } from '@/types/spotify'
 export interface PlayerState {
   currentTrack: SpotifyTrack | null
   queue: SpotifyTrack[]
+  queueIndex: number
   isPlaying: boolean
   isLoading: boolean
   duration: number
@@ -26,11 +27,13 @@ export type PlayerAction =
   | { type: 'TOGGLE_FULLSCREEN' }
   | { type: 'SET_PALETTE'; payload: [string, string] }
   | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
+  | { type: 'SET_QUEUE_INDEX'; payload: number }
   | { type: 'SET_SEEK_TIME'; payload: number }
 
 export const initialPlayerState: PlayerState = {
   currentTrack: null,
   queue: [],
+  queueIndex: 0,
   isPlaying: false,
   isLoading: false,
   duration: 0,
@@ -45,6 +48,7 @@ export const initialPlayerState: PlayerState = {
 type QueueAction =
   | { type: 'SET_TRACK'; payload: SpotifyTrack }
   | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
+  | { type: 'SET_QUEUE_INDEX'; payload: number }
   | { type: 'SET_SEEK_TIME'; payload: number }
 
 type PlaybackAction =
@@ -64,6 +68,8 @@ function queueReducer(state: PlayerState, action: QueueAction): PlayerState {
       return { ...state, currentTrack: action.payload, duration: action.payload.duration_ms }
     case 'SET_QUEUE':
       return { ...state, queue: action.payload }
+    case 'SET_QUEUE_INDEX':
+      return { ...state, queueIndex: action.payload }
     case 'SET_SEEK_TIME':
       return { ...state, lastSeekTime: action.payload }
     default:
@@ -105,7 +111,7 @@ function uiReducer(state: PlayerState, action: UiAction): PlayerState {
 
 export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
   const { type } = action
-  if (type === 'SET_TRACK' || type === 'SET_QUEUE' || type === 'SET_SEEK_TIME') {
+  if (type === 'SET_TRACK' || type === 'SET_QUEUE' || type === 'SET_QUEUE_INDEX' || type === 'SET_SEEK_TIME') {
     return queueReducer(state, action)
   }
   if (type === 'TOGGLE_FULLSCREEN' || type === 'SET_PALETTE') {
