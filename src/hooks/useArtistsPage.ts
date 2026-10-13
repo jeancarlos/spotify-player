@@ -14,13 +14,16 @@ interface PageParams {
   page: number
 }
 
+const SEARCH_TABS: readonly SearchTab[] = ['artist', 'album', 'playlist']
+
 function extractPageParams(
   searchParams: URLSearchParams,
   saved: ReturnType<typeof loadLastSearch>
 ): PageParams {
-  const query = searchParams.get('q') ?? saved?.q ?? ''
-  const tab = (searchParams.get('tab') as SearchTab | null) ?? saved?.tab ?? 'artist'
-  const page = Number(searchParams.get('page') ?? '1')
+  const query = (searchParams.get('q') ?? saved?.q ?? '').trim()
+  const rawTab = searchParams.get('tab') ?? saved?.tab ?? 'artist'
+  const tab = SEARCH_TABS.includes(rawTab as SearchTab) ? (rawTab as SearchTab) : 'artist'
+  const page = Math.max(1, Math.trunc(Number(searchParams.get('page'))) || 1)
   return { query, tab, page }
 }
 
@@ -48,7 +51,7 @@ export function useArtistsPage() {
   const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const saved = loadLastSearch()
+  const saved = useMemo(() => loadLastSearch(), [])
   const { query, tab, page } = extractPageParams(searchParams, saved)
 
   const isSearch = query.trim().length > 0
