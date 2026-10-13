@@ -34,7 +34,7 @@ vi.mock('@/components/favorites/AddFavoriteForm', () => ({
   }: {
     onClose: () => void
     existingFavorites: SpotifyTrack[]
-    onAdd: (t: SpotifyTrack, n?: string) => void
+    onAdd: (t: SpotifyTrack, n?: string) => boolean
   }) => (
     <div data-testid="add-favorite-form">
       <button type="button" onClick={onClose}>
@@ -44,20 +44,22 @@ vi.mock('@/components/favorites/AddFavoriteForm', () => ({
   ),
 }))
 
-const mockSpoterPlaylist = {
+const mockToast = vi.fn()
+vi.mock('@/components/ui/toast', () => ({
+  useToast: () => ({ toast: mockToast }),
+}))
+
+const mockFavorites = {
   tracks: [] as SpotifyTrack[],
   notes: {} as Record<string, string>,
   addTrack: vi.fn(),
   removeTrack: vi.fn(),
-  refresh: vi.fn().mockResolvedValue(undefined),
-  isRefreshing: false,
-  isLoading: false,
-  playlistId: 'pl-1',
-  playlistName: "User's Spoter List",
+  setNote: vi.fn(),
+  playlistName: 'Spoter List',
 }
 
-vi.mock('@/hooks/useSpoterPlaylist', () => ({
-  useSpoterPlaylist: () => mockSpoterPlaylist,
+vi.mock('@/hooks/useFavorites', () => ({
+  useFavorites: () => mockFavorites,
 }))
 
 import { Favorites } from '@/pages/Favorites'
@@ -94,9 +96,7 @@ function renderFavorites() {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockSpoterPlaylist.tracks = []
-  mockSpoterPlaylist.isLoading = false
-  mockSpoterPlaylist.refresh = vi.fn().mockResolvedValue(undefined)
+  mockFavorites.tracks = []
 })
 
 describe('Favorites', () => {
@@ -106,22 +106,36 @@ describe('Favorites', () => {
   })
 
   it('não mostra EmptyState quando há tracks', () => {
-    mockSpoterPlaylist.tracks = [mockTrack('t1')]
+    mockFavorites.tracks = [mockTrack('t1')]
     renderFavorites()
     expect(screen.queryByText('favorites.emptyList')).toBeNull()
   })
 
   it('renderiza uma linha por track', () => {
-    mockSpoterPlaylist.tracks = [mockTrack('t1'), mockTrack('t2')]
+    mockFavorites.tracks = [mockTrack('t1'), mockTrack('t2')]
     renderFavorites()
     expect(screen.getByText('Track t1')).toBeInTheDocument()
     expect(screen.getByText('Track t2')).toBeInTheDocument()
   })
 
-  it('mostra skeleton quando isLoading é true', () => {
-    mockSpoterPlaylist.isLoading = true
+  it('remover mostra toast de erro quando o storage falha', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1'), mockTrack('t2')]
+    mockFavorites.removeTrack.mockReturnValue(false)
     renderFavorites()
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+    await user.click(screen.getAllByRole('button', { name: /favorites\.removeConfirm/i })[0])
+    expect(mockFavorites.removeTrack).toHaveBeenCalledWith('spotify:track:t1')
+    expect(mockToast).toHaveBeenCalledWith('favorites.saveFailed', 'error')
+  })
+
+  it('permite remover o último favorito', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1')]
+    mockFavorites.removeTrack.mockReturnValue(true)
+    renderFavorites()
+    await user.click(screen.getByRole('button', { name: /favorites\.removeConfirm/i }))
+    expect(mockFavorites.removeTrack).toHaveBeenCalledWith('spotify:track:t1')
+    expect(mockToast).not.toHaveBeenCalled()
   })
 
   it('botão de adicionar abre o popover', async () => {

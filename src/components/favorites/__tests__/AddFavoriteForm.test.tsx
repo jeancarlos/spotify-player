@@ -51,7 +51,7 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
 
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
 
-const onAdd = vi.fn()
+const onAdd = vi.fn(() => true)
 const onClose = vi.fn()
 
 beforeEach(() => {
@@ -107,6 +107,18 @@ describe('AddFavoriteForm', () => {
       expect(onAdd).toHaveBeenCalledWith(mockTrack, 'ouço no treino')
       expect(onClose).toHaveBeenCalled()
     })
+  })
+
+  it('submit nao fecha o form quando onAdd falha', async () => {
+    const user = userEvent.setup()
+    onAdd.mockReturnValueOnce(false)
+    renderForm()
+    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await user.click(screen.getByRole('button', { name: /favorites\.addConfirm/i }))
+    await waitFor(() => {
+      expect(onAdd).toHaveBeenCalled()
+    })
+    expect(onClose).not.toHaveBeenCalled()
   })
 
   it('submit com nota vazia chama onAdd com undefined como nota', async () => {

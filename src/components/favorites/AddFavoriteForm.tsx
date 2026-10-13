@@ -11,7 +11,7 @@ const MAX_NOTE_LENGTH = 80
 
 interface AddFavoriteFormProps {
   existingFavorites: SpotifyTrack[]
-  onAdd: (track: SpotifyTrack, note?: string) => void
+  onAdd: (track: SpotifyTrack, note?: string) => boolean
   onClose: () => void
 }
 
@@ -55,7 +55,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
 
   const onSubmit = handleSubmit(({ track, note }) => {
     if (!track) return
-    onAdd(track, note.trim() || undefined)
+    if (!onAdd(track, note.trim() || undefined)) return
     reset()
     onClose()
   })

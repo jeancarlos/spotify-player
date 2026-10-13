@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { usePlayer } from '@/contexts/PlayerContext'
-import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
+import { useFavorites } from '@/hooks/useFavorites'
 import { useTranslation } from 'react-i18next'
 import { ProgressBar } from './mini-player/ProgressBar'
 import { TrackInfo } from './mini-player/TrackInfo'
@@ -14,8 +14,7 @@ interface MiniPlayerProps {
 export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
   const { state } = usePlayer()
   const { currentTrack } = state
-  const { tracks, notes, addTrack, removeTrack } = useSpoterPlaylist()
-  const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
+  const { notes } = useFavorites()
   const { t } = useTranslation()
 
   return (
@@ -35,7 +34,7 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
 
       <div className="relative px-4 py-3 flex items-center gap-3">
         <TrackInfo notes={notes} />
-        <FavoriteButton isSaved={isSaved} addTrack={addTrack} removeTrack={removeTrack} />
+        <FavoriteButton />
         <PlaybackControls />
       </div>
     </motion.aside>

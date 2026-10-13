@@ -3,9 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/contexts/PlayerContext'
-import { useAuth } from '@/hooks/useAuth'
-import { useIsTrackFavorite } from '@/hooks/useIsTrackFavorite'
-import { readLocalNotes } from '@/utils/favStorage'
+import { useFavorites } from '@/hooks/useFavorites'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const PLAYER_CLEARANCE = 136
@@ -74,24 +72,10 @@ interface PersistentVinylDiskProps {
 export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDiskProps) {
   const location = useLocation()
   const { state } = usePlayer()
-  const { state: authState } = useAuth()
   const { loginY, homeY, otherY } = useVinylY()
 
-  const userId = authState.profile?.id ?? ''
-  const isFavorite = useIsTrackFavorite(state.currentTrack?.uri, userId)
-
-  const [notes, setNotes] = useState<Record<string, string>>({})
-  useEffect(() => {
-    if (!userId) return
-    const handler = () => {
-      setNotes(readLocalNotes(userId))
-    }
-    setTimeout(handler, 0)
-    window.addEventListener('spoter:favorites-changed', handler)
-    return () => {
-      window.removeEventListener('spoter:favorites-changed', handler)
-    }
-  }, [userId])
+  const { tracks, notes } = useFavorites()
+  const isFavorite = tracks.some((t) => t.uri === state.currentTrack?.uri)
 
   const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'

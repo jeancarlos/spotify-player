@@ -3,30 +3,27 @@ import { Heart } from 'lucide-react'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { useToast } from '@/components/ui/toast'
 import { useTranslation } from 'react-i18next'
+import { useFavorites } from '@/hooks/useFavorites'
 import { cn } from '@/lib/utils'
 import { ControlTip } from './PlaybackControls'
-import type { SpotifyTrack } from '@/types/spotify'
 
-interface FavoriteButtonProps {
-  isSaved: boolean
-  addTrack: (track: SpotifyTrack) => void
-  removeTrack: (uri: string) => void
-}
-
-export function FavoriteButton({ isSaved, addTrack, removeTrack }: FavoriteButtonProps) {
+export function FavoriteButton() {
   const { state } = usePlayer()
   const { currentTrack } = state
+  const { tracks, addTrack, removeTrack } = useFavorites()
+  const isSaved = !!currentTrack && tracks.some((t) => t.uri === currentTrack.uri)
   const { toast } = useToast()
   const { t } = useTranslation()
 
   const handleHeart = useCallback(() => {
     if (!currentTrack) return
     if (isSaved) {
-      removeTrack(currentTrack.uri)
-      toast(t('favorites.removedFromList'), 'info')
-    } else {
-      addTrack(currentTrack)
+      if (removeTrack(currentTrack.uri)) toast(t('favorites.removedFromList'), 'info')
+      else toast(t('favorites.saveFailed'), 'error')
+    } else if (addTrack(currentTrack)) {
       toast(t('favorites.addedToList'), 'success')
+    } else {
+      toast(t('favorites.saveFailed'), 'error')
     }
   }, [currentTrack, isSaved, addTrack, removeTrack, toast, t])
 

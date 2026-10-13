@@ -105,6 +105,7 @@
     "owner": "by {{name}}"
   },
   "favorites": {
+    "saveFailed": "Couldn't save your favorites in this browser",
     "song": "Song",
     "artist": "Artist",
     "album": "Album",
@@ -122,7 +123,6 @@
     "minQuery": "Type at least 2 characters",
     "close": "Close",
     "addTrack": "+ Add",
-    "viewOnSpotify": "View on Spotify",
     "addToList": "Add to Spoter List",
     "removeFromList": "Remove from Spoter List",
     "addedToList": "Added!",
@@ -139,7 +139,6 @@
     "noteCharsLeft": "{{count}}/80",
     "editNote": "Edit note",
     "clearTrack": "Clear selection",
-    "refreshFromSpotify": "Refresh from Spotify",
     "reorderError": "Reorder failed. Previous order restored.",
     "refreshError": "Failed to refresh from Spotify.",
     "reorderPosition": "Edit position of {{name}}"

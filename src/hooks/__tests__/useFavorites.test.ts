@@ -45,6 +45,20 @@ describe('useFavorites', () => {
     expect(stored().tracks).toHaveLength(2)
   })
 
+  it('shows a track added by one mounted hook in another', () => {
+    const a = renderHook(() => useFavorites())
+    const b = renderHook(() => useFavorites())
+    act(() => {
+      a.result.current.addTrack(mk('1'), 'hi')
+    })
+    expect(b.result.current.tracks.map((t) => t.id)).toEqual(['1'])
+    expect(b.result.current.notes).toEqual({ 'deezer:track:1': 'hi' })
+    act(() => {
+      b.result.current.removeTrack('deezer:track:1')
+    })
+    expect(a.result.current.tracks).toEqual([])
+  })
+
   it('stores tracks with preview_url null and keeps is_playable', () => {
     const { result } = renderHook(() => useFavorites())
     act(() => {

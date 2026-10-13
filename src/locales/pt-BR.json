@@ -105,6 +105,7 @@
     "owner": "por {{name}}"
   },
   "favorites": {
+    "saveFailed": "Não foi possível salvar seus favoritos neste navegador",
     "song": "Música",
     "artist": "Artista",
     "album": "Álbum",
@@ -122,7 +123,6 @@
     "minQuery": "Digite pelo menos 2 caracteres",
     "close": "Fechar",
     "addTrack": "+ Adicionar",
-    "viewOnSpotify": "Ver no Spotify",
     "addToList": "Adicionar à Spoter List",
     "removeFromList": "Remover da Spoter List",
     "addedToList": "Adicionada!",
@@ -139,7 +139,6 @@
     "noteCharsLeft": "{{count}}/80",
     "editNote": "Editar nota",
     "clearTrack": "Limpar seleção",
-    "refreshFromSpotify": "Atualizar do Spotify",
     "reorderError": "Erro ao reordenar. A ordem anterior foi restaurada.",
     "refreshError": "Erro ao atualizar da Spotify.",
     "reorderPosition": "Editar posição de {{name}}"
