@@ -227,13 +227,16 @@ describe('PlayerProvider', () => {
   })
 
   it('setShuffle updates the ref before the next read', async () => {
-    const list = [track('1'), track('2')]
+    vi.spyOn(Math, 'random').mockReturnValue(0.99)
+    const list = [track('1'), track('2'), track('3')]
     await act(() => controls.playTrack(list[0], list))
-    act(() => {
+    await act(async () => {
       controls.setShuffle(true)
       controls.next()
+      await Promise.resolve()
     })
-    await waitFor(() => { expect(latest.currentTrack?.id).toBe('2'); })
-    expect(latest.shuffle).toBe(true)
+    await waitFor(() => {
+      expect(latest.currentTrack?.id).toBe('3')
+    })
   })
 })
