@@ -11,8 +11,12 @@ export function QueryErrorHandler() {
   useEffect(() => {
     const failing = new Set<string>()
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event.type !== 'updated') return
       const { queryHash } = event.query
+      if (event.type === 'removed') {
+        failing.delete(queryHash)
+        return
+      }
+      if (event.type !== 'updated') return
       if (event.action.type === 'success') {
         failing.delete(queryHash)
         return

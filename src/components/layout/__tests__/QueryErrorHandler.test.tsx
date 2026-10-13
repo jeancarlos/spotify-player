@@ -55,4 +55,12 @@ describe('QueryErrorHandler', () => {
     await fail(client, 'a')
     expect(toast).toHaveBeenCalledTimes(1)
   })
+
+  it('toasts again when a failed query is garbage collected without recovering', async () => {
+    const client = setup()
+    await fail(client, 'a')
+    client.removeQueries({ queryKey: ['a'] })
+    await fail(client, 'b')
+    expect(toast).toHaveBeenCalledTimes(2)
+  })
 })
