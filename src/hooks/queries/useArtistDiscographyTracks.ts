@@ -76,7 +76,7 @@ export function useArtistDiscographyTracks(
     const all = trackQueriesResults.flatMap((q) => q.data ?? [])
     if (all.length === 0) return []
     const unique = Array.from(new Map(all.map((t) => [t.id, t])).values())
-    return unique.sort((a, b) => b.popularity - a.popularity).slice(0, topN)
+    return unique.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0)).slice(0, topN)
   }, [trackQueriesResults, topN])
 
   const result = useMemo(() => ({ data, isLoading }), [data, isLoading])

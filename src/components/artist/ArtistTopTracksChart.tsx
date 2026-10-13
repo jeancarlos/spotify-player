@@ -20,7 +20,7 @@ function seededFraction(seed: string): number {
   return (Math.abs(h) % 1000) / 1000
 }
 
-function estimateStreams(popularity: number, trackId: string): number {
+function estimateStreams(popularity = 0, trackId: string): number {
   const base = popularity > 0 ? popularity : Math.round(15 + seededFraction(trackId) * 30)
   return Math.round(50_000 + (base / 100) ** 2 * 4_950_000)
 }
@@ -40,7 +40,7 @@ interface ChartEntry {
   albumName: string
   albumArt: string
   streams: number
-  popularity: number
+  popularity?: number
   track: SpotifyTrack
 }
 
@@ -143,7 +143,7 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   const chartData = useMemo<ChartEntry[]>(() => {
-    const sorted = [...tracks].slice(0, 10).sort((a, b) => b.popularity - a.popularity)
+    const sorted = [...tracks].slice(0, 10).sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
     return sorted.map((t) => ({
       id: t.id,
       label: t.name,

@@ -99,7 +99,6 @@ export function useAlbumDetailPage() {
         ...track,
         type: 'track' as const,
         album: meta.albumSimple,
-        popularity: 0,
       })),
     [albumItems, meta.albumSimple]
   )
@@ -112,7 +111,6 @@ export function useAlbumDetailPage() {
       ...track,
       type: 'track' as const,
       album: meta.albumSimple,
-      popularity: 0,
     }),
     [meta.albumSimple]
   )
