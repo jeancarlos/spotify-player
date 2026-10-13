@@ -190,6 +190,7 @@
     "close": "Close window"
   },
   "track": {
+    "noPreview": "Preview unavailable",
     "popularity": "Popularity",
     "key": "Key",
     "timeSignature": "Time sig.",

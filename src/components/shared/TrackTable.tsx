@@ -2,6 +2,7 @@ import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
+import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface TrackTableProps {
@@ -43,19 +44,23 @@ function TrackTableRow({
 }: TrackTableRowProps) {
   const { t } = useTranslation()
   const { albumImage, albumId, albumName, artistNames, rank } = resolveTrackMeta(track)
+  const playable = isPlayable(track)
 
   return (
     <tr
       className={cn(
-        'group hover:bg-black/4 transition-colors cursor-pointer',
+        'group hover:bg-black/4 transition-colors',
+        playable ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed',
         isActive && 'bg-black/6'
       )}
-      onClick={() => onPlay?.(track)}
+      aria-disabled={!playable || undefined}
+      onClick={() => playable && onPlay?.(track)}
     >
       <td className="py-2 px-3 text-black/30 tabular-nums">
         <span className="group-hover:hidden">{index + 1}</span>
         <button
-          className="hidden group-hover:flex items-center justify-center"
+          className="hidden group-hover:flex items-center justify-center disabled:cursor-not-allowed"
+          disabled={!playable}
           aria-label={t('player.playTrack', { name: track.name })}
           onClick={(e) => {
             e.stopPropagation()
@@ -77,6 +82,7 @@ function TrackTableRow({
       </td>
       <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[180px] truncate">
         {track.name}
+        {!playable && <span className="sr-only">{t('track.noPreview')}</span>}
       </td>
       <td className="py-2 px-3 text-black/50 whitespace-nowrap">{artistNames}</td>
       {showAlbumColumn && (

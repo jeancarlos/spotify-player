@@ -23,7 +23,7 @@ const mk = (id: string): SpotifyTrack => ({
   },
   explicit: false,
   rank: 1,
-  preview_url: null,
+  preview_url: 'https://cdn.test/x.mp3',
   type: 'track',
 })
 

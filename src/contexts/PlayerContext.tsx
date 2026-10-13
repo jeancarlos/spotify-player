@@ -102,6 +102,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const playTrack = useCallback(
     async (track: SpotifyTrack, list?: SpotifyTrack[]) => {
+      if (!isPlayable(track)) return
       const queue = list?.some((t) => t.uri === track.uri) ? list : [track]
       await startAt(queue, queue.findIndex((t) => t.uri === track.uri))
     },

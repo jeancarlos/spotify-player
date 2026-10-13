@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { TrackTable } from '../TrackTable'
 import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
 
@@ -20,7 +20,7 @@ const albumTrack: SpotifyTrack = {
   duration_ms: 212000,
   uri: 'spotify:track:t1',
   explicit: false,
-  preview_url: null,
+  preview_url: 'https://cdn.test/t1.mp3',
   type: 'track',
   disc_number: 1,
   track_number: 1,
@@ -41,5 +41,22 @@ describe('TrackTable', () => {
     render(<TrackTable tracks={[fullTrack]} showAlbumColumn={false} />)
     expect(screen.getAllByRole('columnheader').length).toBe(withoutData * 2 + 1)
     expect(screen.getByText('73')).toBeInTheDocument()
+  })
+
+  it('disables unplayable rows and only plays playable ones', () => {
+    const onPlay = vi.fn()
+    const dead = { ...fullTrack, id: 'dead', name: 'Dead Track', preview_url: null }
+    render(<TrackTable tracks={[albumTrack, dead]} onPlay={onPlay} />)
+    const deadRow = screen.getByText('Dead Track').closest('tr') as HTMLElement
+    expect(deadRow).toHaveAttribute('aria-disabled', 'true')
+    expect(deadRow.className).toContain('opacity-40')
+    expect(screen.getAllByText('track.noPreview')).toHaveLength(1)
+    const dis = screen.getAllByRole('button', { name: /player\.playTrack/i, hidden: true })
+    expect(dis.filter((b) => (b as HTMLButtonElement).disabled)).toHaveLength(1)
+    fireEvent.click(deadRow)
+    expect(onPlay).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Album Track').closest('tr') as HTMLElement)
+    expect(onPlay).toHaveBeenCalledWith(albumTrack)
+    expect(screen.getByText('Album Track').closest('tr')).not.toHaveAttribute('aria-disabled')
   })
 })

@@ -239,4 +239,17 @@ describe('PlayerProvider', () => {
       expect(latest.currentTrack?.id).toBe('3')
     })
   })
+
+  it('ignores playTrack for an unplayable track', async () => {
+    const list = [track('1'), track('2')]
+    deezerMock.mockImplementation((path: string) => Promise.resolve(fresh(list[Number(path.slice(-1)) - 1])))
+    await act(() => controls.playTrack(list[0], list))
+    const src = audio().src
+    deezerMock.mockClear()
+    await act(() => controls.playTrack(track('9', false), [track('9', false)]))
+    expect(latest.currentTrack?.id).toBe('1')
+    expect(latest.queue).toEqual(list)
+    expect(audio().src).toBe(src)
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
 })

@@ -190,6 +190,7 @@
     "close": "Fechar janela"
   },
   "track": {
+    "noPreview": "Prévia indisponível",
     "popularity": "Popularidade",
     "key": "Tonalidade",
     "timeSignature": "Compasso",

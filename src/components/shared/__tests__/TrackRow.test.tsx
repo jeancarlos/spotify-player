@@ -22,7 +22,7 @@ const track: SpotifyTrack = {
   },
   explicit: false,
   rank: 80,
-  preview_url: null,
+  preview_url: 'https://cdn.test/t1.mp3',
   type: 'track',
 }
 
@@ -77,5 +77,27 @@ describe('TrackRow', () => {
   it('renders note text in DOM when note provided', () => {
     render(<TrackRow track={track} note="This is a note" />)
     expect(screen.getByText('Test Track')).toBeInTheDocument()
+  })
+
+  it('disables an unplayable track and never calls onPlay', async () => {
+    const user = userEvent.setup()
+    const onPlay = vi.fn()
+    const dead = { ...track, preview_url: null }
+    render(<TrackRow track={dead} onPlay={onPlay} index={0} />)
+    expect(screen.getByText('track.noPreview')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeDisabled()
+    const row = document.querySelector<HTMLElement>('[aria-disabled="true"]')!
+    expect(row).toBeInTheDocument()
+    expect(row.parentElement?.className).toContain('opacity-40')
+    await user.click(row)
+    row.focus()
+    await user.keyboard('{Enter}')
+    await user.click(screen.getByRole('button', { name: /player\.playTrack/i }))
+    expect(onPlay).not.toHaveBeenCalled()
+  })
+
+  it('flags readable:false tracks as disabled', () => {
+    render(<TrackRow track={{ ...track, is_playable: false }} onPlay={vi.fn()} />)
+    expect(document.querySelector('[aria-disabled="true"]')).toBeInTheDocument()
   })
 })

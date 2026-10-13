@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/shared/Tooltip'
+import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
 
 interface TrackRowProps {
@@ -54,6 +55,20 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
   }
 }
 
+function playableClasses(playable: boolean) {
+  return {
+    row: playable ? '' : 'opacity-40 cursor-not-allowed',
+    area: playable ? 'cursor-pointer' : 'cursor-not-allowed',
+  }
+}
+
+function resolveMeta(track: SpotifyTrack) {
+  return {
+    albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
+    artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '',
+  }
+}
+
 function isActivationKey(key: string): boolean {
   return key === 'Enter' || key === ' '
 }
@@ -94,7 +109,8 @@ function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellPr
   const { t } = useTranslation()
   return (
     <button
-      className="w-6 shrink-0 flex items-center justify-center focus:outline-none"
+      className="w-6 shrink-0 flex items-center justify-center focus:outline-none disabled:cursor-not-allowed"
+      disabled={!onPlay}
       aria-label={t('player.playTrack', { name: trackName })}
       onClick={(e) => {
         e.stopPropagation()
@@ -125,25 +141,28 @@ export function TrackRow({
 }: TrackRowProps) {
   const { t } = useTranslation()
   const styles = buildTrackTheme(theme === 'dark', isActive)
+  const playable = isPlayable(track)
+  const play = playable ? onPlay : undefined
+  const cls = playableClasses(playable)
 
-  const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
-  const artistNames = 'artists' in track ? track.artists.map((a) => a.name).join(', ') : ''
+  const { albumImage, artistNames } = resolveMeta(track)
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (isActivationKey(e.key)) {
       e.preventDefault()
-      onPlay?.(track)
+      play?.(track)
     }
   }
 
   return (
-    <div className={styles.row}>
-      <PlayCell trackName={track.name} index={index} theme={styles} onPlay={onPlay} track={track} />
+    <div className={cn(styles.row, cls.row)}>
+      <PlayCell trackName={track.name} index={index} theme={styles} onPlay={play} track={track} />
 
       <div
-        className="flex-1 min-w-0 flex items-center gap-3 cursor-pointer"
-        onClick={() => onPlay?.(track)}
+        className={cn('flex-1 min-w-0 flex items-center gap-3', cls.area)}
+        onClick={() => play?.(track)}
         role="button"
+        aria-disabled={!playable || undefined}
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
@@ -151,6 +170,7 @@ export function TrackRow({
           <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
         )}
         <NameArea track={track} note={note} theme={styles} artistNames={artistNames} />
+        {!playable && <span className="sr-only">{t('track.noPreview')}</span>}
       </div>
 
       <span className={styles.duration}>{formatDuration(track.duration_ms)}</span>
