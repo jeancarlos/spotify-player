@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePlayer } from '@/contexts/PlayerContext'
-import { fetchLyrics, cleanTitle } from '@/hooks/queries/useLyrics'
+import { fetchLyrics, lyricsKey } from '@/hooks/queries/useLyrics'
 
 export function LyricsPreloader() {
   const { state } = usePlayer()
@@ -15,7 +15,7 @@ export function LyricsPreloader() {
       const album = track.album.name
       const durationMs = track.duration_ms
       if (!artist || !title) return
-      const queryKey = ['lyrics', artist, cleanTitle(title), durationMs]
+      const queryKey = lyricsKey({ artist, title, album, durationMs })
       if (queryClient.getQueryData(queryKey)) return
       void queryClient.prefetchQuery({
         queryKey,
