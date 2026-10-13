@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   toTrack,
   toArtist,
@@ -101,6 +101,12 @@ describe('deezerMappers', () => {
     expect(r.total).toBe(262)
     expect(r.next).toBe(list.next)
     expect(toPage(albumTracks as unknown as DzList<DzTrack>, 0, 50, toTrack).next).toBeNull()
+  })
+
+  it('toPage calls the mapper with exactly one argument', () => {
+    const map = vi.fn((r: number) => r)
+    toPage({ data: [1, 2, 3], total: 3, next: undefined }, 0, 20, map)
+    expect(map.mock.calls).toEqual([[1], [2], [3]])
   })
 
   it('isPlayable needs a preview and a non-false is_playable', () => {

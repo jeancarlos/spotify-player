@@ -1,12 +1,13 @@
 import { useSearchPaged } from './useSearchPaged'
-import type { SearchAlbumsResponse, SpotifyAlbumSimple } from '@/types/spotify'
+import { toAlbum, type DzAlbum } from '@/lib/deezerMappers'
+import type { SpotifyAlbumSimple } from '@/types/spotify'
 
 export function useSearchAlbums(query: string, page: number) {
-  return useSearchPaged<SpotifyAlbumSimple, SearchAlbumsResponse>({
+  return useSearchPaged<DzAlbum, SpotifyAlbumSimple>({
     queryKeyPrefix: 'albums-search',
+    path: 'search/album',
     query,
     page,
-    apiType: 'album',
-    getPage: (res) => res.albums,
+    map: (a) => toAlbum(a),
   })
 }

@@ -117,18 +117,6 @@ export interface RecentlyPlayedResponse {
   next: string | null
 }
 
-export interface SearchArtistsResponse {
-  artists: PagingObject<SpotifyArtist>
-}
-
-export interface SearchAlbumsResponse {
-  albums: PagingObject<SpotifyAlbumSimple>
-}
-
-export interface SearchPlaylistsResponse {
-  playlists: PagingObject<SpotifyPlaylist | null>
-}
-
 export interface ArtistTopTracksResponse {
   tracks: SpotifyTrack[]
 }
@@ -240,10 +228,6 @@ export interface PlaylistTracksResponse {
   next: string | null
   href?: string
   previous?: string | null
-}
-
-export interface SearchTracksResponse {
-  tracks: PagingObject<SpotifyTrack>
 }
 
 export interface SpotifyQueueResponse {

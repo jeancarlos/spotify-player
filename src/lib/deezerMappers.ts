@@ -89,7 +89,8 @@ const toArtistRef = (a: DzArtistRef | undefined): SpotifyArtistSimple => ({
   type: 'artist',
 })
 
-const coverImages = (a: DzAlbumRef) => toImages(a.cover_small, a.cover_medium, a.cover_big, a.cover_xl)
+const coverImages = (a: DzAlbumRef) =>
+  toImages(a.cover_small, a.cover_medium, a.cover_big, a.cover_xl)
 
 const albumType = (t?: string): SpotifyAlbumSimple['album_type'] =>
   t === 'single' || t === 'compilation' ? t : 'album'
@@ -188,10 +189,15 @@ export function toPlaylist(p: DzPlaylist): SpotifyPlaylist {
   }
 }
 
-export function toPage<R, T>(list: DzList<R>, index: number, limit: number, map: (r: R) => T): PagingObject<T> {
+export function toPage<R, T>(
+  list: DzList<R>,
+  index: number,
+  limit: number,
+  map: (r: R) => T
+): PagingObject<T> {
   return {
     href: '',
-    items: list.data.map(map),
+    items: list.data.map((r) => map(r)),
     limit,
     offset: index,
     total: list.total ?? list.data.length,
