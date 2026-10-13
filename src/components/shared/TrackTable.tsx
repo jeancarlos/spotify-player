@@ -9,6 +9,7 @@ interface TrackTableProps {
   tracks: (SpotifyTrack)[]
   showAlbumColumn?: boolean
   activeTrackId?: string
+  startIndex?: number
   onPlay?: (track: SpotifyTrack) => void
   onAlbumClick?: (albumId: string) => void
 }
@@ -121,6 +122,7 @@ export function TrackTable({
   tracks,
   showAlbumColumn = true,
   activeTrackId,
+  startIndex = 0,
   onPlay,
   onAlbumClick,
 }: TrackTableProps) {
@@ -162,7 +164,7 @@ export function TrackTable({
             <TrackTableRow
               key={track.id}
               track={track}
-              index={i}
+              index={startIndex + i}
               isActive={track.id === activeTrackId}
               showAlbumColumn={showAlbumColumn}
               showRank={showRank}

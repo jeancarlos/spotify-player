@@ -65,6 +65,7 @@ export function AlbumDetail() {
               <TrackTable
                 tracks={albumItems}
                 showAlbumColumn={false}
+                startIndex={(page - 1) * ALBUM_LIMIT}
                 activeTrackId={playerState.currentTrack?.id}
                 onPlay={(track) => {
                   void handleTrackPlay(track)

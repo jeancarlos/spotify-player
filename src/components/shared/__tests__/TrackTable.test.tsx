@@ -59,4 +59,9 @@ describe('TrackTable', () => {
     expect(onPlay).toHaveBeenCalledWith(albumTrack)
     expect(screen.getByText('Album Track').closest('tr')).not.toHaveAttribute('aria-disabled')
   })
+
+  it('offsets the row numbers when startIndex is given', () => {
+    render(<TrackTable tracks={[albumTrack]} startIndex={40} />)
+    expect(screen.getByText('41')).toBeInTheDocument()
+  })
 })

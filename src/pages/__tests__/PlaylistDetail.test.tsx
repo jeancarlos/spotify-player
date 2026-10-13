@@ -66,4 +66,9 @@ describe('PlaylistDetail table view', () => {
       s: { from: '/playlists/9?page=3' },
     })
   })
+
+  it('continues row numbers across pages', () => {
+    renderPage()
+    expect(screen.getByText('41')).toBeInTheDocument()
+  })
 })
