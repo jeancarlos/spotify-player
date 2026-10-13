@@ -39,4 +39,17 @@ describe('fetchLyrics', () => {
     const lines = await fetchLyrics(params)
     expect(lines).toHaveLength(1)
   })
+
+  it('falls back to plain lyrics when the synced ones parse to nothing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ syncedLyrics: 'no stamps here', plainLyrics: 'one\ntwo' }),
+      })
+    )
+    const lines = await fetchLyrics(params)
+    expect(lines.map((l) => l.text)).toEqual(['one', 'two'])
+  })
 })

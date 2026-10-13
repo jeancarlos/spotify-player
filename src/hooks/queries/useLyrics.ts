@@ -40,9 +40,8 @@ export async function fetchLyrics({
     plainLyrics?: string
   }
 
-  if (data.syncedLyrics) {
-    return parseLRC(data.syncedLyrics)
-  }
+  const synced = data.syncedLyrics ? parseLRC(data.syncedLyrics) : []
+  if (synced.length > 0) return synced
 
   if (data.plainLyrics && durationMs) {
     return parsePlainLyrics(data.plainLyrics, durationMs)

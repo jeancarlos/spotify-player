@@ -34,6 +34,19 @@ describe('parseLRC', () => {
   })
 })
 
+describe('parseLRC without a fractional part', () => {
+  it('parses [mm:ss] stamps', () => {
+    expect(parseLRC('[00:12] Line one\n[01:05]Line two')).toEqual([
+      { time: 12000, text: 'Line one' },
+      { time: 65000, text: 'Line two' },
+    ])
+  })
+
+  it('ignores metadata tags', () => {
+    expect(parseLRC('[ar:Someone]\n[00:03]Hi')).toEqual([{ time: 3000, text: 'Hi' }])
+  })
+})
+
 describe('parsePlainLyrics', () => {
   it('estimates timestamps correctly', () => {
     const text = 'Line 1\nLine 2'
