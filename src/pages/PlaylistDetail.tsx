@@ -5,7 +5,6 @@ import { ListTableSwitch } from '@/components/shared/ListTableSwitch'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackTable } from '@/components/shared/TrackTable'
 import { Pagination } from '@/components/shared/Pagination'
-import type { SpotifyTrack } from '@/types/spotify'
 
 export function PlaylistDetail() {
   const { t } = useTranslation()
@@ -53,7 +52,7 @@ export function PlaylistDetail() {
                   index={(page - 1) * PLAYLIST_LIMIT + i}
                   isActive={playerState.currentTrack?.id === track.id}
                   onPlay={async (tr) => {
-                    await playTrack(tr as SpotifyTrack, playlistTracks)
+                    await playTrack(tr, playlistTracks)
                   }}
                 />
               ))}
@@ -64,7 +63,7 @@ export function PlaylistDetail() {
               showAlbumColumn={true}
               activeTrackId={playerState.currentTrack?.id}
               onPlay={(track) => {
-                void playTrack(track as SpotifyTrack, playlistTracks)
+                void playTrack(track, playlistTracks)
               }}
             />
           )}

@@ -39,7 +39,7 @@ export function PlayerQueue() {
               key={`${track.uri}-${i}`}
               track={track}
               theme="dark"
-              onPlay={async (t) => playTrack(t as SpotifyTrack)}
+              onPlay={async (t) => playTrack(t)}
             />
           ))}
         </div>

@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/shared/Tooltip'
-import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
+import type { SpotifyTrack } from '@/types/spotify'
 
 interface TrackRowProps {
-  track: SpotifyTrack | SpotifyAlbumTrack
+  track: SpotifyTrack
   isActive?: boolean
-  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
+  onPlay?: (track: SpotifyTrack) => void
   onRemove?: (uri: string) => void
   disableRemove?: boolean
   note?: string
@@ -59,7 +59,7 @@ function isActivationKey(key: string): boolean {
 }
 
 interface NameAreaProps {
-  track: SpotifyTrack | SpotifyAlbumTrack
+  track: SpotifyTrack
   note?: string
   theme: TrackTheme
   artistNames: string
@@ -86,8 +86,8 @@ interface PlayCellProps {
   trackName: string
   index?: number
   theme: TrackTheme
-  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
-  track: SpotifyTrack | SpotifyAlbumTrack
+  onPlay?: (track: SpotifyTrack) => void
+  track: SpotifyTrack
 }
 
 function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellProps) {

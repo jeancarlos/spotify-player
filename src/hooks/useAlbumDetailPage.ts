@@ -9,7 +9,6 @@ import { usePlayer } from '@/hooks/usePlayer'
 import { formatDate } from '@/utils/formatDate'
 import type {
   SpotifyTrack,
-  SpotifyAlbumTrack,
   SpotifyAlbumSimple,
   SpotifyAlbumFull,
 } from '@/types/spotify'
@@ -93,38 +92,20 @@ export function useAlbumDetailPage() {
 
   const albumItems = useMemo(() => tracks.data?.items ?? [], [tracks.data])
 
-  const enrichedTracks: SpotifyTrack[] = useMemo(
-    () =>
-      albumItems.map((track) => ({
-        ...track,
-        type: 'track' as const,
-        album: meta.albumSimple,
-      })),
-    [albumItems, meta.albumSimple]
-  )
 
   const hasNext =
     tracks.data != null ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
-  const toPlayableTrack = useCallback(
-    (track: SpotifyAlbumTrack): SpotifyTrack => ({
-      ...track,
-      type: 'track' as const,
-      album: meta.albumSimple,
-    }),
-    [meta.albumSimple]
-  )
 
   const handleTrackPlay = useCallback(
-    async (track: SpotifyTrack | SpotifyAlbumTrack) => {
-      await playTrack('album' in track ? track : toPlayableTrack(track), enrichedTracks)
+    async (track: SpotifyTrack) => {
+      await playTrack(track, albumItems)
     },
-    [playTrack, enrichedTracks, toPlayableTrack]
+    [playTrack, albumItems]
   )
 
   return {
     albumItems,
-    enrichedTracks,
     handleTrackPlay,
     playerState,
     view,

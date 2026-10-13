@@ -1,9 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { TrackTable } from '../TrackTable'
-import type { SpotifyAlbumTrack, SpotifyTrack } from '@/types/spotify'
+import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
 
-const albumTrack: SpotifyAlbumTrack = {
+const album: SpotifyAlbumSimple = {
+  id: 'alb1',
+  name: 'Test Album',
+  images: [],
+  release_date: '2024-01-01',
+  album_type: 'album',
+  artists: [],
+  uri: 'spotify:album:alb1',
+  type: 'album',
+}
+const albumTrack: SpotifyTrack = {
   id: 't1',
   name: 'Album Track',
   artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
@@ -14,6 +24,7 @@ const albumTrack: SpotifyAlbumTrack = {
   type: 'track',
   disc_number: 1,
   track_number: 1,
+  album,
 }
 
 const fullTrack: SpotifyTrack = {
@@ -21,16 +32,6 @@ const fullTrack: SpotifyTrack = {
   id: 't2',
   name: 'Full Track',
   rank: 73,
-  album: {
-    id: 'alb1',
-    name: 'Test Album',
-    images: [],
-    release_date: '2024-01-01',
-    album_type: 'album',
-    artists: [],
-    uri: 'spotify:album:alb1',
-    type: 'album',
-  },
 }
 
 describe('TrackTable', () => {

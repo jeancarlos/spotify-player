@@ -2,27 +2,27 @@ import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
-import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
+import type { SpotifyTrack } from '@/types/spotify'
 
 interface TrackTableProps {
-  tracks: (SpotifyTrack | SpotifyAlbumTrack)[]
+  tracks: (SpotifyTrack)[]
   showAlbumColumn?: boolean
   activeTrackId?: string
-  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
+  onPlay?: (track: SpotifyTrack) => void
   onAlbumClick?: (albumId: string) => void
 }
 
 interface TrackTableRowProps {
-  track: SpotifyTrack | SpotifyAlbumTrack
+  track: SpotifyTrack
   index: number
   isActive: boolean
   showAlbumColumn: boolean
   showRank: boolean
-  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
+  onPlay?: (track: SpotifyTrack) => void
   onAlbumClick?: (albumId: string) => void
 }
 
-function resolveTrackMeta(track: SpotifyTrack | SpotifyAlbumTrack) {
+function resolveTrackMeta(track: SpotifyTrack) {
   return {
     albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
     albumId: 'album' in track ? track.album.id : undefined,

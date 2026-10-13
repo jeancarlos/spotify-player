@@ -165,7 +165,7 @@ export function Favorites() {
                 index={i}
                 note={notes[track.uri] ?? undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={async (track) => playTrack(track as SpotifyTrack)}
+                onPlay={async (track) => playTrack(track)}
                 onRemove={removeTrack}
                 disableRemove={tracks.length === 1}
               />
