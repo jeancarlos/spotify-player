@@ -29,7 +29,8 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
           id={`${listboxId}-${i}`}
           role="option"
           aria-selected={i === highlightIndex}
-          onClick={() => {
+          onMouseDown={(e) => {
+            e.preventDefault()
             onSelect(track)
           }}
           className={cn(
@@ -106,6 +107,10 @@ interface TrackSearchInputProps {
   resultsLabel: string
 }
 
+function activeOptionId(listboxId: string, isOpen: boolean, index: number, count: number) {
+  return isOpen && index >= 0 && index < count ? `${listboxId}-${index}` : undefined
+}
+
 function TrackSearchInput({
   inputRef,
   blurTimerRef,
@@ -149,7 +154,7 @@ function TrackSearchInput({
         aria-controls={listboxId}
         aria-haspopup="listbox"
         aria-autocomplete="list"
-        aria-activedescendant={highlightIndex >= 0 ? `${listboxId}-${highlightIndex}` : undefined}
+        aria-activedescendant={activeOptionId(listboxId, isOpen, highlightIndex, results.length)}
         placeholder={placeholder}
         className={cn(
           'w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black',
@@ -161,6 +166,10 @@ function TrackSearchInput({
           onQueryChange(e.target.value)
           onOpen()
           setHighlightIndex(() => -1)
+        }}
+        onFocus={() => {
+          clearTimeout(blurTimerRef.current)
+          if (results.length > 0) onOpen()
         }}
         onBlur={() => {
           onBlur()
