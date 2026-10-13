@@ -68,6 +68,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
           onClick={() => {
             onTabChange('lyrics')
           }}
+          aria-label={t('player.lyrics')}
           className={tabClass('lyrics')}
         >
           <Music2 size={14} className="shrink-0" />
@@ -78,6 +79,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
         onClick={() => {
           onTabChange('info')
         }}
+        aria-label={t('track.songDetails')}
         className={tabClass('info')}
       >
         <Info size={14} className="shrink-0" />
@@ -87,6 +89,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
         onClick={() => {
           onTabChange('queue')
         }}
+        aria-label={t('player.queue')}
         className={tabClass('queue')}
       >
         <ListMusic size={14} className="shrink-0" />

@@ -58,4 +58,11 @@ describe('PlayerView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'back' }))
     expect(JSON.parse(screen.getByTestId('loc').textContent).p).toBe('/playlists/9?page=2')
   })
+
+  it('gives every tab button an aria-label', () => {
+    setup()
+    for (const key of ['player.lyrics', 'track.songDetails', 'player.queue']) {
+      expect(screen.getByRole('button', { name: key })).toHaveAttribute('aria-label', key)
+    }
+  })
 })
