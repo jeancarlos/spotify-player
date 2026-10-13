@@ -35,6 +35,15 @@ function renderHome() {
               dispatch: () => {
                 /* noop */
               },
+              controls: {
+                playTrack: () => Promise.resolve(),
+                toggle: () => undefined,
+                next: () => undefined,
+                previous: () => undefined,
+                seek: () => undefined,
+                setShuffle: () => undefined,
+                cycleRepeat: () => undefined,
+              },
             }}
           >
             <ToastProvider>
