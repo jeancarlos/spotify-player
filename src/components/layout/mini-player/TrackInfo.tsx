@@ -51,15 +51,19 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               >
                 <Info size={12} />
               </button>
-              <span className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-[10px] leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 group-focus-within/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]">
+              <span
+                aria-hidden="true"
+                className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-[10px] leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 group-focus-within/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]"
+              >
                 {personalNote}
               </span>
             </div>
           )}
           <button
             type="button"
+            tabIndex={-1}
+            aria-hidden="true"
             onClick={handleTrackClick}
-            aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
             className="block rounded-full focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
           >
             <img

@@ -99,6 +99,7 @@ describe('keyboard operability', () => {
     await user.keyboard('{Enter}')
     await user.keyboard(' ')
     expect(onPlay).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: /track\.noPreview/ })).toBeInTheDocument()
   })
 
   it('TiltCover activates on Enter and Space and prevents the Space scroll', async () => {
@@ -138,9 +139,36 @@ describe('keyboard operability', () => {
     expect(onSeek).toHaveBeenNthCalledWith(2, 5000)
   })
 
-  it('LyricsView without onSeek renders no buttons', () => {
+  it('LyricsView tab order covers at most three lines and a focused line is fully visible', async () => {
+    const user = userEvent.setup()
+    const many = Array.from({ length: 20 }, (_, i) => ({ time: i * 1000, text: `L${i}` }))
+    render(<LyricsView lines={many} progress={10000} onSeek={vi.fn()} />)
+    const tabbable = screen.getAllByRole('button').filter((b) => b.tabIndex === 0)
+    expect(tabbable.map((b) => b.textContent)).toEqual(['L9', 'L10', 'L11'])
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'L9' })).toHaveFocus()
+    await user.tab()
+    await user.tab()
+    await user.tab()
+    expect(document.body).toHaveFocus()
+    const cls = tabbable[0].className
+    expect(cls).toContain('focus-visible:!opacity-100')
+    expect(cls).toContain('focus-visible:![filter:none]')
+  })
+
+  it('LyricsView keeps the same button element for a line as the window advances', () => {
+    const many = Array.from({ length: 20 }, (_, i) => ({ time: i * 1000, text: `L${i}` }))
+    const { rerender } = render(<LyricsView lines={many} progress={10000} onSeek={vi.fn()} />)
+    const el = screen.getByRole('button', { name: 'L11' })
+    rerender(<LyricsView lines={many} progress={11000} onSeek={vi.fn()} />)
+    expect(screen.getByRole('button', { name: 'L11' })).toBe(el)
+  })
+
+  it('LyricsView without onSeek has only disabled buttons', () => {
     render(<LyricsView lines={[{ time: 0, text: 'Primeira' }]} progress={0} />)
-    expect(screen.queryByRole('button')).toBeNull()
+    screen.getAllByRole('button').forEach((b) => {
+      expect(b).toBeDisabled()
+    })
   })
 
   it('the artist chart has a keyboard path that plays playable bars only', async () => {

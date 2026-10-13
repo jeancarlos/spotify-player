@@ -90,7 +90,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
 
   return (
     <>
-      <div style={{ width: '100%', height: chartData.length * 46 + 28 }}>
+      <div aria-hidden="true" style={{ width: '100%', height: chartData.length * 46 + 28 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}

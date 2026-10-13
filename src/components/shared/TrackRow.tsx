@@ -25,6 +25,7 @@ interface TrackTheme {
   subtext: string
   duration: string
   remove: string
+  area: string
 }
 
 function resolveTextColor(dark: boolean, isActive: boolean): string {
@@ -41,11 +42,14 @@ function focusRing(dark: boolean): string {
 function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
   return {
     row: cn(
-      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group outline-none',
-      focusRing(dark),
+      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group',
       dark
         ? cn('hover:bg-white/5', isActive && 'bg-white/10')
         : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
+    ),
+    area: cn(
+      'flex-1 min-w-0 flex items-center gap-3 rounded-xl outline-none group/tipfocus',
+      focusRing(dark)
     ),
     number: cn(
       'text-xs font-bold tabular-nums group-hover:hidden',
@@ -167,7 +171,7 @@ export function TrackRow({
       <PlayCell trackName={track.name} index={index} theme={styles} onPlay={play} track={track} />
 
       <div
-        className={cn('flex-1 min-w-0 flex items-center gap-3', cls.area)}
+        className={cn(styles.area, cls.area)}
         onClick={() => play?.(track)}
         role="button"
         aria-disabled={!playable || undefined}

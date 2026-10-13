@@ -74,6 +74,18 @@ describe('TrackRow', () => {
     expect(onPlay).not.toHaveBeenCalled()
   })
 
+  it('reveals the note when the row has keyboard focus', async () => {
+    render(<TrackRow track={track} onPlay={vi.fn()} note="This is a note" />)
+    await userEvent.tab()
+    await userEvent.tab()
+    const area = screen.getByText('Test Track').closest('[role="button"]')
+    expect(area).toHaveFocus()
+    expect(area?.className).toContain('group/tipfocus')
+    expect(area?.className).toContain('focus-visible:ring-2')
+    expect(screen.getByRole('tooltip').className).toContain(
+      'group-focus-within/tipfocus:opacity-100'
+    )
+  })
   it('renders note text in DOM when note provided', () => {
     render(<TrackRow track={track} note="This is a note" />)
     expect(screen.getByText('Test Track')).toBeInTheDocument()

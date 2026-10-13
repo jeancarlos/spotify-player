@@ -25,22 +25,24 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
 
   const slots = Array.from({ length: WINDOW * 2 + 1 }, (_, i) => {
     const lineIdx = activeIndex - WINDOW + i
-    if (lineIdx < 0 || lineIdx >= lines.length) return null
-    return lines[lineIdx]
+    const line = lineIdx < 0 || lineIdx >= lines.length ? null : lines[lineIdx]
+    return { line, lineIdx }
   })
 
   return (
     <div className="h-full flex flex-col justify-center gap-6 px-8">
-      {slots.map((line, i) => {
+      {slots.map(({ line, lineIdx }, i) => {
         const isActive = i === WINDOW
-
         const seekable = Boolean(line && onSeek)
-        const Line = seekable ? motion.button : motion.div
+        const nearActive = Math.abs(i - WINDOW) <= 1
 
         return (
-          <Line
-            key={i}
-            {...(seekable ? { type: 'button' as const } : {})}
+          <motion.button
+            key={lineIdx}
+            type="button"
+            disabled={!seekable}
+            aria-hidden={line ? undefined : true}
+            tabIndex={nearActive ? 0 : -1}
             animate={{
               opacity: SLOT_OPACITY[i],
               filter: `blur(${SLOT_BLUR[i]}px)`,
@@ -53,14 +55,14 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
                   }
                 : undefined
             }
-            className={`text-center leading-tight select-none line-clamp-2 ${
+            className={`block w-full text-center leading-tight select-none line-clamp-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none focus-visible:!opacity-100 focus-visible:![filter:none] ${
               isActive
                 ? 'text-white font-bold text-2xl md:text-3xl'
                 : 'text-white text-lg md:text-xl'
-            } ${seekable ? 'cursor-pointer hover:opacity-80 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none' : 'cursor-default'}`}
+            } ${seekable ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
           >
             {line?.text ?? ''}
-          </Line>
+          </motion.button>
         )
       })}
     </div>

@@ -1,5 +1,6 @@
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { cn } from '@/lib/utils'
 import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
@@ -17,6 +18,11 @@ function resolvePlay(track: SpotifyTrack, onPlay?: (track: SpotifyTrack) => void
 
 function stateClass(play: unknown): string {
   return play ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'
+}
+
+function cardLabel(t: TFunction, name: string, playable: boolean): string {
+  const base = t('player.playTrack', { name })
+  return playable ? base : `${base}. ${t('track.noPreview')}`
 }
 
 export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: VinylCardProps) {
@@ -41,7 +47,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           play?.(track)
         }
       }}
-      aria-label={t('player.playTrack', { name: track.name })}
+      aria-label={cardLabel(t, track.name, Boolean(play))}
     >
       {!play && <span className="sr-only">{t('track.noPreview')}</span>}
       <div

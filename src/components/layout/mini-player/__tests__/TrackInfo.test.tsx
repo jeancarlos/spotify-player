@@ -33,9 +33,8 @@ describe('TrackInfo', () => {
     )
     expect(container.querySelector('div[role="button"]')).toBeNull()
     await user.tab()
-    expect(screen.getAllByRole('button', { name: /Song/ })[0]).toHaveFocus()
-    await user.tab()
-    expect(screen.getAllByRole('button', { name: /Song/ })[1]).toHaveFocus()
+    const title = screen.getByRole('button', { name: /Song/ })
+    expect(title).toHaveFocus()
     await user.keyboard('{Enter}')
     expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
   })
@@ -50,6 +49,7 @@ describe('TrackInfo', () => {
     expect(note).not.toHaveAttribute('tabindex')
     await user.tab()
     expect(note).toHaveFocus()
+    expect(screen.getByText('my note', { selector: 'span' })).toHaveAttribute('aria-hidden', 'true')
     expect(note.className).toContain('focus-visible:ring-2')
     expect(screen.getByText('my note', { selector: 'span' }).className).toContain(
       'group-focus-within/note:opacity-100'
@@ -64,7 +64,6 @@ describe('TrackInfo', () => {
       </MemoryRouter>
     )
     await user.tab()
-    await user.tab()
     await user.keyboard(' ')
     expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
   })
@@ -78,5 +77,22 @@ describe('TrackInfo', () => {
     expect(screen.getAllByText('Song').length).toBeGreaterThan(0)
     expect(screen.getByText('0:12')).toBeInTheDocument()
     expect(screen.getByText('0:30')).toBeInTheDocument()
+  })
+  it('has a single tab stop for the track', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <TrackInfo notes={{}} />
+      </MemoryRouter>
+    )
+    await user.tab()
+    const title = screen.getByRole('button', { name: /Song/ })
+    expect(title).toHaveFocus()
+    await user.tab()
+    expect(title).not.toHaveFocus()
+    expect(document.querySelectorAll('button[aria-hidden="true"]')[0]).toHaveAttribute(
+      'tabindex',
+      '-1'
+    )
   })
 })
