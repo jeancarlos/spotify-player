@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import vinylWebp from '@/assets/vinyl.webp'
@@ -23,6 +24,17 @@ export function VinylDisk({
   favoriteLabel,
 }: VinylDiskProps) {
   const px = SIZE_MAP[size]
+  const [vw, setVw] = useState(window.innerWidth)
+  useEffect(() => {
+    const onResize = () => {
+      setVw(window.innerWidth)
+    }
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+  const renderedPx = Math.min(px, vw)
   const { t } = useTranslation()
 
   const transition = isPlaying
@@ -65,7 +77,7 @@ export function VinylDisk({
         </div>
       </div>
       {favoriteLabel && px >= 180 && (
-        <ArcTextOverlay label={favoriteLabel} diskPx={px} isPlaying={isPlaying} />
+        <ArcTextOverlay label={favoriteLabel} diskPx={renderedPx} isPlaying={isPlaying} />
       )}
     </div>
   )
