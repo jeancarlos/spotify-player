@@ -47,6 +47,23 @@ export function SearchBar({
     { key: 'playlist', label: t('artists.tabPlaylist') },
   ]
 
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  const onTabKeyDown = (e: React.KeyboardEvent, index: number) => {
+    const last = tabs.length - 1
+    const moves: Record<string, number> = {
+      ArrowRight: index === last ? 0 : index + 1,
+      ArrowLeft: index === 0 ? last : index - 1,
+      Home: 0,
+      End: last,
+    }
+    const target = moves[e.key] ?? -1
+    if (target < 0) return
+    e.preventDefault()
+    setTab(tabs[target].key)
+    tabRefs.current[target]?.focus()
+  }
+
   return (
     <div
       className={cn(
@@ -82,9 +99,16 @@ export function SearchBar({
         className="flex-1 bg-transparent text-sm outline-none text-black placeholder:text-black/30 min-w-0"
       />
       <div className="flex gap-1 shrink-0" role="tablist">
-        {tabs.map(({ key, label }) => (
+        {tabs.map(({ key, label }, i) => (
           <button
             key={key}
+            ref={(el) => {
+              tabRefs.current[i] = el
+            }}
+            onKeyDown={(e) => {
+              onTabKeyDown(e, i)
+            }}
+            tabIndex={tab === key ? 0 : -1}
             onClick={() => {
               setTab(key)
             }}
