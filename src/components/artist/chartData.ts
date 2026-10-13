@@ -32,3 +32,16 @@ export function toChartData(tracks: SpotifyTrack[]): ChartEntry[] {
 export function playEntry(entry: ChartEntry, onPlay?: (track: SpotifyTrack) => void) {
   if (isPlayable(entry.track)) onPlay?.(entry.track)
 }
+
+const PAGE_GUTTER = 48
+
+export function chartLayout(viewportWidth: number) {
+  const narrow = viewportWidth < 640
+  const margin = narrow
+    ? { top: 4, right: 40, bottom: 4, left: 0 }
+    : { top: 4, right: 64, bottom: 4, left: 8 }
+  const yAxisWidth = narrow ? 96 : 144
+  const labelChars = narrow ? 11 : 20
+  const plotWidth = viewportWidth - PAGE_GUTTER - margin.left - margin.right - yAxisWidth
+  return { margin, yAxisWidth, labelChars, plotWidth }
+}

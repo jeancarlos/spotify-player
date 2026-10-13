@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CustomTooltip } from '../ArtistChartTooltip'
-import { toChartData, playEntry } from '../chartData'
+import { toChartData, playEntry, chartLayout } from '../chartData'
 import type { SpotifyTrack } from '@/types/spotify'
 
 const track = (id: string, rank?: number) =>
@@ -49,5 +49,18 @@ describe('playEntry', () => {
     playEntry(ok, onPlay)
     playEntry(dead, onPlay)
     expect(onPlay).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('chartLayout', () => {
+  it('leaves a usable plot width on a 375 px viewport', () => {
+    expect(chartLayout(375).plotWidth).toBeGreaterThanOrEqual(150)
+  })
+
+  it('keeps the wide labels on desktop', () => {
+    const wide = chartLayout(1024)
+    expect(wide.yAxisWidth).toBe(144)
+    expect(wide.labelChars).toBe(20)
+    expect(wide.plotWidth).toBeGreaterThan(chartLayout(375).plotWidth)
   })
 })

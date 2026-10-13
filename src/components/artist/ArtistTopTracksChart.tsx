@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   BarChart,
@@ -13,7 +13,7 @@ import {
 } from 'recharts'
 import { isPlayable } from '@/lib/deezerMappers'
 import type { SpotifyTrack } from '@/types/spotify'
-import { toChartData, playEntry, type ChartEntry } from './chartData'
+import { toChartData, playEntry, chartLayout, type ChartEntry } from './chartData'
 import { CustomTooltip } from './ArtistChartTooltip'
 
 interface Props {
@@ -26,13 +26,14 @@ interface TickProps {
   x?: number
   y?: number
   index?: number
+  maxChars?: number
   payload?: { value: string }
 }
 
-function CustomYTick({ x = 0, y = 0, index = 0, payload }: TickProps) {
+function CustomYTick({ x = 0, y = 0, index = 0, maxChars = 20, payload }: TickProps) {
   const position = String(index + 1).padStart(2, '0')
   const raw = payload?.value ?? ''
-  const name = raw.length > 20 ? raw.slice(0, 20) + '…' : raw
+  const name = raw.length > maxChars ? raw.slice(0, maxChars) + '…' : raw
   return (
     <g transform={`translate(${x},${y})`}>
       <text
@@ -84,6 +85,13 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   const { t, i18n } = useTranslation()
+  const [vw, setVw] = useState(window.innerWidth)
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  const layout = chartLayout(vw)
   const chartData = useMemo(() => toChartData(tracks), [tracks])
 
   if (chartData.length === 0) return null
@@ -95,7 +103,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 4, right: 64, bottom: 4, left: 152 }}
+            margin={layout.margin}
           >
             <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.04)" />
 
@@ -104,8 +112,8 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
             <YAxis
               type="category"
               dataKey="label"
-              width={144}
-              tick={<CustomYTick />}
+              width={layout.yAxisWidth}
+              tick={<CustomYTick maxChars={layout.labelChars} />}
               axisLine={false}
               tickLine={false}
             />
