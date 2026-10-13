@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { currentPath } from '@/utils/routerState'
 import { usePlaylistDetailPage, PLAYLIST_LIMIT } from '@/hooks/usePlaylistDetailPage'
 import { CollectionHeader } from '@/components/shared/CollectionHeader'
 import { ListTableSwitch } from '@/components/shared/ListTableSwitch'
@@ -8,6 +10,8 @@ import { Pagination } from '@/components/shared/Pagination'
 
 export function PlaylistDetail() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const {
     playlist,
@@ -64,6 +68,9 @@ export function PlaylistDetail() {
               activeTrackId={playerState.currentTrack?.id}
               onPlay={(track) => {
                 void playTrack(track, playlistTracks)
+              }}
+              onAlbumClick={(albumId) => {
+                navigate(`/albums/${albumId}`, { state: { from: currentPath(location) } })
               }}
             />
           )}
