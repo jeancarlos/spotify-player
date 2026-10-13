@@ -252,5 +252,3 @@ export interface SpotifyAlbumFull extends SpotifyAlbumSimple {
   copyrights?: { text: string; type: 'C' | 'P' }[]
   external_ids?: { upc?: string; ean?: string }
 }
-
-export type AlbumTracksResponse = PagingObject<SpotifyAlbumTrack>

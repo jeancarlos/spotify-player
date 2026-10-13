@@ -1,18 +1,23 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { TIME_60_MINUTES } from '@/utils/constants'
-import api from '@/lib/axios'
-import type { AlbumTracksResponse } from '@/types/spotify'
+import { deezer } from '@/lib/deezer'
+import { toPage, toTrack, type DzList, type DzTrack } from '@/lib/deezerMappers'
+import { albumQuery } from './useAlbum'
+import type { PagingObject, SpotifyTrack } from '@/types/spotify'
 
 export function useAlbumTracks(albumId: string | undefined, page: number, limit = 20) {
-  return useQuery<AlbumTracksResponse>({
-    queryKey: ['album-tracks', albumId, page, limit],
+  const queryClient = useQueryClient()
+  const index = (page - 1) * limit
+  return useQuery<PagingObject<SpotifyTrack>>({
+    queryKey: ['album-tracks', albumId, index, limit],
     enabled: !!albumId,
     staleTime: TIME_60_MINUTES,
     queryFn: async () => {
-      const { data } = await api.get<AlbumTracksResponse>(`/albums/${albumId}/tracks`, {
-        params: { limit, offset: (page - 1) * limit, market: 'BR' },
-      })
-      return data
+      const [album, list] = await Promise.all([
+        queryClient.ensureQueryData(albumQuery(albumId)),
+        deezer<DzList<DzTrack>>(`album/${albumId ?? ''}/tracks`, { index, limit }),
+      ])
+      return toPage(list, index, limit, (t) => toTrack(t, album))
     },
   })
 }
