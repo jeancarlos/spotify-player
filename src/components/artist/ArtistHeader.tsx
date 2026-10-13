@@ -46,6 +46,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
     const fn = () => {
       scrollY.set(el.scrollTop)
     }
+    fn()
     el.addEventListener('scroll', fn, { passive: true })
     return () => {
       el.removeEventListener('scroll', fn)
