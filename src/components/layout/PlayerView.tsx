@@ -1,35 +1,20 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Info, Music2, ListMusic } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer, useProgress } from '@/contexts/PlayerContext'
 import { useLyrics } from '@/hooks/queries/useLyrics'
-import { useProgressEngine } from '@/hooks/useProgressEngine'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
-import { seekRequest } from '@/lib/playerApi'
 import { getFromPath } from '@/utils/routerState'
 import type { SpotifyTrack } from '@/types/spotify'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { LyricLine } from '@/types/lyrics'
 
 type PlayerTab = 'lyrics' | 'info' | 'queue'
-
-function usePlayerSeek() {
-  const { dispatch } = usePlayer()
-  const { seekTo } = useProgressEngine()
-  return useCallback(
-    async (ms: number) => {
-      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-      seekTo(ms)
-      await seekRequest(ms)
-    },
-    [dispatch, seekTo]
-  )
-}
 
 interface TrackFields {
   artistName: string
@@ -115,7 +100,7 @@ interface PlayerContentPaneProps {
   currentTrack: SpotifyTrack | null
   lyrics: UseQueryResult<LyricLine[]>
   currentProgress: number
-  onSeek: (ms: number) => Promise<void>
+  onSeek: (ms: number) => void
 }
 
 function PlayerContentPane({
@@ -175,13 +160,12 @@ function PlayerContentPane({
 }
 
 export function PlayerView() {
-  const { state } = usePlayer()
+  const { state, controls } = usePlayer()
   const { currentTrack, duration } = state
-  const { currentProgress } = useProgressEngine()
+  const { progressMs: currentProgress } = useProgress()
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const handleSeek = usePlayerSeek()
 
   const activeTab = (searchParams.get('tab') ?? 'lyrics') as PlayerTab
 
@@ -240,7 +224,9 @@ export function PlayerView() {
             currentTrack={currentTrack}
             lyrics={lyrics}
             currentProgress={currentProgress}
-            onSeek={handleSeek}
+            onSeek={(ms) => {
+              controls.seek(ms)
+            }}
           />
         </AnimatePresence>
       </main>
