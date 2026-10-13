@@ -114,6 +114,7 @@
     "artistRequired": "Artista é obrigatório",
     "minQuery": "Digite pelo menos 2 caracteres",
     "close": "Fechar",
+    "dismissNotification": "Dispensar notificação",
     "addTrack": "+ Adicionar",
     "addToList": "Adicionar à Spoter List",
     "removeFromList": "Remover da Spoter List",

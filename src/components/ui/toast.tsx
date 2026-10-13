@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useCallback, useRef } from 'react'
+import { createContext, useContext, useReducer, useCallback, useRef, useMemo, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, AlertCircle, CheckCircle2, Info } from 'lucide-react'
 
@@ -12,13 +13,13 @@ interface Toast {
 
 type ToastAction = { type: 'ADD'; payload: Toast } | { type: 'REMOVE'; payload: string }
 
-interface ToastContextValue {
-  toasts: Toast[]
+interface ToastActions {
   toast: (message: string, variant?: ToastVariant) => void
   dismiss: (id: string) => void
 }
 
-const ToastContext = createContext<ToastContextValue | null>(null)
+const ToastStateContext = createContext<Toast[]>([])
+const ToastActionsContext = createContext<ToastActions | null>(null)
 
 function toastReducer(state: Toast[], action: ToastAction): Toast[] {
   switch (action.type) {
@@ -56,51 +57,79 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'REMOVE', payload: id })
   }, [])
 
-  const icons: Record<ToastVariant, React.ReactNode> = {
-    error: <AlertCircle size={16} className="text-red-400 shrink-0" />,
-    success: <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />,
-    info: <Info size={16} className="text-blue-400 shrink-0" />,
-  }
+  useEffect(() => {
+    const pending = timers.current
+    return () => {
+      pending.forEach(clearTimeout)
+      pending.clear()
+    }
+  }, [])
 
-  const borders: Record<ToastVariant, string> = {
-    error: 'border-red-500/30',
-    success: 'border-emerald-500/30',
-    info: 'border-blue-500/30',
-  }
+  const actions = useMemo(() => ({ toast, dismiss }), [toast, dismiss])
 
   return (
-    <ToastContext.Provider value={{ toasts, toast, dismiss }}>
-      {children}
-      <div className="fixed bottom-24 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
-        <AnimatePresence>
-          {toasts.map((t) => (
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0, x: 60, scale: 0.95 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 60, scale: 0.95 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl max-w-sm shadow-xl border ${borders[t.variant]}`}
-              style={{ background: 'rgba(20,20,20,0.88)', backdropFilter: 'blur(16px)' }}
+    <ToastActionsContext.Provider value={actions}>
+      <ToastStateContext.Provider value={toasts}>
+        {children}
+        <ToastList />
+      </ToastStateContext.Provider>
+    </ToastActionsContext.Provider>
+  )
+}
+
+const icons: Record<ToastVariant, React.ReactNode> = {
+  error: <AlertCircle size={16} className="text-red-400 shrink-0" />,
+  success: <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />,
+  info: <Info size={16} className="text-blue-400 shrink-0" />,
+}
+
+const borders: Record<ToastVariant, string> = {
+  error: 'border-red-500/30',
+  success: 'border-emerald-500/30',
+  info: 'border-blue-500/30',
+}
+
+function ToastList() {
+  const toasts = useContext(ToastStateContext)
+  const { dismiss } = useToast()
+  const { t } = useTranslation()
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed bottom-24 right-4 z-[100] flex flex-col gap-2 pointer-events-none"
+    >
+      <AnimatePresence>
+        {toasts.map((item) => (
+          <motion.div
+            key={item.id}
+            role={item.variant === 'error' ? 'alert' : undefined}
+            initial={{ opacity: 0, x: 60, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 60, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl max-w-sm shadow-xl border ${borders[item.variant]}`}
+            style={{ background: 'rgba(20,20,20,0.88)', backdropFilter: 'blur(16px)' }}
+          >
+            {icons[item.variant]}
+            <p className="text-sm text-white/80 flex-1">{item.message}</p>
+            <button
+              type="button"
+              onClick={() => dismiss(item.id)}
+              aria-label={t('common.dismissNotification')}
+              className="text-white/30 hover:text-white/70 transition-colors ml-1 rounded focus-visible:outline-2 focus-visible:outline-white"
             >
-              {icons[t.variant]}
-              <p className="text-sm text-white/80 flex-1">{t.message}</p>
-              <button
-                onClick={() => dismiss(t.id)}
-                className="text-white/30 hover:text-white/70 transition-colors ml-1"
-              >
-                <X size={14} />
-              </button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-    </ToastContext.Provider>
+              <X size={14} aria-hidden="true" />
+            </button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
   )
 }
 
 export function useToast() {
-  const ctx = useContext(ToastContext)
+  const ctx = useContext(ToastActionsContext)
   if (!ctx) throw new Error('useToast must be used inside ToastProvider')
   return ctx
 }
