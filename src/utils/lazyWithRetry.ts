@@ -28,7 +28,9 @@ async function retryImport<T extends ComponentType<unknown>>(
   retriesLeft: number
 ): Promise<{ default: T }> {
   try {
-    return await importFn()
+    const module = await importFn()
+    sessionStorage.removeItem(`chunk-reload:${chunkName}`)
+    return module
   } catch (error) {
     if (retriesLeft > 0) {
       const delay = 1000 * (3 - retriesLeft)
