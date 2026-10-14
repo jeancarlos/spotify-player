@@ -121,7 +121,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
       <button
         type="submit"
         disabled={!isValid || isSubmitting || isAlreadyFavorite}
-        className="w-full py-2.5 bg-black text-white rounded-xl text-sm font-medium hover:bg-black/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="w-full py-2.5 bg-primary text-ink rounded-xl text-sm font-bold hover:bg-primary/85 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {t('favorites.addConfirm')}
       </button>

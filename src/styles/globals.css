@@ -123,7 +123,7 @@
 .blob-3 {
   width: 360px;
   height: 360px;
-  background: hsl(160, 75%, 82%);
+  background: hsl(12, 100%, 90%);
   top: 45%;
   left: 35%;
   animation: blob-drift-3 22s ease-in-out infinite;

@@ -45,7 +45,7 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
       'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group',
       dark
         ? cn('hover:bg-white/5', isActive && 'bg-white/10')
-        : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
+        : cn('hover:bg-black/5', isActive && 'bg-primary/10')
     ),
     area: cn(
       'flex-1 min-w-0 flex items-center gap-3 rounded-xl outline-none group/tipfocus',

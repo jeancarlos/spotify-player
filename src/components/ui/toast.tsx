@@ -79,13 +79,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
 const icons: Record<ToastVariant, React.ReactNode> = {
   error: <AlertCircle size={16} className="text-red-400 shrink-0" />,
-  success: <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />,
+  success: <CheckCircle2 size={16} className="text-primary shrink-0" />,
   info: <Info size={16} className="text-blue-400 shrink-0" />,
 }
 
 const borders: Record<ToastVariant, string> = {
   error: 'border-red-500/30',
-  success: 'border-emerald-500/30',
+  success: 'border-primary/30',
   info: 'border-blue-500/30',
 }
 
