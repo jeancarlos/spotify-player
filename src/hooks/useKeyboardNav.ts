@@ -1,12 +1,12 @@
 import type { KeyboardEvent, Dispatch, SetStateAction } from 'react'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface UseKeyboardNavOptions {
   isOpen: boolean
-  results: SpotifyTrack[]
+  results: Track[]
   highlightIndex: number
   setHighlightIndex: Dispatch<SetStateAction<number>>
-  onSelect: (track: SpotifyTrack) => void
+  onSelect: (track: Track) => void
   onClose: () => void
 }
 
@@ -19,6 +19,11 @@ export function useKeyboardNav({
   onClose,
 }: UseKeyboardNavOptions) {
   return (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      onClose()
+      setHighlightIndex(() => -1)
+      return
+    }
     if (!isOpen || results.length === 0) return
     if (e.key === 'ArrowDown') {
       e.preventDefault()
@@ -26,12 +31,9 @@ export function useKeyboardNav({
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setHighlightIndex((i) => Math.max(i - 1, 0))
-    } else if (e.key === 'Enter' && highlightIndex >= 0) {
+    } else if (e.key === 'Enter' && highlightIndex >= 0 && highlightIndex < results.length) {
       e.preventDefault()
       onSelect(results[highlightIndex])
-    } else if (e.key === 'Escape') {
-      onClose()
-      setHighlightIndex(() => -1)
     }
   }
 }

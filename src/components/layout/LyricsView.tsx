@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import type { LyricLine } from '@/types/lyrics'
 
 const WINDOW = 4
@@ -12,10 +13,11 @@ interface LyricsViewProps {
 }
 
 export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
+  const { t } = useTranslation()
   if (lines.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-white/20 text-sm">Sem letra disponível</p>
+        <p className="text-white/20 text-sm">{t('lyrics.noLyricsAvailable')}</p>
       </div>
     )
   }
@@ -25,18 +27,24 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
 
   const slots = Array.from({ length: WINDOW * 2 + 1 }, (_, i) => {
     const lineIdx = activeIndex - WINDOW + i
-    if (lineIdx < 0 || lineIdx >= lines.length) return null
-    return lines[lineIdx]
+    const line = lineIdx < 0 || lineIdx >= lines.length ? null : lines[lineIdx]
+    return { line, lineIdx }
   })
 
   return (
     <div className="h-full flex flex-col justify-center gap-6 px-8">
-      {slots.map((line, i) => {
+      {slots.map(({ line, lineIdx }, i) => {
         const isActive = i === WINDOW
+        const seekable = Boolean(line && onSeek)
+        const nearActive = Math.abs(i - WINDOW) <= 1
 
         return (
-          <motion.div
-            key={i}
+          <motion.button
+            key={lineIdx}
+            type="button"
+            disabled={!seekable}
+            aria-hidden={line ? undefined : true}
+            tabIndex={nearActive ? 0 : -1}
             animate={{
               opacity: SLOT_OPACITY[i],
               filter: `blur(${SLOT_BLUR[i]}px)`,
@@ -49,14 +57,14 @@ export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
                   }
                 : undefined
             }
-            className={`text-center leading-tight select-none line-clamp-2 ${
+            className={`block w-full text-center leading-tight select-none line-clamp-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none focus-visible:!opacity-100 focus-visible:![filter:none] ${
               isActive
                 ? 'text-white font-bold text-2xl md:text-3xl'
                 : 'text-white text-lg md:text-xl'
-            } ${line && onSeek ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+            } ${seekable ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
           >
             {line?.text ?? ''}
-          </motion.div>
+          </motion.button>
         )
       })}
     </div>

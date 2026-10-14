@@ -30,7 +30,7 @@ export function ReloadPrompt() {
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <p className="text-sm font-bold text-black">
-              {offlineReady ? 'Spoter' : t('pwa.updateAvailable')}
+              {offlineReady ? 'Vinyla' : t('pwa.updateAvailable')}
             </p>
             <p className="text-xs text-black/60 mt-0.5 leading-relaxed">
               {offlineReady ? t('pwa.readyOffline') : t('pwa.newVersion')}

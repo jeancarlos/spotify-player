@@ -1,25 +1,25 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { TIME_15_MINUTES } from '@/utils/constants'
-import api from '@/lib/axios'
-import type { PlaylistTracksResponse } from '@/types/spotify'
+import { deezer } from '@/lib/deezer'
+import { toPage, toTrack, type DzList, type DzTrack } from '@/lib/deezerMappers'
+import type { PlaylistTracksResponse } from '@/types/music'
 
-export function usePlaylistTracks(
-  playlistId: string,
-  enabled = true,
-  page = 1,
-  limit = 20,
-  options?: Partial<UseQueryOptions<PlaylistTracksResponse>>
-) {
+export function usePlaylistTracks(playlistId: string, enabled = true, page = 1, limit = 20) {
+  const index = (page - 1) * limit
   return useQuery<PlaylistTracksResponse>({
-    ...options,
-    queryKey: ['playlist-tracks', playlistId, page, limit],
+    queryKey: ['playlist-tracks', playlistId, index, limit],
     enabled: enabled && playlistId.length > 0,
     staleTime: TIME_15_MINUTES,
     queryFn: async () => {
-      const { data } = await api.get<PlaylistTracksResponse>(`/playlists/${playlistId}/items`, {
-        params: { limit, offset: (page - 1) * limit },
+      const list = await deezer<DzList<DzTrack | null>>(`playlist/${playlistId}/tracks`, {
+        index,
+        limit,
       })
-      return data
+      const data = list.data.filter((t): t is DzTrack => t != null)
+      return toPage({ ...list, data }, index, limit, (t) => {
+        const track = toTrack(t)
+        return { added_at: null, item: track, track }
+      })
     },
   })
 }

@@ -4,12 +4,12 @@ import { useArtist } from '@/hooks/queries/useArtist'
 import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
 import { formatDate } from '@/utils/formatDate'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 import { StatCard } from '@/components/shared/StatCard'
 import { TiltCover } from '@/components/shared/TiltCover'
 
 interface Props {
-  track: SpotifyTrack
+  track: Track
 }
 
 export function TrackInfoPanel({ track }: Props) {
@@ -46,7 +46,7 @@ export function TrackInfoPanel({ track }: Props) {
                   onClick={() => {
                     navigate(`/artists/${a.id}`)
                   }}
-                  className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors outline-none focus:text-white focus:underline"
+                  className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors rounded outline-none focus:text-white focus:underline focus-visible:ring-2 focus-visible:ring-white/60"
                 >
                   {a.name}
                 </button>

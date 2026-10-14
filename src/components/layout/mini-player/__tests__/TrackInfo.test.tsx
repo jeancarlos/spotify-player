@@ -1,0 +1,98 @@
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter, useLocation } from 'react-router-dom'
+import { TrackInfo } from '../TrackInfo'
+import type { Track } from '@/types/music'
+
+const track = {
+  id: '1',
+  uri: 'u1',
+  name: 'Song',
+  artists: [{ id: 'a', name: 'Artist' }],
+  album: { id: 'b', name: 'Album', images: [] },
+} as unknown as Track
+
+vi.mock('@/contexts/PlayerContext', () => ({
+  usePlayer: () => ({ state: { currentTrack: track } }),
+  useProgress: () => ({ progressMs: 12000, durationMs: 30000 }),
+}))
+
+function Where() {
+  const l = useLocation()
+  return <output data-testid="where">{l.pathname + l.search}</output>
+}
+describe('TrackInfo', () => {
+  it('has no fake role=button wrapper and opens the lyrics once from the keyboard', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <MemoryRouter initialEntries={['/']}>
+        <TrackInfo notes={{}} />
+        <Where />
+      </MemoryRouter>
+    )
+    expect(container.querySelector('div[role="button"]')).toBeNull()
+    await user.tab()
+    const title = screen.getByRole('button', { name: /Song/ })
+    expect(title).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
+  })
+  it('makes the note button focusable and reveals its text on focus', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <TrackInfo notes={{ u1: 'my note' }} />
+      </MemoryRouter>
+    )
+    const note = screen.getByRole('button', { name: 'my note' })
+    expect(note).not.toHaveAttribute('tabindex')
+    await user.tab()
+    expect(note).toHaveFocus()
+    expect(screen.getByText('my note', { selector: 'span' })).toHaveAttribute('aria-hidden', 'true')
+    expect(note.className).toContain('focus-visible:ring-2')
+    expect(screen.getByText('my note', { selector: 'span' }).className).toContain(
+      'group-focus-within/note:opacity-100'
+    )
+  })
+  it('opens the lyrics with Space on the title button', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <TrackInfo notes={{}} />
+        <Where />
+      </MemoryRouter>
+    )
+    await user.tab()
+    await user.keyboard(' ')
+    expect(screen.getByTestId('where')).toHaveTextContent('/player?tab=lyrics')
+  })
+
+  it('shows the track and the useProgress times', () => {
+    render(
+      <MemoryRouter>
+        <TrackInfo notes={{}} />
+      </MemoryRouter>
+    )
+    expect(screen.getAllByText('Song').length).toBeGreaterThan(0)
+    expect(screen.getByText('0:12')).toBeInTheDocument()
+    expect(screen.getByText('0:30')).toBeInTheDocument()
+  })
+  it('has a single tab stop for the track', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <TrackInfo notes={{}} />
+      </MemoryRouter>
+    )
+    await user.tab()
+    const title = screen.getByRole('button', { name: /Song/ })
+    expect(title).toHaveFocus()
+    await user.tab()
+    expect(title).not.toHaveFocus()
+    expect(document.querySelectorAll('button[aria-hidden="true"]')[0]).toHaveAttribute(
+      'tabindex',
+      '-1'
+    )
+  })
+})

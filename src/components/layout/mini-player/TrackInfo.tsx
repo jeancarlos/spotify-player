@@ -1,37 +1,32 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Info } from 'lucide-react'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer, useProgress } from '@/contexts/PlayerContext'
 import { useTranslation } from 'react-i18next'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
 import { formatDuration } from '@/utils/formatDuration'
-import { getFromPath } from '@/utils/routerState'
+import { currentPath, getFromPath } from '@/utils/routerState'
 
 interface TrackInfoProps {
-  progress: number
   notes: Record<string, string>
 }
 
-export function TrackInfo({ progress, notes }: TrackInfoProps) {
+export function TrackInfo({ notes }: TrackInfoProps) {
   const { state } = usePlayer()
   const { currentTrack } = state
+  const { progressMs: progress, durationMs: duration } = useProgress()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
 
   const isPlayerPage = location.pathname === '/player'
-  const duration = currentTrack?.duration_ms ?? 0
   const personalNote = currentTrack ? (notes[currentTrack.uri] ?? '') : ''
 
   const handleTrackClick = () => {
     if (isPlayerPage) {
       navigate(getFromPath(location.state))
     } else if (currentTrack) {
-      navigate('/player?tab=lyrics', { state: { from: location.pathname } })
+      navigate('/player?tab=lyrics', { state: { from: currentPath(location) } })
     }
-  }
-
-  const handleEnterTrack = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') handleTrackClick()
   }
 
   if (!currentTrack) {
@@ -45,41 +40,43 @@ export function TrackInfo({ progress, notes }: TrackInfoProps) {
 
   return (
     <div className="flex ml-[-5px] items-center gap-2.5 flex-1 min-w-0  group/track">
-      <div
-        className="flex items-center gap-2.5 min-w-0 cursor-pointer"
-        role="button"
-        tabIndex={0}
-        aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
-      >
+      <div className="flex items-center gap-2.5 min-w-0">
         <div className="relative shrink-0">
           {personalNote && (
             <div className="group/note absolute top-0 left-0 z-10">
               <button
                 type="button"
-                className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-black/60 hover:text-black transition-colors cursor-default"
+                className="w-5 h-5 rounded-full bg-white shadow-md flex items-center justify-center text-black/60 hover:text-black transition-colors focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
                 aria-label={personalNote}
-                tabIndex={-1}
               >
                 <Info size={12} />
               </button>
-              <span className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-[10px] leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]">
+              <span
+                aria-hidden="true"
+                className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-[10px] leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 group-focus-within/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]"
+              >
                 {personalNote}
               </span>
             </div>
           )}
-          <img
-            src={currentTrack.album.images[0]?.url}
-            alt={currentTrack.album.name}
-            className="w-12 h-12 rounded-full"
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
             onClick={handleTrackClick}
-            onKeyDown={handleEnterTrack}
-          />
+            className="block rounded-full focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
+          >
+            <img
+              src={currentTrack.album.images[0]?.url}
+              alt=""
+              className="w-12 h-12 rounded-full"
+            />
+          </button>
         </div>
         <div className="min-w-0 flex flex-col justify-center">
           <button
             onClick={handleTrackClick}
-            onKeyDown={handleEnterTrack}
-            className="text-xs text-left font-bold text-black truncate hover:underline cursor-pointer"
+            className="text-xs text-left font-bold text-black truncate hover:underline cursor-pointer rounded focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
             aria-label={`${t('player.viewTrack')}: ${currentTrack.name}`}
           >
             {currentTrack.name}
@@ -89,7 +86,7 @@ export function TrackInfo({ progress, notes }: TrackInfoProps) {
               {currentTrack.artists.map((a, i) => (
                 <button
                   key={a.id}
-                  className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none focus:text-black focus:underline"
+                  className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
                   onClick={() => {
                     navigate(`/artists/${a.id}`)
                   }}
@@ -101,9 +98,11 @@ export function TrackInfo({ progress, notes }: TrackInfoProps) {
             </div>
             <button
               onClick={() => {
-                navigate(`/albums/${currentTrack.album.id}`, { state: { from: location.pathname } })
+                navigate(`/albums/${currentTrack.album.id}`, {
+                  state: { from: currentPath(location) },
+                })
               }}
-              className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none text-left w-fit"
+              className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
             >
               {currentTrack.album.name}
             </button>

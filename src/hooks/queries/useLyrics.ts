@@ -31,38 +31,34 @@ export async function fetchLyrics({
   if (album) url.searchParams.set('album_name', album)
   if (durationMs) url.searchParams.set('duration', Math.round(durationMs / 1000).toString())
 
-  try {
-    const res = await fetch(url.toString())
-    if (!res.ok) return []
+  const res = await fetch(url.toString())
+  if (res.status === 404) return []
+  if (!res.ok) throw new Error(`lrclib responded ${res.status}`)
 
-    const data = (await res.json()) as {
-      syncedLyrics?: string
-      plainLyrics?: string
-      error?: string
-    }
-
-    if (data.syncedLyrics) {
-      return parseLRC(data.syncedLyrics)
-    }
-
-    if (data.plainLyrics && durationMs) {
-      return parsePlainLyrics(data.plainLyrics, durationMs)
-    }
-
-    return []
-  } catch (error) {
-    console.error('Error fetching lyrics:', error)
-    return []
+  const data = (await res.json()) as {
+    syncedLyrics?: string
+    plainLyrics?: string
   }
+
+  const synced = data.syncedLyrics ? parseLRC(data.syncedLyrics) : []
+  if (synced.length > 0) return synced
+
+  if (data.plainLyrics && durationMs) {
+    return parsePlainLyrics(data.plainLyrics, durationMs)
+  }
+
+  return []
+}
+
+export function lyricsKey({ artist, title, album, durationMs }: FetchLyricsParams) {
+  return ['lyrics', artist, cleanTitle(title), durationMs, album] as const
 }
 
 export type UseLyricsParams = FetchLyricsParams
 
 export function useLyrics(params: UseLyricsParams) {
-  const cleanedTitle = cleanTitle(params.title)
-
   return useQuery<LyricLine[]>({
-    queryKey: ['lyrics', params.artist, cleanedTitle, params.durationMs],
+    queryKey: lyricsKey(params),
     enabled: !!params.artist && !!params.title,
     retry: false,
     staleTime: Infinity,

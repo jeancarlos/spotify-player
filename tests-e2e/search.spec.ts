@@ -1,175 +1,62 @@
-import { test, expect } from './fixtures/auth'
+import { test, expect } from './test'
+import { NO_RESULTS_QUERY } from './routes'
 
-// Silence album-tracks requests triggered by discography hooks on artist detail pages
-test.beforeEach(async ({ page }) => {
-  await page.route('**/api.spotify.com/v1/albums/*/tracks**', (route) =>
-    route.fulfill({
-      json: { items: [], limit: 10, offset: 0, total: 0, next: null, previous: null, href: '' },
-    })
-  )
-})
-
-// ─── SearchBar ────────────────────────────────────────────────────────────────
-
-test.describe('SearchBar', () => {
-  test('shows spinner while debounce is pending', async ({ page }) => {
+test.describe('Search', () => {
+  test('finds artists and shows the result count', async ({ page }) => {
     await page.goto('/artists')
-    await page.fill('#global-search', 'artist')
-    await expect(page.locator('[data-testid="search-spinner"]')).toBeVisible()
+    await page.getByRole('textbox', { name: 'Search...' }).fill('coldplay')
+    await expect(page.getByRole('button', { name: 'Coldplay', exact: true })).toBeVisible()
+    await expect(page.getByText('18 results')).toBeVisible()
+    await expect(page).toHaveURL(/q=coldplay/)
   })
 
-  test('spinner disappears and search icon returns after debounce fires', async ({ page }) => {
+  test('finds albums', async ({ page }) => {
     await page.goto('/artists')
-    await page.fill('#global-search', 'artist')
-    await expect(page.locator('[data-testid="search-spinner"]')).toBeVisible()
-    // debounce = 700ms; 1500ms timeout gives comfortable margin
-    await expect(page.locator('[data-testid="search-icon"]')).toBeVisible({ timeout: 1500 })
-  })
-})
-
-// ─── Artists ──────────────────────────────────────────────────────────────────
-
-test.describe('Artists search', () => {
-  test('previous button disabled on page 1', async ({ page }) => {
-    await page.goto('/artists?q=Artist&tab=artist&page=1')
-    await expect(page.getByRole('button', { name: 'Artist 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await expect(page.getByRole('button', { name: /^(Previous|Anterior)$/ }).last()).toBeDisabled()
+    await page.getByRole('tab', { name: 'Album' }).click()
+    await page.getByRole('textbox', { name: 'Search...' }).fill('parachutes')
+    await expect(page.getByRole('button', { name: 'Parachutes' }).first()).toBeVisible()
+    await expect(page.getByText('158 results')).toBeVisible()
   })
 
-  test('next button disabled when results fit in one page', async ({ page }) => {
-    // "Artist 1" substring-matches Artist 1, Artist 10-19 = 11 results < PAGE_SIZE 20
-    await page.goto('/artists?q=Artist+1&tab=artist')
-    await expect(page.getByRole('button', { name: 'Artist 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await expect(page.getByRole('button', { name: /^(Next|Próxima)$/ }).last()).toBeDisabled()
+  test('finds playlists', async ({ page }) => {
+    await page.goto('/artists')
+    await page.getByRole('tab', { name: 'Playlist' }).click()
+    await page.getByRole('textbox', { name: 'Search...' }).fill('workout')
+    await expect(page.getByRole('button', { name: 'Metal Workout' })).toBeVisible()
+    await expect(page.getByText('169 results')).toBeVisible()
   })
 
-  test('navigate to page 2 via pagination — URL updates and previous becomes enabled', async ({
-    page,
-  }) => {
-    await page.goto('/artists?q=Artist&tab=artist&page=1')
-    await expect(page.getByRole('button', { name: 'Artist 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await page
-      .getByRole('button', { name: /^(Next|Próxima)$/ })
-      .last()
-      .click()
+  test('paginates results', async ({ page }) => {
+    await page.goto('/artists?q=coldplay&tab=artist')
+    await expect(page.getByRole('button', { name: 'Coldplay', exact: true })).toBeVisible()
+    const previous = page.getByRole('button', { name: 'Previous' })
+    await expect(previous).toBeDisabled()
+
+    const pageTwo = page.waitForRequest(
+      (request) => request.url().includes('/search/artist') && /[?&]index=[1-9]/.test(request.url())
+    )
+    await page.getByRole('button', { name: 'Next' }).last().click()
+    await pageTwo
     await expect(page).toHaveURL(/page=2/)
-    await expect(page.getByRole('button', { name: /^(Previous|Anterior)$/ }).last()).toBeEnabled({
-      timeout: 10000,
-    })
-  })
+    await expect(previous).toBeEnabled()
 
-  test('navigate back to page 1 — previous becomes disabled again', async ({ page }) => {
-    await page.goto('/artists?q=Artist&tab=artist&page=2')
-    await expect(page.getByRole('button', { name: 'Artist 21', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await page
-      .getByRole('button', { name: /^(Previous|Anterior)$/ })
-      .last()
-      .click()
+    await previous.click()
     await expect(page).toHaveURL(/page=1/)
-    await expect(page.getByRole('button', { name: /^(Previous|Anterior)$/ }).last()).toBeDisabled({
-      timeout: 10000,
-    })
   })
 
-  test('clicking artist card navigates to artist detail page', async ({ page }) => {
-    await page.goto('/artists?q=Artist&tab=artist')
-    await expect(page.getByRole('button', { name: 'Artist 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await page.getByRole('button', { name: 'Artist 1', exact: true }).click()
-    await expect(page).toHaveURL(/\/artists\/artist-1/)
-  })
-})
-
-// ─── Albums ───────────────────────────────────────────────────────────────────
-
-test.describe('Albums search', () => {
-  test('album tab shows album cards', async ({ page }) => {
-    await page.goto('/artists?q=Album&tab=album')
-    await expect(page.getByRole('button', { name: 'Album 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
+  test('shows the empty state when nothing matches', async ({ page }) => {
+    await page.goto('/artists')
+    await page.getByRole('textbox', { name: 'Search...' }).fill(NO_RESULTS_QUERY)
+    await expect(page.getByText('No results found')).toBeVisible()
   })
 
-  test('album card navigates to album detail page', async ({ page }) => {
-    await page.goto('/artists?q=Album&tab=album')
-    await expect(page.getByRole('button', { name: 'Album 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await page.getByRole('button', { name: 'Album 1', exact: true }).click()
-    await expect(page).toHaveURL(/\/albums\/album-1/)
-  })
+  test('navigates to the artist and album detail pages', async ({ page }) => {
+    await page.goto('/artists?q=coldplay&tab=artist')
+    await page.getByRole('button', { name: 'Coldplay', exact: true }).click()
+    await expect(page).toHaveURL(/\/artists\/892$/)
 
-  test('next button enabled when albums exceed one page (25 total > PAGE_SIZE 20)', async ({
-    page,
-  }) => {
-    await page.goto('/artists?q=Album&tab=album&page=1')
-    await expect(page.getByRole('button', { name: 'Album 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await expect(page.getByRole('button', { name: /^(Next|Próxima)$/ }).last()).toBeEnabled()
-  })
-
-  test('direct navigation to album page 2 loads second batch of results', async ({ page }) => {
-    // page 2 offset=20 -> Album 21 is first result in mock
-    await page.goto('/artists?q=Album&tab=album&page=2')
-    await expect(page.getByRole('button', { name: 'Album 21', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await expect(page.getByRole('button', { name: /^(Previous|Anterior)$/ }).last()).toBeEnabled()
-  })
-})
-
-// ─── Playlists ────────────────────────────────────────────────────────────────
-
-test.describe('Playlists search', () => {
-  test('playlist tab shows playlist cards', async ({ page }) => {
-    await page.goto('/artists?q=Playlist&tab=playlist')
-    await expect(page.getByRole('button', { name: 'Playlist 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-  })
-
-  test('no results shows empty state message', async ({ page }) => {
-    await page.goto('/artists?q=zzznoresults&tab=playlist')
-    await expect(page.getByText(/Nenhum resultado|No results/i)).toBeVisible({ timeout: 10000 })
-  })
-})
-
-// ─── Grid next-page card ──────────────────────────────────────────────────────
-
-test.describe('Grid next-page card', () => {
-  test('next card inside grid navigates to next page', async ({ page }) => {
-    await page.goto('/artists?q=Artist&tab=artist&page=1')
-    await expect(page.getByRole('button', { name: 'Artist 1', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    // first() = card inside the grid; last() = Pagination button at the bottom of the page
-    await page
-      .getByRole('button', { name: /^(Next|Próxima)$/ })
-      .first()
-      .click()
-    await expect(page).toHaveURL(/page=2/)
-  })
-})
-
-// ─── URL state ────────────────────────────────────────────────────────────────
-
-test.describe('URL state', () => {
-  test('direct URL with page=2 loads correct artist page', async ({ page }) => {
-    // mock returns 40 artists; page 2 offset=20 -> Artist 21 is first card
-    await page.goto('/artists?q=Artist&tab=artist&page=2')
-    await expect(page.getByRole('button', { name: 'Artist 21', exact: true })).toBeVisible({
-      timeout: 15000,
-    })
-    await expect(page.getByRole('button', { name: /^(Previous|Anterior)$/ }).last()).toBeEnabled()
+    await page.goto('/artists?q=parachutes&tab=album')
+    await page.getByRole('button', { name: 'Parachutes' }).first().click()
+    await expect(page).toHaveURL(/\/albums\/\d+$/)
   })
 })

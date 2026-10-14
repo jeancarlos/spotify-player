@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { useRecentlyPlayed } from '@/hooks/queries/useRecentlyPlayed'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
+import { useRecentlyPlayed } from '@/hooks/useRecentlyPlayed'
+import { useCatalogHealth } from '@/hooks/useCatalogHealth'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
 import { SearchBar } from '@/components/shared/SearchBar'
 import type { SearchTab } from '@/utils/search'
-import type { SpotifyTrack } from '@/types/spotify'
 
 const DISK_ENTRY_DELAY_S = 0.75
 const MAX_CAROUSEL_TRACKS = 5
@@ -51,21 +51,12 @@ function useDiskLayout() {
 export function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const playTrack = usePlayTrack()
+  const { controls } = usePlayer()
   const recentlyPlayed = useRecentlyPlayed(10)
+  const { unavailable } = useCatalogHealth()
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
 
-  const isLoading = recentlyPlayed.isPending
-  const isError = recentlyPlayed.isError
-
-  const uniqueTracks: SpotifyTrack[] = recentlyPlayed.data
-    ? [
-        ...new Map(
-          recentlyPlayed.data.map((playedItem) => [playedItem.track.id, playedItem.track])
-        ).values(),
-      ]
-    : []
-  const tracks = uniqueTracks.slice(0, MAX_CAROUSEL_TRACKS)
+  const tracks = recentlyPlayed.data.slice(0, MAX_CAROUSEL_TRACKS)
 
   const handleSearch = useCallback(
     (query: string, tab: SearchTab) => {
@@ -75,16 +66,6 @@ export function Home() {
   )
 
   const renderCarouselContent = () => {
-    if (isLoading) {
-      return (
-        <div className="flex items-center justify-center mb-12">
-          <div className="w-6 h-6 border-2 border-black/10 rounded-full border-t-black/30 animate-spin" />
-        </div>
-      )
-    }
-    if (isError) {
-      return <p className="text-center text-xs text-black/20 mb-12">{t('common.error')}</p>
-    }
     if (tracks.length === 0) {
       return <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
     }
@@ -93,7 +74,7 @@ export function Home() {
         <ArcCarousel
           items={tracks.map((track) => ({
             id: track.id,
-            content: <VinylCard track={track} onPlay={playTrack} size="sm" />,
+            content: <VinylCard track={track} onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks)} size="sm" />,
           }))}
           radius={arcRadius}
           arcDeg={arcDeg}
@@ -110,7 +91,7 @@ export function Home() {
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
 
-      {showHint && !isLoading && tracks.length > 0 && (
+      {showHint && tracks.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

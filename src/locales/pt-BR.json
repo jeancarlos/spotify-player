@@ -2,10 +2,8 @@
   "nav": {
     "home": "Início",
     "artists": "Artistas",
-    "profile": "Perfil",
     "favorites": "Favoritos",
     "collapse": "Recolher",
-    "logout": "Sair",
     "openMenu": "Abrir menu",
     "languageSwitcher": "Seletor de idioma"
   },
@@ -14,18 +12,11 @@
     "newReleases": "Novos Lançamentos",
     "recommendations": "Recomendados para Você",
     "seeMore": "Ver mais",
-    "hint": "Essa é uma experiencia interativa, abra o Spotify no celular, de play e mantenha aberto enquanto usa o Spoter"
-  },
-  "login": {
-    "title": "Spoter",
-    "subtitle": "Sua experiência musical imersiva",
-    "button": "Entrar com Spotify",
-    "hint": "Essa é uma experiencia interativa, abra o Spotify no celular, de play e mantenha aberto enquanto usa o Spoter"
+    "hint": "Toque em um vinil para ouvir uma prévia de 30 segundos"
   },
   "player": {
     "nowPlaying": "Tocando agora",
-    "noTrack": "Inicir uma música no seu dispositivo",
-    "noActiveDevice": "Nenhum dispositivo ativo",
+    "noTrack": "Escolha um vinil para ouvir uma prévia",
     "lyrics": "Letra",
     "queue": "Fila",
     "closeQueue": "Fechar fila",
@@ -37,17 +28,23 @@
     "play": "Reproduzir",
     "pause": "Pausar",
     "seek": "Buscar",
-    "playTrack": "Tocar {{name}}"
+    "playTrack": "Tocar {{name}}",
+    "progressText": "{{current}} de {{total}}"
+  },
+  "catalog": {
+    "unavailable": "O catálogo do Deezer está inacessível. Favoritos e tocadas recentemente continuam listados, mas a reprodução está pausada."
   },
   "common": {
     "loading": "Carregando...",
     "error": "Algo deu errado",
     "retry": "Tentar novamente",
     "back": "Voltar",
+    "poweredByDeezer": "Dados e prévias de música por Deezer",
+    "openOnDeezer": "Abrir no Deezer",
     "skipToContent": "Pular para o conteúdo principal",
     "list": "Lista",
     "table": "Tabela",
-    "popularity": "Pop.",
+    "rank": "Rank",
     "name": "Nome",
     "clear": "Limpar"
   },
@@ -64,6 +61,7 @@
     "result_one": "{{count}} resultado",
     "result_other": "{{count}} resultados",
     "searchPrompt": "Digite para buscar",
+    "charts": "Em alta no Deezer",
     "previous": "Anterior",
     "next": "Próxima",
     "all": "Todos",
@@ -74,27 +72,19 @@
   "artistDetail": {
     "topTracks": "Top Tracks",
     "albums": "Álbuns",
-    "popularity": "Popularidade",
     "previous": "Anterior",
     "next": "Próxima",
-    "audioProfile": "Perfil de Áudio",
-    "danceability": "Dança",
-    "energy": "Energia",
-    "valence": "Valência",
-    "acousticness": "Acústica",
-    "liveness": "Ao Vivo",
     "discography": "Discografia",
     "bio": "Sobre o artista",
     "relatedArtists": "Artistas Similares",
     "loadMore": "Carregar mais",
-    "topTracksRanked": "Mais ouvidas",
-    "musicalProfile": "Perfil Musical"
+    "topTracksRanked": "Mais populares no Deezer",
+    "deezerRank": "Rank no Deezer"
   },
   "albumDetail": {
     "playAlbum": "Tocar álbum",
     "tracks": "Faixas",
-    "by": "por",
-    "musicalProfile": "Perfil Musical"
+    "by": "por"
   },
   "playlistDetail": {
     "playPlaylist": "Tocar playlist",
@@ -103,12 +93,12 @@
     "owner": "por {{name}}"
   },
   "favorites": {
+    "saveFailed": "Não foi possível salvar seus favoritos neste navegador",
     "song": "Música",
     "artist": "Artista",
     "album": "Álbum",
     "note": "Nota pessoal",
     "addButton": "Adicionar favorito",
-    "notFound": "Nenhuma música encontrada no Spotify",
     "addHeading": "Adicionar Favorito",
     "searchPlaceholder": "Buscar nos favoritos...",
     "searchAddPlaceholder": "Música ou artista...",
@@ -119,10 +109,10 @@
     "artistRequired": "Artista é obrigatório",
     "minQuery": "Digite pelo menos 2 caracteres",
     "close": "Fechar",
+    "dismissNotification": "Dispensar notificação",
     "addTrack": "+ Adicionar",
-    "viewOnSpotify": "Ver no Spotify",
-    "addToList": "Adicionar à Spoter List",
-    "removeFromList": "Remover da Spoter List",
+    "addToList": "Adicionar à Vinyla List",
+    "removeFromList": "Remover da Vinyla List",
     "addedToList": "Adicionada!",
     "removedFromList": "Removida!",
     "trackRequired": "Selecione uma música",
@@ -137,9 +127,7 @@
     "noteCharsLeft": "{{count}}/80",
     "editNote": "Editar nota",
     "clearTrack": "Limpar seleção",
-    "refreshFromSpotify": "Atualizar do Spotify",
     "reorderError": "Erro ao reordenar. A ordem anterior foi restaurada.",
-    "refreshError": "Erro ao atualizar da Spotify.",
     "reorderPosition": "Editar posição de {{name}}"
   },
   "lyrics": {
@@ -147,74 +135,17 @@
     "notFound": "Letra não encontrada",
     "album": "Álbum",
     "releaseDate": "Lançamento",
-    "popularity": "Popularidade",
     "duration": "Duração",
-    "nowPlaying": "Tocando agora"
+    "nowPlaying": "Tocando agora",
+    "noLyricsAvailable": "Sem letra disponível"
   },
-  "trackRow": {
-    "popularity": "Popularidade"
-  },
-  "profile": {
-    "followers_one": "{{count}} seguidor",
-    "followers_other": "{{count}} seguidores",
-    "followers_label_one": "seguidor",
-    "followers_label_other": "seguidores",
-    "topArtists": "Artistas Mais Ouvidos",
-    "topTracks": "Faixas Favoritas",
-    "audioProfile": "Perfil Musical",
-    "fourWeeks": "4 semanas",
-    "sixMonths": "6 meses",
-    "allTime": "Longo prazo",
-    "mostPlayedAlbums": "Álbuns Mais Ouvidos",
-    "tracks_one": "{{count}} faixa",
-    "tracks_other": "{{count}} faixas",
-    "tracks_label_one": "faixa",
-    "tracks_label_other": "faixas",
-    "listenMore": "Ouça mais músicas para ver seu perfil",
-    "plan": "Plano"
-  },
-  "auth": {
-    "authenticating": "Autenticando...",
-    "invalidState": "Estado OAuth inválido ou verifier ausente",
-    "tokenExchangeFailed": "Troca de token falhou"
-  },
-  "authError": {
-    "title": "Falha na autenticação",
-    "stateMismatch": "Os dados de segurança da sessão expiraram ou foram perdidos.",
-    "tokenError": "Não foi possível completar a troca de autorização com o Spotify.",
-    "unknown": "Ocorreu um erro inesperado durante a autenticação.",
-    "hint": "Isso pode acontecer se a janela demorou muito para responder ou se o browser bloqueou o acesso à sessão.",
-    "retry": "Tentar novamente",
-    "close": "Fechar janela"
-  },
+  "trackRow": {},
   "track": {
-    "popularity": "Popularidade",
-    "key": "Tonalidade",
-    "timeSignature": "Compasso",
+    "noPreview": "Prévia indisponível",
     "duration": "Duração",
     "instrumental": "Instrumental",
-    "major": "Maior",
-    "minor": "Menor",
-    "tempo": "Tempo",
-    "loudness": "Volume",
-    "valence": "Valência",
-    "speechiness": "Vocal",
-    "instrumentalness": "Instrumentalidade",
-    "audioFeatures": "Características de Áudio",
     "songDetails": "Detalhes da música",
-    "moodZone": "Zona de Humor",
-    "intense": "Intenso",
-    "chill": "Tranquilo",
-    "sad": "Sombrio",
-    "happy": "Alegre",
-    "mood": {
-      "happyEnergetic": "Animado & Enérgico",
-      "darkEnergetic": "Intenso & Sombrio",
-      "happyChill": "Leve & Alegre",
-      "darkChill": "Introspectivo"
-    },
     "bpm": "BPM",
-    "keyLabel": "Tom",
     "explicit": "Explícito",
     "trackNumber": "Nº",
     "albumCol": "Álbum",
@@ -226,12 +157,12 @@
     "readMore": "Ler mais na Wikipedia"
   },
   "playlist": {
-    "defaultName": "Spoter List"
+    "defaultName": "Vinyla List"
   },
   "pwa": {
     "readyOffline": "O app está pronto para funcionar offline",
     "updateAvailable": "Atualização disponível",
-    "newVersion": "Uma nova versão do Spoter está disponível. Recarregue para atualizar.",
+    "newVersion": "Uma nova versão do Vinyla está disponível. Recarregue para atualizar.",
     "reload": "Recarregar e Atualizar"
   }
 }

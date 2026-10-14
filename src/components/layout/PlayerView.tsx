@@ -1,35 +1,21 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Info, Music2, ListMusic } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer, useProgress } from '@/contexts/PlayerContext'
 import { useLyrics } from '@/hooks/queries/useLyrics'
-import { useProgressEngine } from '@/hooks/useProgressEngine'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
-import { seekRequest } from '@/lib/playerApi'
 import { getFromPath } from '@/utils/routerState'
-import type { SpotifyTrack } from '@/types/spotify'
+import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
+import type { Track } from '@/types/music'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { LyricLine } from '@/types/lyrics'
 
 type PlayerTab = 'lyrics' | 'info' | 'queue'
-
-function usePlayerSeek() {
-  const { dispatch } = usePlayer()
-  const { seekTo } = useProgressEngine()
-  return useCallback(
-    async (ms: number) => {
-      dispatch({ type: 'SET_SEEK_TIME', payload: Date.now() })
-      seekTo(ms)
-      await seekRequest(ms)
-    },
-    [dispatch, seekTo]
-  )
-}
 
 interface TrackFields {
   artistName: string
@@ -38,7 +24,7 @@ interface TrackFields {
   albumArt: string | undefined
 }
 
-function extractTrackFields(track: SpotifyTrack | null): TrackFields {
+function extractTrackFields(track: Track | null): TrackFields {
   if (!track) {
     return { artistName: '', trackName: '', albumName: undefined, albumArt: undefined }
   }
@@ -53,13 +39,14 @@ function extractTrackFields(track: SpotifyTrack | null): TrackFields {
 function useTabRedirect(
   noLyrics: boolean,
   activeTab: PlayerTab,
-  setSearchParams: ReturnType<typeof useSearchParams>[1]
+  setSearchParams: ReturnType<typeof useSearchParams>[1],
+  state: unknown
 ) {
   useEffect(() => {
     if (noLyrics && activeTab === 'lyrics') {
-      setSearchParams({ tab: 'info' }, { replace: true })
+      setSearchParams({ tab: 'info' }, { replace: true, state })
     }
-  }, [noLyrics, activeTab, setSearchParams])
+  }, [noLyrics, activeTab, setSearchParams, state])
 }
 
 interface PlayerTabBarProps {
@@ -72,7 +59,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
   const { t } = useTranslation()
   const tabClass = (tab: PlayerTab) =>
     cn(
-      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none',
+      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-white/60',
       activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/70'
     )
   return (
@@ -82,6 +69,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
           onClick={() => {
             onTabChange('lyrics')
           }}
+          aria-label={t('player.lyrics')}
           className={tabClass('lyrics')}
         >
           <Music2 size={14} className="shrink-0" />
@@ -92,6 +80,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
         onClick={() => {
           onTabChange('info')
         }}
+        aria-label={t('track.songDetails')}
         className={tabClass('info')}
       >
         <Info size={14} className="shrink-0" />
@@ -101,6 +90,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
         onClick={() => {
           onTabChange('queue')
         }}
+        aria-label={t('player.queue')}
         className={tabClass('queue')}
       >
         <ListMusic size={14} className="shrink-0" />
@@ -112,10 +102,10 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
 
 interface PlayerContentPaneProps {
   activeTab: PlayerTab
-  currentTrack: SpotifyTrack | null
+  currentTrack: Track | null
   lyrics: UseQueryResult<LyricLine[]>
   currentProgress: number
-  onSeek: (ms: number) => Promise<void>
+  onSeek: (ms: number) => void
 }
 
 function PlayerContentPane({
@@ -175,18 +165,18 @@ function PlayerContentPane({
 }
 
 export function PlayerView() {
-  const { state } = usePlayer()
-  const { currentTrack, duration } = state
-  const { currentProgress } = useProgressEngine()
+  const { state, controls } = usePlayer()
+  const { currentTrack } = state
+  const { progressMs: currentProgress } = useProgress()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const handleSeek = usePlayerSeek()
 
   const activeTab = (searchParams.get('tab') ?? 'lyrics') as PlayerTab
 
   const handleTabChange = (tab: PlayerTab) => {
-    setSearchParams({ tab }, { replace: true })
+    setSearchParams({ tab }, { replace: true, state: location.state as unknown })
   }
 
   const { artistName, trackName, albumName, albumArt } = extractTrackFields(currentTrack)
@@ -194,12 +184,12 @@ export function PlayerView() {
     artist: artistName,
     title: trackName,
     album: albumName,
-    durationMs: duration,
+    durationMs: currentTrack?.duration_ms ?? 0,
   })
 
   const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
 
-  useTabRedirect(noLyrics, activeTab, setSearchParams)
+  useTabRedirect(noLyrics, activeTab, setSearchParams, location.state as unknown)
 
   return (
     <div className="relative h-screen bg-black overflow-hidden flex flex-col">
@@ -222,15 +212,15 @@ export function PlayerView() {
           onClick={() => {
             navigate(getFromPath(location.state))
           }}
-          className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none"
-          aria-label="back"
+          className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+          aria-label={t('common.back')}
         >
           <ArrowLeft size={20} className="text-white" />
         </button>
 
         <PlayerTabBar activeTab={activeTab} noLyrics={noLyrics} onTabChange={handleTabChange} />
 
-        <div className="w-10" />
+        <DeezerAttribution className="rounded bg-white px-2 py-1" />
       </header>
 
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
@@ -240,7 +230,9 @@ export function PlayerView() {
             currentTrack={currentTrack}
             lyrics={lyrics}
             currentProgress={currentProgress}
-            onSeek={handleSeek}
+            onSeek={(ms) => {
+              controls.seek(ms)
+            }}
           />
         </AnimatePresence>
       </main>

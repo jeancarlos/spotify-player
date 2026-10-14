@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import { playerReducer, initialPlayerState } from '../playerReducer'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const mockTrack: SpotifyTrack = {
+const mockTrack: Track = {
   id: 't1',
   name: 'Track 1',
   duration_ms: 210000,
   explicit: false,
-  popularity: 80,
+  rank: 80,
   preview_url: null,
   uri: 'spotify:track:t1',
   type: 'track',
@@ -25,58 +25,39 @@ const mockTrack: SpotifyTrack = {
 }
 
 describe('playerReducer', () => {
-  it('SET_TRACK atualiza currentTrack e duration', () => {
+  it('SET_TRACK stores currentTrack', () => {
     const state = playerReducer(initialPlayerState, { type: 'SET_TRACK', payload: mockTrack })
     expect(state.currentTrack?.id).toBe('t1')
-    expect(state.duration).toBe(210000)
   })
 
-  it('TOGGLE_PLAY inverte isPlaying', () => {
-    const s1 = playerReducer(initialPlayerState, { type: 'TOGGLE_PLAY' })
-    expect(s1.isPlaying).toBe(true)
-    const s2 = playerReducer(s1, { type: 'TOGGLE_PLAY' })
-    expect(s2.isPlaying).toBe(false)
-  })
-
-  it('SET_VOLUME limita entre 0 e 1', () => {
-    const s1 = playerReducer(initialPlayerState, { type: 'SET_VOLUME', payload: 1.5 })
-    expect(s1.volume).toBe(1)
-    const s2 = playerReducer(initialPlayerState, { type: 'SET_VOLUME', payload: -0.1 })
-    expect(s2.volume).toBe(0)
-  })
-
-  it('SET_PALETTE atualiza a paleta', () => {
-    const state = playerReducer(initialPlayerState, {
-      type: 'SET_PALETTE',
-      payload: ['100,50,200', '50,100,150'],
-    })
-    expect(state.palette).toEqual(['100,50,200', '50,100,150'])
-  })
-
-  it('TOGGLE_FULLSCREEN inverte isFullscreen', () => {
-    const state = playerReducer(initialPlayerState, { type: 'TOGGLE_FULLSCREEN' })
-    expect(state.isFullscreen).toBe(true)
-  })
-
-  it('SET_PLAYING define isPlaying diretamente', () => {
+  it('SET_PLAYING sets isPlaying directly', () => {
     const s1 = playerReducer(initialPlayerState, { type: 'SET_PLAYING', payload: true })
     expect(s1.isPlaying).toBe(true)
-    const s2 = playerReducer(s1, { type: 'SET_PLAYING', payload: false })
-    expect(s2.isPlaying).toBe(false)
+    expect(playerReducer(s1, { type: 'SET_PLAYING', payload: false }).isPlaying).toBe(false)
   })
 
-  it('SET_SHUFFLE define shuffle diretamente sem toggle', () => {
+  it('SET_LOADING sets isLoading', () => {
+    expect(playerReducer(initialPlayerState, { type: 'SET_LOADING', payload: true }).isLoading).toBe(true)
+  })
+
+  it('SET_SHUFFLE sets shuffle directly', () => {
     const s1 = playerReducer(initialPlayerState, { type: 'SET_SHUFFLE', payload: true })
     expect(s1.shuffle).toBe(true)
-    const s2 = playerReducer(s1, { type: 'SET_SHUFFLE', payload: true })
-    expect(s2.shuffle).toBe(true)
-    const s3 = playerReducer(s2, { type: 'SET_SHUFFLE', payload: false })
-    expect(s3.shuffle).toBe(false)
+    expect(playerReducer(s1, { type: 'SET_SHUFFLE', payload: true }).shuffle).toBe(true)
+    expect(playerReducer(s1, { type: 'SET_SHUFFLE', payload: false }).shuffle).toBe(false)
   })
 
-  it('SET_SEEK_TIME atualiza timestamp do último seek', () => {
-    const now = Date.now()
-    const state = playerReducer(initialPlayerState, { type: 'SET_SEEK_TIME', payload: now })
-    expect(state.lastSeekTime).toBe(now)
+  it('SET_REPEAT sets repeat', () => {
+    expect(playerReducer(initialPlayerState, { type: 'SET_REPEAT', payload: 'track' }).repeat).toBe('track')
+  })
+
+  it('SET_QUEUE stores the queue', () => {
+    expect(playerReducer(initialPlayerState, { type: 'SET_QUEUE', payload: [mockTrack] }).queue).toHaveLength(1)
+  })
+
+  it('SET_QUEUE_INDEX stores the index of the playing track', () => {
+    const next = playerReducer(initialPlayerState, { type: 'SET_QUEUE_INDEX', payload: 3 })
+    expect(next.queueIndex).toBe(3)
+    expect(initialPlayerState.queueIndex).toBe(0)
   })
 })

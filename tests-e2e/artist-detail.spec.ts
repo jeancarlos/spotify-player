@@ -1,72 +1,32 @@
-import { test, expect } from './fixtures/auth'
+import { test, expect } from './test'
 
-test.describe('Artist detail page', () => {
+test.describe('Artist detail', () => {
   test.beforeEach(async ({ page }) => {
-    // Silence album track queries triggered by useArtistDiscographyTracks
-    await page.route('**/api.spotify.com/v1/albums/*/tracks**', (route) =>
-      route.fulfill({
-        json: {
-          items: [],
-          limit: 10,
-          offset: 0,
-          total: 0,
-          next: null,
-          previous: null,
-          href: '',
-        },
-      })
-    )
+    await page.goto('/artists/892')
   })
 
-  test('navigates to /artists/:id when artist card is clicked', async ({ page }) => {
-    await page.goto('/artists?q=Artist&tab=artist')
-
-    // exact: true avoids "Artist 1" matching "Artist 10", "Artist 11", etc.
-    const firstCard = page.getByRole('button', { name: 'Artist 1', exact: true })
-    await expect(firstCard).toBeVisible({ timeout: 15000 })
-    await firstCard.click()
-    await expect(page).toHaveURL(/\/artists\//, { timeout: 10000 })
+  test('shows the artist header and Wikipedia bio', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Coldplay' }).first()).toBeVisible()
+    await expect(page.getByText('About the artist')).toBeVisible()
+    await expect(page.getByText('Coldplay are a British rock band')).toBeVisible()
   })
 
-  test('detail page shows artist name in heading', async ({ page }) => {
-    await page.goto('/artists/artist-1')
-
-    // ArtistHeader renders name in an h1
-    await expect(page.getByRole('heading', { name: 'Mock Artist' })).toBeVisible({
-      timeout: 15000,
-    })
+  test('shows the ranked top tracks chart', async ({ page }) => {
+    await expect(page.getByText('Top tracks on Deezer')).toBeVisible()
+    await expect(page.locator('svg.recharts-surface').first()).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Play Yellow' })).toBeAttached()
   })
 
-  test('detail page shows genre info in subtitle', async ({ page }) => {
-    await page.goto('/artists/artist-1')
-
-    // Genres joined as "pop · indie" rendered as subtitle paragraph under the h1
-    await expect(page.getByText('pop · indie')).toBeVisible({ timeout: 15000 })
+  test('lists the discography and opens an album', async ({ page }) => {
+    await expect(page.getByText('Discography')).toBeVisible()
+    await page.getByRole('button', { name: /Moon Music/ }).first().click()
+    await expect(page).toHaveURL(/\/albums\/\d+$/)
   })
 
-  test('top tracks section is visible', async ({ page }) => {
-    await page.goto('/artists/artist-1')
-
-    // Chart SVG from recharts renders after artist data loads
-    await expect(page.getByRole('heading', { name: 'Mock Artist' })).toBeVisible({
-      timeout: 15000,
-    })
-    await expect(page.locator('svg').first()).toBeVisible({ timeout: 15000 })
-  })
-
-  test('chart SVG element is present on the page', async ({ page }) => {
-    await page.goto('/artists/artist-1')
-
-    // ArtistTopTracksChart uses recharts which renders SVG
-    await expect(page.locator('svg').first()).toBeVisible({ timeout: 15000 })
-  })
-
-  test('albums section shows album names', async ({ page }) => {
-    await page.goto('/artists/artist-1')
-
-    // ArtistDiscography renders album names as text; mock returns "Album 1" through "Album 5"
-    await expect(page.getByText('Album 1', { exact: true }).first()).toBeVisible({
-      timeout: 15000,
-    })
+  test('shows the album tracks on the album page', async ({ page }) => {
+    await page.goto('/albums/650278821')
+    await expect(page.getByRole('heading', { name: 'Moon Music' }).first()).toBeVisible()
+    await expect(page.getByText('MOON MUSiC').first()).toBeVisible()
+    await expect(page.getByText('feelslikeimfallinginlove').first()).toBeVisible()
   })
 })

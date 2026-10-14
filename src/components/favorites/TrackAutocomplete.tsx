@@ -5,13 +5,13 @@ import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { cn } from '@/lib/utils'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface ResultsListProps {
   listboxId: string
-  results: SpotifyTrack[]
+  results: Track[]
   highlightIndex: number
-  onSelect: (track: SpotifyTrack) => void
+  onSelect: (track: Track) => void
   label: string
 }
 
@@ -29,7 +29,8 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
           id={`${listboxId}-${i}`}
           role="option"
           aria-selected={i === highlightIndex}
-          onClick={() => {
+          onMouseDown={(e) => {
+            e.preventDefault()
             onSelect(track)
           }}
           className={cn(
@@ -55,7 +56,7 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
 }
 
 interface SelectedTrackProps {
-  track: SpotifyTrack
+  track: Track
   onClear: () => void
   clearLabel: string
 }
@@ -85,11 +86,12 @@ function SelectedTrack({ track, onClear, clearLabel }: SelectedTrackProps) {
 }
 
 interface TrackSearchInputProps {
+  id?: string
   inputRef: React.RefObject<HTMLInputElement | null>
   blurTimerRef: React.RefObject<number>
   query: string
   isOpen: boolean
-  results: SpotifyTrack[]
+  results: Track[]
   highlightIndex: number
   listboxId: string
   isPending: boolean
@@ -99,14 +101,19 @@ interface TrackSearchInputProps {
   onOpen: () => void
   onClose: () => void
   onBlur: () => void
-  onSelect: (track: SpotifyTrack) => void
+  onSelect: (track: Track) => void
   setHighlightIndex: React.Dispatch<React.SetStateAction<number>>
   placeholder: string
   loadingText: string
   resultsLabel: string
 }
 
+function activeOptionId(listboxId: string, isOpen: boolean, index: number, count: number) {
+  return isOpen && index >= 0 && index < count ? `${listboxId}-${index}` : undefined
+}
+
 function TrackSearchInput({
+  id,
   inputRef,
   blurTimerRef,
   query,
@@ -140,6 +147,7 @@ function TrackSearchInput({
     <div className="relative">
       <input
         ref={inputRef}
+        id={id}
         type="text"
         value={query}
         autoFocus
@@ -149,11 +157,11 @@ function TrackSearchInput({
         aria-controls={listboxId}
         aria-haspopup="listbox"
         aria-autocomplete="list"
-        aria-activedescendant={highlightIndex >= 0 ? `${listboxId}-${highlightIndex}` : undefined}
+        aria-activedescendant={activeOptionId(listboxId, isOpen, highlightIndex, results.length)}
         placeholder={placeholder}
         className={cn(
           'w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black',
-          'placeholder:text-black/30 outline-none focus:bg-black/[0.08] transition-colors',
+          'placeholder:text-black/30 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors',
           isOpen ? 'rounded-b-none' : 'rounded-xl',
           error && 'ring-1 ring-red-400'
         )}
@@ -161,6 +169,10 @@ function TrackSearchInput({
           onQueryChange(e.target.value)
           onOpen()
           setHighlightIndex(() => -1)
+        }}
+        onFocus={() => {
+          clearTimeout(blurTimerRef.current)
+          if (results.length > 0) onOpen()
         }}
         onBlur={() => {
           onBlur()
@@ -193,13 +205,14 @@ function TrackSearchInput({
 }
 
 export interface TrackAutocompleteProps {
-  value: SpotifyTrack | null
-  onChange: (track: SpotifyTrack | null) => void
+  value: Track | null
+  onChange: (track: Track | null) => void
   onBlur: () => void
   error?: string
+  id?: string
 }
 
-export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutocompleteProps) {
+export function TrackAutocomplete({ value, onChange, onBlur, error, id }: TrackAutocompleteProps) {
   const { t } = useTranslation()
   const uid = useId()
   const listboxId = `${uid}-listbox`
@@ -223,7 +236,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
     debouncedQuery.length >= 2
   )
 
-  const handleSelect = (track: SpotifyTrack) => {
+  const handleSelect = (track: Track) => {
     clearTimeout(blurTimerRef.current)
     onChange(track)
     setQuery('')
@@ -246,6 +259,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error }: TrackAutoc
 
   return (
     <TrackSearchInput
+      id={id}
       inputRef={inputRef}
       blurTimerRef={blurTimerRef}
       query={query}

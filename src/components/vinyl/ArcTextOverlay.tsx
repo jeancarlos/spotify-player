@@ -25,15 +25,16 @@ export function ArcTextOverlay({
   const fontSize = 10
   const letterSpacing = 1
 
-  const startAngleRad = (270 - arcDeg / 2) * (Math.PI / 230)
-  const endAngleRad = (270 + arcDeg / 2) * (Math.PI / 230)
+  const startAngleRad = (270 - arcDeg / 2) * (Math.PI / 180)
+  const endAngleRad = (270 + arcDeg / 2) * (Math.PI / 180)
 
   const x1 = cx + r * Math.cos(startAngleRad)
   const y1 = cy + r * Math.sin(startAngleRad)
   const x2 = cx + r * Math.cos(endAngleRad)
   const y2 = cy + r * Math.sin(endAngleRad)
 
-  const arcPath = `M ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2}`
+  const largeArc = arcDeg > 180 ? 1 : 0
+  const arcPath = `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`
 
   const rotateTransition = isPlaying
     ? { duration: 8, ease: 'linear' as const, repeat: Infinity }

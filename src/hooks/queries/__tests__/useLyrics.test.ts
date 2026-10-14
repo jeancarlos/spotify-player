@@ -1,0 +1,55 @@
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { fetchLyrics, lyricsKey } from '../useLyrics'
+
+const params = { artist: 'A', title: 'T', album: 'Al', durationMs: 1000 }
+
+afterEach(() => vi.unstubAllGlobals())
+
+describe('lyricsKey', () => {
+  it('includes the cleaned title and the album', () => {
+    expect(lyricsKey({ ...params, title: 'T - Remastered 2011' })).toEqual(['lyrics', 'A', 'T', 1000, 'Al'])
+  })
+
+  it('differs per album', () => {
+    expect(lyricsKey(params)).not.toEqual(lyricsKey({ ...params, album: 'Other' }))
+  })
+})
+
+describe('fetchLyrics', () => {
+  it('returns an empty list when lrclib has no match', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404 }))
+    await expect(fetchLyrics(params)).resolves.toEqual([])
+  })
+
+  it.each([429, 500, 503])('throws on transient status %i', async (status) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status }))
+    await expect(fetchLyrics(params)).rejects.toThrow(String(status))
+  })
+
+  it('throws on network failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('offline')))
+    await expect(fetchLyrics(params)).rejects.toThrow('offline')
+  })
+
+  it('parses synced lyrics', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ syncedLyrics: '[00:01.00]hi' }) })
+    )
+    const lines = await fetchLyrics(params)
+    expect(lines).toHaveLength(1)
+  })
+
+  it('falls back to plain lyrics when the synced ones parse to nothing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ syncedLyrics: 'no stamps here', plainLyrics: 'one\ntwo' }),
+      })
+    )
+    const lines = await fetchLyrics(params)
+    expect(lines.map((l) => l.text)).toEqual(['one', 'two'])
+  })
+})

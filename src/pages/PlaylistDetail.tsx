@@ -1,14 +1,17 @@
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { currentPath } from '@/utils/routerState'
 import { usePlaylistDetailPage, PLAYLIST_LIMIT } from '@/hooks/usePlaylistDetailPage'
 import { CollectionHeader } from '@/components/shared/CollectionHeader'
 import { ListTableSwitch } from '@/components/shared/ListTableSwitch'
 import { TrackRow } from '@/components/shared/TrackRow'
 import { TrackTable } from '@/components/shared/TrackTable'
 import { Pagination } from '@/components/shared/Pagination'
-import type { SpotifyTrack } from '@/types/spotify'
 
 export function PlaylistDetail() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const {
     playlist,
@@ -35,6 +38,7 @@ export function PlaylistDetail() {
         playLabel={t('playlistDetail.playPlaylist')}
         onPlay={handlePlay}
         onLayout={handleLayout}
+        link={playlist.data?.link}
       />
 
       <div style={{ paddingTop: headerHeight }} className="px-4 pb-32">
@@ -53,7 +57,7 @@ export function PlaylistDetail() {
                   index={(page - 1) * PLAYLIST_LIMIT + i}
                   isActive={playerState.currentTrack?.id === track.id}
                   onPlay={async (tr) => {
-                    await playTrack(tr as SpotifyTrack, playlistTracks)
+                    await playTrack(tr, playlistTracks)
                   }}
                 />
               ))}
@@ -62,9 +66,13 @@ export function PlaylistDetail() {
             <TrackTable
               tracks={playlistTracks}
               showAlbumColumn={true}
+              startIndex={(page - 1) * PLAYLIST_LIMIT}
               activeTrackId={playerState.currentTrack?.id}
               onPlay={(track) => {
-                void playTrack(track as SpotifyTrack, playlistTracks)
+                void playTrack(track, playlistTracks)
+              }}
+              onAlbumClick={(albumId) => {
+                navigate(`/albums/${albumId}`, { state: { from: currentPath(location) } })
               }}
             />
           )}

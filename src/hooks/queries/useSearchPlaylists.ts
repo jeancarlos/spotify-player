@@ -1,12 +1,13 @@
 import { useSearchPaged } from './useSearchPaged'
-import type { SearchPlaylistsResponse, SpotifyPlaylist } from '@/types/spotify'
+import { toPlaylist, type DzPlaylist } from '@/lib/deezerMappers'
+import type { Playlist } from '@/types/music'
 
 export function useSearchPlaylists(query: string, page: number) {
-  return useSearchPaged<SpotifyPlaylist | null, SearchPlaylistsResponse>({
+  return useSearchPaged<DzPlaylist, Playlist>({
     queryKeyPrefix: 'playlists-search',
+    path: 'search/playlist',
     query,
     page,
-    apiType: 'playlist',
-    getPage: (res) => res.playlists,
+    map: (p) => toPlaylist(p),
   })
 }

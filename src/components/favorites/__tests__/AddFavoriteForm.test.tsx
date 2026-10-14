@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const mockTrack: SpotifyTrack = {
+const mockTrack: Track = {
   id: 't1',
   uri: 'spotify:track:t1',
   name: 'Test Track',
   duration_ms: 180000,
   explicit: false,
-  popularity: 80,
+  rank: 80,
   preview_url: null,
   type: 'track',
   artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
@@ -29,9 +29,11 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
   TrackAutocomplete: ({
     onChange,
     value,
+    id,
   }: {
-    onChange: (t: SpotifyTrack | null) => void
-    value: SpotifyTrack | null
+    id?: string
+    onChange: (t: Track | null) => void
+    value: Track | null
     onBlur: () => void
     error?: string
   }) =>
@@ -39,6 +41,7 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
       <div data-testid="selected-track">{value.name}</div>
     ) : (
       <button
+        data-input-id={id}
         type="button"
         onClick={() => {
           onChange(mockTrack)
@@ -51,20 +54,32 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
 
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
 
-const onAdd = vi.fn()
+const onAdd = vi.fn(() => true)
 const onClose = vi.fn()
 
 beforeEach(() => {
   vi.clearAllMocks()
 })
 
-function renderForm(existingFavorites: SpotifyTrack[] = []) {
+function renderForm(existingFavorites: Track[] = []) {
   return render(
     <AddFavoriteForm existingFavorites={existingFavorites} onAdd={onAdd} onClose={onClose} />
   )
 }
 
 describe('AddFavoriteForm', () => {
+  it('associates both labels with their controls', () => {
+    renderForm()
+    expect(screen.getByRole('button', { name: /selecionar música/i })).toHaveAttribute(
+      'data-input-id',
+      'favorite-track'
+    )
+    expect(screen.getByText(/favorites\.trackLabel/).closest('label')).toHaveAttribute(
+      'for',
+      'favorite-track'
+    )
+    expect(screen.getByLabelText(/favorites\.noteLabel/).tagName).toBe('TEXTAREA')
+  })
   it('botão de submit está desabilitado sem track selecionada', () => {
     renderForm()
     expect(screen.getByRole('button', { name: /favorites\.addConfirm/i })).toBeDisabled()
@@ -107,6 +122,18 @@ describe('AddFavoriteForm', () => {
       expect(onAdd).toHaveBeenCalledWith(mockTrack, 'ouço no treino')
       expect(onClose).toHaveBeenCalled()
     })
+  })
+
+  it('submit nao fecha o form quando onAdd falha', async () => {
+    const user = userEvent.setup()
+    onAdd.mockReturnValueOnce(false)
+    renderForm()
+    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await user.click(screen.getByRole('button', { name: /favorites\.addConfirm/i }))
+    await waitFor(() => {
+      expect(onAdd).toHaveBeenCalled()
+    })
+    expect(onClose).not.toHaveBeenCalled()
   })
 
   it('submit com nota vazia chama onAdd com undefined como nota', async () => {

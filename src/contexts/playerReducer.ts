@@ -1,115 +1,51 @@
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 export interface PlayerState {
-  currentTrack: SpotifyTrack | null
-  queue: SpotifyTrack[]
+  currentTrack: Track | null
+  queue: Track[]
+  queueIndex: number
   isPlaying: boolean
   isLoading: boolean
-  duration: number
-  volume: number
   shuffle: boolean
   repeat: 'off' | 'track' | 'context'
-  isFullscreen: boolean
-  palette: [string, string] | null
-  lastSeekTime: number // Local timestamp of the last manual seek
 }
 
 export type PlayerAction =
-  | { type: 'SET_TRACK'; payload: SpotifyTrack }
-  | { type: 'TOGGLE_PLAY' }
+  | { type: 'SET_TRACK'; payload: Track }
   | { type: 'SET_PLAYING'; payload: boolean }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_VOLUME'; payload: number }
-  | { type: 'TOGGLE_SHUFFLE' }
   | { type: 'SET_SHUFFLE'; payload: boolean }
   | { type: 'SET_REPEAT'; payload: 'off' | 'track' | 'context' }
-  | { type: 'TOGGLE_FULLSCREEN' }
-  | { type: 'SET_PALETTE'; payload: [string, string] }
-  | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
-  | { type: 'SET_SEEK_TIME'; payload: number }
+  | { type: 'SET_QUEUE'; payload: Track[] }
+  | { type: 'SET_QUEUE_INDEX'; payload: number }
 
 export const initialPlayerState: PlayerState = {
   currentTrack: null,
   queue: [],
+  queueIndex: 0,
   isPlaying: false,
   isLoading: false,
-  duration: 0,
-  volume: 0.8,
   shuffle: false,
   repeat: 'off',
-  isFullscreen: false,
-  palette: null,
-  lastSeekTime: 0,
 }
 
-type QueueAction =
-  | { type: 'SET_TRACK'; payload: SpotifyTrack }
-  | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
-  | { type: 'SET_SEEK_TIME'; payload: number }
-
-type PlaybackAction =
-  | { type: 'TOGGLE_PLAY' }
-  | { type: 'SET_PLAYING'; payload: boolean }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_VOLUME'; payload: number }
-  | { type: 'TOGGLE_SHUFFLE' }
-  | { type: 'SET_SHUFFLE'; payload: boolean }
-  | { type: 'SET_REPEAT'; payload: 'off' | 'track' | 'context' }
-
-type UiAction = { type: 'TOGGLE_FULLSCREEN' } | { type: 'SET_PALETTE'; payload: [string, string] }
-
-function queueReducer(state: PlayerState, action: QueueAction): PlayerState {
+export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
   switch (action.type) {
     case 'SET_TRACK':
-      return { ...state, currentTrack: action.payload, duration: action.payload.duration_ms }
-    case 'SET_QUEUE':
-      return { ...state, queue: action.payload }
-    case 'SET_SEEK_TIME':
-      return { ...state, lastSeekTime: action.payload }
-    default:
-      return state
-  }
-}
-
-function playbackReducer(state: PlayerState, action: PlaybackAction): PlayerState {
-  switch (action.type) {
-    case 'TOGGLE_PLAY':
-      return { ...state, isPlaying: !state.isPlaying }
+      return { ...state, currentTrack: action.payload }
     case 'SET_PLAYING':
       return { ...state, isPlaying: action.payload }
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload }
-    case 'SET_VOLUME':
-      return { ...state, volume: Math.min(1, Math.max(0, action.payload)) }
-    case 'TOGGLE_SHUFFLE':
-      return { ...state, shuffle: !state.shuffle }
     case 'SET_SHUFFLE':
       return { ...state, shuffle: action.payload }
     case 'SET_REPEAT':
       return { ...state, repeat: action.payload }
+    case 'SET_QUEUE':
+      return { ...state, queue: action.payload }
+    case 'SET_QUEUE_INDEX':
+      return { ...state, queueIndex: action.payload }
     default:
       return state
   }
-}
-
-function uiReducer(state: PlayerState, action: UiAction): PlayerState {
-  switch (action.type) {
-    case 'TOGGLE_FULLSCREEN':
-      return { ...state, isFullscreen: !state.isFullscreen }
-    case 'SET_PALETTE':
-      return { ...state, palette: action.payload }
-    default:
-      return state
-  }
-}
-
-export function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
-  const { type } = action
-  if (type === 'SET_TRACK' || type === 'SET_QUEUE' || type === 'SET_SEEK_TIME') {
-    return queueReducer(state, action)
-  }
-  if (type === 'TOGGLE_FULLSCREEN' || type === 'SET_PALETTE') {
-    return uiReducer(state, action)
-  }
-  return playbackReducer(state, action)
 }

@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
-import { usePlayer } from '@/hooks/usePlayer'
-import { useAuth } from '@/hooks/useAuth'
-import { useIsTrackFavorite } from '@/hooks/useIsTrackFavorite'
-import { readLocalNotes } from '@/utils/favStorage'
-import type { SpotifyTrack } from '@/types/spotify'
+import { usePlayer } from '@/contexts/PlayerContext'
+import { useFavorites } from '@/hooks/useFavorites'
+import type { Track } from '@/types/music'
 
 const PLAYER_CLEARANCE = 136
 
@@ -17,12 +15,11 @@ interface VinylDiskDisplayProps {
 }
 
 function getVinylDiskProps(
-  track: SpotifyTrack | null,
+  track: Track | null,
   notes: Record<string, string>,
-  isFavorite: boolean,
-  isLogin: boolean
+  isFavorite: boolean
 ): VinylDiskDisplayProps {
-  if (isLogin || !track) return {}
+  if (!track) return {}
   const albumArt = track.album.images[0]?.url
   const albumName = track.album.name
   const currentNote = notes[track.uri]
@@ -31,18 +28,15 @@ function getVinylDiskProps(
 }
 
 interface VinylPositions {
-  loginY: number
   homeY: number
   otherY: number
 }
 
 function getVinylY(
-  isLogin: boolean,
   isHome: boolean,
   playerHovered: boolean,
   pos: VinylPositions
 ): number {
-  if (isLogin) return pos.loginY
   if (isHome) return pos.homeY
   if (playerHovered) return pos.homeY
   return pos.otherY
@@ -61,7 +55,6 @@ function useVinylY() {
   }, [])
   const diskPx = Math.min(720, vw)
   return {
-    loginY: Math.round(diskPx * 0.5),
     homeY: Math.round(diskPx * 0.28),
     otherY: diskPx - PLAYER_CLEARANCE,
   }
@@ -74,30 +67,15 @@ interface PersistentVinylDiskProps {
 export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDiskProps) {
   const location = useLocation()
   const { state } = usePlayer()
-  const { state: authState } = useAuth()
-  const { loginY, homeY, otherY } = useVinylY()
+  const { homeY, otherY } = useVinylY()
 
-  const userId = authState.profile?.id ?? ''
-  const isFavorite = useIsTrackFavorite(state.currentTrack?.uri, userId)
+  const { tracks, notes } = useFavorites()
+  const isFavorite = tracks.some((t) => t.uri === state.currentTrack?.uri)
 
-  const [notes, setNotes] = useState<Record<string, string>>({})
-  useEffect(() => {
-    if (!userId) return
-    const handler = () => {
-      setNotes(readLocalNotes(userId))
-    }
-    setTimeout(handler, 0)
-    window.addEventListener('spoter:favorites-changed', handler)
-    return () => {
-      window.removeEventListener('spoter:favorites-changed', handler)
-    }
-  }, [userId])
-
-  const isLogin = location.pathname === '/login'
   const isHome = location.pathname === '/'
 
-  const y = getVinylY(isLogin, isHome, playerHovered, { loginY, homeY, otherY })
-  const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite, isLogin)
+  const y = getVinylY(isHome, playerHovered, { homeY, otherY })
+  const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite)
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[15] pointer-events-none flex justify-center">

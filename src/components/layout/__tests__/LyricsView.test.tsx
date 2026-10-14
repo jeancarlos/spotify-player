@@ -17,7 +17,7 @@ const fewLines: LyricLine[] = [
 describe('LyricsView', () => {
   it('shows empty state message when lines is empty', () => {
     render(<LyricsView lines={[]} progress={0} />)
-    expect(screen.getByText('Sem letra disponível')).toBeInTheDocument()
+    expect(screen.getByText('lyrics.noLyricsAvailable')).toBeInTheDocument()
   })
 
   it('active slot (slot 4) always has font-bold', () => {

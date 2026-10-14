@@ -1,25 +1,13 @@
 import { useTranslation } from 'react-i18next'
-import { usePlayer } from '@/hooks/usePlayer'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { TrackRow } from '@/components/shared/TrackRow'
-import type { SpotifyTrack } from '@/types/spotify'
 
 export function PlayerQueue() {
   const { t } = useTranslation()
-  const { state } = usePlayer()
-  const playTrack = usePlayTrack()
-  const { queue, currentTrack } = state
+  const { state, controls } = usePlayer()
+  const upcoming = state.queue.slice(state.queueIndex + 1)
 
-  const filteredQueue = queue.reduce((acc: SpotifyTrack[], track) => {
-    const isCurrent = track.uri === currentTrack?.uri
-    const isDuplicate = acc.some((t) => t.uri === track.uri)
-    if (!isCurrent && !isDuplicate) {
-      acc.push(track)
-    }
-    return acc
-  }, [])
-
-  if (filteredQueue.length === 0) {
+  if (upcoming.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center p-8 text-center">
         <p className="text-white/30 text-sm">{t('player.emptyQueue', 'A fila está vazia')}</p>
@@ -34,12 +22,12 @@ export function PlayerQueue() {
           {t('player.nextUp')}
         </h3>
         <div className="space-y-0.5">
-          {filteredQueue.map((track, i) => (
+          {upcoming.map((track, i) => (
             <TrackRow
-              key={`${track.uri}-${i}`}
+              key={state.queueIndex + 1 + i}
               track={track}
               theme="dark"
-              onPlay={async (t) => playTrack(t as SpotifyTrack)}
+              onPlay={async (t) => controls.playTrack(t, state.queue)}
             />
           ))}
         </div>

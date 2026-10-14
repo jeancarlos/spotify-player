@@ -1,40 +1,29 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useQueue } from '@/hooks/queries/useQueue'
-import { useAuth } from '@/hooks/useAuth'
-import { fetchLyrics, cleanTitle } from '@/hooks/queries/useLyrics'
+import { usePlayer } from '@/contexts/PlayerContext'
+import { fetchLyrics, lyricsKey } from '@/hooks/queries/useLyrics'
 
 export function LyricsPreloader() {
-  const { state: authState } = useAuth()
-  const { data: queueData } = useQueue(authState.isAuthenticated)
+  const { state } = usePlayer()
   const queryClient = useQueryClient()
+  const { queue, queueIndex } = state
 
   useEffect(() => {
-    if (!queueData?.queue || queueData.queue.length === 0) return
-
-    const tracksToPreload = queueData.queue.slice(0, 2)
-
-    tracksToPreload.forEach((track) => {
+    queue.slice(queueIndex + 1, queueIndex + 3).forEach((track) => {
       const artist = track.artists[0]?.name
       const title = track.name
       const album = track.album.name
       const durationMs = track.duration_ms
-
-      if (artist && title) {
-        const cleanedTitle = cleanTitle(title)
-        const queryKey = ['lyrics', artist, cleanedTitle, durationMs]
-
-        const existingData = queryClient.getQueryData(queryKey)
-        if (!existingData) {
-          void queryClient.prefetchQuery({
-            queryKey,
-            queryFn: async () => fetchLyrics({ artist, title, album, durationMs }),
-            staleTime: Infinity,
-          })
-        }
-      }
+      if (!artist || !title) return
+      const queryKey = lyricsKey({ artist, title, album, durationMs })
+      if (queryClient.getQueryData(queryKey)) return
+      void queryClient.prefetchQuery({
+        queryKey,
+        queryFn: async () => fetchLyrics({ artist, title, album, durationMs }),
+        staleTime: Infinity,
+      })
     })
-  }, [queueData, queryClient])
+  }, [queue, queueIndex, queryClient])
 
   return null
 }

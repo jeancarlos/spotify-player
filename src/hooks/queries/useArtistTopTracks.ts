@@ -1,25 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { TIME_30_MINUTES } from '@/utils/constants'
-import axios from 'axios'
-import api from '@/lib/axios'
-import type { ArtistTopTracksResponse, SpotifyTrack } from '@/types/spotify'
+import { deezer } from '@/lib/deezer'
+import { toTrack, type DzList, type DzTrack } from '@/lib/deezerMappers'
+import type { Track } from '@/types/music'
 
-export function useArtistTopTracks(artistId: string | undefined) {
-  return useQuery<SpotifyTrack[]>({
-    queryKey: ['artist-top-tracks', artistId],
+export function useArtistTopTracks(artistId: string | undefined, limit = 10) {
+  return useQuery<Track[]>({
+    queryKey: ['artist-top-tracks', artistId, limit],
     enabled: !!artistId,
     staleTime: TIME_30_MINUTES,
-    retry: false,
     queryFn: async () => {
-      try {
-        const { data } = await api.get<ArtistTopTracksResponse>(`/artists/${artistId}/top-tracks`, {
-          params: { market: 'BR' },
-        })
-        return data.tracks
-      } catch (err) {
-        if (axios.isAxiosError(err) && err.response?.status === 403) return []
-        throw err
-      }
+      const list = await deezer<DzList<DzTrack>>(`artist/${artistId ?? ''}/top`, { limit })
+      return list.data.map((t) => toTrack(t))
     },
   })
 }

@@ -21,7 +21,10 @@ export function MediaCard({
 }: MediaCardProps) {
   return (
     <div
-      className={cn('cursor-pointer focus:outline-none group', className)}
+      className={cn(
+        'cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-black/40 group',
+        className
+      )}
       role="button"
       tabIndex={0}
       onClick={onClick}

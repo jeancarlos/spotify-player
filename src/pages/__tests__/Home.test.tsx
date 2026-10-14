@@ -1,26 +1,27 @@
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { I18nextProvider } from 'react-i18next'
-import { server } from '@/mocks/server'
 import { Home } from '../Home'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
 import { ToastProvider } from '@/components/ui/toast'
 import i18n from '@/lib/i18n'
+import type { Track } from '@/types/music'
+const playTrack = vi.fn(() => Promise.resolve())
+const recent = [
+  { id: 'r1', uri: 'spotify:track:r1', name: 'Mock Track 1', artists: [], album: { images: [] } },
+  { id: 'r2', uri: 'spotify:track:r2', name: 'Mock Track 2', artists: [], album: { images: [] } },
+] as unknown as Track[]
+beforeEach(() => {
+  localStorage.setItem('spoter_recent_v1', JSON.stringify(recent))
+})
 
 beforeAll(async () => {
-  server.listen({ onUnhandledRequest: 'error' })
   await i18n.changeLanguage('pt-BR')
 })
-afterEach(() => {
-  server.resetHandlers()
-})
-afterAll(() => {
-  server.close()
-})
-
 function renderHome() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -32,8 +33,14 @@ function renderHome() {
           <PlayerContext.Provider
             value={{
               state: initialPlayerState,
-              dispatch: () => {
-                /* noop */
+              controls: {
+                playTrack,
+                toggle: () => undefined,
+                next: () => undefined,
+                previous: () => undefined,
+                seek: () => undefined,
+                setShuffle: () => undefined,
+                cycleRepeat: () => undefined,
               },
             }}
           >
@@ -68,5 +75,14 @@ describe('Página Home', () => {
     renderHome()
     await screen.findByText('Mock Track 1')
     expect(screen.queryByRole('button', { name: /próximo/i })).not.toBeInTheDocument()
+  })
+
+  it('clicar num disco toca a faixa com a lista de recentes', async () => {
+    renderHome()
+    await userEvent.click(await screen.findByText('Mock Track 1'))
+    expect(playTrack).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'r1' }),
+      expect.arrayContaining([expect.objectContaining({ id: 'r2' })])
+    )
   })
 })

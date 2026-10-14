@@ -1,36 +1,62 @@
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { cn } from '@/lib/utils'
-import type { SpotifyTrack } from '@/types/spotify'
+import { isPlayable } from '@/lib/deezerMappers'
+import type { Track } from '@/types/music'
 
 interface VinylCardProps {
-  track: SpotifyTrack
+  track: Track
   isActive?: boolean
-  onPlay?: (track: SpotifyTrack) => void
+  onPlay?: (track: Track) => void
   size?: 'sm' | 'md'
+}
+
+function resolvePlay(track: Track, onPlay?: (track: Track) => void) {
+  return isPlayable(track) ? onPlay : undefined
+}
+
+function stateClass(play: unknown): string {
+  return play ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'
+}
+
+function cardLabel(t: TFunction, name: string, playable: boolean): string {
+  const base = t('player.playTrack', { name })
+  return playable ? base : `${base}. ${t('track.noPreview')}`
 }
 
 export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: VinylCardProps) {
   const { t } = useTranslation()
   const dim = size === 'sm' ? 100 : 132
+  const play = resolvePlay(track, onPlay)
 
   return (
     <div
-      className="cursor-pointer shrink-0 focus:outline-none group"
+      className={cn(
+        'shrink-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-black/40 group',
+        stateClass(play)
+      )}
       style={{ width: dim }}
-      onClick={() => onPlay?.(track)}
+      onClick={() => play?.(track)}
       role="button"
+      aria-disabled={play ? undefined : true}
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onPlay?.(track)}
-      aria-label={t('player.playTrack', { name: track.name })}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          play?.(track)
+        }
+      }}
+      aria-label={cardLabel(t, track.name, Boolean(play))}
     >
+      {!play && <span className="sr-only">{t('track.noPreview')}</span>}
       <div
         className={cn(
           'relative overflow-hidden transition-all duration-200',
           'shadow-lg group-hover:shadow-xl',
           'group-hover:scale-105 group-active:scale-95',
           isActive
-            ? 'ring-2 ring-[#1DB954] scale-105 shadow-[0_0_18px_rgba(29,185,84,0.45)]'
+            ? 'ring-2 ring-primary scale-105 shadow-[0_0_18px_rgb(var(--color-primary)/0.45)]'
             : 'ring-1 ring-white/10'
         )}
         style={{ width: dim, height: dim, borderRadius: '8px' }}
@@ -55,7 +81,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
             {[0, 150, 300].map((delay) => (
               <span
                 key={delay}
-                className="w-[3px] rounded-full bg-[#1DB954]"
+                className="w-[3px] rounded-full bg-primary"
                 style={{
                   height: '100%',
                   animation: `soundBar 0.8s ease-in-out infinite alternate`,

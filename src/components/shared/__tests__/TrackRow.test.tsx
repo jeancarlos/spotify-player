@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TrackRow } from '../TrackRow'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const track: SpotifyTrack = {
+const track: Track = {
   id: 't1',
   name: 'Test Track',
   artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
@@ -21,8 +21,8 @@ const track: SpotifyTrack = {
     type: 'album',
   },
   explicit: false,
-  popularity: 80,
-  preview_url: null,
+  rank: 80,
+  preview_url: 'https://cdn.test/t1.mp3',
   type: 'track',
 }
 
@@ -74,8 +74,48 @@ describe('TrackRow', () => {
     expect(onPlay).not.toHaveBeenCalled()
   })
 
+  it('reveals the note when the row has keyboard focus', async () => {
+    render(<TrackRow track={track} onPlay={vi.fn()} note="This is a note" />)
+    await userEvent.tab()
+    await userEvent.tab()
+    const area = screen.getByText('Test Track').closest('[role="button"]')
+    expect(area).toHaveFocus()
+    expect(area?.className).toContain('group/tipfocus')
+    expect(area?.className).toContain('focus-visible:ring-2')
+    expect(screen.getByRole('tooltip').className).toContain(
+      'group-focus-within/tipfocus:opacity-100'
+    )
+  })
   it('renders note text in DOM when note provided', () => {
     render(<TrackRow track={track} note="This is a note" />)
     expect(screen.getByText('Test Track')).toBeInTheDocument()
+  })
+
+  it('disables an unplayable track and never calls onPlay', async () => {
+    const user = userEvent.setup()
+    const onPlay = vi.fn()
+    const dead = { ...track, is_playable: false }
+    render(<TrackRow track={dead} onPlay={onPlay} index={0} />)
+    expect(screen.getByText('track.noPreview')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeDisabled()
+    const row = document.querySelector<HTMLElement>('[aria-disabled="true"]')!
+    expect(row).toBeInTheDocument()
+    expect(row.parentElement?.className).toContain('opacity-40')
+    await user.click(row)
+    row.focus()
+    await user.keyboard('{Enter}')
+    await user.click(screen.getByRole('button', { name: /player\.playTrack/i }))
+    expect(onPlay).not.toHaveBeenCalled()
+  })
+
+  it('keeps a stored-shape track enabled', () => {
+    render(<TrackRow track={{ ...track, is_playable: true, preview_url: null }} onPlay={vi.fn()} />)
+    expect(document.querySelector('[aria-disabled="true"]')).toBeNull()
+    expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeEnabled()
+  })
+
+  it('flags readable:false tracks as disabled', () => {
+    render(<TrackRow track={{ ...track, is_playable: false }} onPlay={vi.fn()} />)
+    expect(document.querySelector('[aria-disabled="true"]')).toBeInTheDocument()
   })
 })

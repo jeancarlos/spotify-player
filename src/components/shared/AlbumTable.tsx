@@ -1,15 +1,15 @@
-import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
 import { useTranslation } from 'react-i18next'
-import type { SpotifyAlbumSimple } from '@/types/spotify'
+import type { AlbumSimple } from '@/types/music'
 
 interface AlbumTableProps {
-  albums: SpotifyAlbumSimple[]
-  onClick: (album: SpotifyAlbumSimple) => void
+  albums: AlbumSimple[]
+  onClick: (album: AlbumSimple) => void
 }
 
 export function AlbumTable({ albums, onClick }: AlbumTableProps) {
   const { t } = useTranslation()
+  const showTrackCount = albums.some((album) => album.total_tracks != null)
 
   return (
     <div className="overflow-x-auto">
@@ -22,12 +22,11 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
             <th className="text-right py-2 px-3 text-black/30 font-semibold">
               {t('track.releaseYear')}
             </th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">
-              {t('track.trackCount')}
-            </th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">
-              {t('common.popularity')}
-            </th>
+            {showTrackCount && (
+              <th className="text-right py-2 px-3 text-black/30 font-semibold">
+                {t('track.trackCount')}
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -47,16 +46,26 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
                 />
               </td>
               <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[200px] truncate">
-                {album.name}
+                <button
+                  type="button"
+                  className="max-w-full truncate text-left rounded focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onClick(album)
+                  }}
+                >
+                  {album.name}
+                </button>
               </td>
               <td className="py-2 px-3 text-black/50 capitalize">{album.album_type}</td>
               <td className="py-2 px-3 text-right text-black/40 tabular-nums">
                 {album.release_date ? formatDate(album.release_date, 'year') : ''}
               </td>
-              <td className={cn('py-2 px-3 text-right text-black/40 tabular-nums')}>
-                {album.total_tracks ?? '—'}
-              </td>
-              <td className="py-2 px-3 text-right text-black/40 tabular-nums">—</td>
+              {showTrackCount && (
+                <td className="py-2 px-3 text-right text-black/40 tabular-nums">
+                  {album.total_tracks ?? '—'}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

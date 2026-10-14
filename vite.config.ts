@@ -17,7 +17,6 @@ export default defineConfig(() => ({
         'apple-touch-icon.png',
         'favicon-32x32.png',
         'favicon-16x16.png',
-        'spoter-logo-cor-small.svg',
         'robots.txt',
       ],
       workbox: {
@@ -27,10 +26,10 @@ export default defineConfig(() => ({
         clientsClaim: true,
       },
       manifest: {
-        name: 'Spoter - Spotify Player',
-        short_name: 'Spoter',
-        description: 'A modern Spotify player with a vinyl touch',
-        theme_color: '#44aa00',
+        name: 'Vinyla',
+        short_name: 'Vinyla',
+        description: 'A modern music player with Deezer previews and a vinyl touch',
+        theme_color: '#FF6B4A',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
@@ -55,9 +54,9 @@ export default defineConfig(() => ({
             type: 'image/png',
           },
           {
-            src: 'favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: 'android-chrome-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
             purpose: 'maskable',
           },
         ],
@@ -72,7 +71,7 @@ export default defineConfig(() => ({
           {
             name: 'Artistas',
             short_name: 'Artistas',
-            description: 'Ver meus artistas favoritos',
+            description: 'Buscar e explorar artistas',
             url: '/artists',
             icons: [{ src: 'favicon-32x32.png', sizes: '32x32' }],
           },
@@ -98,7 +97,7 @@ export default defineConfig(() => ({
             if (id.includes('recharts')) {
               return 'vendor-charts'
             }
-            if (id.includes('framer-motion') || id.includes('@base-ui/react')) {
+            if (id.includes('framer-motion')) {
               return 'vendor-ui'
             }
             if (id.includes('@tanstack/react-query')) {

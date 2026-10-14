@@ -61,7 +61,10 @@ export function TiltCover({ imageUrl, size, name, onClick, className, children }
         onKeyDown={
           onClick
             ? (e: React.KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') onClick()
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onClick()
+                }
               }
             : undefined
         }

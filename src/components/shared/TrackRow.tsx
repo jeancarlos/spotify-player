@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/shared/Tooltip'
-import type { SpotifyTrack, SpotifyAlbumTrack } from '@/types/spotify'
+import { isPlayable } from '@/lib/deezerMappers'
+import type { Track } from '@/types/music'
 
 interface TrackRowProps {
-  track: SpotifyTrack | SpotifyAlbumTrack
+  track: Track
   isActive?: boolean
-  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
+  onPlay?: (track: Track) => void
   onRemove?: (uri: string) => void
   disableRemove?: boolean
   note?: string
@@ -24,6 +25,7 @@ interface TrackTheme {
   subtext: string
   duration: string
   remove: string
+  area: string
 }
 
 function resolveTextColor(dark: boolean, isActive: boolean): string {
@@ -31,13 +33,23 @@ function resolveTextColor(dark: boolean, isActive: boolean): string {
   return isActive ? 'text-black' : 'text-black/80'
 }
 
+function focusRing(dark: boolean): string {
+  return dark
+    ? 'focus-visible:ring-2 focus-visible:ring-white/60'
+    : 'focus-visible:ring-2 focus-visible:ring-black/40'
+}
+
 function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
   return {
     row: cn(
-      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group focus:outline-none',
+      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group',
       dark
         ? cn('hover:bg-white/5', isActive && 'bg-white/10')
         : cn('hover:bg-black/5', isActive && 'bg-black/[0.04]')
+    ),
+    area: cn(
+      'flex-1 min-w-0 flex items-center gap-3 rounded-xl outline-none group/tipfocus',
+      focusRing(dark)
     ),
     number: cn(
       'text-xs font-bold tabular-nums group-hover:hidden',
@@ -48,9 +60,24 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
     subtext: cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40'),
     duration: cn('text-xs tabular-nums shrink-0', dark ? 'text-white/20' : 'text-black/30'),
     remove: cn(
-      'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 focus:outline-none focus:opacity-100',
+      'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
+      focusRing(dark),
       dark ? 'text-white/30 hover:text-red-400' : 'text-black/30 hover:text-red-500'
     ),
+  }
+}
+
+function playableClasses(playable: boolean) {
+  return {
+    row: playable ? '' : 'opacity-40 cursor-not-allowed',
+    area: playable ? 'cursor-pointer' : 'cursor-not-allowed',
+  }
+}
+
+function resolveMeta(track: Track) {
+  return {
+    albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
+    artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '',
   }
 }
 
@@ -59,7 +86,7 @@ function isActivationKey(key: string): boolean {
 }
 
 interface NameAreaProps {
-  track: SpotifyTrack | SpotifyAlbumTrack
+  track: Track
   note?: string
   theme: TrackTheme
   artistNames: string
@@ -86,15 +113,16 @@ interface PlayCellProps {
   trackName: string
   index?: number
   theme: TrackTheme
-  onPlay?: (track: SpotifyTrack | SpotifyAlbumTrack) => void
-  track: SpotifyTrack | SpotifyAlbumTrack
+  onPlay?: (track: Track) => void
+  track: Track
 }
 
 function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellProps) {
   const { t } = useTranslation()
   return (
     <button
-      className="w-6 shrink-0 flex items-center justify-center focus:outline-none"
+      className="w-6 shrink-0 flex items-center justify-center rounded outline-none focus-visible:ring-2 focus-visible:ring-black/40 disabled:cursor-not-allowed"
+      disabled={!onPlay}
       aria-label={t('player.playTrack', { name: trackName })}
       onClick={(e) => {
         e.stopPropagation()
@@ -125,25 +153,28 @@ export function TrackRow({
 }: TrackRowProps) {
   const { t } = useTranslation()
   const styles = buildTrackTheme(theme === 'dark', isActive)
+  const playable = isPlayable(track)
+  const play = playable ? onPlay : undefined
+  const cls = playableClasses(playable)
 
-  const albumImage = 'album' in track ? track.album.images[0]?.url : undefined
-  const artistNames = 'artists' in track ? track.artists.map((a) => a.name).join(', ') : ''
+  const { albumImage, artistNames } = resolveMeta(track)
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (isActivationKey(e.key)) {
       e.preventDefault()
-      onPlay?.(track)
+      play?.(track)
     }
   }
 
   return (
-    <div className={styles.row}>
-      <PlayCell trackName={track.name} index={index} theme={styles} onPlay={onPlay} track={track} />
+    <div className={cn(styles.row, cls.row)}>
+      <PlayCell trackName={track.name} index={index} theme={styles} onPlay={play} track={track} />
 
       <div
-        className="flex-1 min-w-0 flex items-center gap-3 cursor-pointer"
-        onClick={() => onPlay?.(track)}
+        className={cn(styles.area, cls.area)}
+        onClick={() => play?.(track)}
         role="button"
+        aria-disabled={!playable || undefined}
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
@@ -151,6 +182,7 @@ export function TrackRow({
           <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
         )}
         <NameArea track={track} note={note} theme={styles} artistNames={artistNames} />
+        {!playable && <span className="sr-only">{t('track.noPreview')}</span>}
       </div>
 
       <span className={styles.duration}>{formatDuration(track.duration_ms)}</span>

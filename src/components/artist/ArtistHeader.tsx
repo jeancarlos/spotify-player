@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
+import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
 
 interface ArtistHeaderProps {
   imageUrl: string | undefined
   name: string
   subtitle?: string
+  link?: string
   onLayout: (height: number) => void
 }
 
-function useArtistHeaderLayout() {
+function useArtistHeaderLayout(hasLink: boolean) {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
     const fn = () => {
@@ -21,13 +24,14 @@ function useArtistHeaderLayout() {
   }, [])
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
-  const headerHeight = Math.round(imgPx * 0.75) + 120
+  const headerHeight = Math.round(imgPx * 0.75) + 120 + (hasLink ? 28 : 0)
 
   return { imgPx, headerHeight }
 }
 
-export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeaderProps) {
-  const { imgPx, headerHeight } = useArtistHeaderLayout()
+export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: ArtistHeaderProps) {
+  const { t } = useTranslation()
+  const { imgPx, headerHeight } = useArtistHeaderLayout(!!link)
 
   const scrollY = useMotionValue(0)
   const opacity = useTransform(scrollY, [0, headerHeight * 0.65], [1, 0])
@@ -46,6 +50,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
     const fn = () => {
       scrollY.set(el.scrollTop)
     }
+    fn()
     el.addEventListener('scroll', fn, { passive: true })
     return () => {
       el.removeEventListener('scroll', fn)
@@ -107,6 +112,13 @@ export function ArtistHeader({ imageUrl, name, subtitle, onLayout }: ArtistHeade
           {name}
         </h1>
         {subtitle && <p className="text-sm text-black/50 mt-1 text-center px-8">{subtitle}</p>}
+        {link && (
+          <DeezerAttribution
+            href={link}
+            label={t('common.openOnDeezer')}
+            className="mt-2 pointer-events-auto"
+          />
+        )}
       </motion.div>
     </motion.div>
   )

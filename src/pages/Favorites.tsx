@@ -1,21 +1,20 @@
 import { useState, useRef, useCallback } from 'react'
-import { Music, Plus, X, RefreshCw } from 'lucide-react'
+import { Music, Plus, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import { usePlayer } from '@/hooks/usePlayer'
-import { useSpoterPlaylist } from '@/hooks/useSpoterPlaylist'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
+import { usePlayer } from '@/contexts/PlayerContext'
+import { useCatalogHealth } from '@/hooks/useCatalogHealth'
+import { useFavorites } from '@/hooks/useFavorites'
 import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { Tooltip } from '@/components/shared/Tooltip'
+import { useToast } from '@/components/ui/toast'
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
 import { TrackRow } from '@/components/shared/TrackRow'
-import { TrackRowSkeleton } from '@/components/shared/TrackRowSkeleton'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface AddButtonProps {
-  existingFavorites: SpotifyTrack[]
-  onAdd: (track: SpotifyTrack, note?: string) => void
+  existingFavorites: Track[]
+  onAdd: (track: Track, note?: string) => boolean
 }
 
 function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
@@ -89,19 +88,20 @@ function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
 
 export function Favorites() {
   const { t } = useTranslation()
-  const { state: playerState } = usePlayer()
-  const {
-    tracks,
-    notes,
-    addTrack,
-    removeTrack,
-    refresh,
-    isRefreshing,
-    isLoading,
-    playlistId,
-    playlistName,
-  } = useSpoterPlaylist()
-  const playTrack = usePlayTrack()
+  const { state: playerState, controls } = usePlayer()
+  const { toast } = useToast()
+  const { unavailable } = useCatalogHealth()
+  const { tracks, notes, addTrack, removeTrack, playlistName } = useFavorites()
+
+  const handleAdd = (track: Track, note?: string) => {
+    const ok = addTrack(track, note?.trim())
+    if (!ok) toast(t('favorites.saveFailed'), 'error')
+    return ok
+  }
+
+  const handleRemove = (uri: string) => {
+    if (!removeTrack(uri)) toast(t('favorites.saveFailed'), 'error')
+  }
 
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">
@@ -115,48 +115,20 @@ export function Favorites() {
               {t('nav.favorites')}
             </h1>
             <div className="mt-0.5">
-              {playlistId ? (
-                <Tooltip content={t('favorites.viewOnSpotify')}>
-                  <a
-                    href={`https://open.spotify.com/playlist/${playlistId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-black/40 font-medium hover:text-black/70 hover:underline transition-colors"
-                  >
-                    {playlistName}
-                  </a>
-                </Tooltip>
-              ) : (
-                <span className="text-sm text-black/40 font-medium">{playlistName}</span>
-              )}
+              <span className="text-sm text-black/40 font-medium">{playlistName}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Tooltip content={t('favorites.refreshFromSpotify')}>
-              <button
-                onClick={() => {
-                  void refresh()
-                }}
-                disabled={isRefreshing}
-                className="p-2 glass rounded-full text-black/50 hover:text-black/80 transition-colors disabled:opacity-40"
-                aria-label={t('favorites.refreshFromSpotify')}
-              >
-                <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-              </button>
-            </Tooltip>
-
-            <AddButton existingFavorites={tracks} onAdd={addTrack} />
+            <AddButton existingFavorites={tracks} onAdd={handleAdd} />
           </div>
         </div>
 
-        {isLoading && <TrackRowSkeleton count={6} />}
-
-        {!isLoading && tracks.length === 0 && (
+        {tracks.length === 0 && (
           <EmptyState message={t('favorites.emptyList')} icon={<Music size={32} />} />
         )}
 
-        {!isLoading && tracks.length > 0 && (
+        {tracks.length > 0 && (
           <div className="flex flex-col gap-0.5">
             {tracks.map((track, i) => (
               <TrackRow
@@ -165,9 +137,8 @@ export function Favorites() {
                 index={i}
                 note={notes[track.uri] ?? undefined}
                 isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={async (track) => playTrack(track as SpotifyTrack)}
-                onRemove={removeTrack}
-                disableRemove={tracks.length === 1}
+                onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks)}
+                onRemove={handleRemove}
               />
             ))}
           </div>

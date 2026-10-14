@@ -2,10 +2,8 @@
   "nav": {
     "home": "Home",
     "artists": "Artists",
-    "profile": "Profile",
     "favorites": "Favorites",
     "collapse": "Collapse",
-    "logout": "Sign out",
     "openMenu": "Open menu",
     "languageSwitcher": "Language switcher"
   },
@@ -14,18 +12,11 @@
     "newReleases": "New Releases",
     "recommendations": "Recommended for You",
     "seeMore": "See more",
-    "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
-  },
-  "login": {
-    "title": "Spoter",
-    "subtitle": "Your immersive music experience",
-    "button": "Sign in with Spotify",
-    "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
+    "hint": "Tap a vinyl to hear a 30-second preview"
   },
   "player": {
     "nowPlaying": "Now playing",
-    "noTrack": "Start a music on your phone",
-    "noActiveDevice": "No active device",
+    "noTrack": "Pick a vinyl to start a preview",
     "lyrics": "Lyrics",
     "queue": "Queue",
     "closeQueue": "Close queue",
@@ -37,17 +28,23 @@
     "play": "Play",
     "pause": "Pause",
     "seek": "Seek",
-    "playTrack": "Play {{name}}"
+    "playTrack": "Play {{name}}",
+    "progressText": "{{current}} of {{total}}"
+  },
+  "catalog": {
+    "unavailable": "The Deezer catalog is unreachable. Favorites and recently played are still listed, but playback is paused."
   },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
     "retry": "Try again",
     "back": "Back",
+    "poweredByDeezer": "Music data and previews by Deezer",
+    "openOnDeezer": "Open on Deezer",
     "skipToContent": "Skip to main content",
     "list": "List",
     "table": "Table",
-    "popularity": "Pop.",
+    "rank": "Rank",
     "name": "Name",
     "clear": "Clear"
   },
@@ -64,6 +61,7 @@
     "result_one": "{{count}} result",
     "result_other": "{{count}} results",
     "searchPrompt": "Type to search",
+    "charts": "Top charts on Deezer",
     "previous": "Previous",
     "next": "Next",
     "all": "All",
@@ -74,27 +72,19 @@
   "artistDetail": {
     "topTracks": "Top Tracks",
     "albums": "Albums",
-    "popularity": "Popularity",
     "previous": "Previous",
     "next": "Next",
-    "audioProfile": "Audio Profile",
-    "danceability": "Danceability",
-    "energy": "Energy",
-    "valence": "Valence",
-    "acousticness": "Acousticness",
-    "liveness": "Liveness",
     "discography": "Discography",
     "bio": "About the artist",
     "relatedArtists": "Similar Artists",
     "loadMore": "Load more",
-    "topTracksRanked": "Most played",
-    "musicalProfile": "Musical Profile"
+    "topTracksRanked": "Top tracks on Deezer",
+    "deezerRank": "Deezer rank"
   },
   "albumDetail": {
     "playAlbum": "Play album",
     "tracks": "Tracks",
-    "by": "by",
-    "musicalProfile": "Musical Profile"
+    "by": "by"
   },
   "playlistDetail": {
     "playPlaylist": "Play playlist",
@@ -103,12 +93,12 @@
     "owner": "by {{name}}"
   },
   "favorites": {
+    "saveFailed": "Couldn't save your favorites in this browser",
     "song": "Song",
     "artist": "Artist",
     "album": "Album",
     "note": "Personal note",
     "addButton": "Add favorite",
-    "notFound": "No songs found on Spotify",
     "addHeading": "Add Favorite",
     "searchPlaceholder": "Search favorites...",
     "searchAddPlaceholder": "Song or artist...",
@@ -119,10 +109,10 @@
     "artistRequired": "Artist is required",
     "minQuery": "Type at least 2 characters",
     "close": "Close",
+    "dismissNotification": "Dismiss notification",
     "addTrack": "+ Add",
-    "viewOnSpotify": "View on Spotify",
-    "addToList": "Add to Spoter List",
-    "removeFromList": "Remove from Spoter List",
+    "addToList": "Add to Vinyla List",
+    "removeFromList": "Remove from Vinyla List",
     "addedToList": "Added!",
     "removedFromList": "Removed!",
     "trackRequired": "Select a song",
@@ -137,9 +127,7 @@
     "noteCharsLeft": "{{count}}/80",
     "editNote": "Edit note",
     "clearTrack": "Clear selection",
-    "refreshFromSpotify": "Refresh from Spotify",
     "reorderError": "Reorder failed. Previous order restored.",
-    "refreshError": "Failed to refresh from Spotify.",
     "reorderPosition": "Edit position of {{name}}"
   },
   "lyrics": {
@@ -147,74 +135,17 @@
     "notFound": "Lyrics not found",
     "album": "Album",
     "releaseDate": "Release date",
-    "popularity": "Popularity",
     "duration": "Duration",
-    "nowPlaying": "Now playing"
+    "nowPlaying": "Now playing",
+    "noLyricsAvailable": "No lyrics available"
   },
-  "trackRow": {
-    "popularity": "Popularity"
-  },
-  "profile": {
-    "followers_one": "{{count}} follower",
-    "followers_other": "{{count}} followers",
-    "followers_label_one": "follower",
-    "followers_label_other": "followers",
-    "topArtists": "Top Artists",
-    "topTracks": "Top Tracks",
-    "audioProfile": "Audio Profile",
-    "fourWeeks": "4 weeks",
-    "sixMonths": "6 months",
-    "allTime": "All time",
-    "mostPlayedAlbums": "Most Played Albums",
-    "tracks_one": "{{count}} track",
-    "tracks_other": "{{count}} tracks",
-    "tracks_label_one": "track",
-    "tracks_label_other": "tracks",
-    "listenMore": "Listen to more songs to see your profile",
-    "plan": "Plan"
-  },
-  "auth": {
-    "authenticating": "Authenticating...",
-    "invalidState": "Invalid OAuth state or verifier missing",
-    "tokenExchangeFailed": "Token exchange failed"
-  },
-  "authError": {
-    "title": "Authentication failed",
-    "stateMismatch": "Session security data expired or was lost.",
-    "tokenError": "Could not complete the authorization exchange with Spotify.",
-    "unknown": "An unexpected error occurred during authentication.",
-    "hint": "This can happen if the window took too long to respond or the browser blocked session access.",
-    "retry": "Try again",
-    "close": "Close window"
-  },
+  "trackRow": {},
   "track": {
-    "popularity": "Popularity",
-    "key": "Key",
-    "timeSignature": "Time sig.",
+    "noPreview": "Preview unavailable",
     "duration": "Duration",
     "instrumental": "Instrumental",
-    "major": "Major",
-    "minor": "Minor",
-    "tempo": "Tempo",
-    "loudness": "Loudness",
-    "valence": "Valence",
-    "speechiness": "Speechiness",
-    "instrumentalness": "Instrumentalness",
-    "audioFeatures": "Audio Features",
     "songDetails": "Song details",
-    "moodZone": "Mood Zone",
-    "intense": "Intense",
-    "chill": "Chill",
-    "sad": "Dark",
-    "happy": "Happy",
-    "mood": {
-      "happyEnergetic": "Happy & Energetic",
-      "darkEnergetic": "Intense & Dark",
-      "happyChill": "Light & Joyful",
-      "darkChill": "Introspective"
-    },
     "bpm": "BPM",
-    "keyLabel": "Key",
     "explicit": "Explicit",
     "trackNumber": "#",
     "albumCol": "Album",
@@ -226,12 +157,12 @@
     "readMore": "Read more on Wikipedia"
   },
   "playlist": {
-    "defaultName": "Spoter List"
+    "defaultName": "Vinyla List"
   },
   "pwa": {
     "readyOffline": "App is ready to work offline",
     "updateAvailable": "Update available",
-    "newVersion": "A new version of Spoter is available. Reload to update.",
+    "newVersion": "A new version of Vinyla is available. Reload to update.",
     "reload": "Reload & Update"
   }
 }

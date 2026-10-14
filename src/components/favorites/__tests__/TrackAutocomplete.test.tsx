@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 vi.mock('@/hooks/useDebounce', () => ({
   useDebounce: (value: unknown) => value,
@@ -13,14 +13,14 @@ vi.mock('@/hooks/useKeyboardNav', () => ({
   },
 }))
 
-const mockSearchResults: SpotifyTrack[] = [
+const mockSearchResults: Track[] = [
   {
     id: 'r1',
     uri: 'spotify:track:r1',
     name: 'Resultado Um',
     duration_ms: 200000,
     explicit: false,
-    popularity: 70,
+    rank: 70,
     preview_url: null,
     type: 'track',
     artists: [{ id: 'a1', name: 'Artista A', uri: 'spotify:artist:a1', type: 'artist' }],
@@ -104,5 +104,65 @@ describe('TrackAutocomplete', () => {
     render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
     await user.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
     expect(onChange).toHaveBeenCalledWith(null)
+  })
+
+  it('seleciona no mouseDown sem esperar o timer de blur', () => {
+    vi.useFakeTimers()
+    try {
+      mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
+      render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+      const input = screen.getByRole('combobox')
+      fireEvent.change(input, { target: { value: 'Re' } })
+      expect(screen.getByText('Resultado Um')).toBeInTheDocument()
+      fireEvent.blur(input)
+      act(() => {
+        vi.advanceTimersByTime(1000)
+      })
+      expect(screen.queryByText('Resultado Um')).toBeNull()
+      fireEvent.focus(input)
+      fireEvent.mouseDown(screen.getByText('Resultado Um'))
+      expect(onChange).toHaveBeenCalledWith(mockSearchResults[0])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('mouseDown na opcao evita o blur do input', async () => {
+    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
+    const user = userEvent.setup()
+    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    await user.type(screen.getByRole('combobox'), 'Re')
+    await waitFor(() => screen.getByText('Resultado Um'))
+    const notPrevented = fireEvent.mouseDown(screen.getByText('Resultado Um'))
+    expect(notPrevented).toBe(false)
+  })
+
+  it('reabre a lista ao focar quando ha resultados', async () => {
+    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
+    const user = userEvent.setup()
+    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    const input = screen.getByRole('combobox')
+    await user.type(input, 'Re')
+    fireEvent.keyDown(input, { key: 'Escape' })
+    act(() => {
+      input.blur()
+    })
+    await waitFor(() => {
+      expect(screen.queryByRole('listbox')).toBeNull()
+    })
+    act(() => {
+      input.focus()
+    })
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+  })
+
+  it('aria-activedescendant so existe com a lista renderizada', async () => {
+    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
+    const user = userEvent.setup()
+    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    const input = screen.getByRole('combobox')
+    await user.type(input, 'Re')
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+    expect(input).not.toHaveAttribute('aria-activedescendant')
   })
 })

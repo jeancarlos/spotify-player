@@ -1,36 +1,43 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { currentPath } from '@/utils/routerState'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
-import { useArtistDiscographyTracks } from '@/hooks/queries/useArtistDiscographyTracks'
-import { usePlayer } from '@/hooks/usePlayer'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
-import type { SpotifyAlbumSimple, SpotifyArtist } from '@/types/spotify'
+import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
+import { usePlayer } from '@/contexts/PlayerContext'
+import type { AlbumSimple, Artist, Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 interface ArtistMeta {
   artistSubtitle: string
   artistImageUrl: string | undefined
   artistName: string
+  artistLink: string | undefined
 }
 
-function deriveArtistMeta(data: SpotifyArtist | undefined): ArtistMeta {
+function deriveArtistMeta(data: Artist | undefined): ArtistMeta {
   if (!data) {
-    return { artistSubtitle: '', artistImageUrl: undefined, artistName: '' }
+    return { artistSubtitle: '', artistImageUrl: undefined, artistName: '', artistLink: undefined }
   }
   const genres = data.genres?.slice(0, 2) ?? []
   return {
     artistSubtitle: genres.join(' · '),
     artistImageUrl: data.images[0]?.url,
     artistName: data.name,
+    artistLink: data.link,
   }
 }
 
 export function useArtistDetailPage(id: string | undefined) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { state } = usePlayer()
-  const playTrack = usePlayTrack()
+  const { state, controls } = usePlayer()
+  const playTrack = useCallback(
+    async (track: Track, list?: Track[]) => {
+      await controls.playTrack(track, list)
+    },
+    [controls]
+  )
 
   const [albumPage, setAlbumPage] = useState(1)
   const [discographyView, setDiscographyView] = useState<ViewMode>('list')
@@ -39,8 +46,7 @@ export function useArtistDetailPage(id: string | undefined) {
   const artist = useArtist(id)
   const albums = useArtistAlbums(id, albumPage, 10)
 
-  const albumPageItems = useMemo(() => albums.data?.items ?? [], [albums.data?.items])
-  const discographyTracks = useArtistDiscographyTracks(id, 10, albumPageItems)
+  const topTracks = useArtistTopTracks(id, 10)
 
   const hasNextAlbums =
     albums.data != null ? albums.data.offset + albums.data.limit < albums.data.total : false
@@ -50,10 +56,10 @@ export function useArtistDetailPage(id: string | undefined) {
   }, [])
 
   const handleAlbumClick = useCallback(
-    (album: SpotifyAlbumSimple) => {
-      navigate(`/albums/${album.id}`, { state: { from: location.pathname } })
+    (album: AlbumSimple) => {
+      navigate(`/albums/${album.id}`, { state: { from: currentPath(location) } })
     },
-    [navigate, location.pathname]
+    [navigate, location]
   )
 
   const meta = useMemo(() => deriveArtistMeta(artist.data), [artist.data])
@@ -62,7 +68,7 @@ export function useArtistDetailPage(id: string | undefined) {
 
   return useMemo(
     () => ({
-      discographyTracks,
+      topTracks,
       discographyView,
       setDiscographyView,
       albumPage,
@@ -77,7 +83,7 @@ export function useArtistDetailPage(id: string | undefined) {
       ...meta,
     }),
     [
-      discographyTracks,
+      topTracks,
       discographyView,
       setDiscographyView,
       albumPage,

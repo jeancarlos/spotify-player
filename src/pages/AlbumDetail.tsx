@@ -8,7 +8,6 @@ import { Pagination } from '@/components/shared/Pagination'
 export function AlbumDetail() {
   const {
     albumItems,
-    enrichedTracks,
     handleTrackPlay,
     playerState,
     view,
@@ -22,6 +21,7 @@ export function AlbumDetail() {
     imageUrl,
     albumName,
     albumArtists,
+    albumLink,
     handlePlay,
     handleLayout,
     handleArtistClick,
@@ -40,6 +40,7 @@ export function AlbumDetail() {
         onPlay={handlePlay}
         onLayout={handleLayout}
         onArtistClick={handleArtistClick}
+        link={albumLink}
       />
 
       <div style={{ paddingTop: headerHeight }} className="pb-32">
@@ -52,7 +53,7 @@ export function AlbumDetail() {
 
             {view === 'list' ? (
               <div className="flex flex-col gap-0.5">
-                {enrichedTracks.map((track, i) => (
+                {albumItems.map((track, i) => (
                   <TrackRow
                     key={track.id}
                     track={track}
@@ -66,6 +67,7 @@ export function AlbumDetail() {
               <TrackTable
                 tracks={albumItems}
                 showAlbumColumn={false}
+                startIndex={(page - 1) * ALBUM_LIMIT}
                 activeTrackId={playerState.currentTrack?.id}
                 onPlay={(track) => {
                   void handleTrackPlay(track)

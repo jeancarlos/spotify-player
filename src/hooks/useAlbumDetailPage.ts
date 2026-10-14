@@ -1,23 +1,22 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { currentPath } from '@/utils/routerState'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
-import { usePlayContext } from '@/hooks/usePlayContext'
-import { usePlayTrack } from '@/hooks/usePlayTrack'
-import { usePlayer } from '@/hooks/usePlayer'
+import { usePlayer } from '@/contexts/PlayerContext'
+import { isPlayable } from '@/lib/deezerMappers'
 import { formatDate } from '@/utils/formatDate'
 import type {
-  SpotifyTrack,
-  SpotifyAlbumTrack,
-  SpotifyAlbumSimple,
-  SpotifyAlbumFull,
-} from '@/types/spotify'
+  Track,
+  AlbumSimple,
+  AlbumFull,
+} from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 export const ALBUM_LIMIT = 20
 
-const EMPTY_ALBUM_SIMPLE: SpotifyAlbumSimple = {
+const EMPTY_ALBUM_SIMPLE: AlbumSimple = {
   id: '',
   name: '',
   images: [],
@@ -29,15 +28,16 @@ const EMPTY_ALBUM_SIMPLE: SpotifyAlbumSimple = {
 }
 
 interface AlbumMeta {
-  albumSimple: SpotifyAlbumSimple
+  albumSimple: AlbumSimple
   albumYear: string | undefined
   albumSubtitle: string
   imageUrl: string | undefined
   albumName: string
-  albumArtists: SpotifyAlbumSimple['artists'] | undefined
+  albumArtists: AlbumSimple['artists'] | undefined
+  albumLink: string | undefined
 }
 
-function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
+function deriveAlbumMeta(data: AlbumFull | undefined): AlbumMeta {
   if (!data) {
     return {
       albumSimple: EMPTY_ALBUM_SIMPLE,
@@ -46,6 +46,7 @@ function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
       imageUrl: undefined,
       albumName: '',
       albumArtists: undefined,
+      albumLink: undefined,
     }
   }
   return {
@@ -55,6 +56,7 @@ function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
     imageUrl: data.images[0]?.url,
     albumName: data.name,
     albumArtists: data.artists,
+    albumLink: data.link,
   }
 }
 
@@ -70,13 +72,7 @@ export function useAlbumDetailPage() {
 
   const album = useAlbum(id)
   const tracks = useAlbumTracks(id, page, ALBUM_LIMIT)
-  const playContext = usePlayContext()
-  const playTrack = usePlayTrack()
-  const { state: playerState } = usePlayer()
-
-  const handlePlay = useCallback(() => {
-    if (album.data?.uri) void playContext(album.data.uri)
-  }, [album.data, playContext])
+  const { state: playerState, controls } = usePlayer()
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)
@@ -84,47 +80,34 @@ export function useAlbumDetailPage() {
 
   const handleArtistClick = useCallback(
     (artistId: string) => {
-      navigate(`/artists/${artistId}`, { state: { from: location.pathname } })
+      navigate(`/artists/${artistId}`, { state: { from: currentPath(location) } })
     },
-    [navigate, location.pathname]
+    [navigate, location]
   )
 
   const meta = useMemo(() => deriveAlbumMeta(album.data), [album.data])
 
   const albumItems = useMemo(() => tracks.data?.items ?? [], [tracks.data])
 
-  const enrichedTracks: SpotifyTrack[] = useMemo(
-    () =>
-      albumItems.map((track) => ({
-        ...track,
-        type: 'track' as const,
-        album: meta.albumSimple,
-      })),
-    [albumItems, meta.albumSimple]
-  )
 
   const hasNext =
     tracks.data != null ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
 
-  const toPlayableTrack = useCallback(
-    (track: SpotifyAlbumTrack): SpotifyTrack => ({
-      ...track,
-      type: 'track' as const,
-      album: meta.albumSimple,
-    }),
-    [meta.albumSimple]
-  )
 
   const handleTrackPlay = useCallback(
-    async (track: SpotifyTrack | SpotifyAlbumTrack) => {
-      await playTrack('album' in track ? track : toPlayableTrack(track), enrichedTracks)
+    async (track: Track) => {
+      await controls.playTrack(track, albumItems)
     },
-    [playTrack, enrichedTracks, toPlayableTrack]
+    [controls, albumItems]
   )
+
+  const handlePlay = useCallback(() => {
+    const first = albumItems.find(isPlayable)
+    if (first) void controls.playTrack(first, albumItems)
+  }, [albumItems, controls])
 
   return {
     albumItems,
-    enrichedTracks,
     handleTrackPlay,
     playerState,
     view,
