@@ -17,10 +17,13 @@ vi.mock('@/contexts/PlayerContext', () => ({
 vi.mock('@/hooks/queries/usePlaylist', () => ({
   usePlaylist: () => ({ data: undefined }),
 }))
+const allTracks = [...tracks, { id: '3', uri: 'u3', preview_url: 'http://p/3' }] as unknown as Track[]
+
 vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
-  usePlaylistTracks: () => ({
-    data: { items: tracks, offset: 0, limit: 20, total: 2 },
-  }),
+  usePlaylistTracks: (_id: string, _enabled: boolean, _page: number, limit: number) =>
+    limit === 20
+      ? { data: { items: tracks, offset: 0, limit: 20, total: 3 } }
+      : { data: { items: allTracks, offset: 0, limit, total: 3 } },
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter>{children}</MemoryRouter>
@@ -29,6 +32,12 @@ describe('usePlaylistDetailPage playback', () => {
   it('Play starts the first playable track with the full list', () => {
     const { result } = renderHook(() => usePlaylistDetailPage(), { wrapper })
     result.current.handlePlay()
-    expect(playTrack).toHaveBeenCalledWith(tracks[1], tracks)
+    expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks)
+  })
+
+  it('queues the whole playlist, not just the visible page', async () => {
+    const { result } = renderHook(() => usePlaylistDetailPage(), { wrapper })
+    await result.current.playTrack(tracks[1], 1)
+    expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks, 1)
   })
 })

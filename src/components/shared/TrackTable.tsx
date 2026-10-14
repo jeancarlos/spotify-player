@@ -10,7 +10,7 @@ interface TrackTableProps {
   showAlbumColumn?: boolean
   activeTrackId?: string
   startIndex?: number
-  onPlay?: (track: Track) => void
+  onPlay?: (track: Track, index: number) => void
   onAlbumClick?: (albumId: string) => void
 }
 
@@ -20,7 +20,7 @@ interface TrackTableRowProps {
   isActive: boolean
   showAlbumColumn: boolean
   showRank: boolean
-  onPlay?: (track: Track) => void
+  onPlay?: (track: Track, index: number) => void
   onAlbumClick?: (albumId: string) => void
 }
 
@@ -70,7 +70,7 @@ function TrackTableRow({
         isActive && 'bg-black/6'
       )}
       aria-disabled={!playable || undefined}
-      onClick={() => playable && onPlay?.(track)}
+      onClick={() => playable && onPlay?.(track, index)}
     >
       <td className="py-2 px-3 text-black/60 tabular-nums">
         <span className="group-hover:hidden group-focus-within:hidden">{index + 1}</span>
@@ -80,7 +80,7 @@ function TrackTableRow({
           aria-label={t('player.playTrack', { name: track.name })}
           onClick={(e) => {
             e.stopPropagation()
-            onPlay?.(track)
+            onPlay?.(track, index)
           }}
         >
           <Play size={11} className="fill-black text-black" />

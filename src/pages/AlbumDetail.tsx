@@ -59,7 +59,7 @@ export function AlbumDetail() {
                     track={track}
                     index={(page - 1) * ALBUM_LIMIT + i}
                     isActive={playerState.currentTrack?.id === track.id}
-                    onPlay={handleTrackPlay}
+                    onPlay={async (tr) => handleTrackPlay(tr, (page - 1) * ALBUM_LIMIT + i)}
                   />
                 ))}
               </div>
@@ -69,8 +69,8 @@ export function AlbumDetail() {
                 showAlbumColumn={false}
                 startIndex={(page - 1) * ALBUM_LIMIT}
                 activeTrackId={playerState.currentTrack?.id}
-                onPlay={(track) => {
-                  void handleTrackPlay(track)
+                onPlay={(track, index) => {
+                  void handleTrackPlay(track, index)
                 }}
               />
             )}

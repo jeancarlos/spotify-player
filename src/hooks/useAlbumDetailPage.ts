@@ -8,6 +8,7 @@ import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
 import { formatDate } from '@/utils/formatDate'
+import { QUEUE_LIMIT } from '@/utils/constants'
 import type {
   Track,
   AlbumSimple,
@@ -74,6 +75,7 @@ export function useAlbumDetailPage() {
 
   const album = useAlbum(id)
   const tracks = useAlbumTracks(id, page, ALBUM_LIMIT)
+  const allTracks = useAlbumTracks(id, 1, QUEUE_LIMIT)
   const { state: playerState, controls } = usePlayer()
 
   const handleLayout = useCallback((h: number) => {
@@ -90,6 +92,7 @@ export function useAlbumDetailPage() {
   const meta = useMemo(() => deriveAlbumMeta(album.data), [album.data])
 
   const albumItems = useMemo(() => tracks.data?.items ?? [], [tracks.data])
+  const queue = allTracks.data?.items ?? albumItems
 
 
   const hasNext =
@@ -97,16 +100,16 @@ export function useAlbumDetailPage() {
 
 
   const handleTrackPlay = useCallback(
-    async (track: Track) => {
-      await controls.playTrack(track, albumItems)
+    async (track: Track, index?: number) => {
+      await controls.playTrack(track, queue, index)
     },
-    [controls, albumItems]
+    [controls, queue]
   )
 
   const handlePlay = useCallback(() => {
-    const first = albumItems.find(isPlayable)
-    if (first) void controls.playTrack(first, albumItems)
-  }, [albumItems, controls])
+    const first = queue.find(isPlayable)
+    if (first) void controls.playTrack(first, queue)
+  }, [queue, controls])
 
   return {
     albumItems,

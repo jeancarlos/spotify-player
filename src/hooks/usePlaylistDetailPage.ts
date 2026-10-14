@@ -6,6 +6,7 @@ import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
 import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
+import { QUEUE_LIMIT } from '@/utils/constants'
 import type { Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
@@ -21,21 +22,23 @@ export function usePlaylistDetailPage() {
 
   const playlist = usePlaylist(id)
   const tracks = usePlaylistTracks(id ?? '', !!id, page, PLAYLIST_LIMIT)
+  const allTracks = usePlaylistTracks(id ?? '', !!id, 1, QUEUE_LIMIT)
   const { state: playerState, controls } = usePlayer()
 
   const playlistTracks: Track[] = useMemo(() => tracks.data?.items ?? [], [tracks.data])
+  const queue = allTracks.data?.items ?? playlistTracks
 
   const playTrack = useCallback(
-    async (track: Track, list?: Track[]) => {
-      await controls.playTrack(track, list)
+    async (track: Track, index?: number) => {
+      await controls.playTrack(track, queue, index)
     },
-    [controls]
+    [controls, queue]
   )
 
   const handlePlay = useCallback(() => {
-    const first = playlistTracks.find(isPlayable)
-    if (first) void controls.playTrack(first, playlistTracks)
-  }, [playlistTracks, controls])
+    const first = queue.find(isPlayable)
+    if (first) void controls.playTrack(first, queue)
+  }, [queue, controls])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)

@@ -56,7 +56,7 @@ describe('TrackTable', () => {
     fireEvent.click(deadRow)
     expect(onPlay).not.toHaveBeenCalled()
     fireEvent.click(screen.getByText('Album Track').closest('tr') as HTMLElement)
-    expect(onPlay).toHaveBeenCalledWith(albumTrack)
+    expect(onPlay).toHaveBeenCalledWith(albumTrack, 0)
     expect(screen.getByText('Album Track').closest('tr')).not.toHaveAttribute('aria-disabled')
   })
 

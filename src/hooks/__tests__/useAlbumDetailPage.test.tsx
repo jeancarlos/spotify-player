@@ -18,8 +18,14 @@ vi.mock('@/contexts/PlayerContext', () => ({
 vi.mock('@/hooks/queries/useAlbum', () => ({
   useAlbum: () => ({ data: undefined }),
 }))
+const rest = Array.from({ length: 30 }, (_, i) => ({ id: `r${i}`, uri: `ur${i}`, preview_url: 'http://p/r' }))
+const allTracks = [...tracks, ...rest] as unknown as Track[]
+
 vi.mock('@/hooks/queries/useAlbumTracks', () => ({
-  useAlbumTracks: () => ({ data: { items: tracks, offset: 0, limit: 20, total: 3 } }),
+  useAlbumTracks: (_id: string, _page: number, limit: number) =>
+    limit === 20
+      ? { data: { items: tracks, offset: 0, limit: 20, total: 33 } }
+      : { data: { items: allTracks, offset: 0, limit, total: 33 } },
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter>{children}</MemoryRouter>
@@ -33,7 +39,13 @@ describe('useAlbumDetailPage playback', () => {
   it('Play starts the first playable track with the full list', () => {
     const { result } = renderHook(() => useAlbumDetailPage(), { wrapper })
     result.current.handlePlay()
-    expect(playTrack).toHaveBeenCalledWith(tracks[1], tracks)
+    expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks)
+  })
+
+  it('queues the whole album, not just the visible page', async () => {
+    const { result } = renderHook(() => useAlbumDetailPage(), { wrapper })
+    await result.current.handleTrackPlay(tracks[2], 2)
+    expect(playTrack).toHaveBeenCalledWith(tracks[2], allTracks, 2)
   })
 
   it('navigates with the full current path, query included, as from', () => {

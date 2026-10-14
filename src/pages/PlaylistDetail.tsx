@@ -58,7 +58,7 @@ export function PlaylistDetail() {
                     index={(page - 1) * PLAYLIST_LIMIT + i}
                     isActive={playerState.currentTrack?.id === track.id}
                     onPlay={async (tr) => {
-                      await playTrack(tr, playlistTracks)
+                      await playTrack(tr, (page - 1) * PLAYLIST_LIMIT + i)
                     }}
                   />
                 ))}
@@ -69,8 +69,8 @@ export function PlaylistDetail() {
                 showAlbumColumn={true}
                 startIndex={(page - 1) * PLAYLIST_LIMIT}
                 activeTrackId={playerState.currentTrack?.id}
-                onPlay={(track) => {
-                  void playTrack(track, playlistTracks)
+                onPlay={(track, index) => {
+                  void playTrack(track, index)
                 }}
                 onAlbumClick={(albumId) => {
                   navigate(`/albums/${albumId}`, { state: { from: currentPath(location) } })
