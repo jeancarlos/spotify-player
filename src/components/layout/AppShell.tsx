@@ -34,8 +34,10 @@ export function AppShell() {
       <header className="fixed top-0 left-0 right-0 z-40 pointer-events-none">
         <div className="pointer-events-auto">
           <HamburgerMenu />
-          <LanguageSwitcher className="fixed top-4 right-4 z-40" />
-          <DeezerAttribution className="fixed top-5 right-28 z-40" />
+          <div className="fixed top-4 right-4 z-40 flex h-[38px] items-center gap-3">
+            <DeezerAttribution />
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
       <main id="main-content" className="relative z-[1] h-full overflow-y-auto" tabIndex={-1}>

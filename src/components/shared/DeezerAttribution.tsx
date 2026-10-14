@@ -24,7 +24,7 @@ export function DeezerAttribution({
         className
       )}
     >
-      <img src="/deezer-logo.png" alt="" className="h-4 w-auto" />
+      <img src="/deezer-logo.png" alt="" className="h-5 w-auto" />
       {label && <span>{label}</span>}
     </a>
   )
