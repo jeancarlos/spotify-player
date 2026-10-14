@@ -35,6 +35,7 @@ describe('deezerMappers', () => {
     expect(r.followers?.total).toBe(dz.nb_fan)
     expect(r.link).toBe('https://www.deezer.com/artist/892')
     expect(toArtist((searchArtists as unknown as DzList<DzArtist>).data[0]).id).toBe('892')
+    expect(toArtist({ ...dz, nb_fan: undefined }).followers).toBeUndefined()
   })
 
   it('maps an album with genres from the nested data list', () => {

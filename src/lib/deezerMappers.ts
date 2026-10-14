@@ -102,7 +102,7 @@ export function toArtist(a: DzArtist): Artist {
     uri: `deezer:artist:${a.id}`,
     type: 'artist',
     images: toImages(a.picture_small, a.picture_medium, a.picture_big, a.picture_xl),
-    followers: { href: null, total: a.nb_fan ?? 0 },
+    followers: a.nb_fan == null ? undefined : { href: null, total: a.nb_fan },
     link: a.link,
   }
 }
