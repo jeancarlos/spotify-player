@@ -33,7 +33,7 @@ const Favorites = lazyWithRetry(
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen bg-white">
-    <div className="w-8 h-8 border-4 border-green-500 rounded-full border-t-transparent animate-spin" />
+    <div className="w-8 h-8 border-4 border-primary rounded-full border-t-transparent animate-spin" />
   </div>
 )
 

@@ -200,7 +200,7 @@
   "pwa": {
     "readyOffline": "App is ready to work offline",
     "updateAvailable": "Update available",
-    "newVersion": "A new version of Spoter is available. Reload to update.",
+    "newVersion": "A new version of Vinyla is available. Reload to update.",
     "reload": "Reload & Update"
   }
 }

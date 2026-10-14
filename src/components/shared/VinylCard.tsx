@@ -56,7 +56,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           'shadow-lg group-hover:shadow-xl',
           'group-hover:scale-105 group-active:scale-95',
           isActive
-            ? 'ring-2 ring-[#1DB954] scale-105 shadow-[0_0_18px_rgba(29,185,84,0.45)]'
+            ? 'ring-2 ring-primary scale-105 shadow-[0_0_18px_rgba(255,107,74,0.45)]'
             : 'ring-1 ring-white/10'
         )}
         style={{ width: dim, height: dim, borderRadius: '8px' }}
@@ -81,7 +81,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
             {[0, 150, 300].map((delay) => (
               <span
                 key={delay}
-                className="w-[3px] rounded-full bg-[#1DB954]"
+                className="w-[3px] rounded-full bg-primary"
                 style={{
                   height: '100%',
                   animation: `soundBar 0.8s ease-in-out infinite alternate`,

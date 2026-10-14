@@ -5,6 +5,9 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary: 255 107 74;
+  }
   * {
     box-sizing: border-box;
   }

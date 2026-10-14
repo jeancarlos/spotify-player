@@ -17,7 +17,6 @@ export default defineConfig(() => ({
         'apple-touch-icon.png',
         'favicon-32x32.png',
         'favicon-16x16.png',
-        'spoter-logo-cor-small.svg',
         'robots.txt',
       ],
       workbox: {
@@ -27,10 +26,10 @@ export default defineConfig(() => ({
         clientsClaim: true,
       },
       manifest: {
-        name: 'Spoter - Spotify Player',
-        short_name: 'Spoter',
-        description: 'A modern Spotify player with a vinyl touch',
-        theme_color: '#44aa00',
+        name: 'Vinyla',
+        short_name: 'Vinyla',
+        description: 'A modern music player with Deezer previews and a vinyl touch',
+        theme_color: '#FF6B4A',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
