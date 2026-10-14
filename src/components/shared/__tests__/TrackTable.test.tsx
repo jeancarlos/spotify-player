@@ -10,15 +10,15 @@ const album: AlbumSimple = {
   release_date: '2024-01-01',
   album_type: 'album',
   artists: [],
-  uri: 'spotify:album:alb1',
+  uri: 'deezer:album:alb1',
   type: 'album',
 }
 const albumTrack: Track = {
   id: 't1',
   name: 'Album Track',
-  artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
+  artists: [{ id: 'a1', name: 'Test Artist', uri: 'deezer:artist:a1', type: 'artist' }],
   duration_ms: 212000,
-  uri: 'spotify:track:t1',
+  uri: 'deezer:track:t1',
   explicit: false,
   preview_url: 'https://cdn.test/t1.mp3',
   type: 'track',

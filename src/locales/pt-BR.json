@@ -43,7 +43,8 @@
     "rank": "Rank",
     "name": "Nome",
     "dismissNotification": "Dispensar notificação",
-    "notFound": "Esta página não existe no Deezer"
+    "notFound": "Esta página não existe no Deezer",
+    "unknown": "Desconhecido"
   },
   "artists": {
     "searchPlaceholder": "Buscar...",

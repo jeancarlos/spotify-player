@@ -1,3 +1,4 @@
+import i18n from '@/lib/i18n'
 import type {
   PagingObject,
   AlbumFull,
@@ -89,7 +90,7 @@ const toImages = (...urls: (string | undefined)[]): Image[] =>
 
 const toArtistRef = (a: DzArtistRef | undefined): ArtistSimple => ({
   id: String(a?.id ?? 0),
-  name: a?.name ?? 'Unknown',
+  name: a?.name ?? i18n.t('common.unknown'),
   uri: `deezer:artist:${a?.id ?? 0}`,
   type: 'artist',
 })
@@ -162,7 +163,7 @@ export function toTrack(t: DzTrack, album?: AlbumSimple): Track {
           }
         : {
             id: '0',
-            name: 'Unknown',
+            name: i18n.t('common.unknown'),
             uri: 'deezer:album:0',
             type: 'album',
             images: [],

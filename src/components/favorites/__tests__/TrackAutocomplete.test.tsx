@@ -16,14 +16,14 @@ vi.mock('@/hooks/useKeyboardNav', () => ({
 const mockSearchResults: Track[] = [
   {
     id: 'r1',
-    uri: 'spotify:track:r1',
+    uri: 'deezer:track:r1',
     name: 'Resultado Um',
     duration_ms: 200000,
     explicit: false,
     rank: 70,
     preview_url: null,
     type: 'track',
-    artists: [{ id: 'a1', name: 'Artista A', uri: 'spotify:artist:a1', type: 'artist' }],
+    artists: [{ id: 'a1', name: 'Artista A', uri: 'deezer:artist:a1', type: 'artist' }],
     album: {
       id: 'alb1',
       name: 'Álbum A',
@@ -31,7 +31,7 @@ const mockSearchResults: Track[] = [
       release_date: '2024-01-01',
       album_type: 'album',
       artists: [],
-      uri: 'spotify:album:alb1',
+      uri: 'deezer:album:alb1',
       type: 'album',
     },
   },

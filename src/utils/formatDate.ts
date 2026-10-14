@@ -9,7 +9,7 @@ function inferPrecision(date: string): Precision {
 }
 
 /**
- * Formats Spotify release_date respecting precision and active language.
+ * Formats Deezer release_date respecting precision and active language.
  * date: 'YYYY' | 'YYYY-MM' | 'YYYY-MM-DD'
  */
 export function formatDate(date: string, precision?: Precision): string {

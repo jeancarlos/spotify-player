@@ -69,14 +69,14 @@ import { Favorites } from '@/pages/Favorites'
 
 const mockTrack = (id: string): Track => ({
   id,
-  uri: `spotify:track:${id}`,
+  uri: `deezer:track:${id}`,
   name: `Track ${id}`,
   duration_ms: 180000,
   explicit: false,
   rank: 50,
   preview_url: null,
   type: 'track',
-  artists: [{ id: 'a1', name: 'Artista', uri: 'spotify:artist:a1', type: 'artist' }],
+  artists: [{ id: 'a1', name: 'Artista', uri: 'deezer:artist:a1', type: 'artist' }],
   album: {
     id: 'alb1',
     name: 'Álbum',
@@ -84,7 +84,7 @@ const mockTrack = (id: string): Track => ({
     release_date: '2024-01-01',
     album_type: 'album',
     artists: [],
-    uri: 'spotify:album:alb1',
+    uri: 'deezer:album:alb1',
     type: 'album',
   },
 })
@@ -139,7 +139,7 @@ describe('Favorites', () => {
     mockFavorites.removeTrack.mockReturnValue(false)
     renderFavorites()
     await user.click(screen.getAllByRole('button', { name: /favorites\.removeConfirm/i })[0])
-    expect(mockFavorites.removeTrack).toHaveBeenCalledWith('spotify:track:t1')
+    expect(mockFavorites.removeTrack).toHaveBeenCalledWith('deezer:track:t1')
     expect(mockToast).toHaveBeenCalledWith('favorites.saveFailed', 'error')
   })
 
@@ -149,7 +149,7 @@ describe('Favorites', () => {
     mockFavorites.removeTrack.mockReturnValue(true)
     renderFavorites()
     await user.click(screen.getByRole('button', { name: /favorites\.removeConfirm/i }))
-    expect(mockFavorites.removeTrack).toHaveBeenCalledWith('spotify:track:t1')
+    expect(mockFavorites.removeTrack).toHaveBeenCalledWith('deezer:track:t1')
     expect(mockToast).not.toHaveBeenCalled()
   })
 

@@ -5,14 +5,14 @@ import type { Track } from '@/types/music'
 
 const mockTrack: Track = {
   id: 't1',
-  uri: 'spotify:track:t1',
+  uri: 'deezer:track:t1',
   name: 'Test Track',
   duration_ms: 180000,
   explicit: false,
   rank: 80,
   preview_url: null,
   type: 'track',
-  artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
+  artists: [{ id: 'a1', name: 'Test Artist', uri: 'deezer:artist:a1', type: 'artist' }],
   album: {
     id: 'alb1',
     name: 'Test Album',
@@ -20,7 +20,7 @@ const mockTrack: Track = {
     release_date: '2024-01-01',
     album_type: 'album',
     artists: [],
-    uri: 'spotify:album:alb1',
+    uri: 'deezer:album:alb1',
     type: 'album',
   },
 }
@@ -92,7 +92,7 @@ describe('FavoriteButton', () => {
     mockFavorites.tracks = [mockTrack]
     render(<FavoriteButton />)
     await user.click(screen.getByRole('button'))
-    expect(removeTrack).toHaveBeenCalledWith('spotify:track:t1')
+    expect(removeTrack).toHaveBeenCalledWith('deezer:track:t1')
     expect(addTrack).not.toHaveBeenCalled()
     expect(mockToast).toHaveBeenCalledWith('favorites.removedFromList', 'info')
   })

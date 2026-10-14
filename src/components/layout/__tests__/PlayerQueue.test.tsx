@@ -8,9 +8,9 @@ import type { Track } from '@/types/music'
 const mk = (id: string): Track => ({
   id,
   name: `Name ${id}`,
-  artists: [{ id: 'a1', name: 'Artist', uri: 'spotify:artist:a1', type: 'artist' }],
+  artists: [{ id: 'a1', name: 'Artist', uri: 'deezer:artist:a1', type: 'artist' }],
   duration_ms: 1000,
-  uri: `spotify:track:${id}`,
+  uri: `deezer:track:${id}`,
   album: {
     id: 'alb',
     name: 'Album',
@@ -18,7 +18,7 @@ const mk = (id: string): Track => ({
     release_date: '2024-01-01',
     album_type: 'album',
     artists: [],
-    uri: 'spotify:album:alb',
+    uri: 'deezer:album:alb',
     type: 'album',
   },
   explicit: false,

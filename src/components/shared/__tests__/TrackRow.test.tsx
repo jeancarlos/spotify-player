@@ -7,9 +7,9 @@ import type { Track } from '@/types/music'
 const track: Track = {
   id: 't1',
   name: 'Test Track',
-  artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
+  artists: [{ id: 'a1', name: 'Test Artist', uri: 'deezer:artist:a1', type: 'artist' }],
   duration_ms: 212000,
-  uri: 'spotify:track:t1',
+  uri: 'deezer:track:t1',
   album: {
     id: 'alb1',
     name: 'Test Album',
@@ -17,7 +17,7 @@ const track: Track = {
     release_date: '2024-01-01',
     album_type: 'album',
     artists: [],
-    uri: 'spotify:album:alb1',
+    uri: 'deezer:album:alb1',
     type: 'album',
   },
   explicit: false,
@@ -78,7 +78,7 @@ describe('TrackRow', () => {
     const removeBtn = screen.getByRole('button', { name: /favorites\.removeConfirm/i })
     fireEvent.click(removeBtn)
 
-    expect(onRemove).toHaveBeenCalledWith('spotify:track:t1')
+    expect(onRemove).toHaveBeenCalledWith('deezer:track:t1')
     expect(onPlay).not.toHaveBeenCalled()
   })
 

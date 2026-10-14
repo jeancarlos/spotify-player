@@ -11,6 +11,7 @@ import {
   type DzTrack,
 } from '@/lib/deezerMappers'
 
+import i18n from '@/lib/i18n'
 import searchArtists from '@/mocks/fixtures/deezer/search-artist.json'
 import searchTracks from '@/mocks/fixtures/deezer/search-track.json'
 import artist from '@/mocks/fixtures/deezer/artist.json'
@@ -24,6 +25,13 @@ const tracks = (searchTracks as unknown as DzList<DzTrack>).data
 const noPreview = (playlistTracks as unknown as DzList<DzTrack>).data.find((t) => !t.preview)!
 
 describe('deezerMappers', () => {
+  it('localizes the fallback names for a track without artist or album', async () => {
+    await i18n.changeLanguage('pt-BR')
+    const bare = toTrack({ ...tracks[0], artist: undefined, album: undefined })
+    expect(bare.artists[0].name).toBe('Desconhecido')
+    expect(bare.album.name).toBe('Desconhecido')
+  })
+
   it('maps an artist', () => {
     const dz = artist as unknown as DzArtist
     const r = toArtist(dz)
