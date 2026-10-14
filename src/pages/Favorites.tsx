@@ -94,6 +94,17 @@ export function Favorites() {
   const { unavailable } = useCatalogHealth()
   const { tracks, notes, addTrack, removeTrack, setNote, playlistName } = useFavorites()
   const [editing, setEditing] = useState<string | null>(null)
+  const editOpener = useRef<HTMLElement | null>(null)
+
+  const openEditor = (uri: string) => {
+    editOpener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    setEditing(uri)
+  }
+
+  const closeEditor = () => {
+    setEditing(null)
+    editOpener.current?.focus()
+  }
 
   const handleAdd = (track: Track, note?: string) => {
     const ok = addTrack(track, note?.trim())
@@ -106,7 +117,7 @@ export function Favorites() {
   }
 
   const handleSaveNote = (uri: string, note: string) => {
-    if (setNote(uri, note)) setEditing(null)
+    if (setNote(uri, note)) closeEditor()
     else toast(t('favorites.saveFailed'), 'error')
   }
 
@@ -145,7 +156,7 @@ export function Favorites() {
                   note={notes[track.uri] ?? undefined}
                   isActive={playerState.currentTrack?.uri === track.uri}
                   onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)}
-                  onEditNote={setEditing}
+                  onEditNote={openEditor}
                   onRemove={handleRemove}
                 />
                 {editing === track.uri && (
@@ -154,9 +165,7 @@ export function Favorites() {
                     onSave={(note) => {
                       handleSaveNote(track.uri, note)
                     }}
-                    onCancel={() => {
-                      setEditing(null)
-                    }}
+                    onCancel={closeEditor}
                   />
                 )}
               </div>

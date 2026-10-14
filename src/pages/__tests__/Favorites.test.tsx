@@ -160,14 +160,16 @@ describe('Favorites', () => {
     mockFavorites.notes = {}
   })
 
-  it('Escape closes the note editor without saving', async () => {
+  it('Escape closes the note editor without saving and refocuses the edit button', async () => {
     const user = userEvent.setup()
     mockFavorites.tracks = [mockTrack('t1')]
     renderFavorites()
-    await user.click(screen.getByRole('button', { name: /favorites\.editNote/i }))
+    const edit = screen.getByRole('button', { name: /favorites\.editNote/i })
+    await user.click(edit)
     await user.type(screen.getByRole('textbox', { name: 'favorites.noteLabel' }), 'x{Escape}')
     expect(mockFavorites.setNote).not.toHaveBeenCalled()
     expect(screen.queryByRole('textbox', { name: 'favorites.noteLabel' })).toBeNull()
+    expect(edit).toHaveFocus()
   })
 
   it('permite remover o último favorito', async () => {
