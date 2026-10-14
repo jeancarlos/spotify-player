@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import i18n from '@/lib/i18n'
 import type { Image, Track } from '@/types/music'
 
 export function cn(...inputs: ClassValue[]) {
@@ -32,8 +33,19 @@ export function normalizeImages<T extends SizedImage>(images: unknown): T[] {
   return [...list].sort((a, b) => (b.width ?? 0) - (a.width ?? 0))
 }
 
+const UNKNOWN_ID = '0'
+
+function localizeUnknown<T extends { id: string; name: string }>(ref: T): T {
+  return ref.id === UNKNOWN_ID ? { ...ref, name: i18n.t('common.unknown') } : ref
+}
+
 export function normalizeTrack(track: Track): Track {
+  const artists = Array.isArray(track.artists) ? track.artists.map(localizeUnknown) : track.artists
   const album = track.album as Track['album'] | undefined
-  if (!album) return track
-  return { ...track, album: { ...album, images: normalizeImages<Image>(album.images) } }
+  if (!album) return { ...track, artists }
+  return {
+    ...track,
+    artists,
+    album: { ...localizeUnknown(album), images: normalizeImages<Image>(album.images) },
+  }
 }

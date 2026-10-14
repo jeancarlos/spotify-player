@@ -1,3 +1,4 @@
+import i18n from '@/lib/i18n'
 import { describe, it, expect } from 'vitest'
 import { pickImage, srcSetOf, normalizeImages, normalizeTrack } from '@/lib/utils'
 import type { Image, Track } from '@/types/music'
@@ -65,5 +66,21 @@ describe('normalizeTrack', () => {
       },
     } as unknown as Track
     expect(normalizeTrack(t).album.images.map((i) => i.url)).toEqual(['xl', 'small'])
+  })
+
+  it('re-localizes stored unknown artists and albums in the current language', async () => {
+    const stored = {
+      uri: 'x',
+      name: 'n',
+      artists: [
+        { id: '0', name: 'Desconhecido' },
+        { id: '7', name: 'Real' },
+      ],
+      album: { id: '0', name: 'Desconhecido', images: [] },
+    } as unknown as Track
+    await i18n.changeLanguage('en-US')
+    const t = normalizeTrack(stored)
+    expect(t.artists.map((a) => a.name)).toEqual(['Unknown', 'Real'])
+    expect(t.album.name).toBe('Unknown')
   })
 })
