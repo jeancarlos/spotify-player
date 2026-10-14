@@ -14,11 +14,14 @@ interface ArtistHeaderProps {
   onLayout: (height: number) => void
 }
 
+const HERO_TOP = 64
+const HERO_GAP = 16
+
 function useArtistHeaderLayout(hasLink: boolean) {
   const { width: vw } = useWindowSize()
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
-  const headerHeight = Math.round(imgPx * 0.75) + 120 + (hasLink ? 28 : 0)
+  const headerHeight = Math.round(imgPx * 0.75) + 120 + HERO_TOP + HERO_GAP + (hasLink ? 28 : 0)
 
   return { imgPx, headerHeight }
 }
@@ -58,7 +61,7 @@ export function ArtistHeader({ images, name, subtitle, link, onLayout }: ArtistH
     >
       <div
         className="absolute left-1/2"
-        style={{ transform: 'translateX(-50%) translateY(-16px)', top: 0, zIndex: 2 }}
+        style={{ transform: 'translateX(-50%)', top: HERO_TOP, zIndex: 2 }}
       >
         <motion.div
           initial={{ scale: 0.8, y: 60, opacity: 0 }}
@@ -97,7 +100,7 @@ export function ArtistHeader({ images, name, subtitle, link, onLayout }: ArtistH
 
       <motion.div
         className="absolute left-0 right-0 flex flex-col items-center"
-        style={{ top: imgPx, zIndex: 1 }}
+        style={{ top: HERO_TOP + imgPx + HERO_GAP, zIndex: 1 }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
