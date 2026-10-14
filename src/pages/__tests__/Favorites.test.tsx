@@ -143,6 +143,33 @@ describe('Favorites', () => {
     expect(mockToast).toHaveBeenCalledWith('favorites.saveFailed', 'error')
   })
 
+  it('edits the note of an existing favorite', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1')]
+    mockFavorites.notes = { 'deezer:track:t1': 'old' }
+    mockFavorites.setNote.mockReturnValue(true)
+    renderFavorites()
+    await user.click(screen.getByRole('button', { name: /favorites\.editNote/i }))
+    const input = screen.getByRole('textbox', { name: 'favorites.noteLabel' })
+    expect(input).toHaveValue('old')
+    expect(input).toHaveFocus()
+    await user.clear(input)
+    await user.type(input, ' new note {Enter}')
+    expect(mockFavorites.setNote).toHaveBeenCalledWith('deezer:track:t1', 'new note')
+    expect(screen.queryByRole('textbox', { name: 'favorites.noteLabel' })).toBeNull()
+    mockFavorites.notes = {}
+  })
+
+  it('Escape closes the note editor without saving', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1')]
+    renderFavorites()
+    await user.click(screen.getByRole('button', { name: /favorites\.editNote/i }))
+    await user.type(screen.getByRole('textbox', { name: 'favorites.noteLabel' }), 'x{Escape}')
+    expect(mockFavorites.setNote).not.toHaveBeenCalled()
+    expect(screen.queryByRole('textbox', { name: 'favorites.noteLabel' })).toBeNull()
+  })
+
   it('permite remover o último favorito', async () => {
     const user = userEvent.setup()
     mockFavorites.tracks = [mockTrack('t1')]

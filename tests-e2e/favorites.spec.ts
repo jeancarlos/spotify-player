@@ -20,6 +20,12 @@ test('plays a preview, favourites it and keeps it after a reload', async ({ page
   await expect(page.getByText('Yellow').first()).toBeVisible()
   await expect(page.getByText('No favorites yet')).toHaveCount(0)
 
+  await page.getByRole('button', { name: 'Edit note for Yellow' }).click()
+  await page.getByRole('textbox', { name: 'Personal note' }).fill('road trip')
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('textbox', { name: 'Personal note' })).toHaveCount(0)
+  expect(await page.evaluate(() => localStorage.getItem('spoter_favorites_v2'))).toContain('road trip')
+
   await page.getByRole('button', { name: 'Remove', exact: true }).click()
   await expect(page.getByText('Yellow')).toHaveCount(0)
   await expect(page.getByText('No favorites yet')).toBeVisible()

@@ -94,7 +94,8 @@ export function useFavorites() {
   const setNote = useCallback(
     (uri: string, note: string): boolean => {
       const { tracks, notes } = dataRef.current
-      return commit({ tracks, notes: { ...notes, [uri]: note } })
+      const { [uri]: _old, ...rest } = notes
+      return commit({ tracks, notes: note ? { ...rest, [uri]: note } : rest })
     },
     [commit]
   )

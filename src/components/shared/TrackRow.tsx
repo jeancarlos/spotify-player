@@ -1,4 +1,4 @@
-import { Play, Trash2 } from 'lucide-react'
+import { Pencil, Play, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
 import { cn, pickImage, srcSetOf } from '@/lib/utils'
@@ -11,6 +11,7 @@ interface TrackRowProps {
   isActive?: boolean
   onPlay?: (track: Track) => void
   onRemove?: (uri: string) => void
+  onEditNote?: (uri: string) => void
   note?: string
   index?: number
   theme?: 'light' | 'dark'
@@ -24,6 +25,7 @@ interface TrackTheme {
   subtext: string
   duration: string
   remove: string
+  edit: string
   area: string
   focus: string
 }
@@ -61,6 +63,11 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
       'tap-target p-1 rounded-lg transition-colors [@media(hover:hover)]:opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
       focusRing(dark),
       dark ? 'text-white/60 hover:text-red-400' : 'text-black/60 hover:text-red-500'
+    ),
+    edit: cn(
+      'tap-target p-1 rounded-lg transition-colors [@media(hover:hover)]:opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
+      focusRing(dark),
+      dark ? 'text-white/60 hover:text-white' : 'text-black/60 hover:text-black'
     ),
   }
 }
@@ -136,6 +143,7 @@ export function TrackRow({
   isActive = false,
   onPlay,
   onRemove,
+  onEditNote,
   note,
   index,
   theme = 'light',
@@ -168,6 +176,19 @@ export function TrackRow({
       </div>
 
       <span className={styles.duration}>{formatDuration(track.duration_ms)}</span>
+
+      {onEditNote && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onEditNote(track.uri)
+          }}
+          aria-label={t('favorites.editNote', { name: track.name })}
+          className={styles.edit}
+        >
+          <Pencil size={14} />
+        </button>
+      )}
 
       {onRemove && (
         <button

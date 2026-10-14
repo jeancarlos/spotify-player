@@ -96,6 +96,8 @@
     "noteTooLong": "Maximum 80 characters",
     "alreadyFavorite": "Already in favorites",
     "notePlaceholder": "A personal note (optional)...",
+    "editNote": "Edit note for {{name}}",
+    "saveNote": "Save",
     "noteLabel": "Personal note",
     "trackLabel": "Song",
     "addConfirm": "Add to favorites",

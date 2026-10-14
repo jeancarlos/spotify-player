@@ -9,6 +9,7 @@ import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
+import { NoteEditor } from '@/components/favorites/NoteEditor'
 import { TrackRow } from '@/components/shared/TrackRow'
 import type { Track } from '@/types/music'
 
@@ -91,7 +92,8 @@ export function Favorites() {
   const { state: playerState, controls } = usePlayer()
   const { toast } = useToast()
   const { unavailable } = useCatalogHealth()
-  const { tracks, notes, addTrack, removeTrack, playlistName } = useFavorites()
+  const { tracks, notes, addTrack, removeTrack, setNote, playlistName } = useFavorites()
+  const [editing, setEditing] = useState<string | null>(null)
 
   const handleAdd = (track: Track, note?: string) => {
     const ok = addTrack(track, note?.trim())
@@ -101,6 +103,11 @@ export function Favorites() {
 
   const handleRemove = (uri: string) => {
     if (!removeTrack(uri)) toast(t('favorites.saveFailed'), 'error')
+  }
+
+  const handleSaveNote = (uri: string, note: string) => {
+    if (setNote(uri, note)) setEditing(null)
+    else toast(t('favorites.saveFailed'), 'error')
   }
 
   return (
@@ -131,15 +138,28 @@ export function Favorites() {
         {tracks.length > 0 && (
           <div className="flex flex-col gap-0.5">
             {tracks.map((track, i) => (
-              <TrackRow
-                key={track.id}
-                track={track}
-                index={i}
-                note={notes[track.uri] ?? undefined}
-                isActive={playerState.currentTrack?.uri === track.uri}
-                onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks)}
-                onRemove={handleRemove}
-              />
+              <div key={track.id}>
+                <TrackRow
+                  track={track}
+                  index={i}
+                  note={notes[track.uri] ?? undefined}
+                  isActive={playerState.currentTrack?.uri === track.uri}
+                  onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)}
+                  onEditNote={setEditing}
+                  onRemove={handleRemove}
+                />
+                {editing === track.uri && (
+                  <NoteEditor
+                    note={notes[track.uri] ?? ''}
+                    onSave={(note) => {
+                      handleSaveNote(track.uri, note)
+                    }}
+                    onCancel={() => {
+                      setEditing(null)
+                    }}
+                  />
+                )}
+              </div>
             ))}
           </div>
         )}

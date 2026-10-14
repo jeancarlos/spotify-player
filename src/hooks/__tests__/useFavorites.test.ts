@@ -157,4 +157,16 @@ describe('useFavorites', () => {
     expect(result.current.notes['deezer:track:1']).toBe('hello')
     expect(stored().notes['deezer:track:1']).toBe('hello')
   })
+
+  it('setNote with an empty note removes it', () => {
+    const { result } = renderHook(() => useFavorites())
+    act(() => {
+      result.current.addTrack(mk('1'), 'hello')
+    })
+    act(() => {
+      result.current.setNote('deezer:track:1', '')
+    })
+    expect(result.current.notes).toEqual({})
+    expect(stored().notes).toEqual({})
+  })
 })

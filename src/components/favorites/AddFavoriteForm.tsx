@@ -5,9 +5,8 @@ import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { TrackAutocomplete } from './TrackAutocomplete'
 import { cn } from '@/lib/utils'
+import { MAX_NOTE_LENGTH } from '@/utils/constants'
 import type { Track } from '@/types/music'
-
-const MAX_NOTE_LENGTH = 80
 
 interface AddFavoriteFormProps {
   existingFavorites: Track[]
