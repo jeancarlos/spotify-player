@@ -1,9 +1,12 @@
+import { useEffect } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { useTranslation } from 'react-i18next'
 import { X, RefreshCw } from 'lucide-react'
+import { useToast } from '@/components/ui/toast'
 
 export function ReloadPrompt() {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
@@ -17,43 +20,40 @@ export function ReloadPrompt() {
     },
   })
 
-  const close = () => {
+  useEffect(() => {
+    if (!offlineReady) return
+    toast(t('pwa.readyOffline'), 'info')
     setOfflineReady(false)
-    setNeedRefresh(false)
-  }
+  }, [offlineReady, setOfflineReady, toast, t])
 
-  if (!offlineReady && !needRefresh) return null
+  if (!needRefresh) return null
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed top-16 right-4 left-4 sm:left-auto z-50 animate-in fade-in slide-in-from-top-4 duration-300">
       <div className="glass-card p-4 flex flex-col gap-3 shadow-2xl border-white/20">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <p className="text-sm font-bold text-black">
-              {offlineReady ? 'Vinyla' : t('pwa.updateAvailable')}
-            </p>
-            <p className="text-xs text-black/60 mt-0.5 leading-relaxed">
-              {offlineReady ? t('pwa.readyOffline') : t('pwa.newVersion')}
-            </p>
+            <p className="text-sm font-bold text-black">{t('pwa.updateAvailable')}</p>
+            <p className="text-xs text-black/60 mt-0.5 leading-relaxed">{t('pwa.newVersion')}</p>
           </div>
           <button
-            onClick={close}
-            className="p-1 rounded-lg hover:bg-black/5 transition-colors"
+            onClick={() => {
+              setNeedRefresh(false)
+            }}
+            className="tap-target p-1 rounded-lg hover:bg-black/5 transition-colors"
             aria-label={t('favorites.cancel')}
           >
-            <X size={16} className="text-black/40" />
+            <X size={16} className="text-black/60" />
           </button>
         </div>
 
-        {needRefresh && (
-          <button
-            onClick={async () => updateServiceWorker(true)}
-            className="flex items-center justify-center gap-2 w-full py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-black/80 transition-colors"
-          >
-            <RefreshCw size={14} />
-            {t('pwa.reload')}
-          </button>
-        )}
+        <button
+          onClick={async () => updateServiceWorker(true)}
+          className="flex items-center justify-center gap-2 w-full py-2 bg-primary text-ink text-xs font-bold rounded-xl hover:bg-primary/85 transition-colors"
+        >
+          <RefreshCw size={14} />
+          {t('pwa.reload')}
+        </button>
       </div>
     </div>
   )
