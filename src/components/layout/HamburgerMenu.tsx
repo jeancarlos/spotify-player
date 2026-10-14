@@ -1,10 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Heart, Menu, X, Home } from 'lucide-react'
+import { ArrowLeft, Github, Heart, Menu, X, Home } from 'lucide-react'
 import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useUI } from '@/hooks/useUI'
 import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
+
+const SOURCE_URL = 'https://github.com/jeancarlos/spotify-player'
+const itemClass =
+  'flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full'
 
 function MenuToggleIcon({ isOpen }: { isOpen: boolean }) {
   return (
@@ -55,11 +59,6 @@ export function HamburgerMenu() {
 
   usePopoverDismiss(isOpen, close, buttonRef, popoverRef)
 
-  const handleNav = (path: string) => {
-    close()
-    navigate(path)
-  }
-
   return (
     <div className="fixed top-4 left-4 z-40 flex items-center gap-2">
       <div className="relative">
@@ -69,16 +68,15 @@ export function HamburgerMenu() {
           className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
           aria-label={t('nav.openMenu')}
           aria-expanded={isOpen}
-          aria-haspopup="true"
         >
           <MenuToggleIcon isOpen={isOpen} />
         </button>
 
         <AnimatePresence>
           {isOpen && (
-            <motion.div
+            <motion.nav
               ref={popoverRef}
-              role="menu"
+              aria-label={t('nav.openMenu')}
               className="absolute top-[calc(100%+8px)] left-0 w-56 glass rounded-2xl shadow-xl overflow-hidden"
               initial={{ opacity: 0, scale: 0.92, y: -6 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -86,32 +84,30 @@ export function HamburgerMenu() {
               transition={{ type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }}
               style={{ transformOrigin: 'top left' }}
             >
-
               <div className="flex flex-col py-1.5">
-                <button
-                  role="menuitem"
-                  onClick={() => {
-                    handleNav('/')
-                  }}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
-                >
+                <Link to="/" onClick={close} className={itemClass}>
                   <Home size={16} className="text-black/50 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.home')}</span>
-                </button>
+                </Link>
 
-                <button
-                  role="menuitem"
-                  onClick={() => {
-                    handleNav('/favorites')
-                  }}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full"
-                >
+                <Link to="/favorites" onClick={close} className={itemClass}>
                   <Heart size={16} className="text-black/50 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.favorites')}</span>
-                </button>
+                </Link>
 
+                <a
+                  href={SOURCE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={close}
+                  className={itemClass}
+                >
+                  {/* eslint-disable-next-line @typescript-eslint/no-deprecated */}
+                  <Github size={16} className="text-black/50 flex-shrink-0" />
+                  <span className="text-sm text-black/70">{t('nav.sourceCode')}</span>
+                </a>
               </div>
-            </motion.div>
+            </motion.nav>
           )}
         </AnimatePresence>
       </div>
@@ -123,7 +119,7 @@ export function HamburgerMenu() {
               navigate(-1)
             }}
             className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
-            aria-label={t('nav.back', 'Voltar')}
+            aria-label={t('common.back')}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
