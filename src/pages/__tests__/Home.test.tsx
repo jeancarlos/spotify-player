@@ -15,7 +15,23 @@ const recent = [
   { id: 'r1', uri: 'deezer:track:r1', name: 'Mock Track 1', artists: [], album: { images: [] } },
   { id: 'r2', uri: 'deezer:track:r2', name: 'Mock Track 2', artists: [], album: { images: [] } },
 ] as unknown as Track[]
+const popular = Array.from({ length: 8 }, (_, i) => ({
+  id: `p${i}`,
+  uri: `deezer:track:p${i}`,
+  name: `Popular ${i}`,
+  is_playable: true,
+  artists: [],
+  album: { images: [] },
+})) as unknown as Track[]
+const popularPage = { items: popular, offset: 0, limit: 20, total: popular.length }
+let chartData: typeof popularPage | undefined = popularPage
+const useChartTracks = vi.fn((_enabled: boolean) => ({ data: chartData }))
+vi.mock('@/hooks/queries/useChart', () => ({
+  useChartTracks: (enabled: boolean) => useChartTracks(enabled),
+}))
+
 beforeEach(() => {
+  chartData = popularPage
   localStorage.setItem('spoter_recent_v1', JSON.stringify(recent))
 })
 
@@ -82,11 +98,29 @@ describe('Página Home', () => {
     await userEvent.click(await screen.findByText('Mock Track 1'))
     expect(playTrack).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'r1' }),
-      expect.arrayContaining([expect.objectContaining({ id: 'r2' })])
+      expect.arrayContaining([expect.objectContaining({ id: 'r2' })]),
+      0
     )
   })
 
+  it('shows recently played and skips the chart when there is history', async () => {
+    renderHome()
+    expect(await screen.findByText('Mock Track 1')).toBeInTheDocument()
+    expect(screen.queryByText(/home\.popular/i)).toBeNull()
+    expect(useChartTracks).toHaveBeenLastCalledWith(false)
+  })
+
+  it('shows five random popular tracks on a first visit', () => {
+    localStorage.removeItem('spoter_recent_v1')
+    renderHome()
+    expect(screen.getByText(/home\.popular/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Tocadas Recentemente/i)).toBeNull()
+    expect(screen.getAllByText(/^Popular \d$/)).toHaveLength(5)
+    expect(useChartTracks).toHaveBeenLastCalledWith(true)
+  })
+
   it('shows the search prompt in the hint slot above the vinyl when nothing was played', () => {
+    chartData = undefined
     localStorage.removeItem('spoter_recent_v1')
     renderHome()
     const prompt = screen.getByText(/Digite para buscar/)

@@ -1,8 +1,11 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useRecentlyPlayed } from '@/hooks/useRecentlyPlayed'
+import { useChartTracks } from '@/hooks/queries/useChart'
+import { isPlayable } from '@/lib/deezerMappers'
+import { shuffled } from '@/utils/shuffled'
 import { useCatalogHealth } from '@/hooks/useCatalogHealth'
 import { useWindowSize } from '@/hooks/useWindowSize'
 import { homeDiskOffset } from '@/utils/diskLayout'
@@ -47,7 +50,13 @@ export function Home() {
   const { unavailable } = useCatalogHealth()
   const { arcRadius, arcBottom, arcDeg, showHint, hintTop } = useDiskLayout()
 
-  const tracks = recentlyPlayed.data.slice(0, MAX_CAROUSEL_TRACKS)
+  const hasRecent = recentlyPlayed.data.length > 0
+  const popular = useChartTracks(!hasRecent)
+  const randomPopular = useMemo(
+    () => shuffled((popular.data?.items ?? []).filter(isPlayable)).slice(0, MAX_CAROUSEL_TRACKS),
+    [popular.data]
+  )
+  const tracks = hasRecent ? recentlyPlayed.data.slice(0, MAX_CAROUSEL_TRACKS) : randomPopular
 
   const handleSearch = useCallback(
     (query: string, tab: SearchTab) => {
@@ -61,14 +70,14 @@ export function Home() {
     return (
       <div className="relative">
         <ArcCarousel
-          items={tracks.map((track) => ({
+          items={tracks.map((track, i) => ({
             id: track.id,
-            content: <VinylCard track={track} onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks)} size="sm" />,
+            content: <VinylCard track={track} onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)} size="sm" />,
           }))}
           radius={arcRadius}
           arcDeg={arcDeg}
           baseDelay={DISK_ENTRY_DELAY_S}
-          title={t('home.recentlyPlayed')}
+          title={hasRecent ? t('home.recentlyPlayed') : t('home.popular')}
         />
       </div>
     )

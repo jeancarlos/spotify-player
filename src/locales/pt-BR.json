@@ -7,6 +7,7 @@
     "sourceCode": "Código-fonte"
   },
   "home": {
+    "popular": "Populares",
     "recentlyPlayed": "Tocadas Recentemente",
     "hint": "Toque em um vinil para ouvir uma prévia de 30 segundos"
   },

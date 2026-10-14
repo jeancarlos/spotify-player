@@ -6,10 +6,12 @@ import {
   toArtist,
   toPage,
   toPlaylist,
+  toTrack,
   type DzAlbum,
   type DzArtist,
   type DzList,
   type DzPlaylist,
+  type DzTrack,
 } from '@/lib/deezerMappers'
 import { PAGE_SIZE } from './useSearchPaged'
 import type {
@@ -17,10 +19,11 @@ import type {
   AlbumSimple,
   Artist,
   Playlist,
+  Track,
 } from '@/types/music'
 
 interface UseChartOptions<R, T> {
-  kind: 'artists' | 'albums' | 'playlists'
+  kind: 'artists' | 'albums' | 'playlists' | 'tracks'
   enabled: boolean
   map: (raw: R) => T
 }
@@ -44,6 +47,10 @@ export function useChartArtists(enabled = true) {
 
 export function useChartAlbums(enabled = true) {
   return useChart<DzAlbum, AlbumSimple>({ kind: 'albums', enabled, map: (a) => toAlbum(a) })
+}
+
+export function useChartTracks(enabled = true) {
+  return useChart<DzTrack, Track>({ kind: 'tracks', enabled, map: (t) => toTrack(t) })
 }
 
 export function useChartPlaylists(enabled = true) {

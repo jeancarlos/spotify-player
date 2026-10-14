@@ -26,6 +26,7 @@ const FIXTURE_ROUTES: [RegExp, string][] = [
   [/^chart\/0\/artists$/, 'chart-artists'],
   [/^chart\/0\/albums$/, 'chart-albums'],
   [/^chart\/0\/playlists$/, 'chart-playlists'],
+  [/^chart\/0\/tracks$/, 'artist-top'],
 ]
 
 const jsonp = (callback: string, body: string) => `${callback}(${body})`
