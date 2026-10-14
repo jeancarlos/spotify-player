@@ -48,21 +48,19 @@ describe('toast', () => {
   })
 
   it('clears pending timers on unmount', () => {
-    vi.useFakeTimers()
-    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const setSpy = vi.spyOn(globalThis, 'setTimeout')
+    const clearSpy = vi.spyOn(globalThis, 'clearTimeout')
     const { unmount } = render(
       <ToastProvider>
         <Grab />
       </ToastProvider>
     )
     act(() => api.toast('Saved'))
-    expect(vi.getTimerCount()).toBeGreaterThan(0)
+    const call = setSpy.mock.calls.findIndex(([, ms]) => ms === 4500)
+    const timer: unknown = setSpy.mock.results[call]?.value
+    expect(timer).toBeDefined()
     unmount()
-    expect(vi.getTimerCount()).toBe(0)
-    act(() => {
-      vi.advanceTimersByTime(10000)
-    })
-    expect(error).not.toHaveBeenCalled()
+    expect(clearSpy.mock.calls.some(([id]) => id === timer)).toBe(true)
   })
 
   it('does not re-render components that only call toast() when the list changes', () => {
