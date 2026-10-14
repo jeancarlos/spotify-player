@@ -63,4 +63,12 @@ describe('QueryErrorHandler', () => {
     await fail(client, 'b')
     expect(toast).toHaveBeenCalledTimes(2)
   })
+
+  it('ignores background queries', async () => {
+    const client = setup()
+    await client
+      .fetchQuery({ queryKey: ['bg'], meta: { background: true }, queryFn: () => Promise.reject(new Error('x')) })
+      .catch(() => undefined)
+    expect(toast).not.toHaveBeenCalled()
+  })
 })

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
 import { useScopedPage } from '@/hooks/useScopedPage'
+import { useQueueLoader } from '@/hooks/useQueueLoader'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
 import { isNoData } from '@/lib/deezer'
@@ -76,7 +77,7 @@ export function useAlbumDetailPage() {
 
   const album = useAlbum(id)
   const tracks = useAlbumTracks(id, page, ALBUM_LIMIT)
-  const allTracks = useAlbumTracks(id, 1, QUEUE_LIMIT)
+  const allTracks = useAlbumTracks(id, 1, QUEUE_LIMIT, true)
   const { state: playerState, controls } = usePlayer()
 
   const handleLayout = useCallback((h: number) => {
@@ -93,7 +94,8 @@ export function useAlbumDetailPage() {
   const meta = useMemo(() => deriveAlbumMeta(album.data), [album.data])
 
   const albumItems = useMemo(() => tracks.data?.items ?? [], [tracks.data])
-  const queue = allTracks.data?.items ?? albumItems
+  const loadQueue = useQueueLoader(allTracks)
+  const pageOffset = (page - 1) * ALBUM_LIMIT
 
 
   const hasNext =
@@ -101,16 +103,23 @@ export function useAlbumDetailPage() {
 
 
   const handleTrackPlay = useCallback(
-    async (track: Track, index?: number) => {
-      await controls.playTrack(track, queue, index)
+    async (track: Track, index: number) => {
+      const all = await loadQueue()
+      if (all) await controls.playTrack(track, all, index)
+      else await controls.playTrack(track, albumItems, index - pageOffset)
     },
-    [controls, queue]
+    [controls, loadQueue, albumItems, pageOffset]
   )
 
-  const handlePlay = useCallback(() => {
+  const playFirst = useCallback(async () => {
+    const queue = (await loadQueue()) ?? albumItems
     const first = queue.find(isPlayable)
-    if (first) void controls.playTrack(first, queue)
-  }, [queue, controls])
+    if (first) await controls.playTrack(first, queue)
+  }, [loadQueue, albumItems, controls])
+
+  const handlePlay = useCallback(() => {
+    void playFirst()
+  }, [playFirst])
 
   return {
     albumItems,

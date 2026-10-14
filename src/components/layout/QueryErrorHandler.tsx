@@ -16,7 +16,7 @@ export function QueryErrorHandler() {
         failing.delete(queryHash)
         return
       }
-      if (event.type !== 'updated') return
+      if (event.type !== 'updated' || event.query.meta?.background) return
       if (event.action.type === 'success') {
         failing.delete(queryHash)
         return

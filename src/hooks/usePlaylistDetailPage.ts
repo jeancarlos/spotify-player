@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { usePlaylist } from '@/hooks/queries/usePlaylist'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
 import { useScopedPage } from '@/hooks/useScopedPage'
+import { useQueueLoader } from '@/hooks/useQueueLoader'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
 import { isNoData } from '@/lib/deezer'
@@ -23,23 +24,31 @@ export function usePlaylistDetailPage() {
 
   const playlist = usePlaylist(id)
   const tracks = usePlaylistTracks(id ?? '', !!id, page, PLAYLIST_LIMIT)
-  const allTracks = usePlaylistTracks(id ?? '', !!id, 1, QUEUE_LIMIT)
+  const allTracks = usePlaylistTracks(id ?? '', !!id, 1, QUEUE_LIMIT, true)
   const { state: playerState, controls } = usePlayer()
 
   const playlistTracks: Track[] = useMemo(() => tracks.data?.items ?? [], [tracks.data])
-  const queue = allTracks.data?.items ?? playlistTracks
+  const loadQueue = useQueueLoader(allTracks)
+  const pageOffset = (page - 1) * PLAYLIST_LIMIT
 
   const playTrack = useCallback(
-    async (track: Track, index?: number) => {
-      await controls.playTrack(track, queue, index)
+    async (track: Track, index: number) => {
+      const all = await loadQueue()
+      if (all) await controls.playTrack(track, all, index)
+      else await controls.playTrack(track, playlistTracks, index - pageOffset)
     },
-    [controls, queue]
+    [controls, loadQueue, playlistTracks, pageOffset]
   )
 
-  const handlePlay = useCallback(() => {
+  const playFirst = useCallback(async () => {
+    const queue = (await loadQueue()) ?? playlistTracks
     const first = queue.find(isPlayable)
-    if (first) void controls.playTrack(first, queue)
-  }, [queue, controls])
+    if (first) await controls.playTrack(first, queue)
+  }, [loadQueue, playlistTracks, controls])
+
+  const handlePlay = useCallback(() => {
+    void playFirst()
+  }, [playFirst])
 
   const handleLayout = useCallback((h: number) => {
     setHeaderHeight(h)

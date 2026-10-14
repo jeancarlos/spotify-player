@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { usePlaylistDetailPage } from '../usePlaylistDetailPage'
 import type { Track } from '@/types/music'
@@ -29,10 +29,12 @@ vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
 const wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter>{children}</MemoryRouter>
 
 describe('usePlaylistDetailPage playback', () => {
-  it('Play starts the first playable track with the full list', () => {
+  it('Play starts the first playable track with the full list', async () => {
     const { result } = renderHook(() => usePlaylistDetailPage(), { wrapper })
     result.current.handlePlay()
-    expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks)
+    await waitFor(() => {
+      expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks)
+    })
   })
 
   it('queues the whole playlist, not just the visible page', async () => {

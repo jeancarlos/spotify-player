@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { describe, it, expect, vi } from 'vitest'
-import { renderHook, act, screen } from '@testing-library/react'
+import { renderHook, act, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useAlbumDetailPage } from '../useAlbumDetailPage'
 import type { Track } from '@/types/music'
@@ -21,11 +21,14 @@ vi.mock('@/hooks/queries/useAlbum', () => ({
 const rest = Array.from({ length: 30 }, (_, i) => ({ id: `r${i}`, uri: `ur${i}`, preview_url: 'http://p/r' }))
 const allTracks = [...tracks, ...rest] as unknown as Track[]
 
+let fullListFailed = false
 vi.mock('@/hooks/queries/useAlbumTracks', () => ({
-  useAlbumTracks: (_id: string, _page: number, limit: number) =>
-    limit === 20
-      ? { data: { items: tracks, offset: 0, limit: 20, total: 33 } }
-      : { data: { items: allTracks, offset: 0, limit, total: 33 } },
+  useAlbumTracks: (_id: string, _page: number, limit: number) => {
+    if (limit === 20) return { data: { items: tracks, offset: 0, limit: 20, total: 33 } }
+    return fullListFailed
+      ? { data: undefined, isError: true }
+      : { data: { items: allTracks, offset: 0, limit, total: 33 } }
+  },
 }))
 
 const wrapper = ({ children }: { children: ReactNode }) => <MemoryRouter>{children}</MemoryRouter>
@@ -36,10 +39,20 @@ function Probe() {
 }
 
 describe('useAlbumDetailPage playback', () => {
-  it('Play starts the first playable track with the full list', () => {
+  it('Play starts the first playable track with the full list', async () => {
     const { result } = renderHook(() => useAlbumDetailPage(), { wrapper })
     result.current.handlePlay()
-    expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks)
+    await waitFor(() => {
+      expect(playTrack).toHaveBeenCalledWith(tracks[1], allTracks)
+    })
+  })
+
+  it('falls back to the visible page with a page-relative index when the full list failed', async () => {
+    fullListFailed = true
+    const { result } = renderHook(() => useAlbumDetailPage(), { wrapper })
+    await result.current.handleTrackPlay(tracks[2], 2)
+    expect(playTrack).toHaveBeenCalledWith(tracks[2], tracks, 2)
+    fullListFailed = false
   })
 
   it('queues the whole album, not just the visible page', async () => {

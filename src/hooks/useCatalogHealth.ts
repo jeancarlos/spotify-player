@@ -17,6 +17,10 @@ function nextFailures(action: QueryAction, failures: number): number | null {
   return isNoData(action.error) ? 0 : failures + 1
 }
 
+function countsTowardHealth(meta: Record<string, unknown> | undefined): boolean {
+  return meta?.source === 'deezer' && !meta.background
+}
+
 const stores = new WeakMap<QueryCache, HealthStore>()
 
 function storeFor(cache: QueryCache): HealthStore {
@@ -25,7 +29,7 @@ function storeFor(cache: QueryCache): HealthStore {
   const store: HealthStore = { failures: 0, listeners: new Set() }
   stores.set(cache, store)
   cache.subscribe((event) => {
-    if (event.type !== 'updated' || event.query.meta?.source !== 'deezer') return
+    if (event.type !== 'updated' || !countsTowardHealth(event.query.meta)) return
     const failures = nextFailures(event.action, store.failures)
     if (failures === null) return
     const before = store.failures >= FAILURE_LIMIT
