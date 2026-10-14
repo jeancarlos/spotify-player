@@ -11,7 +11,6 @@ interface TrackRowProps {
   isActive?: boolean
   onPlay?: (track: Track) => void
   onRemove?: (uri: string) => void
-  disableRemove?: boolean
   note?: string
   index?: number
   theme?: 'light' | 'dark'
@@ -26,6 +25,7 @@ interface TrackTheme {
   duration: string
   remove: string
   area: string
+  focus: string
 }
 
 function resolveTextColor(dark: boolean, isActive: boolean): string {
@@ -42,17 +42,15 @@ function focusRing(dark: boolean): string {
 function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
   return {
     row: cn(
-      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group',
+      'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer group group/tipfocus',
       dark
         ? cn('hover:bg-white/5', isActive && 'bg-white/10')
         : cn('hover:bg-black/5', isActive && 'bg-primary/10')
     ),
-    area: cn(
-      'flex-1 min-w-0 flex items-center gap-3 rounded-xl outline-none group/tipfocus',
-      focusRing(dark)
-    ),
+    area: 'flex-1 min-w-0 flex items-center gap-3',
+    focus: cn('outline-none', focusRing(dark)),
     number: cn(
-      'text-xs font-bold tabular-nums group-hover:hidden',
+      'text-xs font-bold tabular-nums group-hover:hidden group-focus-within:hidden',
       dark ? 'text-white/60' : 'text-black/60'
     ),
     icon: dark ? 'fill-white text-white' : 'fill-black text-black',
@@ -72,17 +70,6 @@ function playableClasses(playable: boolean) {
     row: playable ? '' : 'opacity-40 cursor-not-allowed',
     area: playable ? 'cursor-pointer' : 'cursor-not-allowed',
   }
-}
-
-function resolveMeta(track: Track) {
-  return {
-    albumImages: 'album' in track ? track.album.images : undefined,
-    artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '',
-  }
-}
-
-function isActivationKey(key: string): boolean {
-  return key === 'Enter' || key === ' '
 }
 
 interface NameAreaProps {
@@ -121,7 +108,10 @@ function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellPr
   const { t } = useTranslation()
   return (
     <button
-      className="w-6 shrink-0 flex items-center justify-center rounded outline-none focus-visible:ring-2 focus-visible:ring-black/40 disabled:cursor-not-allowed"
+      className={cn(
+        'tap-target w-6 shrink-0 flex items-center justify-center rounded disabled:cursor-not-allowed',
+        styles.focus
+      )}
       disabled={!onPlay}
       aria-label={t('player.playTrack', { name: trackName })}
       onClick={(e) => {
@@ -132,7 +122,7 @@ function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellPr
       {index !== undefined ? (
         <>
           <span className={styles.number}>{String(index + 1).padStart(2, '0')}</span>
-          <Play size={12} className={cn('hidden group-hover:block', styles.icon)} />
+          <Play size={12} className={cn('hidden group-hover:block group-focus-within:block', styles.icon)} />
         </>
       ) : (
         <Play size={12} className={styles.icon} />
@@ -146,7 +136,6 @@ export function TrackRow({
   isActive = false,
   onPlay,
   onRemove,
-  disableRemove,
   note,
   index,
   theme = 'light',
@@ -157,38 +146,23 @@ export function TrackRow({
   const play = playable ? onPlay : undefined
   const cls = playableClasses(playable)
 
-  const { albumImages, artistNames } = resolveMeta(track)
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (isActivationKey(e.key)) {
-      e.preventDefault()
-      play?.(track)
-    }
-  }
+  const albumImages = track.album.images
+  const artistNames = track.artists.map((a) => a.name).join(', ')
 
   return (
     <div className={cn(styles.row, cls.row)}>
       <PlayCell trackName={track.name} index={index} theme={styles} onPlay={play} track={track} />
 
-      <div
-        className={cn(styles.area, cls.area)}
-        onClick={() => play?.(track)}
-        role="button"
-        aria-disabled={!playable || undefined}
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-      >
-        {albumImages && (
-          <img
-            src={pickImage(albumImages, 36)?.url}
-            srcSet={srcSetOf(albumImages)}
-            sizes="36px"
-            loading="lazy"
-            decoding="async"
-            alt=""
-            className="w-9 h-9 rounded-lg object-cover shrink-0"
-          />
-        )}
+      <div className={cn(styles.area, cls.area)} onClick={() => play?.(track)}>
+        <img
+          src={pickImage(albumImages, 36)?.url}
+          srcSet={srcSetOf(albumImages)}
+          sizes="36px"
+          loading="lazy"
+          decoding="async"
+          alt=""
+          className="w-9 h-9 rounded-lg object-cover shrink-0"
+        />
         <NameArea track={track} note={note} theme={styles} artistNames={artistNames} />
         {!playable && <span className="sr-only">{t('track.noPreview')}</span>}
       </div>
@@ -199,14 +173,10 @@ export function TrackRow({
         <button
           onClick={(e) => {
             e.stopPropagation()
-            if (!disableRemove) onRemove(track.uri)
+            onRemove(track.uri)
           }}
-          disabled={disableRemove}
           aria-label={t('favorites.removeConfirm')}
-          className={cn(
-            styles.remove,
-            disableRemove && 'cursor-not-allowed opacity-50 group-hover:opacity-50'
-          )}
+          className={styles.remove}
         >
           <Trash2 size={14} />
         </button>

@@ -85,14 +85,34 @@ describe('TrackRow', () => {
   it('reveals the note when the row has keyboard focus', async () => {
     render(<TrackRow track={track} onPlay={vi.fn()} note="This is a note" />)
     await userEvent.tab()
-    await userEvent.tab()
-    const area = screen.getByText('Test Track').closest('[role="button"]')
-    expect(area).toHaveFocus()
-    expect(area?.className).toContain('group/tipfocus')
-    expect(area?.className).toContain('focus-visible:ring-2')
+    const play = screen.getByRole('button', { name: /player\.playTrack/i })
+    expect(play).toHaveFocus()
+    expect(play.className).toContain('focus-visible:ring-2')
+    expect(play.closest('.group\\/tipfocus')).not.toBeNull()
     expect(screen.getByRole('tooltip').className).toContain(
       'group-focus-within/tipfocus:opacity-100'
     )
+  })
+
+  it('takes a single tab stop per row', async () => {
+    render(
+      <>
+        <TrackRow track={track} onPlay={vi.fn()} index={0} />
+        <TrackRow track={{ ...track, id: 't2', name: 'Second' }} onPlay={vi.fn()} index={1} />
+      </>
+    )
+    const [first, second] = screen.getAllByRole('button', { name: /player\.playTrack/i })
+    await userEvent.tab()
+    expect(first).toHaveFocus()
+    await userEvent.tab()
+    expect(second).toHaveFocus()
+  })
+
+  it('plays when the row body is clicked', async () => {
+    const onPlay = vi.fn()
+    render(<TrackRow track={track} onPlay={onPlay} />)
+    await userEvent.click(screen.getByText('Test Track'))
+    expect(onPlay).toHaveBeenCalledWith(track)
   })
   it('renders note text in DOM when note provided', () => {
     render(<TrackRow track={track} note="This is a note" />)
@@ -106,11 +126,10 @@ describe('TrackRow', () => {
     render(<TrackRow track={dead} onPlay={onPlay} index={0} />)
     expect(screen.getByText('track.noPreview')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeDisabled()
-    const row = document.querySelector<HTMLElement>('[aria-disabled="true"]')!
+    const row = screen.getByText('Test Track').closest<HTMLElement>('.opacity-40')!
     expect(row).toBeInTheDocument()
-    expect(row.parentElement?.className).toContain('opacity-40')
-    await user.click(row)
-    row.focus()
+    await user.click(screen.getByText('Test Track'))
+    await user.tab()
     await user.keyboard('{Enter}')
     await user.click(screen.getByRole('button', { name: /player\.playTrack/i }))
     expect(onPlay).not.toHaveBeenCalled()
@@ -118,12 +137,12 @@ describe('TrackRow', () => {
 
   it('keeps a stored-shape track enabled', () => {
     render(<TrackRow track={{ ...track, is_playable: true, preview_url: null }} onPlay={vi.fn()} />)
-    expect(document.querySelector('[aria-disabled="true"]')).toBeNull()
+    expect(screen.getByText('Test Track').closest('.opacity-40')).toBeNull()
     expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeEnabled()
   })
 
   it('flags readable:false tracks as disabled', () => {
     render(<TrackRow track={{ ...track, is_playable: false }} onPlay={vi.fn()} />)
-    expect(document.querySelector('[aria-disabled="true"]')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeDisabled()
   })
 })
