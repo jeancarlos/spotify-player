@@ -19,7 +19,7 @@ vi.mock('@/hooks/queries/usePlaylist', () => ({
 }))
 vi.mock('@/hooks/queries/usePlaylistTracks', () => ({
   usePlaylistTracks: () => ({
-    data: { items: tracks.map((item) => ({ item })), offset: 0, limit: 20, total: 2 },
+    data: { items: tracks, offset: 0, limit: 20, total: 2 },
   }),
 }))
 

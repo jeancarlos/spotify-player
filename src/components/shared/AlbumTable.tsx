@@ -1,4 +1,5 @@
 import { pickImage, srcSetOf } from '@/lib/utils'
+import { albumTypeLabel } from '@/utils/albumType'
 import { formatDate } from '@/utils/formatDate'
 import { useTranslation } from 'react-i18next'
 import type { AlbumSimple } from '@/types/music'
@@ -62,7 +63,7 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
                   {album.name}
                 </button>
               </td>
-              <td className="py-2 px-3 text-black/50 capitalize">{album.album_type}</td>
+              <td className="py-2 px-3 text-black/50 capitalize">{albumTypeLabel(t, album.album_type)}</td>
               <td className="py-2 px-3 text-right text-black/40 tabular-nums">
                 {album.release_date ? formatDate(album.release_date, 'year') : ''}
               </td>
