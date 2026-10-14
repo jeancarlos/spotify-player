@@ -3,8 +3,9 @@ import { setupRoutes } from './routes'
 
 export const test = base.extend({
   page: async ({ page }, use) => {
-    await setupRoutes(page)
+    const unexpected = await setupRoutes(page)
     await use(page)
+    expect(unexpected, 'requests to hosts no route stubs').toEqual([])
   },
 })
 

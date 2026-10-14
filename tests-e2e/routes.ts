@@ -35,10 +35,14 @@ const WIKI_SUMMARY = {
   content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/Coldplay' } },
 }
 
-export async function setupRoutes(page: Page) {
+export async function setupRoutes(page: Page): Promise<string[]> {
+  const unexpected: string[] = []
   await page.route(
     (url) => !['localhost', '127.0.0.1'].includes(url.hostname),
-    (route) => route.abort()
+    (route) => {
+      unexpected.push(route.request().url())
+      return route.abort()
+    }
   )
 
   await page.route('https://api.deezer.com/**', async (route) => {
@@ -78,9 +82,15 @@ export async function setupRoutes(page: Page) {
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
   })
 
+  await page.route('https://fonts.googleapis.com/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/css', body: '' })
+  )
+
   await page.route('https://lrclib.net/**', (route) =>
     route.fulfill({ status: 404, contentType: 'application/json', body: '{}' })
   )
+
+  return unexpected
 }
 
 export { NO_RESULTS_QUERY }
