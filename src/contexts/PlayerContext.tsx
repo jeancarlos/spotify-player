@@ -60,6 +60,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const stateRef = useRef(state)
   const requestRef = useRef(0)
+  const resumeRef = useRef(0)
 
   useEffect(() => {
     stateRef.current = state
@@ -70,6 +71,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const track = queue[index]
     if (!audio) return
     const request = ++requestRef.current
+    resumeRef.current = fromS
     audio.pause()
     audio.removeAttribute('src')
     audio.load()
@@ -88,6 +90,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       audio.currentTime = fromS
       await audio.play()
       if (request !== requestRef.current) return
+      resumeRef.current = 0
       pushRecent(track)
     } catch {
       return
@@ -140,7 +143,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const { currentTrack, isLoading, queue, queueIndex } = stateRef.current
     if (!audio || !currentTrack || isLoading) return
     if (!audio.getAttribute('src')) {
-      void startAt(queue, queueIndex)
+      void startAt(queue, queueIndex, resumeRef.current)
       return
     }
     if (!audio.paused) {
@@ -150,7 +153,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const request = requestRef.current
     audio.play().catch((error: unknown) => {
       if (request !== requestRef.current) return
-      if (error instanceof DOMException && error.name === 'AbortError') return
+      if (error instanceof DOMException && ['AbortError', 'NotAllowedError'].includes(error.name)) return
       void startAt(queue, queueIndex, audio.currentTime)
     })
   }, [startAt, stop])

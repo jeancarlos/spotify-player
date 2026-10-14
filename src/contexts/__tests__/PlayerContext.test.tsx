@@ -141,6 +141,46 @@ describe('PlayerProvider', () => {
     expect(audio().currentTime).toBe(12)
   })
 
+  it('does not refetch when the browser blocks playback', async () => {
+    await act(() => controls.playTrack(track('1')))
+    act(() => {
+      controls.toggle()
+    })
+    deezerMock.mockClear()
+    play.mockImplementationOnce(() => Promise.reject(new DOMException('blocked', 'NotAllowedError')))
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
+  it('keeps the paused position when the resume refetch fails', async () => {
+    await act(() => controls.playTrack(track('1')))
+    act(() => {
+      controls.toggle()
+    })
+    audio().currentTime = 12
+    deezerMock.mockRejectedValueOnce(new Error('offline'))
+    play.mockImplementationOnce(() => Promise.reject(new DOMException('expired', 'NotSupportedError')))
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(latest.isLoading).toBe(false)
+    })
+    expect(audio().getAttribute('src')).toBeNull()
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(latest.isPlaying).toBe(true)
+    })
+    expect(audio().currentTime).toBe(12)
+  })
+
   it('does not refetch when a resume is aborted', async () => {
     await act(() => controls.playTrack(track('1')))
     act(() => {
