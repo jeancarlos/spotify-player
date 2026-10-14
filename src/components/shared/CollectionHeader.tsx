@@ -134,8 +134,8 @@ export function CollectionHeader({
         <button
           onClick={onPlay}
           className={cn(
-            'mt-4 px-8 py-3 bg-black text-white text-sm font-bold rounded-full',
-            'hover:bg-black/80 active:scale-95 transition-all shadow-lg'
+            'mt-4 px-8 py-3 bg-primary text-ink text-sm font-bold rounded-full',
+            'hover:bg-primary/85 active:scale-95 transition-all shadow-lg'
           )}
         >
           {playLabel}
