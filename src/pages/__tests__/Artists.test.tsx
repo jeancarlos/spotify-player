@@ -1,10 +1,9 @@
-import { describe, it, expect, vi, beforeAll, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { I18nextProvider } from 'react-i18next'
 import i18n from '@/lib/i18n'
-import { server } from '@/mocks/server'
 import { deezer } from '@/lib/deezer'
 import { PlayerProvider } from '@/contexts/PlayerContext'
 import { ToastProvider } from '@/components/ui/toast'
@@ -19,9 +18,6 @@ vi.mock('@/lib/deezer', async (importOriginal) => ({
 
 const deezerMock = vi.mocked(deezer)
 
-beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'warn' })
-})
 beforeEach(() => {
   localStorage.clear()
   deezerMock.mockReset()
@@ -29,13 +25,6 @@ beforeEach(() => {
     Promise.resolve(path === 'chart/0/artists' ? chartArtists : searchArtist)
   )
 })
-afterEach(() => {
-  server.resetHandlers()
-})
-afterAll(() => {
-  server.close()
-})
-
 function renderArtists() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(

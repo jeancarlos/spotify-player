@@ -1,10 +1,9 @@
-import { describe, it, expect, vi, beforeAll, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { I18nextProvider } from 'react-i18next'
-import { server } from '@/mocks/server'
 import { Home } from '../Home'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
@@ -21,16 +20,8 @@ beforeEach(() => {
 })
 
 beforeAll(async () => {
-  server.listen({ onUnhandledRequest: 'error' })
   await i18n.changeLanguage('pt-BR')
 })
-afterEach(() => {
-  server.resetHandlers()
-})
-afterAll(() => {
-  server.close()
-})
-
 function renderHome() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
