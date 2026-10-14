@@ -1,3 +1,4 @@
+import { pickImage, srcSetOf } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
 import { useTranslation } from 'react-i18next'
 import type { AlbumSimple } from '@/types/music'
@@ -40,7 +41,11 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
             >
               <td className="py-2 px-3">
                 <img
-                  src={album.images[0]?.url}
+                  src={pickImage(album.images, 32)?.url}
+                  srcSet={srcSetOf(album.images)}
+                  sizes="32px"
+                  loading="lazy"
+                  decoding="async"
                   alt=""
                   className="w-8 h-8 rounded-md object-cover"
                 />

@@ -5,24 +5,24 @@ import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { usePlayer } from '@/contexts/PlayerContext'
-import type { AlbumSimple, Artist, Track } from '@/types/music'
+import type { AlbumSimple, Artist, Image, Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 interface ArtistMeta {
   artistSubtitle: string
-  artistImageUrl: string | undefined
+  artistImages: Image[]
   artistName: string
   artistLink: string | undefined
 }
 
 function deriveArtistMeta(data: Artist | undefined): ArtistMeta {
   if (!data) {
-    return { artistSubtitle: '', artistImageUrl: undefined, artistName: '', artistLink: undefined }
+    return { artistSubtitle: '', artistImages: [], artistName: '', artistLink: undefined }
   }
   const genres = data.genres?.slice(0, 2) ?? []
   return {
     artistSubtitle: genres.join(' · '),
-    artistImageUrl: data.images[0]?.url,
+    artistImages: data.images,
     artistName: data.name,
     artistLink: data.link,
   }

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { AlbumTable } from '@/components/shared/AlbumTable'
 import { ListTableSwitch, type ViewMode } from '@/components/shared/ListTableSwitch'
 import { Pagination } from '@/components/shared/Pagination'
+import { pickImage, srcSetOf } from '@/lib/utils'
 import { formatDate } from '@/utils/formatDate'
 import type { AlbumSimple } from '@/types/music'
 
@@ -56,7 +57,11 @@ export function ArtistDiscography({
               }}
             >
               <img
-                src={album.images[0]?.url}
+                src={pickImage(album.images, 40)?.url}
+                srcSet={srcSetOf(album.images)}
+                sizes="40px"
+                loading="lazy"
+                decoding="async"
                 alt={album.name}
                 className="w-10 h-10 rounded-lg object-cover shrink-0"
               />

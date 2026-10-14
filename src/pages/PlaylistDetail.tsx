@@ -32,7 +32,7 @@ export function PlaylistDetail() {
   return (
     <div className="min-h-screen">
       <CollectionHeader
-        imageUrl={playlist.data?.images[0]?.url}
+        images={playlist.data?.images ?? []}
         name={playlist.data?.name ?? ''}
         subtitle={subtitle}
         playLabel={t('playlistDetail.playPlaylist')}

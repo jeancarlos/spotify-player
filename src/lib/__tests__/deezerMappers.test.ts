@@ -31,7 +31,10 @@ describe('deezerMappers', () => {
     expect(r.name).toBe('Coldplay')
     expect(r.uri).toBe('deezer:artist:892')
     expect(r.type).toBe('artist')
-    expect(r.images).toHaveLength(4)
+    expect(r.images.map((i) => i.width)).toEqual([1000, 500, 250, 56])
+    expect(r.images.map((i) => i.height)).toEqual([1000, 500, 250, 56])
+    expect(r.images[0].url).toBe(dz.picture_xl)
+    expect(r.images[3].url).toBe(dz.picture_small)
     expect(r.followers?.total).toBe(dz.nb_fan)
     expect(r.link).toBe('https://www.deezer.com/artist/892')
     expect(toArtist((searchArtists as unknown as DzList<DzArtist>).data[0]).id).toBe('892')
@@ -40,6 +43,8 @@ describe('deezerMappers', () => {
 
   it('maps an album with genres from the nested data list', () => {
     const r = toAlbum(album)
+    expect(r.images.map((i) => i.width)).toEqual([1000, 500, 250, 56])
+    expect(r.images[0].url).toBe(album.cover_xl)
     expect(r.id).toBe('650278821')
     expect(r.name).toBe('Moon Music')
     expect(r.uri).toBe('deezer:album:650278821')
@@ -54,6 +59,8 @@ describe('deezerMappers', () => {
   it('maps a track with rank, link, preview and embedded album', () => {
     const dz = tracks[0]
     const r = toTrack(dz)
+    expect(r.album.images.map((i) => i.width)).toEqual([1000, 500, 250, 56])
+    expect(r.album.images[0].url).toBe(dz.album?.cover_xl)
     expect(r.id).toBe('3106505')
     expect(r.name).toBe('Fix You')
     expect(r.uri).toBe('deezer:track:3106505')
@@ -90,7 +97,8 @@ describe('deezerMappers', () => {
     expect(r.description).toBe('Ouça os maiores sucessos do sertanejo! Capa: Simone Mendes.')
     expect(r.owner.display_name).toBe('Daniel - Editor Deezer Brasil')
     expect(r.items.total).toBe(50)
-    expect(r.images).toHaveLength(4)
+    expect(r.images.map((i) => i.width)).toEqual([1000, 500, 250, 56])
+    expect(r.images[0].url).toBe(playlist.picture_xl)
   })
 
   it('pages a list using the supplied index and limit', () => {

@@ -1,5 +1,5 @@
 import { isPlayable } from '@/lib/deezerMappers'
-import type { Track } from '@/types/music'
+import type { Image, Track } from '@/types/music'
 
 export interface ChartEntry {
   id: string
@@ -7,7 +7,7 @@ export interface ChartEntry {
   name: string
   artists: string
   albumName: string
-  albumArt: string
+  albumImages: Image[]
   rank: number
   track: Track
 }
@@ -23,7 +23,7 @@ export function toChartData(tracks: Track[]): ChartEntry[] {
       name: t.name,
       artists: t.artists.map((a) => a.name).join(', '),
       albumName: t.album.name,
-      albumArt: (t.album.images.at(1) ?? t.album.images.at(0))?.url ?? '',
+      albumImages: t.album.images,
       rank: t.rank,
       track: t,
     }))

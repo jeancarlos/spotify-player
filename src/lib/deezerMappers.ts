@@ -79,8 +79,12 @@ export interface DzList<T> {
   next?: string
 }
 
+const IMAGE_SIZES = [1000, 500, 250, 56]
+
 const toImages = (...urls: (string | undefined)[]): Image[] =>
-  urls.filter((url): url is string => !!url).map((url) => ({ url, width: null, height: null }))
+  urls.flatMap((url, i) =>
+    url ? [{ url, width: IMAGE_SIZES[i] ?? null, height: IMAGE_SIZES[i] ?? null }] : []
+  )
 
 const toArtistRef = (a: DzArtistRef | undefined): ArtistSimple => ({
   id: String(a?.id ?? 0),
@@ -90,7 +94,7 @@ const toArtistRef = (a: DzArtistRef | undefined): ArtistSimple => ({
 })
 
 const coverImages = (a: DzAlbumRef) =>
-  toImages(a.cover_small, a.cover_medium, a.cover_big, a.cover_xl)
+  toImages(a.cover_xl, a.cover_big, a.cover_medium, a.cover_small)
 
 const albumType = (t?: string): AlbumSimple['album_type'] =>
   t === 'single' || t === 'compilation' ? t : 'album'
@@ -101,7 +105,7 @@ export function toArtist(a: DzArtist): Artist {
     name: a.name,
     uri: `deezer:artist:${a.id}`,
     type: 'artist',
-    images: toImages(a.picture_small, a.picture_medium, a.picture_big, a.picture_xl),
+    images: toImages(a.picture_xl, a.picture_big, a.picture_medium, a.picture_small),
     followers: a.nb_fan == null ? undefined : { href: null, total: a.nb_fan },
     link: a.link,
   }
@@ -176,7 +180,7 @@ export function toPlaylist(p: DzPlaylist): Playlist {
     description: p.description === '' ? null : (p.description ?? null),
     uri: `deezer:playlist:${p.id}`,
     type: 'playlist',
-    images: toImages(p.picture_small, p.picture_medium, p.picture_big, p.picture_xl),
+    images: toImages(p.picture_xl, p.picture_big, p.picture_medium, p.picture_small),
     owner: {
       id: String(p.creator?.id ?? 0),
       display_name: p.creator?.name ?? 'Unknown',

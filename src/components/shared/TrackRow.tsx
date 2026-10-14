@@ -1,7 +1,7 @@
 import { Play, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatDuration } from '@/utils/formatDuration'
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { isPlayable } from '@/lib/deezerMappers'
 import type { Track } from '@/types/music'
@@ -76,7 +76,7 @@ function playableClasses(playable: boolean) {
 
 function resolveMeta(track: Track) {
   return {
-    albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
+    albumImages: 'album' in track ? track.album.images : undefined,
     artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '',
   }
 }
@@ -157,7 +157,7 @@ export function TrackRow({
   const play = playable ? onPlay : undefined
   const cls = playableClasses(playable)
 
-  const { albumImage, artistNames } = resolveMeta(track)
+  const { albumImages, artistNames } = resolveMeta(track)
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (isActivationKey(e.key)) {
@@ -178,8 +178,16 @@ export function TrackRow({
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
-        {albumImage && (
-          <img src={albumImage} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
+        {albumImages && (
+          <img
+            src={pickImage(albumImages, 36)?.url}
+            srcSet={srcSetOf(albumImages)}
+            sizes="36px"
+            loading="lazy"
+            decoding="async"
+            alt=""
+            className="w-9 h-9 rounded-lg object-cover shrink-0"
+          />
         )}
         <NameArea track={track} note={note} theme={styles} artistNames={artistNames} />
         {!playable && <span className="sr-only">{t('track.noPreview')}</span>}

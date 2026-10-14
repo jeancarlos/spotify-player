@@ -1,7 +1,7 @@
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
 import { isPlayable } from '@/lib/deezerMappers'
 import type { Track } from '@/types/music'
 
@@ -62,7 +62,11 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
         style={{ width: dim, height: dim, borderRadius: '8px' }}
       >
         <img
-          src={track.album.images[0]?.url ?? ''}
+          src={pickImage(track.album.images, dim)?.url ?? ''}
+          srcSet={srcSetOf(track.album.images)}
+          sizes={`${dim}px`}
+          loading="lazy"
+          decoding="async"
           alt={track.album.name}
           className="w-full h-full object-cover"
           draggable={false}

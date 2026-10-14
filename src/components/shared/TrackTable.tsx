@@ -1,9 +1,9 @@
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
 import { isPlayable } from '@/lib/deezerMappers'
-import type { Track } from '@/types/music'
+import type { Image, Track } from '@/types/music'
 
 interface TrackTableProps {
   tracks: Track[]
@@ -26,12 +26,27 @@ interface TrackTableRowProps {
 
 function resolveTrackMeta(track: Track) {
   return {
-    albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
+    albumImages: 'album' in track ? track.album.images : undefined,
     albumId: 'album' in track ? track.album.id : undefined,
     albumName: 'album' in track ? track.album.name : '—',
     artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '—',
     rank: ('rank' in track ? track.rank : undefined) ?? '—',
   }
+}
+
+function AlbumThumb({ images }: { images: Image[] }) {
+  return (
+    <img
+      src={pickImage(images, 32)?.url}
+      srcSet={srcSetOf(images)}
+      sizes="32px"
+      loading="lazy"
+      decoding="async"
+      alt=""
+      className="w-8 h-8 rounded-md object-cover shrink-0"
+      style={{ minWidth: 32, minHeight: 32 }}
+    />
+  )
 }
 
 function TrackTableRow({
@@ -44,7 +59,7 @@ function TrackTableRow({
   onAlbumClick,
 }: TrackTableRowProps) {
   const { t } = useTranslation()
-  const { albumImage, albumId, albumName, artistNames, rank } = resolveTrackMeta(track)
+  const { albumImages, albumId, albumName, artistNames, rank } = resolveTrackMeta(track)
   const playable = isPlayable(track)
 
   return (
@@ -72,14 +87,7 @@ function TrackTableRow({
         </button>
       </td>
       <td className="py-2 px-3 w-10">
-        {albumImage && (
-          <img
-            src={albumImage}
-            alt=""
-            className="w-8 h-8 rounded-md object-cover shrink-0"
-            style={{ minWidth: 32, minHeight: 32 }}
-          />
-        )}
+        {albumImages && <AlbumThumb images={albumImages} />}
       </td>
       <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[180px] truncate">
         {track.name}

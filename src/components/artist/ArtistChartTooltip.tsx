@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { pickImage, srcSetOf } from '@/lib/utils'
 import type { TooltipProps } from 'recharts'
 import type { ChartEntry } from './chartData'
 
@@ -9,7 +10,10 @@ export function CustomTooltip({ active, payload }: TooltipProps<number, string>)
   return (
     <div className="flex items-start gap-3 bg-white/96 backdrop-blur-sm border border-black/[0.07] rounded-2xl p-3 shadow-xl max-w-[260px] pointer-events-none">
       <img
-        src={e.albumArt}
+        src={pickImage(e.albumImages, 56)?.url}
+        srcSet={srcSetOf(e.albumImages)}
+        sizes="56px"
+        decoding="async"
         alt=""
         className="w-14 h-14 rounded-xl object-cover shrink-0 shadow-sm"
       />

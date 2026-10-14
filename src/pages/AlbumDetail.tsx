@@ -18,7 +18,7 @@ export function AlbumDetail() {
     hasNext,
     albumYear,
     albumSubtitle,
-    imageUrl,
+    images,
     albumName,
     albumArtists,
     albumLink,
@@ -31,7 +31,7 @@ export function AlbumDetail() {
   return (
     <div className="min-h-screen">
       <CollectionHeader
-        imageUrl={imageUrl}
+        images={images}
         name={albumName}
         subtitle={albumSubtitle}
         artists={albumArtists}

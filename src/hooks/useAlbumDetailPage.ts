@@ -11,6 +11,7 @@ import type {
   Track,
   AlbumSimple,
   AlbumFull,
+  Image,
 } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
@@ -31,7 +32,7 @@ interface AlbumMeta {
   albumSimple: AlbumSimple
   albumYear: string | undefined
   albumSubtitle: string
-  imageUrl: string | undefined
+  images: Image[]
   albumName: string
   albumArtists: AlbumSimple['artists'] | undefined
   albumLink: string | undefined
@@ -43,7 +44,7 @@ function deriveAlbumMeta(data: AlbumFull | undefined): AlbumMeta {
       albumSimple: EMPTY_ALBUM_SIMPLE,
       albumYear: undefined,
       albumSubtitle: '',
-      imageUrl: undefined,
+      images: [],
       albumName: '',
       albumArtists: undefined,
       albumLink: undefined,
@@ -53,7 +54,7 @@ function deriveAlbumMeta(data: AlbumFull | undefined): AlbumMeta {
     albumSimple: data,
     albumYear: formatDate(data.release_date, 'year'),
     albumSubtitle: data.artists.map((a) => a.name).join(', '),
-    imageUrl: data.images[0]?.url,
+    images: data.images,
     albumName: data.name,
     albumArtists: data.artists,
     albumLink: data.link,

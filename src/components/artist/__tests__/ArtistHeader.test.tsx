@@ -12,7 +12,7 @@ describe('ArtistHeader', () => {
     main.id = 'main-content'
     document.body.appendChild(main)
     main.scrollTop = 100
-    const { container } = render(<ArtistHeader imageUrl={undefined} name="A" onLayout={vi.fn()} />)
+    const { container } = render(<ArtistHeader images={[]} name="A" onLayout={vi.fn()} />)
     const header = container.firstElementChild as HTMLElement
     const imgPx = Math.min(280, Math.round(window.innerWidth * 0.65))
     const fadeEnd = (Math.round(imgPx * 0.75) + 120) * 0.65

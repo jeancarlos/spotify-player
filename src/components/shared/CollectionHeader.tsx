@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { cn } from '@/lib/utils'
+import { cn, pickImage } from '@/lib/utils'
+import type { Image } from '@/types/music'
 import { DeezerAttribution } from './DeezerAttribution'
 import { TiltCover } from './TiltCover'
 
@@ -12,7 +13,7 @@ interface ArtistLink {
 }
 
 interface CollectionHeaderProps {
-  imageUrl: string | undefined
+  images: Image[]
   name: string
   subtitle: string
   artists?: ArtistLink[]
@@ -44,7 +45,7 @@ function useCollectionLayout(hasLink: boolean) {
 }
 
 export function CollectionHeader({
-  imageUrl,
+  images,
   name,
   subtitle,
   artists,
@@ -76,7 +77,7 @@ export function CollectionHeader({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         >
-          <TiltCover imageUrl={imageUrl} size={imgPx} name={name} onClick={onPlay}>
+          <TiltCover images={images} size={imgPx} name={name} onClick={onPlay}>
             <div
               className={cn(
                 'absolute inset-0 flex items-center justify-center',
@@ -89,9 +90,9 @@ export function CollectionHeader({
         </motion.div>
       </div>
 
-      {imageUrl && (
+      {images.length > 0 && (
         <motion.img
-          src={imageUrl}
+          src={pickImage(images, 250)?.url}
           aria-hidden="true"
           alt={name}
           className="absolute left-0 right-0 top-[-300px] sepia-[.25] h-[600px] scale-2 opacity-10 w-full blur-3xl z-0"

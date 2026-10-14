@@ -35,6 +35,17 @@ describe('useFavorites', () => {
     expect(result.current.playlistName).toBe('Vinyla List')
   })
 
+  it('reads old smallest-first covers largest first', () => {
+    const old = mk('1')
+    old.album.images = [
+      { url: 'small', width: null, height: null },
+      { url: 'xl', width: null, height: null },
+    ]
+    localStorage.setItem(KEY, JSON.stringify({ tracks: [old], notes: {} }))
+    const { result } = renderHook(() => useFavorites())
+    expect(result.current.tracks[0].album.images.map((i) => i.url)).toEqual(['xl', 'small'])
+  })
+
   it('keeps both tracks when two adds happen before a re-render', () => {
     const { result } = renderHook(() => useFavorites())
     act(() => {

@@ -4,7 +4,7 @@ import { X } from 'lucide-react'
 import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
 import type { Track } from '@/types/music'
 
 interface ResultsListProps {
@@ -39,7 +39,11 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
           )}
         >
           <img
-            src={track.album.images[0]?.url}
+            src={pickImage(track.album.images, 32)?.url}
+            srcSet={srcSetOf(track.album.images)}
+            sizes="32px"
+            loading="lazy"
+            decoding="async"
             className="w-8 h-8 rounded-lg object-cover shrink-0"
             alt=""
           />
@@ -65,7 +69,10 @@ function SelectedTrack({ track, onClear, clearLabel }: SelectedTrackProps) {
   return (
     <div className="flex items-center gap-2 px-3 py-2 bg-black/5 rounded-xl">
       <img
-        src={track.album.images[0]?.url}
+        src={pickImage(track.album.images, 24)?.url}
+        srcSet={srcSetOf(track.album.images)}
+        sizes="24px"
+        decoding="async"
         className="w-6 h-6 rounded object-cover shrink-0"
         alt=""
       />

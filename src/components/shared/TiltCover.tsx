@@ -1,9 +1,10 @@
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
+import type { Image } from '@/types/music'
 
 interface TiltCoverProps {
-  imageUrl?: string
+  images?: Image[]
   size: number
   name?: string
   onClick?: () => void
@@ -13,7 +14,7 @@ interface TiltCoverProps {
 
 const TILT = 12
 
-export function TiltCover({ imageUrl, size, name, onClick, className, children }: TiltCoverProps) {
+export function TiltCover({ images, size, name, onClick, className, children }: TiltCoverProps) {
   const cardRef = useRef<HTMLDivElement>(null)
 
   const rotX = useMotionValue(0)
@@ -82,9 +83,12 @@ export function TiltCover({ imageUrl, size, name, onClick, className, children }
         }}
         whileTap={onClick ? { scale: 0.97 } : undefined}
       >
-        {imageUrl ? (
+        {images?.length ? (
           <img
-            src={imageUrl}
+            src={pickImage(images, size)?.url}
+            srcSet={srcSetOf(images)}
+            sizes={`${size}px`}
+            decoding="async"
             alt={name ?? ''}
             className="w-full h-full object-cover"
             draggable={false}

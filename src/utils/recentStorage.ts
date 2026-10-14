@@ -1,3 +1,4 @@
+import { normalizeTrack } from '@/lib/utils'
 import type { Track } from '@/types/music'
 
 const STORAGE_KEY = 'spoter_recent_v1'
@@ -8,7 +9,7 @@ export function readRecent(): Track[] {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
     const tracks = JSON.parse(raw) as Track[]
-    return Array.isArray(tracks) ? tracks : []
+    return Array.isArray(tracks) ? tracks.map(normalizeTrack) : []
   } catch {
     return []
   }

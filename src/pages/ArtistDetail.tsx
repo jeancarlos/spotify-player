@@ -22,7 +22,7 @@ export function ArtistDetail() {
     handleAlbumClick,
     playTrack,
     artistSubtitle,
-    artistImageUrl,
+    artistImages,
     artistName,
     artistLink,
     albumItems,
@@ -32,7 +32,7 @@ export function ArtistDetail() {
   return (
     <div className="min-h-screen">
       <ArtistHeader
-        imageUrl={artistImageUrl}
+        images={artistImages}
         name={artistName}
         subtitle={artistSubtitle}
         link={artistLink}

@@ -32,7 +32,7 @@ export function SearchResultsGrid({
           <MediaCard
             key={artist.id}
             title={artist.name}
-            imageUrl={artist.images[0]?.url}
+            images={artist.images}
             subtitle={
               artist.followers?.total != null
                 ? t('artists.followers', { count: artist.followers.total })
@@ -49,7 +49,7 @@ export function SearchResultsGrid({
           <MediaCard
             key={album.id}
             title={album.name}
-            imageUrl={album.images[0]?.url}
+            images={album.images}
             subtitle={album.artists.map((a) => a.name).join(', ')}
             onClick={() => {
               navigate(`/albums/${album.id}`)
@@ -64,7 +64,7 @@ export function SearchResultsGrid({
             <MediaCard
               key={playlist.id}
               title={playlist.name}
-              imageUrl={playlist.images[0]?.url}
+              images={playlist.images}
               subtitle={playlist.owner.display_name}
               onClick={() => {
                 navigate(`/playlists/${playlist.id}`)
