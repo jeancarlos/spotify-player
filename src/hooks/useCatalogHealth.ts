@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { useQueryClient, type QueryCache } from '@tanstack/react-query'
+import { useQueryClient, type QueryCache, type QueryCacheNotifyEvent } from '@tanstack/react-query'
 import { DeezerError } from '@/lib/deezer'
 
 const FAILURE_LIMIT = 3
@@ -7,6 +7,14 @@ const FAILURE_LIMIT = 3
 interface HealthStore {
   failures: number
   listeners: Set<() => void>
+}
+
+type QueryAction = Extract<QueryCacheNotifyEvent, { type: 'updated' }>['action']
+
+function nextFailures(action: QueryAction, failures: number): number | null {
+  if (action.type === 'success') return 0
+  if (action.type !== 'error' || !(action.error instanceof DeezerError)) return null
+  return action.error.code === 800 ? 0 : failures + 1
 }
 
 const stores = new WeakMap<QueryCache, HealthStore>()
@@ -18,15 +26,10 @@ function storeFor(cache: QueryCache): HealthStore {
   stores.set(cache, store)
   cache.subscribe((event) => {
     if (event.type !== 'updated' || event.query.meta?.source !== 'deezer') return
-    const { action } = event
+    const failures = nextFailures(event.action, store.failures)
+    if (failures === null) return
     const before = store.failures >= FAILURE_LIMIT
-    if (
-      action.type === 'success' ||
-      (action.type === 'error' && action.error instanceof DeezerError && action.error.code === 800)
-    )
-      store.failures = 0
-    else if (action.type === 'error' && action.error instanceof DeezerError) store.failures++
-    else return
+    store.failures = failures
     if (before !== store.failures >= FAILURE_LIMIT)
       store.listeners.forEach((l) => {
         l()
