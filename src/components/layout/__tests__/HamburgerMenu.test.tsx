@@ -32,7 +32,7 @@ describe('HamburgerMenu', () => {
   it('links the source code in a new tab', async () => {
     await open()
     const link = screen.getByRole('link', { name: 'nav.sourceCode' })
-    expect(link).toHaveAttribute('href', 'https://github.com/jeancarlos/spotify-player')
+    expect(link).toHaveAttribute('href', 'https://github.com/jeancarlos/vinyla-player-demo')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })

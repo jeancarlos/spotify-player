@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useUI } from '@/hooks/useUI'
 import { usePopoverDismiss } from '@/hooks/usePopoverDismiss'
 
-const SOURCE_URL = 'https://github.com/jeancarlos/spotify-player'
+const SOURCE_URL = 'https://github.com/jeancarlos/vinyla-player-demo'
 const itemClass =
   'flex items-center gap-3 px-4 py-2.5 hover:bg-black/5 transition-colors text-left w-full'
 
