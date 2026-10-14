@@ -71,7 +71,7 @@ function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
         {open && (
           <motion.div
             ref={popoverRef}
-            className="absolute top-[calc(100%+8px)] right-0 w-80 glass rounded-2xl shadow-xl overflow-hidden z-30"
+            className="absolute top-[calc(100%+8px)] right-0 w-80 max-w-[calc(100vw-2rem)] glass bg-white/90 rounded-2xl shadow-xl z-30"
             initial={{ opacity: 0, scale: 0.92, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: -6 }}
