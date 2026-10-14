@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const mockTrack: SpotifyTrack = {
+const mockTrack: Track = {
   id: 't1',
   uri: 'spotify:track:t1',
   name: 'Test Track',
@@ -32,8 +32,8 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
     id,
   }: {
     id?: string
-    onChange: (t: SpotifyTrack | null) => void
-    value: SpotifyTrack | null
+    onChange: (t: Track | null) => void
+    value: Track | null
     onBlur: () => void
     error?: string
   }) =>
@@ -61,7 +61,7 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-function renderForm(existingFavorites: SpotifyTrack[] = []) {
+function renderForm(existingFavorites: Track[] = []) {
   return render(
     <AddFavoriteForm existingFavorites={existingFavorites} onAdd={onAdd} onClose={onClose} />
   )

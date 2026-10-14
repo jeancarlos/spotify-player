@@ -3,13 +3,13 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { usePlaylistDetailPage } from '../usePlaylistDetailPage'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const playTrack = vi.fn()
 const tracks = [
   { id: '1', uri: 'u1', is_playable: false },
   { id: '2', uri: 'u2', preview_url: 'http://p/2' },
-] as unknown as SpotifyTrack[]
+] as unknown as Track[]
 
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({ state: {}, controls: { playTrack } }),

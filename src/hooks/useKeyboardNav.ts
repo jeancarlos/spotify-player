@@ -1,12 +1,12 @@
 import type { KeyboardEvent, Dispatch, SetStateAction } from 'react'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface UseKeyboardNavOptions {
   isOpen: boolean
-  results: SpotifyTrack[]
+  results: Track[]
   highlightIndex: number
   setHighlightIndex: Dispatch<SetStateAction<number>>
-  onSelect: (track: SpotifyTrack) => void
+  onSelect: (track: Track) => void
   onClose: () => void
 }
 

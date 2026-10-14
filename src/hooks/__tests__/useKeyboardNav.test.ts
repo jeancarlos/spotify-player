@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { KeyboardEvent } from 'react'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 import { useKeyboardNav } from '../useKeyboardNav'
 
-const track = { id: 't1' } as SpotifyTrack
+const track = { id: 't1' } as Track
 
 function setup(over: Partial<Parameters<typeof useKeyboardNav>[0]> = {}) {
   const opts = {

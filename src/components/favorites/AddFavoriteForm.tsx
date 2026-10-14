@@ -5,18 +5,18 @@ import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { TrackAutocomplete } from './TrackAutocomplete'
 import { cn } from '@/lib/utils'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const MAX_NOTE_LENGTH = 80
 
 interface AddFavoriteFormProps {
-  existingFavorites: SpotifyTrack[]
-  onAdd: (track: SpotifyTrack, note?: string) => boolean
+  existingFavorites: Track[]
+  onAdd: (track: Track, note?: string) => boolean
   onClose: () => void
 }
 
 interface FormValues {
-  track: SpotifyTrack | undefined
+  track: Track | undefined
   note: string
 }
 
@@ -26,7 +26,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
   const schema = useMemo(
     () =>
       z.object({
-        track: z.custom<SpotifyTrack>(
+        track: z.custom<Track>(
           (val) => val !== null && typeof val === 'object' && 'uri' in val,
           { message: t('favorites.trackRequired') }
         ),

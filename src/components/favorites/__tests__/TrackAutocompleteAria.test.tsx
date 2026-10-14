@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 vi.mock('@/hooks/useDebounce', () => ({
   useDebounce: (value: unknown) => value,
@@ -14,7 +14,7 @@ const results = [
     artists: [{ id: 'a1', name: 'Artista A' }],
     album: { id: 'alb1', name: 'Album A', images: [{ url: 'https://img.test/1.jpg' }] },
   },
-] as unknown as SpotifyTrack[]
+] as unknown as Track[]
 
 vi.mock('@/hooks/queries/useSearchTracks', () => ({
   useSearchTracks: () => ({ data: results, isPending: false }),

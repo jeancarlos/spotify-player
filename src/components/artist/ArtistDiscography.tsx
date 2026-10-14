@@ -3,13 +3,13 @@ import { AlbumTable } from '@/components/shared/AlbumTable'
 import { ListTableSwitch, type ViewMode } from '@/components/shared/ListTableSwitch'
 import { Pagination } from '@/components/shared/Pagination'
 import { formatDate } from '@/utils/formatDate'
-import type { SpotifyAlbumSimple } from '@/types/spotify'
+import type { AlbumSimple } from '@/types/music'
 
 interface ArtistDiscographyProps {
-  albums: SpotifyAlbumSimple[]
+  albums: AlbumSimple[]
   view: ViewMode
   onViewChange: (view: ViewMode) => void
-  onAlbumClick: (album: SpotifyAlbumSimple) => void
+  onAlbumClick: (album: AlbumSimple) => void
   page: number
   hasNext: boolean
   onPrevPage: () => void

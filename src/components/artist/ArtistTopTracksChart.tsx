@@ -12,14 +12,14 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { isPlayable } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 import { toChartData, playEntry, chartLayout, type ChartEntry } from './chartData'
 import { CustomTooltip } from './ArtistChartTooltip'
 
 interface Props {
-  tracks: SpotifyTrack[]
+  tracks: Track[]
   activeTrackId?: string
-  onPlay?: (track: SpotifyTrack) => void
+  onPlay?: (track: Track) => void
 }
 
 interface TickProps {

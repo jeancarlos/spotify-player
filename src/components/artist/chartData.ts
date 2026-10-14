@@ -1,5 +1,5 @@
 import { isPlayable } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 export interface ChartEntry {
   id: string
@@ -9,12 +9,12 @@ export interface ChartEntry {
   albumName: string
   albumArt: string
   rank: number
-  track: SpotifyTrack
+  track: Track
 }
 
-export function toChartData(tracks: SpotifyTrack[]): ChartEntry[] {
+export function toChartData(tracks: Track[]): ChartEntry[] {
   return tracks
-    .filter((t): t is SpotifyTrack & { rank: number } => t.rank != null)
+    .filter((t): t is Track & { rank: number } => t.rank != null)
     .sort((a, b) => b.rank - a.rank)
     .slice(0, 10)
     .map((t) => ({
@@ -29,7 +29,7 @@ export function toChartData(tracks: SpotifyTrack[]): ChartEntry[] {
     }))
 }
 
-export function playEntry(entry: ChartEntry, onPlay?: (track: SpotifyTrack) => void) {
+export function playEntry(entry: ChartEntry, onPlay?: (track: Track) => void) {
   if (isPlayable(entry.track)) onPlay?.(entry.track)
 }
 

@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { STORAGE_KEYS } from '@/lib/storageKeys'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface FavoritesData {
-  tracks: SpotifyTrack[]
+  tracks: Track[]
   notes: Record<string, string>
 }
 
 const CHANGED_EVENT = 'spoter:favorites-changed'
 
-const isTrack = (value: unknown): value is SpotifyTrack =>
+const isTrack = (value: unknown): value is Track =>
   typeof value === 'object' &&
   value !== null &&
-  typeof (value as SpotifyTrack).uri === 'string' &&
-  typeof (value as SpotifyTrack).name === 'string'
+  typeof (value as Track).uri === 'string' &&
+  typeof (value as Track).name === 'string'
 
 function parseNotes(notes: unknown): Record<string, string> {
   if (typeof notes !== 'object' || notes === null || Array.isArray(notes)) return {}
@@ -70,7 +70,7 @@ export function useFavorites() {
   }, [])
 
   const addTrack = useCallback(
-    (track: SpotifyTrack, note?: string): boolean => {
+    (track: Track, note?: string): boolean => {
       const { tracks, notes } = dataRef.current
       if (tracks.some((t) => t.uri === track.uri)) return true
       return commit({

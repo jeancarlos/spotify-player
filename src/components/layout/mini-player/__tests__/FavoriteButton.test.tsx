@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const mockTrack: SpotifyTrack = {
+const mockTrack: Track = {
   id: 't1',
   uri: 'spotify:track:t1',
   name: 'Test Track',
@@ -30,7 +30,7 @@ vi.mock('@/components/ui/toast', () => ({
   useToast: () => ({ toast: mockToast }),
 }))
 
-const mockPlayerState = { currentTrack: mockTrack as SpotifyTrack | null, isPlaying: false }
+const mockPlayerState = { currentTrack: mockTrack as Track | null, isPlaying: false }
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({ state: mockPlayerState }),
 }))
@@ -40,7 +40,7 @@ vi.mock('@/components/layout/mini-player/PlaybackControls', () => ({
 }))
 
 const mockFavorites = {
-  tracks: [] as SpotifyTrack[],
+  tracks: [] as Track[],
   addTrack: vi.fn(() => true),
   removeTrack: vi.fn(() => true),
 }

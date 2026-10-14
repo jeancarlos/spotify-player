@@ -4,12 +4,12 @@ import { useArtist } from '@/hooks/queries/useArtist'
 import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
 import { formatDate } from '@/utils/formatDate'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 import { StatCard } from '@/components/shared/StatCard'
 import { TiltCover } from '@/components/shared/TiltCover'
 
 interface Props {
-  track: SpotifyTrack
+  track: Track
 }
 
 export function TrackInfoPanel({ track }: Props) {

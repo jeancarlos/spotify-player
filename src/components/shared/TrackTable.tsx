@@ -3,28 +3,28 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
 import { isPlayable } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface TrackTableProps {
-  tracks: SpotifyTrack[]
+  tracks: Track[]
   showAlbumColumn?: boolean
   activeTrackId?: string
   startIndex?: number
-  onPlay?: (track: SpotifyTrack) => void
+  onPlay?: (track: Track) => void
   onAlbumClick?: (albumId: string) => void
 }
 
 interface TrackTableRowProps {
-  track: SpotifyTrack
+  track: Track
   index: number
   isActive: boolean
   showAlbumColumn: boolean
   showRank: boolean
-  onPlay?: (track: SpotifyTrack) => void
+  onPlay?: (track: Track) => void
   onAlbumClick?: (albumId: string) => void
 }
 
-function resolveTrackMeta(track: SpotifyTrack) {
+function resolveTrackMeta(track: Track) {
   return {
     albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
     albumId: 'album' in track ? track.album.id : undefined,

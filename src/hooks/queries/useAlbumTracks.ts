@@ -3,12 +3,12 @@ import { TIME_60_MINUTES } from '@/utils/constants'
 import { deezer } from '@/lib/deezer'
 import { toPage, toTrack, type DzList, type DzTrack } from '@/lib/deezerMappers'
 import { albumQuery } from './useAlbum'
-import type { PagingObject, SpotifyTrack } from '@/types/spotify'
+import type { PagingObject, Track } from '@/types/music'
 
 export function useAlbumTracks(albumId: string | undefined, page: number, limit = 20) {
   const queryClient = useQueryClient()
   const index = (page - 1) * limit
-  return useQuery<PagingObject<SpotifyTrack>>({
+  return useQuery<PagingObject<Track>>({
     queryKey: ['album-tracks', albumId, index, limit],
     enabled: !!albumId,
     staleTime: TIME_60_MINUTES,

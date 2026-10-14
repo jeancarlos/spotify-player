@@ -1,13 +1,13 @@
 import type {
   PagingObject,
-  SpotifyAlbumFull,
-  SpotifyAlbumSimple,
-  SpotifyArtist,
-  SpotifyArtistSimple,
-  SpotifyImage,
-  SpotifyPlaylist,
-  SpotifyTrack,
-} from '@/types/spotify'
+  AlbumFull,
+  AlbumSimple,
+  Artist,
+  ArtistSimple,
+  Image,
+  Playlist,
+  Track,
+} from '@/types/music'
 
 export interface DzArtistRef {
   id: number
@@ -79,10 +79,10 @@ export interface DzList<T> {
   next?: string
 }
 
-const toImages = (...urls: (string | undefined)[]): SpotifyImage[] =>
+const toImages = (...urls: (string | undefined)[]): Image[] =>
   urls.filter((url): url is string => !!url).map((url) => ({ url, width: null, height: null }))
 
-const toArtistRef = (a: DzArtistRef | undefined): SpotifyArtistSimple => ({
+const toArtistRef = (a: DzArtistRef | undefined): ArtistSimple => ({
   id: String(a?.id ?? 0),
   name: a?.name ?? 'Unknown',
   uri: `deezer:artist:${a?.id ?? 0}`,
@@ -92,10 +92,10 @@ const toArtistRef = (a: DzArtistRef | undefined): SpotifyArtistSimple => ({
 const coverImages = (a: DzAlbumRef) =>
   toImages(a.cover_small, a.cover_medium, a.cover_big, a.cover_xl)
 
-const albumType = (t?: string): SpotifyAlbumSimple['album_type'] =>
+const albumType = (t?: string): AlbumSimple['album_type'] =>
   t === 'single' || t === 'compilation' ? t : 'album'
 
-export function toArtist(a: DzArtist): SpotifyArtist {
+export function toArtist(a: DzArtist): Artist {
   return {
     id: String(a.id),
     name: a.name,
@@ -107,7 +107,7 @@ export function toArtist(a: DzArtist): SpotifyArtist {
   }
 }
 
-export function toAlbum(a: DzAlbum): SpotifyAlbumFull {
+export function toAlbum(a: DzAlbum): AlbumFull {
   return {
     id: String(a.id),
     name: a.title,
@@ -124,7 +124,7 @@ export function toAlbum(a: DzAlbum): SpotifyAlbumFull {
   }
 }
 
-export function toTrack(t: DzTrack, album?: SpotifyAlbumSimple): SpotifyTrack {
+export function toTrack(t: DzTrack, album?: AlbumSimple): Track {
   const artists = [toArtistRef(t.artist)]
   return {
     id: String(t.id),
@@ -168,7 +168,7 @@ export function toTrack(t: DzTrack, album?: SpotifyAlbumSimple): SpotifyTrack {
   }
 }
 
-export function toPlaylist(p: DzPlaylist): SpotifyPlaylist {
+export function toPlaylist(p: DzPlaylist): Playlist {
   const total = p.nb_tracks ?? 0
   return {
     id: String(p.id),
@@ -206,6 +206,6 @@ export function toPage<R, T>(
   }
 }
 
-export function isPlayable(t: SpotifyTrack): boolean {
+export function isPlayable(t: Track): boolean {
   return t.is_playable !== false
 }

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { useRecentlyPlayed } from '../useRecentlyPlayed'
 import { pushRecent } from '@/utils/recentStorage'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const track = {
   uri: 'deezer:track:1',
@@ -15,7 +15,7 @@ const track = {
   duration_ms: 180000,
   artists: [],
   album: { uri: 'deezer:album:1', id: '1', name: 'Album', type: 'album', images: [] },
-} as unknown as SpotifyTrack
+} as unknown as Track
 
 function List({ limit }: { limit: number }) {
   const { data } = useRecentlyPlayed(limit)

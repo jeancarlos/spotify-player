@@ -5,7 +5,7 @@ import { usePlaylist } from '@/hooks/queries/usePlaylist'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 export const PLAYLIST_LIMIT = 20
@@ -22,10 +22,10 @@ export function usePlaylistDetailPage() {
   const tracks = usePlaylistTracks(id ?? '', !!id, page, PLAYLIST_LIMIT)
   const { state: playerState, controls } = usePlayer()
 
-  const playlistTracks: SpotifyTrack[] = (tracks.data?.items ?? []).map((item) => item.item)
+  const playlistTracks: Track[] = (tracks.data?.items ?? []).map((item) => item.item)
 
   const playTrack = useCallback(
-    async (track: SpotifyTrack, list?: SpotifyTrack[]) => {
+    async (track: Track, list?: Track[]) => {
       await controls.playTrack(track, list)
     },
     [controls]

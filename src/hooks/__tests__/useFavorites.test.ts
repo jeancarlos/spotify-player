@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useFavorites } from '../useFavorites'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const KEY = 'spoter_favorites_v2'
 
-const mk = (id: string): SpotifyTrack => ({
+const mk = (id: string): Track => ({
   uri: `deezer:track:${id}`,
   id,
   name: `Track ${id}`,
@@ -16,7 +16,7 @@ const mk = (id: string): SpotifyTrack => ({
   duration_ms: 180000,
   artists: [{ uri: 'deezer:artist:1', id: '1', name: 'A', type: 'artist' }],
   album: { uri: 'deezer:album:1', id: '1', name: 'Album', type: 'album', images: [] },
-} as unknown as SpotifyTrack)
+} as unknown as Track)
 
 const stored = () => JSON.parse(localStorage.getItem(KEY) ?? '{}')
 

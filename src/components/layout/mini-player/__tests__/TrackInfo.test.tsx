@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { TrackInfo } from '../TrackInfo'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const track = {
   id: '1',
@@ -11,7 +11,7 @@ const track = {
   name: 'Song',
   artists: [{ id: 'a', name: 'Artist' }],
   album: { id: 'b', name: 'Album', images: [] },
-} as unknown as SpotifyTrack
+} as unknown as Track
 
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({ state: { currentTrack: track } }),

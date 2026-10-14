@@ -10,11 +10,11 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { AddFavoriteForm } from '@/components/favorites/AddFavoriteForm'
 import { TrackRow } from '@/components/shared/TrackRow'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface AddButtonProps {
-  existingFavorites: SpotifyTrack[]
-  onAdd: (track: SpotifyTrack, note?: string) => boolean
+  existingFavorites: Track[]
+  onAdd: (track: Track, note?: string) => boolean
 }
 
 function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
@@ -93,7 +93,7 @@ export function Favorites() {
   const { unavailable } = useCatalogHealth()
   const { tracks, notes, addTrack, removeTrack, playlistName } = useFavorites()
 
-  const handleAdd = (track: SpotifyTrack, note?: string) => {
+  const handleAdd = (track: Track, note?: string) => {
     const ok = addTrack(track, note?.trim())
     if (!ok) toast(t('favorites.saveFailed'), 'error')
     return ok

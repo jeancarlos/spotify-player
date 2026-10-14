@@ -4,7 +4,7 @@ import { MemoryRouter, useLocation } from 'react-router-dom'
 import { PlaybackControls } from '../PlaybackControls'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 function setup(overrides: Partial<typeof initialPlayerState> = {}) {
   const controls = {
@@ -18,7 +18,7 @@ function setup(overrides: Partial<typeof initialPlayerState> = {}) {
   }
   const state = {
     ...initialPlayerState,
-    currentTrack: { id: '1', name: 'Song' } as SpotifyTrack,
+    currentTrack: { id: '1', name: 'Song' } as Track,
     ...overrides,
   }
   render(
@@ -83,7 +83,7 @@ function setupAt(entry: Parameters<typeof MemoryRouter>[0]['initialEntries']) {
           {
             state: {
               ...initialPlayerState,
-              currentTrack: { id: '1', name: 'Song' } as SpotifyTrack,
+              currentTrack: { id: '1', name: 'Song' } as Track,
             },
             controls: {},
           } as never

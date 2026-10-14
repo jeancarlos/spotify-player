@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { TrackTable } from '../TrackTable'
-import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
+import type { AlbumSimple, Track } from '@/types/music'
 
-const album: SpotifyAlbumSimple = {
+const album: AlbumSimple = {
   id: 'alb1',
   name: 'Test Album',
   images: [],
@@ -13,7 +13,7 @@ const album: SpotifyAlbumSimple = {
   uri: 'spotify:album:alb1',
   type: 'album',
 }
-const albumTrack: SpotifyTrack = {
+const albumTrack: Track = {
   id: 't1',
   name: 'Album Track',
   artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],
@@ -27,7 +27,7 @@ const albumTrack: SpotifyTrack = {
   album,
 }
 
-const fullTrack: SpotifyTrack = {
+const fullTrack: Track = {
   ...albumTrack,
   id: 't2',
   name: 'Full Track',

@@ -2,14 +2,14 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 import { MediaCard } from '@/components/shared/MediaCard'
-import type { SpotifyArtist, SpotifyAlbumSimple, SpotifyPlaylist } from '@/types/spotify'
+import type { Artist, AlbumSimple, Playlist } from '@/types/music'
 import type { SearchTab } from '@/utils/search'
 
 interface SearchResultsGridProps {
   tab: SearchTab
-  artists?: SpotifyArtist[]
-  albums?: SpotifyAlbumSimple[]
-  playlists?: (SpotifyPlaylist | null)[]
+  artists?: Artist[]
+  albums?: AlbumSimple[]
+  playlists?: (Playlist | null)[]
   hasNext: boolean
   onNextPage: () => void
 }

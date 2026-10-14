@@ -13,10 +13,10 @@ import { playerReducer, initialPlayerState, type PlayerState } from './playerRed
 import { deezer } from '@/lib/deezer'
 import { isPlayable, toTrack, type DzTrack } from '@/lib/deezerMappers'
 import { pushRecent } from '@/utils/recentStorage'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 export interface PlayerControls {
-  playTrack(track: SpotifyTrack, list?: SpotifyTrack[]): Promise<void>
+  playTrack(track: Track, list?: Track[]): Promise<void>
   toggle(): void
   next(): void
   previous(): void
@@ -42,14 +42,14 @@ const REPEAT_ORDER = { off: 'context', context: 'track', track: 'off' } as const
 export const PlayerContext = createContext<PlayerContextValue | null>(null)
 const ProgressContext = createContext<ProgressValue>({ progressMs: 0, durationMs: 0 })
 
-function stepPlayable(queue: SpotifyTrack[], from: number, step: 1 | -1): number {
+function stepPlayable(queue: Track[], from: number, step: 1 | -1): number {
   for (let i = from + step; i >= 0 && i < queue.length; i += step) {
     if (isPlayable(queue[i])) return i
   }
   return -1
 }
 
-function randomPlayable(queue: SpotifyTrack[], current: number): number {
+function randomPlayable(queue: Track[], current: number): number {
   const candidates = queue.map((_, i) => i).filter((i) => i !== current && isPlayable(queue[i]))
   return candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : -1
 }
@@ -65,7 +65,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     stateRef.current = state
   }, [state])
 
-  const startAt = useCallback(async (queue: SpotifyTrack[], index: number) => {
+  const startAt = useCallback(async (queue: Track[], index: number) => {
     const audio = audioRef.current
     const track = queue[index]
     if (!audio) return
@@ -99,7 +99,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const playTrack = useCallback(
-    async (track: SpotifyTrack, list?: SpotifyTrack[]) => {
+    async (track: Track, list?: Track[]) => {
       if (!isPlayable(track)) return
       const queue = list?.some((t) => t.uri === track.uri) ? list : [track]
       await startAt(queue, queue.findIndex((t) => t.uri === track.uri))

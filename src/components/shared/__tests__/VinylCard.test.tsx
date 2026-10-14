@@ -1,16 +1,16 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { VinylCard } from '../VinylCard'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const track = (extra: Partial<SpotifyTrack> = {}) =>
+const track = (extra: Partial<Track> = {}) =>
   ({
     id: 't',
     name: 'Song',
     artists: [{ id: 'a', name: 'A' }],
     album: { name: 'Al', images: [{ url: 'u' }] },
     ...extra,
-  }) as unknown as SpotifyTrack
+  }) as unknown as Track
 
 describe('VinylCard', () => {
   it('disables an unplayable vinyl and ignores clicks', () => {

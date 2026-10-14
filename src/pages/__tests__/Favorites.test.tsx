@@ -3,7 +3,7 @@ import React from 'react'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 vi.mock('framer-motion', () => ({
   motion: {
@@ -32,8 +32,8 @@ vi.mock('@/components/favorites/AddFavoriteForm', () => ({
     onClose,
   }: {
     onClose: () => void
-    existingFavorites: SpotifyTrack[]
-    onAdd: (t: SpotifyTrack, n?: string) => boolean
+    existingFavorites: Track[]
+    onAdd: (t: Track, n?: string) => boolean
   }) => (
     <div data-testid="add-favorite-form">
       <button type="button" onClick={onClose}>
@@ -49,7 +49,7 @@ vi.mock('@/components/ui/toast', () => ({
 }))
 
 const mockFavorites = {
-  tracks: [] as SpotifyTrack[],
+  tracks: [] as Track[],
   notes: {} as Record<string, string>,
   addTrack: vi.fn(),
   removeTrack: vi.fn(),
@@ -67,7 +67,7 @@ vi.mock('@/hooks/useCatalogHealth', () => ({
 }))
 import { Favorites } from '@/pages/Favorites'
 
-const mockTrack = (id: string): SpotifyTrack => ({
+const mockTrack = (id: string): Track => ({
   id,
   uri: `spotify:track:${id}`,
   name: `Track ${id}`,

@@ -3,10 +3,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderHook, act, screen } from '@testing-library/react'
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { useArtistDetailPage } from '../useArtistDetailPage'
-import type { SpotifyTrack, SpotifyAlbumSimple } from '@/types/spotify'
+import type { Track, AlbumSimple } from '@/types/music'
 
 const playTrack = vi.fn()
-const top = [{ id: '1', uri: 'u1', preview_url: 'http://p/1' }] as unknown as SpotifyTrack[]
+const top = [{ id: '1', uri: 'u1', preview_url: 'http://p/1' }] as unknown as Track[]
 
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({ state: {}, controls: { playTrack } }),
@@ -42,7 +42,7 @@ describe('useArtistDetailPage playback', () => {
     )
     const { result } = renderHook(() => useArtistDetailPage('9'), { wrapper: routedWrapper })
     act(() => {
-      result.current.handleAlbumClick({ id: 'al1' } as SpotifyAlbumSimple)
+      result.current.handleAlbumClick({ id: 'al1' } as AlbumSimple)
     })
     expect(screen.getByTestId('probe').textContent).toBe(JSON.stringify({ from: '/artists/9?view=grid' }))
   })

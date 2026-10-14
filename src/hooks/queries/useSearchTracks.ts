@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { deezer } from '@/lib/deezer'
 import { toTrack, type DzList, type DzTrack } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const SUGGESTION_LIMIT = 5
 
 export function useSearchTracks(query: string, enabled = true) {
-  return useQuery<SpotifyTrack[]>({
+  return useQuery<Track[]>({
     queryKey: ['search-tracks', query, SUGGESTION_LIMIT],
     enabled: enabled && query.trim().length > 0,
     queryFn: async () => {

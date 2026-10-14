@@ -5,13 +5,13 @@ import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { cn } from '@/lib/utils'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface ResultsListProps {
   listboxId: string
-  results: SpotifyTrack[]
+  results: Track[]
   highlightIndex: number
-  onSelect: (track: SpotifyTrack) => void
+  onSelect: (track: Track) => void
   label: string
 }
 
@@ -56,7 +56,7 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
 }
 
 interface SelectedTrackProps {
-  track: SpotifyTrack
+  track: Track
   onClear: () => void
   clearLabel: string
 }
@@ -91,7 +91,7 @@ interface TrackSearchInputProps {
   blurTimerRef: React.RefObject<number>
   query: string
   isOpen: boolean
-  results: SpotifyTrack[]
+  results: Track[]
   highlightIndex: number
   listboxId: string
   isPending: boolean
@@ -101,7 +101,7 @@ interface TrackSearchInputProps {
   onOpen: () => void
   onClose: () => void
   onBlur: () => void
-  onSelect: (track: SpotifyTrack) => void
+  onSelect: (track: Track) => void
   setHighlightIndex: React.Dispatch<React.SetStateAction<number>>
   placeholder: string
   loadingText: string
@@ -205,8 +205,8 @@ function TrackSearchInput({
 }
 
 export interface TrackAutocompleteProps {
-  value: SpotifyTrack | null
-  onChange: (track: SpotifyTrack | null) => void
+  value: Track | null
+  onChange: (track: Track | null) => void
   onBlur: () => void
   error?: string
   id?: string
@@ -236,7 +236,7 @@ export function TrackAutocomplete({ value, onChange, onBlur, error, id }: TrackA
     debouncedQuery.length >= 2
   )
 
-  const handleSelect = (track: SpotifyTrack) => {
+  const handleSelect = (track: Track) => {
     clearTimeout(blurTimerRef.current)
     onChange(track)
     setQuery('')

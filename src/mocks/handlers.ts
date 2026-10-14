@@ -1,18 +1,18 @@
 import { http, HttpResponse } from 'msw'
 import type {
-  SpotifyTrack,
-  SpotifyArtistSimple,
-  SpotifyAlbumSimple,
-  SpotifyArtist,
-} from '@/types/spotify'
+  Track,
+  ArtistSimple,
+  AlbumSimple,
+  Artist,
+} from '@/types/music'
 
-const artistSimple: SpotifyArtistSimple = {
+const artistSimple: ArtistSimple = {
   id: 'a1',
   name: 'Mock Artist',
   uri: 'spotify:artist:a1',
   type: 'artist',
 }
-const album: SpotifyAlbumSimple = {
+const album: AlbumSimple = {
   id: 'al1',
   name: 'Mock Album',
   images: [{ url: 'https://picsum.photos/300', width: 300, height: 300 }],
@@ -22,7 +22,7 @@ const album: SpotifyAlbumSimple = {
   uri: 'spotify:album:al1',
   type: 'album',
 }
-const track: SpotifyTrack = {
+const track: Track = {
   id: 't1',
   name: 'Mock Track 1',
   duration_ms: 210000,
@@ -34,7 +34,7 @@ const track: SpotifyTrack = {
   artists: [artistSimple],
   album,
 }
-const artist: SpotifyArtist = {
+const artist: Artist = {
   id: 'a1',
   name: 'Mock Artist',
   images: [{ url: 'https://picsum.photos/300', width: 300, height: 300 }],

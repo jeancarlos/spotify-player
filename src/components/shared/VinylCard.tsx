@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { cn } from '@/lib/utils'
 import { isPlayable } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface VinylCardProps {
-  track: SpotifyTrack
+  track: Track
   isActive?: boolean
-  onPlay?: (track: SpotifyTrack) => void
+  onPlay?: (track: Track) => void
   size?: 'sm' | 'md'
 }
 
-function resolvePlay(track: SpotifyTrack, onPlay?: (track: SpotifyTrack) => void) {
+function resolvePlay(track: Track, onPlay?: (track: Track) => void) {
   return isPlayable(track) ? onPlay : undefined
 }
 

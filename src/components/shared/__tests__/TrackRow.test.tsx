@@ -2,9 +2,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TrackRow } from '../TrackRow'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const track: SpotifyTrack = {
+const track: Track = {
   id: 't1',
   name: 'Test Track',
   artists: [{ id: 'a1', name: 'Test Artist', uri: 'spotify:artist:a1', type: 'artist' }],

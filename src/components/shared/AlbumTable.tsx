@@ -1,10 +1,10 @@
 import { formatDate } from '@/utils/formatDate'
 import { useTranslation } from 'react-i18next'
-import type { SpotifyAlbumSimple } from '@/types/spotify'
+import type { AlbumSimple } from '@/types/music'
 
 interface AlbumTableProps {
-  albums: SpotifyAlbumSimple[]
-  onClick: (album: SpotifyAlbumSimple) => void
+  albums: AlbumSimple[]
+  onClick: (album: AlbumSimple) => void
 }
 
 export function AlbumTable({ albums, onClick }: AlbumTableProps) {

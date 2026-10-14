@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CustomTooltip } from '../ArtistChartTooltip'
 import { toChartData, playEntry, chartLayout } from '../chartData'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const track = (id: string, rank?: number) =>
   ({
@@ -11,7 +11,7 @@ const track = (id: string, rank?: number) =>
     rank,
     artists: [{ id: 'a', name: 'A' }],
     album: { name: 'Al', images: [{ url: 'u' }] },
-  }) as unknown as SpotifyTrack
+  }) as unknown as Track
 
 describe('toChartData', () => {
   it('sorts by Deezer rank descending and keeps real values', () => {

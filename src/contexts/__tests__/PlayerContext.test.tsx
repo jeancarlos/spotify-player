@@ -4,17 +4,17 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { PlayerProvider, usePlayer, useProgress, type PlayerControls } from '../PlayerContext'
 import { deezer } from '@/lib/deezer'
 import { readRecent } from '@/utils/recentStorage'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 vi.mock('@/lib/deezer', () => ({ deezer: vi.fn() }))
 vi.mock('@/lib/deezerMappers', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
-  toTrack: (raw: SpotifyTrack) => raw,
+  toTrack: (raw: Track) => raw,
 }))
 
 const deezerMock = vi.mocked(deezer)
 
-function track(id: string, playable = true): SpotifyTrack {
+function track(id: string, playable = true): Track {
   return {
     id,
     uri: `deezer:track:${id}`,
@@ -55,7 +55,7 @@ function audio(): HTMLAudioElement {
   return screen.getByTestId('player-audio')
 }
 
-const fresh = (t: SpotifyTrack): SpotifyTrack => ({ ...t, preview_url: `https://fresh.test/${t.id}.mp3` })
+const fresh = (t: Track): Track => ({ ...t, preview_url: `https://fresh.test/${t.id}.mp3` })
 
 describe('PlayerProvider', () => {
   let play: ReturnType<typeof vi.spyOn>
@@ -149,10 +149,10 @@ describe('PlayerProvider', () => {
   })
 
   it('keeps only the latest track when plays overlap', async () => {
-    let releaseFirst: (t: SpotifyTrack) => void = () => undefined
+    let releaseFirst: (t: Track) => void = () => undefined
     deezerMock.mockImplementationOnce(
       () =>
-        new Promise<SpotifyTrack>((resolve) => {
+        new Promise<Track>((resolve) => {
           releaseFirst = resolve
         })
     )

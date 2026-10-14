@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { PlayerView } from '../PlayerView'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 vi.mock('@/hooks/queries/useLyrics', () => ({
   useLyrics: () => ({ isPending: false, data: [{ timeMs: 0, text: 'la' }] }),
@@ -29,7 +29,7 @@ function setup() {
     duration_ms: 1000,
     artists: [{ name: 'A' }],
     album: { name: 'B', images: [] },
-  } as unknown as SpotifyTrack
+  } as unknown as Track
   const controls = { seek: vi.fn() }
   render(
     <MemoryRouter initialEntries={[{ pathname: '/player', search: '?tab=lyrics', state: { from: '/playlists/9?page=2' } }]}>

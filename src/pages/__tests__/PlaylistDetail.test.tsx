@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { PlaylistDetail } from '../PlaylistDetail'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const tracks = [
   {
@@ -14,7 +14,7 @@ const tracks = [
     artists: [{ id: 'a1', name: 'Artist' }],
     album: { id: 'alb1', name: 'Album One', images: [] },
   },
-] as unknown as SpotifyTrack[]
+] as unknown as Track[]
 
 const hook = {
   playlist: { data: undefined },

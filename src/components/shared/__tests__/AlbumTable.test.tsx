@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { AlbumTable } from '../AlbumTable'
-import type { SpotifyAlbumSimple } from '@/types/spotify'
+import type { AlbumSimple } from '@/types/music'
 
-const album: SpotifyAlbumSimple = {
+const album: AlbumSimple = {
   id: 'alb1',
   name: 'Test Album',
   images: [],

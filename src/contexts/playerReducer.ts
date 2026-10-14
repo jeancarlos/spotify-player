@@ -1,8 +1,8 @@
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 export interface PlayerState {
-  currentTrack: SpotifyTrack | null
-  queue: SpotifyTrack[]
+  currentTrack: Track | null
+  queue: Track[]
   queueIndex: number
   isPlaying: boolean
   isLoading: boolean
@@ -11,12 +11,12 @@ export interface PlayerState {
 }
 
 export type PlayerAction =
-  | { type: 'SET_TRACK'; payload: SpotifyTrack }
+  | { type: 'SET_TRACK'; payload: Track }
   | { type: 'SET_PLAYING'; payload: boolean }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SHUFFLE'; payload: boolean }
   | { type: 'SET_REPEAT'; payload: 'off' | 'track' | 'context' }
-  | { type: 'SET_QUEUE'; payload: SpotifyTrack[] }
+  | { type: 'SET_QUEUE'; payload: Track[] }
   | { type: 'SET_QUEUE_INDEX'; payload: number }
 
 export const initialPlayerState: PlayerState = {

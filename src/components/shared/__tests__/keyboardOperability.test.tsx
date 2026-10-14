@@ -12,7 +12,7 @@ vi.mock('recharts', async (orig) => ({
   ResponsiveContainer: () => null,
 }))
 
-import type { SpotifyAlbumSimple, SpotifyTrack } from '@/types/spotify'
+import type { AlbumSimple, Track } from '@/types/music'
 
 const album = {
   id: 'alb1',
@@ -21,9 +21,9 @@ const album = {
   release_date: '2024-01-01',
   album_type: 'album',
   artists: [],
-} as unknown as SpotifyAlbumSimple
+} as unknown as AlbumSimple
 
-const track = (id: string, extra: Partial<SpotifyTrack> = {}) =>
+const track = (id: string, extra: Partial<Track> = {}) =>
   ({
     id,
     name: `Song ${id}`,
@@ -31,7 +31,7 @@ const track = (id: string, extra: Partial<SpotifyTrack> = {}) =>
     artists: [{ id: 'a', name: 'A' }],
     album: { id: 'al', name: 'Al', images: [{ url: 'u' }] },
     ...extra,
-  }) as unknown as SpotifyTrack
+  }) as unknown as Track
 
 describe('keyboard operability', () => {
   it('AlbumTable opens an album from a real button with Enter and Space', async () => {

@@ -8,15 +8,15 @@ import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
 import { formatDate } from '@/utils/formatDate'
 import type {
-  SpotifyTrack,
-  SpotifyAlbumSimple,
-  SpotifyAlbumFull,
-} from '@/types/spotify'
+  Track,
+  AlbumSimple,
+  AlbumFull,
+} from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 export const ALBUM_LIMIT = 20
 
-const EMPTY_ALBUM_SIMPLE: SpotifyAlbumSimple = {
+const EMPTY_ALBUM_SIMPLE: AlbumSimple = {
   id: '',
   name: '',
   images: [],
@@ -28,16 +28,16 @@ const EMPTY_ALBUM_SIMPLE: SpotifyAlbumSimple = {
 }
 
 interface AlbumMeta {
-  albumSimple: SpotifyAlbumSimple
+  albumSimple: AlbumSimple
   albumYear: string | undefined
   albumSubtitle: string
   imageUrl: string | undefined
   albumName: string
-  albumArtists: SpotifyAlbumSimple['artists'] | undefined
+  albumArtists: AlbumSimple['artists'] | undefined
   albumLink: string | undefined
 }
 
-function deriveAlbumMeta(data: SpotifyAlbumFull | undefined): AlbumMeta {
+function deriveAlbumMeta(data: AlbumFull | undefined): AlbumMeta {
   if (!data) {
     return {
       albumSimple: EMPTY_ALBUM_SIMPLE,
@@ -95,7 +95,7 @@ export function useAlbumDetailPage() {
 
 
   const handleTrackPlay = useCallback(
-    async (track: SpotifyTrack) => {
+    async (track: Track) => {
       await controls.playTrack(track, albumItems)
     },
     [controls, albumItems]

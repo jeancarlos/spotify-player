@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { playerReducer, initialPlayerState } from '../playerReducer'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const mockTrack: SpotifyTrack = {
+const mockTrack: Track = {
   id: 't1',
   name: 'Track 1',
   duration_ms: 210000,

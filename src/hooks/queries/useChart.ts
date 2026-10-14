@@ -14,10 +14,10 @@ import {
 import { PAGE_SIZE } from './useSearchPaged'
 import type {
   PagingObject,
-  SpotifyAlbumSimple,
-  SpotifyArtist,
-  SpotifyPlaylist,
-} from '@/types/spotify'
+  AlbumSimple,
+  Artist,
+  Playlist,
+} from '@/types/music'
 
 interface UseChartOptions<R, T> {
   kind: 'artists' | 'albums' | 'playlists'
@@ -38,15 +38,15 @@ function useChart<R, T>({ kind, enabled, map }: UseChartOptions<R, T>) {
 }
 
 export function useChartArtists(enabled = true) {
-  return useChart<DzArtist, SpotifyArtist>({ kind: 'artists', enabled, map: (a) => toArtist(a) })
+  return useChart<DzArtist, Artist>({ kind: 'artists', enabled, map: (a) => toArtist(a) })
 }
 
 export function useChartAlbums(enabled = true) {
-  return useChart<DzAlbum, SpotifyAlbumSimple>({ kind: 'albums', enabled, map: (a) => toAlbum(a) })
+  return useChart<DzAlbum, AlbumSimple>({ kind: 'albums', enabled, map: (a) => toAlbum(a) })
 }
 
 export function useChartPlaylists(enabled = true) {
-  return useChart<DzPlaylist, SpotifyPlaylist>({
+  return useChart<DzPlaylist, Playlist>({
     kind: 'playlists',
     enabled,
     map: (p) => toPlaylist(p),

@@ -10,12 +10,12 @@ import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
 import { ToastProvider } from '@/components/ui/toast'
 import i18n from '@/lib/i18n'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 const playTrack = vi.fn(() => Promise.resolve())
 const recent = [
   { id: 'r1', uri: 'spotify:track:r1', name: 'Mock Track 1', artists: [], album: { images: [] } },
   { id: 'r2', uri: 'spotify:track:r2', name: 'Mock Track 2', artists: [], album: { images: [] } },
-] as unknown as SpotifyTrack[]
+] as unknown as Track[]
 beforeEach(() => {
   localStorage.setItem('spoter_recent_v1', JSON.stringify(recent))
 })

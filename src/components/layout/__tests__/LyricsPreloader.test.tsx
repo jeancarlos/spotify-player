@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LyricsPreloader } from '../LyricsPreloader'
 import { lyricsKey } from '@/hooks/queries/useLyrics'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const mk = (n: number) =>
   ({
@@ -11,7 +11,7 @@ const mk = (n: number) =>
     duration_ms: 1000 * n,
     artists: [{ name: `Artist ${n}` }],
     album: { name: `Album ${n}` },
-  }) as unknown as SpotifyTrack
+  }) as unknown as Track
 
 const state = { queue: [mk(0), mk(1), mk(2), mk(3)], queueIndex: 0 }
 

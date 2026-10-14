@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 vi.mock('@/hooks/useDebounce', () => ({
   useDebounce: (value: unknown) => value,
@@ -13,7 +13,7 @@ vi.mock('@/hooks/useKeyboardNav', () => ({
   },
 }))
 
-const mockSearchResults: SpotifyTrack[] = [
+const mockSearchResults: Track[] = [
   {
     id: 'r1',
     uri: 'spotify:track:r1',

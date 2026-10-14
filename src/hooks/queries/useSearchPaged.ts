@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { TIME_30_MINUTES } from '@/utils/constants'
 import { deezer } from '@/lib/deezer'
 import { toPage, type DzList } from '@/lib/deezerMappers'
-import type { PagingObject } from '@/types/spotify'
+import type { PagingObject } from '@/types/music'
 
 export const PAGE_SIZE = 20
 

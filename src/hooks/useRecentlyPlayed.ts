@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { readRecent } from '@/utils/recentStorage'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-export function useRecentlyPlayed(limit: number): { data: SpotifyTrack[] } {
-  const [data, setData] = useState<SpotifyTrack[]>(() => readRecent().slice(0, limit))
+export function useRecentlyPlayed(limit: number): { data: Track[] } {
+  const [data, setData] = useState<Track[]>(() => readRecent().slice(0, limit))
 
   useEffect(() => {
     const refresh = () => { setData(readRecent().slice(0, limit)); }

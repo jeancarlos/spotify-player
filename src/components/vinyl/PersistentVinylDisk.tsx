@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { useFavorites } from '@/hooks/useFavorites'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 const PLAYER_CLEARANCE = 136
 
@@ -15,7 +15,7 @@ interface VinylDiskDisplayProps {
 }
 
 function getVinylDiskProps(
-  track: SpotifyTrack | null,
+  track: Track | null,
   notes: Record<string, string>,
   isFavorite: boolean
 ): VinylDiskDisplayProps {

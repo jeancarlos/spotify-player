@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlayerContext } from '@/contexts/PlayerContext'
 import { PlayerQueue } from '../PlayerQueue'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const mk = (id: string): SpotifyTrack => ({
+const mk = (id: string): Track => ({
   id,
   name: `Name ${id}`,
   artists: [{ id: 'a1', name: 'Artist', uri: 'spotify:artist:a1', type: 'artist' }],
@@ -29,7 +29,7 @@ const mk = (id: string): SpotifyTrack => ({
 
 const [A, B, C] = [mk('A'), mk('B'), mk('C')]
 
-function renderQueue(queue: SpotifyTrack[], queueIndex: number) {
+function renderQueue(queue: Track[], queueIndex: number) {
   const playTrack = vi.fn()
   const value = {
     state: { currentTrack: queue[queueIndex] ?? null, queue, queueIndex, isPlaying: true },

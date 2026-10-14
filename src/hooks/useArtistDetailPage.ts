@@ -5,7 +5,7 @@ import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { usePlayer } from '@/contexts/PlayerContext'
-import type { SpotifyAlbumSimple, SpotifyArtist, SpotifyTrack } from '@/types/spotify'
+import type { AlbumSimple, Artist, Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 interface ArtistMeta {
@@ -15,7 +15,7 @@ interface ArtistMeta {
   artistLink: string | undefined
 }
 
-function deriveArtistMeta(data: SpotifyArtist | undefined): ArtistMeta {
+function deriveArtistMeta(data: Artist | undefined): ArtistMeta {
   if (!data) {
     return { artistSubtitle: '', artistImageUrl: undefined, artistName: '', artistLink: undefined }
   }
@@ -33,7 +33,7 @@ export function useArtistDetailPage(id: string | undefined) {
   const location = useLocation()
   const { state, controls } = usePlayer()
   const playTrack = useCallback(
-    async (track: SpotifyTrack, list?: SpotifyTrack[]) => {
+    async (track: Track, list?: Track[]) => {
       await controls.playTrack(track, list)
     },
     [controls]
@@ -56,7 +56,7 @@ export function useArtistDetailPage(id: string | undefined) {
   }, [])
 
   const handleAlbumClick = useCallback(
-    (album: SpotifyAlbumSimple) => {
+    (album: AlbumSimple) => {
       navigate(`/albums/${album.id}`, { state: { from: currentPath(location) } })
     },
     [navigate, location]

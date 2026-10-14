@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { readRecent, pushRecent } from '../recentStorage'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
-const track: SpotifyTrack = {
+const track: Track = {
   uri: 'deezer:track:1',
   id: '1',
   name: 'Track 1',
@@ -13,7 +13,7 @@ const track: SpotifyTrack = {
   duration_ms: 180000,
   artists: [{ uri: 'deezer:artist:1', id: '1', name: 'A', type: 'artist' }],
   album: { uri: 'deezer:album:1', id: '1', name: 'Album', type: 'album', images: [] },
-} as unknown as SpotifyTrack
+} as unknown as Track
 
 describe('recentStorage', () => {
   beforeEach(() => {

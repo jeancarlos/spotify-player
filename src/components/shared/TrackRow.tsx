@@ -4,12 +4,12 @@ import { formatDuration } from '@/utils/formatDuration'
 import { cn } from '@/lib/utils'
 import { Tooltip } from '@/components/shared/Tooltip'
 import { isPlayable } from '@/lib/deezerMappers'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 
 interface TrackRowProps {
-  track: SpotifyTrack
+  track: Track
   isActive?: boolean
-  onPlay?: (track: SpotifyTrack) => void
+  onPlay?: (track: Track) => void
   onRemove?: (uri: string) => void
   disableRemove?: boolean
   note?: string
@@ -74,7 +74,7 @@ function playableClasses(playable: boolean) {
   }
 }
 
-function resolveMeta(track: SpotifyTrack) {
+function resolveMeta(track: Track) {
   return {
     albumImage: 'album' in track ? track.album.images[0]?.url : undefined,
     artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '',
@@ -86,7 +86,7 @@ function isActivationKey(key: string): boolean {
 }
 
 interface NameAreaProps {
-  track: SpotifyTrack
+  track: Track
   note?: string
   theme: TrackTheme
   artistNames: string
@@ -113,8 +113,8 @@ interface PlayCellProps {
   trackName: string
   index?: number
   theme: TrackTheme
-  onPlay?: (track: SpotifyTrack) => void
-  track: SpotifyTrack
+  onPlay?: (track: Track) => void
+  track: Track
 }
 
 function PlayCell({ trackName, index, theme: styles, onPlay, track }: PlayCellProps) {

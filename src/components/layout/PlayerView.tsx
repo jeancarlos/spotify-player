@@ -11,7 +11,7 @@ import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
 import { getFromPath } from '@/utils/routerState'
 import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
-import type { SpotifyTrack } from '@/types/spotify'
+import type { Track } from '@/types/music'
 import type { UseQueryResult } from '@tanstack/react-query'
 import type { LyricLine } from '@/types/lyrics'
 
@@ -24,7 +24,7 @@ interface TrackFields {
   albumArt: string | undefined
 }
 
-function extractTrackFields(track: SpotifyTrack | null): TrackFields {
+function extractTrackFields(track: Track | null): TrackFields {
   if (!track) {
     return { artistName: '', trackName: '', albumName: undefined, albumArt: undefined }
   }
@@ -102,7 +102,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
 
 interface PlayerContentPaneProps {
   activeTab: PlayerTab
-  currentTrack: SpotifyTrack | null
+  currentTrack: Track | null
   lyrics: UseQueryResult<LyricLine[]>
   currentProgress: number
   onSeek: (ms: number) => void
