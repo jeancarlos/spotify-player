@@ -32,7 +32,7 @@ describe('useFavorites', () => {
     const { result } = renderHook(() => useFavorites())
     expect(result.current.tracks).toEqual([])
     expect(result.current.notes).toEqual({})
-    expect(result.current.playlistName).toBe('Spoter List')
+    expect(result.current.playlistName).toBe('Vinyla List')
   })
 
   it('keeps both tracks when two adds happen before a re-render', () => {

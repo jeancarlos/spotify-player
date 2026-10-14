@@ -12,12 +12,11 @@
     "newReleases": "New Releases",
     "recommendations": "Recommended for You",
     "seeMore": "See more",
-    "hint": "Open Spotify on your phone, play something and keep it open while using Spoter"
+    "hint": "Tap a vinyl to hear a 30-second preview"
   },
   "player": {
     "nowPlaying": "Now playing",
-    "noTrack": "Start a music on your phone",
-    "noActiveDevice": "No active device",
+    "noTrack": "Pick a vinyl to start a preview",
     "lyrics": "Lyrics",
     "queue": "Queue",
     "closeQueue": "Close queue",
@@ -73,28 +72,19 @@
   "artistDetail": {
     "topTracks": "Top Tracks",
     "albums": "Albums",
-    "popularity": "Popularity",
     "previous": "Previous",
     "next": "Next",
-    "audioProfile": "Audio Profile",
-    "danceability": "Danceability",
-    "energy": "Energy",
-    "valence": "Valence",
-    "acousticness": "Acousticness",
-    "liveness": "Liveness",
     "discography": "Discography",
     "bio": "About the artist",
     "relatedArtists": "Similar Artists",
     "loadMore": "Load more",
     "topTracksRanked": "Top tracks on Deezer",
-    "deezerRank": "Deezer rank",
-    "musicalProfile": "Musical Profile"
+    "deezerRank": "Deezer rank"
   },
   "albumDetail": {
     "playAlbum": "Play album",
     "tracks": "Tracks",
-    "by": "by",
-    "musicalProfile": "Musical Profile"
+    "by": "by"
   },
   "playlistDetail": {
     "playPlaylist": "Play playlist",
@@ -109,7 +99,6 @@
     "album": "Album",
     "note": "Personal note",
     "addButton": "Add favorite",
-    "notFound": "No songs found on Spotify",
     "addHeading": "Add Favorite",
     "searchPlaceholder": "Search favorites...",
     "searchAddPlaceholder": "Song or artist...",
@@ -122,8 +111,8 @@
     "close": "Close",
     "dismissNotification": "Dismiss notification",
     "addTrack": "+ Add",
-    "addToList": "Add to Spoter List",
-    "removeFromList": "Remove from Spoter List",
+    "addToList": "Add to Vinyla List",
+    "removeFromList": "Remove from Vinyla List",
     "addedToList": "Added!",
     "removedFromList": "Removed!",
     "trackRequired": "Select a song",
@@ -139,7 +128,6 @@
     "editNote": "Edit note",
     "clearTrack": "Clear selection",
     "reorderError": "Reorder failed. Previous order restored.",
-    "refreshError": "Failed to refresh from Spotify.",
     "reorderPosition": "Edit position of {{name}}"
   },
   "lyrics": {
@@ -147,43 +135,17 @@
     "notFound": "Lyrics not found",
     "album": "Album",
     "releaseDate": "Release date",
-    "popularity": "Popularity",
     "duration": "Duration",
     "nowPlaying": "Now playing",
     "noLyricsAvailable": "No lyrics available"
   },
-  "trackRow": {
-    "popularity": "Popularity"
-  },
+  "trackRow": {},
   "track": {
     "noPreview": "Preview unavailable",
-    "popularity": "Popularity",
-    "key": "Key",
-    "timeSignature": "Time sig.",
     "duration": "Duration",
     "instrumental": "Instrumental",
-    "major": "Major",
-    "minor": "Minor",
-    "tempo": "Tempo",
-    "loudness": "Loudness",
-    "valence": "Valence",
-    "speechiness": "Speechiness",
-    "instrumentalness": "Instrumentalness",
-    "audioFeatures": "Audio Features",
     "songDetails": "Song details",
-    "moodZone": "Mood Zone",
-    "intense": "Intense",
-    "chill": "Chill",
-    "sad": "Dark",
-    "happy": "Happy",
-    "mood": {
-      "happyEnergetic": "Happy & Energetic",
-      "darkEnergetic": "Intense & Dark",
-      "happyChill": "Light & Joyful",
-      "darkChill": "Introspective"
-    },
     "bpm": "BPM",
-    "keyLabel": "Key",
     "explicit": "Explicit",
     "trackNumber": "#",
     "albumCol": "Album",
@@ -195,7 +157,7 @@
     "readMore": "Read more on Wikipedia"
   },
   "playlist": {
-    "defaultName": "Spoter List"
+    "defaultName": "Vinyla List"
   },
   "pwa": {
     "readyOffline": "App is ready to work offline",

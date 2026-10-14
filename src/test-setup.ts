@@ -8,7 +8,7 @@ vi.mock('react-i18next', async (importOriginal) => {
     useTranslation: () => ({
       t: (key: string, options?: Record<string, unknown>) => {
         const translations: Record<string, string> = {
-          'playlist.defaultName': 'Spoter List',
+          'playlist.defaultName': 'Vinyla List',
           'home.recentlyPlayed': 'Tocadas Recentemente',
           'artists.searchPrompt': 'Digite para buscar artistas',
           'common.back': 'Voltar',

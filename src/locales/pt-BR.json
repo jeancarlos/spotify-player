@@ -12,12 +12,11 @@
     "newReleases": "Novos Lançamentos",
     "recommendations": "Recomendados para Você",
     "seeMore": "Ver mais",
-    "hint": "Essa é uma experiencia interativa, abra o Spotify no celular, de play e mantenha aberto enquanto usa o Spoter"
+    "hint": "Toque em um vinil para ouvir uma prévia de 30 segundos"
   },
   "player": {
     "nowPlaying": "Tocando agora",
-    "noTrack": "Inicir uma música no seu dispositivo",
-    "noActiveDevice": "Nenhum dispositivo ativo",
+    "noTrack": "Escolha um vinil para ouvir uma prévia",
     "lyrics": "Letra",
     "queue": "Fila",
     "closeQueue": "Fechar fila",
@@ -73,28 +72,19 @@
   "artistDetail": {
     "topTracks": "Top Tracks",
     "albums": "Álbuns",
-    "popularity": "Popularidade",
     "previous": "Anterior",
     "next": "Próxima",
-    "audioProfile": "Perfil de Áudio",
-    "danceability": "Dança",
-    "energy": "Energia",
-    "valence": "Valência",
-    "acousticness": "Acústica",
-    "liveness": "Ao Vivo",
     "discography": "Discografia",
     "bio": "Sobre o artista",
     "relatedArtists": "Artistas Similares",
     "loadMore": "Carregar mais",
     "topTracksRanked": "Mais populares no Deezer",
-    "deezerRank": "Rank no Deezer",
-    "musicalProfile": "Perfil Musical"
+    "deezerRank": "Rank no Deezer"
   },
   "albumDetail": {
     "playAlbum": "Tocar álbum",
     "tracks": "Faixas",
-    "by": "por",
-    "musicalProfile": "Perfil Musical"
+    "by": "por"
   },
   "playlistDetail": {
     "playPlaylist": "Tocar playlist",
@@ -109,7 +99,6 @@
     "album": "Álbum",
     "note": "Nota pessoal",
     "addButton": "Adicionar favorito",
-    "notFound": "Nenhuma música encontrada no Spotify",
     "addHeading": "Adicionar Favorito",
     "searchPlaceholder": "Buscar nos favoritos...",
     "searchAddPlaceholder": "Música ou artista...",
@@ -122,8 +111,8 @@
     "close": "Fechar",
     "dismissNotification": "Dispensar notificação",
     "addTrack": "+ Adicionar",
-    "addToList": "Adicionar à Spoter List",
-    "removeFromList": "Remover da Spoter List",
+    "addToList": "Adicionar à Vinyla List",
+    "removeFromList": "Remover da Vinyla List",
     "addedToList": "Adicionada!",
     "removedFromList": "Removida!",
     "trackRequired": "Selecione uma música",
@@ -139,7 +128,6 @@
     "editNote": "Editar nota",
     "clearTrack": "Limpar seleção",
     "reorderError": "Erro ao reordenar. A ordem anterior foi restaurada.",
-    "refreshError": "Erro ao atualizar da Spotify.",
     "reorderPosition": "Editar posição de {{name}}"
   },
   "lyrics": {
@@ -147,43 +135,17 @@
     "notFound": "Letra não encontrada",
     "album": "Álbum",
     "releaseDate": "Lançamento",
-    "popularity": "Popularidade",
     "duration": "Duração",
     "nowPlaying": "Tocando agora",
     "noLyricsAvailable": "Sem letra disponível"
   },
-  "trackRow": {
-    "popularity": "Popularidade"
-  },
+  "trackRow": {},
   "track": {
     "noPreview": "Prévia indisponível",
-    "popularity": "Popularidade",
-    "key": "Tonalidade",
-    "timeSignature": "Compasso",
     "duration": "Duração",
     "instrumental": "Instrumental",
-    "major": "Maior",
-    "minor": "Menor",
-    "tempo": "Tempo",
-    "loudness": "Volume",
-    "valence": "Valência",
-    "speechiness": "Vocal",
-    "instrumentalness": "Instrumentalidade",
-    "audioFeatures": "Características de Áudio",
     "songDetails": "Detalhes da música",
-    "moodZone": "Zona de Humor",
-    "intense": "Intenso",
-    "chill": "Tranquilo",
-    "sad": "Sombrio",
-    "happy": "Alegre",
-    "mood": {
-      "happyEnergetic": "Animado & Enérgico",
-      "darkEnergetic": "Intenso & Sombrio",
-      "happyChill": "Leve & Alegre",
-      "darkChill": "Introspectivo"
-    },
     "bpm": "BPM",
-    "keyLabel": "Tom",
     "explicit": "Explícito",
     "trackNumber": "Nº",
     "albumCol": "Álbum",
@@ -195,7 +157,7 @@
     "readMore": "Ler mais na Wikipedia"
   },
   "playlist": {
-    "defaultName": "Spoter List"
+    "defaultName": "Vinyla List"
   },
   "pwa": {
     "readyOffline": "O app está pronto para funcionar offline",

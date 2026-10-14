@@ -54,7 +54,7 @@ const mockFavorites = {
   addTrack: vi.fn(),
   removeTrack: vi.fn(),
   setNote: vi.fn(),
-  playlistName: 'Spoter List',
+  playlistName: 'Vinyla List',
 }
 
 vi.mock('@/hooks/useFavorites', () => ({
