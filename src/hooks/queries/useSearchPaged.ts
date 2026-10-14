@@ -24,6 +24,7 @@ export function useSearchPaged<R, T>({
   const index = (page - 1) * PAGE_SIZE
   return useQuery<PagingObject<T>>({
     queryKey: [queryKeyPrefix, query, index, PAGE_SIZE],
+    meta: { source: 'deezer' },
     enabled: query.trim().length > 0,
     staleTime: TIME_30_MINUTES,
     queryFn: async () => {

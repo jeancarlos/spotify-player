@@ -7,6 +7,7 @@ import type { Artist } from '@/types/music'
 export function useArtist(id: string | undefined) {
   return useQuery<Artist>({
     queryKey: ['artist', id],
+    meta: { source: 'deezer' },
     enabled: !!id,
     staleTime: TIME_30_MINUTES,
     queryFn: async () => toArtist(await deezer<DzArtist>(`artist/${id ?? ''}`)),

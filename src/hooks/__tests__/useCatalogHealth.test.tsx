@@ -14,15 +14,21 @@ const setup = () => {
   return { client, result }
 }
 
-const fail = (client: QueryClient, key: string, error: Error = new DeezerError(-1, 'timeout')) =>
+const DEEZER = { source: 'deezer' }
+const fail = (
+  client: QueryClient,
+  key: string,
+  error: Error = new DeezerError(-1, 'timeout'),
+  meta: Record<string, unknown> = DEEZER
+) =>
   act(async () => {
     await client
-      .fetchQuery({ queryKey: [key], queryFn: () => Promise.reject(error) })
+      .fetchQuery({ queryKey: [key], meta, queryFn: () => Promise.reject(error) })
       .catch(() => undefined)
   })
-const succeed = (client: QueryClient, key: string) =>
+const succeed = (client: QueryClient, key: string, meta: Record<string, unknown> = DEEZER) =>
   act(async () => {
-    await client.fetchQuery({ queryKey: [key], queryFn: () => Promise.resolve(1), staleTime: 0 })
+    await client.fetchQuery({ queryKey: [key], meta, queryFn: () => Promise.resolve(1), staleTime: 0 })
   })
 
 describe('useCatalogHealth', () => {
@@ -66,13 +72,13 @@ describe('useCatalogHealth', () => {
     expect(result.current.unavailable).toBe(false)
   })
 
-  it('ignores lyrics and Wikipedia queries in both directions', async () => {
+  it('ignores queries not marked as Deezer in both directions', async () => {
     const { client, result } = setup()
     await fail(client, 'a')
     await fail(client, 'b')
-    await fail(client, 'lyrics')
-    await succeed(client, 'track-wikipedia')
-    await succeed(client, 'artist-bio')
+    await fail(client, 'lyrics', new DeezerError(-1, 'timeout'), {})
+    await succeed(client, 'track-wikipedia', {})
+    await succeed(client, 'artist-bio', {})
     await fail(client, 'c')
     expect(result.current.unavailable).toBe(true)
   })

@@ -8,6 +8,7 @@ export function useArtistAlbums(artistId: string | undefined, page: number, limi
   const index = (page - 1) * limit
   return useQuery<PagingObject<AlbumSimple>>({
     queryKey: ['artist-albums', artistId, index, limit],
+    meta: { source: 'deezer' },
     enabled: !!artistId,
     staleTime: TIME_15_MINUTES,
     queryFn: async () => {

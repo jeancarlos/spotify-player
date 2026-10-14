@@ -7,6 +7,7 @@ import type { Track } from '@/types/music'
 export function useArtistTopTracks(artistId: string | undefined, limit = 10) {
   return useQuery<Track[]>({
     queryKey: ['artist-top-tracks', artistId, limit],
+    meta: { source: 'deezer' },
     enabled: !!artistId,
     staleTime: TIME_30_MINUTES,
     queryFn: async () => {

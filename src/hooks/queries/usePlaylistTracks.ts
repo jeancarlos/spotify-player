@@ -8,6 +8,7 @@ export function usePlaylistTracks(playlistId: string, enabled = true, page = 1, 
   const index = (page - 1) * limit
   return useQuery<PagingObject<Track>>({
     queryKey: ['playlist-tracks', playlistId, index, limit],
+    meta: { source: 'deezer' },
     enabled: enabled && playlistId.length > 0,
     staleTime: TIME_15_MINUTES,
     queryFn: async () => {

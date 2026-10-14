@@ -6,6 +6,7 @@ import { toAlbum, type DzAlbum } from '@/lib/deezerMappers'
 export function albumQuery(albumId: string | undefined) {
   return queryOptions({
     queryKey: ['album', albumId],
+    meta: { source: 'deezer' },
     staleTime: TIME_60_MINUTES,
     queryFn: async () => toAlbum(await deezer<DzAlbum>(`album/${albumId ?? ''}`)),
   })

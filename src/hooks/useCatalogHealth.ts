@@ -3,7 +3,6 @@ import { useQueryClient, type QueryCache } from '@tanstack/react-query'
 import { DeezerError } from '@/lib/deezer'
 
 const FAILURE_LIMIT = 3
-const NON_DEEZER_KEYS = new Set(['lyrics', 'artist-bio', 'track-wikipedia'])
 
 interface HealthStore {
   failures: number
@@ -18,11 +17,7 @@ function storeFor(cache: QueryCache): HealthStore {
   const store: HealthStore = { failures: 0, listeners: new Set() }
   stores.set(cache, store)
   cache.subscribe((event) => {
-    if (
-      event.type !== 'updated' ||
-      NON_DEEZER_KEYS.has(String((event.query.queryKey as readonly unknown[])[0]))
-    )
-      return
+    if (event.type !== 'updated' || event.query.meta?.source !== 'deezer') return
     const { action } = event
     const before = store.failures >= FAILURE_LIMIT
     if (

@@ -10,6 +10,7 @@ export function useAlbumTracks(albumId: string | undefined, page: number, limit 
   const index = (page - 1) * limit
   return useQuery<PagingObject<Track>>({
     queryKey: ['album-tracks', albumId, index, limit],
+    meta: { source: 'deezer' },
     enabled: !!albumId,
     staleTime: TIME_60_MINUTES,
     queryFn: async () => {

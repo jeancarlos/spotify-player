@@ -7,6 +7,7 @@ import type { Playlist } from '@/types/music'
 export function usePlaylist(playlistId: string | undefined) {
   return useQuery<Playlist>({
     queryKey: ['playlist', playlistId],
+    meta: { source: 'deezer' },
     enabled: !!playlistId,
     staleTime: TIME_30_MINUTES,
     queryFn: async () => toPlaylist(await deezer<DzPlaylist>(`playlist/${playlistId ?? ''}`)),

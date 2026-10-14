@@ -28,6 +28,7 @@ interface UseChartOptions<R, T> {
 function useChart<R, T>({ kind, enabled, map }: UseChartOptions<R, T>) {
   return useQuery<PagingObject<T>>({
     queryKey: ['chart', kind, PAGE_SIZE],
+    meta: { source: 'deezer' },
     enabled,
     staleTime: TIME_30_MINUTES,
     queryFn: async () => {
