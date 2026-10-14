@@ -52,60 +52,72 @@
 @keyframes blob-drift-1 {
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) rotate(0deg) scale(1, 1);
   }
 
   33% {
-    transform: translate(80px, -60px) scale(1.1);
+    transform: translate(80px, -60px) rotate(40deg) scale(1.25, 0.85);
   }
 
   66% {
-    transform: translate(-40px, 80px) scale(0.9);
+    transform: translate(-40px, 80px) rotate(-25deg) scale(0.85, 1.2);
   }
 }
 
 @keyframes blob-drift-2 {
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) rotate(0deg) scale(1, 1);
   }
 
   33% {
-    transform: translate(-70px, 50px) scale(0.95);
+    transform: translate(-70px, 50px) rotate(-35deg) scale(0.8, 1.2);
   }
 
   66% {
-    transform: translate(60px, -80px) scale(1.05);
+    transform: translate(60px, -80px) rotate(30deg) scale(1.2, 0.9);
   }
 }
 
 @keyframes blob-drift-3 {
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) rotate(0deg) scale(1, 1);
   }
 
   33% {
-    transform: translate(50px, 70px) scale(1.08);
+    transform: translate(50px, 70px) rotate(50deg) scale(1.3, 0.8);
   }
 
   66% {
-    transform: translate(-80px, -40px) scale(0.92);
+    transform: translate(-80px, -40px) rotate(-20deg) scale(0.85, 1.15);
+  }
+}
+
+@keyframes blob-tint {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.26;
   }
 }
 
 .blob {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.22;
+  opacity: 0.26;
   filter: blur(80px);
-  will-change: transform;
+  will-change: transform, opacity;
+  transition: background-color 4s ease;
 }
 
 .blob-1 {
   width: 500px;
   height: 500px;
-  background: hsl(340, 75%, 82%);
+  background: hsl(calc(340 + var(--hue-shift, 0)) 75% 82%);
   top: -120px;
   left: -80px;
   animation: blob-drift-1 20s ease-in-out infinite;
@@ -114,7 +126,7 @@
 .blob-2 {
   width: 420px;
   height: 420px;
-  background: hsl(220, 75%, 82%);
+  background: hsl(calc(220 + var(--hue-shift, 0)) 75% 82%);
   bottom: 60px;
   right: -60px;
   animation: blob-drift-2 26s ease-in-out infinite;
@@ -123,9 +135,41 @@
 .blob-3 {
   width: 360px;
   height: 360px;
-  background: hsl(12, 100%, 90%);
+  background: hsl(calc(12 + var(--hue-shift, 0)) 100% 90%);
   top: 45%;
   left: 35%;
   animation: blob-drift-3 22s ease-in-out infinite;
   animation-delay: -8s;
+}
+
+.blob-1.blob-tint {
+  background: hsl(calc(280 + var(--hue-shift, 0)) 75% 82%);
+  animation:
+    blob-drift-1 20s ease-in-out infinite,
+    blob-tint 34s ease-in-out infinite;
+}
+
+.blob-2.blob-tint {
+  background: hsl(calc(170 + var(--hue-shift, 0)) 70% 80%);
+  animation:
+    blob-drift-2 26s ease-in-out infinite,
+    blob-tint 40s ease-in-out -12s infinite;
+}
+
+.blob-3.blob-tint {
+  background: hsl(calc(45 + var(--hue-shift, 0)) 100% 85%);
+  animation:
+    blob-drift-3 22s ease-in-out -8s infinite,
+    blob-tint 30s ease-in-out -20s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none;
+    transition: none;
+  }
+
+  .blob-tint {
+    opacity: 0;
+  }
 }
