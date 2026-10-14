@@ -35,6 +35,12 @@ describe('useCatalogHealth', () => {
     expect(result.current.unavailable).toBe(true)
   })
 
+  it('treats code 800 as a reachable catalog', async () => {
+    const { client, result } = setup()
+    for (const key of ['a', 'b', 'c']) await fail(client, key, new DeezerError(800, 'no data'))
+    expect(result.current.unavailable).toBe(false)
+  })
+
   it('resets after one success', async () => {
     const { client, result } = setup()
     await fail(client, 'a')

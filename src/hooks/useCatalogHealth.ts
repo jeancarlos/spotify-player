@@ -25,7 +25,11 @@ function storeFor(cache: QueryCache): HealthStore {
       return
     const { action } = event
     const before = store.failures >= FAILURE_LIMIT
-    if (action.type === 'success') store.failures = 0
+    if (
+      action.type === 'success' ||
+      (action.type === 'error' && action.error instanceof DeezerError && action.error.code === 800)
+    )
+      store.failures = 0
     else if (action.type === 'error' && action.error instanceof DeezerError) store.failures++
     else return
     if (before !== store.failures >= FAILURE_LIMIT)
