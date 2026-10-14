@@ -54,9 +54,9 @@ export default defineConfig(() => ({
             type: 'image/png',
           },
           {
-            src: 'favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
+            src: 'android-chrome-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
             purpose: 'maskable',
           },
         ],
@@ -71,7 +71,7 @@ export default defineConfig(() => ({
           {
             name: 'Artistas',
             short_name: 'Artistas',
-            description: 'Ver meus artistas favoritos',
+            description: 'Buscar e explorar artistas',
             url: '/artists',
             icons: [{ src: 'favicon-32x32.png', sizes: '32x32' }],
           },

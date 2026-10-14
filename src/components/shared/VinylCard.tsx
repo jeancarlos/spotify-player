@@ -56,7 +56,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           'shadow-lg group-hover:shadow-xl',
           'group-hover:scale-105 group-active:scale-95',
           isActive
-            ? 'ring-2 ring-primary scale-105 shadow-[0_0_18px_rgba(255,107,74,0.45)]'
+            ? 'ring-2 ring-primary scale-105 shadow-[0_0_18px_rgb(var(--color-primary)/0.45)]'
             : 'ring-1 ring-white/10'
         )}
         style={{ width: dim, height: dim, borderRadius: '8px' }}
