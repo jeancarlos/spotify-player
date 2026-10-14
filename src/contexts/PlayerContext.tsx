@@ -16,7 +16,7 @@ import { pushRecent } from '@/utils/recentStorage'
 import type { Track } from '@/types/music'
 
 export interface PlayerControls {
-  playTrack(track: Track, list?: Track[]): Promise<void>
+  playTrack(track: Track, list?: Track[], index?: number): Promise<void>
   toggle(): void
   next(): void
   previous(): void
@@ -65,7 +65,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     stateRef.current = state
   }, [state])
 
-  const startAt = useCallback(async (queue: Track[], index: number) => {
+  const startAt = useCallback(async (queue: Track[], index: number, fromS = 0) => {
     const audio = audioRef.current
     const track = queue[index]
     if (!audio) return
@@ -79,12 +79,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_QUEUE_INDEX', payload: index })
     dispatch({ type: 'SET_TRACK', payload: track })
     dispatch({ type: 'SET_LOADING', payload: true })
-    setProgress({ progressMs: 0, durationMs: PREVIEW_MS })
+    setProgress({ progressMs: fromS * 1000, durationMs: PREVIEW_MS })
     try {
       const fresh = toTrack(await deezer<DzTrack>(`track/${track.id}`))
       if (request !== requestRef.current) return
       if (!fresh.preview_url) throw new Error('unplayable')
       audio.src = fresh.preview_url
+      audio.currentTime = fromS
       await audio.play()
       if (request !== requestRef.current) return
       pushRecent(track)
@@ -100,10 +101,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const playTrack = useCallback(
-    async (track: Track, list?: Track[]) => {
+    async (track: Track, list?: Track[], index?: number) => {
       if (!isPlayable(track)) return
-      const queue = list?.some((t) => t.uri === track.uri) ? list : [track]
-      await startAt(queue, queue.findIndex((t) => t.uri === track.uri))
+      const at =
+        index !== undefined && list?.[index]?.uri === track.uri
+          ? index
+          : (list?.findIndex((t) => t.uri === track.uri) ?? -1)
+      if (!list || at === -1) await startAt([track], 0)
+      else await startAt(list, at)
     },
     [startAt]
   )
@@ -142,7 +147,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       stop()
       return
     }
-    audio.play().catch(() => undefined)
+    const request = requestRef.current
+    audio.play().catch((error: unknown) => {
+      if (request !== requestRef.current) return
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      void startAt(queue, queueIndex, audio.currentTime)
+    })
   }, [startAt, stop])
 
   const seek = useCallback((ms: number) => {

@@ -69,7 +69,14 @@ describe('PlayerQueue', () => {
     const queue = [A, B, C]
     const playTrack = renderQueue(queue, 0)
     await userEvent.click(screen.getByText('Name C'))
-    expect(playTrack).toHaveBeenCalledWith(C, queue)
+    expect(playTrack).toHaveBeenCalledWith(C, queue, 2)
+  })
+
+  it('passes the position of a duplicated track', async () => {
+    const queue = [A, B, C, B]
+    const playTrack = renderQueue(queue, 0)
+    await userEvent.click(screen.getAllByText('Name B')[1])
+    expect(playTrack).toHaveBeenCalledWith(B, queue, 3)
   })
 
   it('shows the empty state when nothing is upcoming', () => {

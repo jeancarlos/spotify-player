@@ -114,6 +114,47 @@ describe('PlayerProvider', () => {
     expect(latest.queueIndex).toBe(0)
   })
 
+  it('starts at the given index when the track is queued twice', async () => {
+    const list = [track('1'), track('2'), track('1')]
+    await act(() => controls.playTrack(list[2], list, 2))
+    expect(latest.queueIndex).toBe(2)
+    await act(() => controls.playTrack(list[2], list, 1))
+    expect(latest.queueIndex).toBe(0)
+  })
+
+  it('refetches the preview at the paused position when resuming fails', async () => {
+    await act(() => controls.playTrack(track('1')))
+    act(() => {
+      controls.toggle()
+    })
+    audio().currentTime = 12
+    deezerMock.mockClear()
+    play.mockImplementationOnce(() => Promise.reject(new DOMException('expired', 'NotSupportedError')))
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(latest.isPlaying).toBe(true)
+    })
+    expect(deezerMock).toHaveBeenCalledWith('track/1')
+    expect(audio().currentTime).toBe(12)
+  })
+
+  it('does not refetch when a resume is aborted', async () => {
+    await act(() => controls.playTrack(track('1')))
+    act(() => {
+      controls.toggle()
+    })
+    deezerMock.mockClear()
+    play.mockImplementationOnce(() => Promise.reject(new DOMException('aborted', 'AbortError')))
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
   it('advances on ended and skips unplayable tracks', async () => {
     const list = [track('1'), track('2', false), track('3')]
     await act(() => controls.playTrack(list[0], list))

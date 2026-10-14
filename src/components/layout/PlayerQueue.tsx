@@ -27,7 +27,7 @@ export function PlayerQueue() {
               key={state.queueIndex + 1 + i}
               track={track}
               theme="dark"
-              onPlay={async (t) => controls.playTrack(t, state.queue)}
+              onPlay={async (t) => controls.playTrack(t, state.queue, state.queueIndex + 1 + i)}
             />
           ))}
         </div>
