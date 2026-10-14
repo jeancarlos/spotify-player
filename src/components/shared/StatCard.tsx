@@ -7,7 +7,7 @@ export function StatCard({ label, value }: StatCardProps) {
   return (
     <div className="flex flex-col p-3 rounded-xl bg-white/[0.04] border border-white/[0.05]">
       {label && (
-        <span className="text-[8px] text-white/30 uppercase tracking-widest font-bold mb-1">
+        <span className="text-[8px] text-white/60 uppercase tracking-widest font-bold mb-1">
           {label}
         </span>
       )}

@@ -18,6 +18,12 @@ describe('calcArcPositions', () => {
     expect(a.y).toBeCloseTo(b.y, 1)
   })
 
+  it('keeps a short list near the centre instead of spreading it across the arc', () => {
+    const [a, b] = calcArcPositions(2, 176, 90, 0)
+    expect(a.tilt).toBeCloseTo(-12.5, 5)
+    expect(b.tilt).toBeCloseTo(12.5, 5)
+  })
+
   it('offset shifts all positions angularly', () => {
     const noOffset = calcArcPositions(3, 300, 160, 0)
     const withOffset = calcArcPositions(3, 300, 160, 20)

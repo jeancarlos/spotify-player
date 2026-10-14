@@ -55,4 +55,11 @@ describe('Pagination', () => {
     if (nextButton) fireEvent.click(nextButton)
     expect(onNext).toHaveBeenCalled()
   })
+
+  it('renders nothing for a single page of results', () => {
+    const { container } = render(
+      <Pagination page={1} hasNext={false} onPrev={vi.fn()} onNext={vi.fn()} />
+    )
+    expect(container).toBeEmptyDOMElement()
+  })
 })

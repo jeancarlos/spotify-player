@@ -85,4 +85,12 @@ describe('Página Home', () => {
       expect.arrayContaining([expect.objectContaining({ id: 'r2' })])
     )
   })
+
+  it('shows the search prompt in the hint slot above the vinyl when nothing was played', () => {
+    localStorage.removeItem('spoter_recent_v1')
+    renderHome()
+    const prompt = screen.getByText(/Digite para buscar/)
+    expect(prompt.closest('.z-\\[4\\]')).not.toBeNull()
+    expect(prompt.closest('.z-\\[5\\]')).toBeNull()
+  })
 })

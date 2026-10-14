@@ -9,6 +9,10 @@ const setup = () => {
 }
 
 describe('SearchBar tablist', () => {
+  it('gives every tab a 44 px tap target', () => {
+    for (const tab of setup()) expect(tab).toHaveClass('tap-target')
+  })
+
   it('makes only the selected tab tabbable', () => {
     const tabs = setup()
     expect(tabs.filter((t) => t.tabIndex === 0)).toHaveLength(1)

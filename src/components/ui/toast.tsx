@@ -79,13 +79,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
 const icons: Record<ToastVariant, React.ReactNode> = {
   error: <AlertCircle size={16} className="text-red-400 shrink-0" />,
-  success: <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />,
+  success: <CheckCircle2 size={16} className="text-primary shrink-0" />,
   info: <Info size={16} className="text-blue-400 shrink-0" />,
 }
 
 const borders: Record<ToastVariant, string> = {
   error: 'border-red-500/30',
-  success: 'border-emerald-500/30',
+  success: 'border-primary/30',
   info: 'border-blue-500/30',
 }
 
@@ -117,7 +117,7 @@ function ToastList() {
               type="button"
               onClick={() => dismiss(item.id)}
               aria-label={t('common.dismissNotification')}
-              className="text-white/30 hover:text-white/70 transition-colors ml-1 rounded focus-visible:outline-2 focus-visible:outline-white"
+              className="text-white/60 hover:text-white/70 transition-colors ml-1 rounded focus-visible:outline-2 focus-visible:outline-white"
             >
               <X size={14} aria-hidden="true" />
             </button>

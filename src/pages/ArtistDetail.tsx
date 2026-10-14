@@ -43,8 +43,8 @@ export function ArtistDetail() {
 
           {(topTracks.data?.length ?? 0) > 0 && (
             <section className="mb-8">
-              <div className="flex items-center justify-between px-2 mb-3">
-                <h3 className="text-sm font-bold text-black/50">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-black/60">
                   {t('artistDetail.topTracksRanked')}
                 </h3>
               </div>

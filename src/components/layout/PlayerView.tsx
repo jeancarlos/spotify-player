@@ -59,7 +59,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
   const tabClass = (tab: PlayerTab) =>
     cn(
       'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-white/60',
-      activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/40 hover:text-white/70'
+      activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/60 hover:text-white/70'
     )
   return (
     <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
@@ -154,7 +154,7 @@ function PlayerContentPane({ activeTab, currentTrack, lyrics }: PlayerContentPan
     >
       {lyrics.isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
+          <p className="text-white/60 text-sm animate-pulse">{t('lyrics.searching')}</p>
         </div>
       ) : (
         <LyricsView lines={lyrics.data ?? []} />

@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useRecentlyPlayed } from '@/hooks/useRecentlyPlayed'
 import { useCatalogHealth } from '@/hooks/useCatalogHealth'
+import { useWindowSize } from '@/hooks/useWindowSize'
+import { homeDiskOffset } from '@/utils/diskLayout'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
@@ -14,21 +16,10 @@ const DISK_ENTRY_DELAY_S = 0.75
 const MAX_CAROUSEL_TRACKS = 5
 
 function useDiskLayout() {
-  const [vw, setVw] = useState(() => window.innerWidth)
-  const [vh, setVh] = useState(() => window.innerHeight)
-  useEffect(() => {
-    const handleResize = () => {
-      setVw(window.innerWidth)
-      setVh(window.innerHeight)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+  const { width: vw, height: vh } = useWindowSize()
 
   const diskPx = Math.min(720, vw)
-  const translateY = Math.round(diskPx * 0.28)
+  const translateY = homeDiskOffset(vw)
   const arcRadius = Math.max(130, Math.round(diskPx * 0.45))
   const arcBottom = Math.max(80, diskPx - translateY - arcRadius - (vw < 768 ? 0 : 20))
   const arcDeg = vw < 768 ? 90 : 75
@@ -66,9 +57,7 @@ export function Home() {
   )
 
   const renderCarouselContent = () => {
-    if (tracks.length === 0) {
-      return <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
-    }
+    if (tracks.length === 0) return null
     return (
       <div className="relative">
         <ArcCarousel
@@ -91,7 +80,7 @@ export function Home() {
         <SearchBar onSearch={handleSearch} className="shadow-sm" />
       </div>
 
-      {showHint && tracks.length > 0 && (
+      {(showHint || tracks.length === 0) && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -99,8 +88,8 @@ export function Home() {
           className="fixed left-0 right-0 z-[4] flex justify-center px-8 pointer-events-none"
           style={{ top: hintTop }}
         >
-          <p className="text-center text-[12px] text-black/30 leading-relaxed max-w-xs">
-            {t('home.hint')}
+          <p className="text-center text-[12px] text-black/60 leading-relaxed max-w-xs">
+            {tracks.length === 0 ? t('artists.searchPrompt') : t('home.hint')}
           </p>
         </motion.div>
       )}

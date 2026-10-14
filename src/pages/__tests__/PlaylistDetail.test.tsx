@@ -71,4 +71,9 @@ describe('PlaylistDetail table view', () => {
     renderPage()
     expect(screen.getByText('41')).toBeInTheDocument()
   })
+
+  it('keeps the track list in the same centred column as album pages', () => {
+    renderPage()
+    expect(screen.getByText('41').closest('.max-w-3xl')).not.toBeNull()
+  })
 })

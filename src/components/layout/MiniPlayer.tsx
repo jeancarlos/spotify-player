@@ -7,11 +7,7 @@ import { TrackInfo } from './mini-player/TrackInfo'
 import { PlaybackControls } from './mini-player/PlaybackControls'
 import { FavoriteButton } from './mini-player/FavoriteButton'
 
-interface MiniPlayerProps {
-  onHoverChange?: (hovered: boolean) => void
-}
-
-export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
+export function MiniPlayer() {
   const { state } = usePlayer()
   const { currentTrack } = state
   const { notes } = useFavorites()
@@ -23,10 +19,8 @@ export function MiniPlayer({ onHoverChange }: MiniPlayerProps) {
       animate={{ y: 0 }}
       exit={{ y: 300 }}
       transition={{ type: 'spring', stiffness: 240, damping: 26 }}
-      className="group/miniplayer rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
+      className="group/miniplayer rounded-full glass bg-white/85 shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
       aria-label={t('lyrics.nowPlaying', 'Tocando agora')}
-      onMouseEnter={() => onHoverChange?.(true)}
-      onMouseLeave={() => onHoverChange?.(false)}
     >
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />
 

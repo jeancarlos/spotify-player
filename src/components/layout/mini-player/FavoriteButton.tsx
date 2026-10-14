@@ -35,8 +35,8 @@ export function FavoriteButton() {
         onClick={handleHeart}
         aria-label={isSaved ? t('favorites.removeFromList') : t('favorites.addToList')}
         className={cn(
-          'p-1.5 rounded-lg transition-all',
-          isSaved ? 'text-red-500 scale-110' : 'text-black/30 hover:text-red-400'
+          'tap-target p-1.5 rounded-lg transition-all',
+          isSaved ? 'text-primary scale-110' : 'text-black/60 hover:text-primary'
         )}
       >
         <Heart size={16} className={isSaved ? 'fill-current' : ''} />

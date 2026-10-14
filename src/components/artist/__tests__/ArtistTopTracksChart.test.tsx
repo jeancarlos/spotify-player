@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CustomTooltip } from '../ArtistChartTooltip'
-import { toChartData, playEntry, chartLayout } from '../chartData'
+import { toChartData, playEntry, chartLayout, barFill } from '../chartData'
 import type { Track } from '@/types/music'
 
 const track = (id: string, rank?: number) =>
@@ -60,7 +60,26 @@ describe('chartLayout', () => {
   it('keeps the wide labels on desktop', () => {
     const wide = chartLayout(1024)
     expect(wide.yAxisWidth).toBe(144)
-    expect(wide.labelChars).toBe(20)
     expect(wide.plotWidth).toBeGreaterThan(chartLayout(375).plotWidth)
+  })
+})
+
+describe('chart labels and bars', () => {
+  const MONO_BOLD_EM = 0.7
+  const TICK_PX = 11
+  const TICK_OFFSET = 8
+
+  it('fits the truncated label inside the axis at every width', () => {
+    for (const vw of [360, 390, 1024]) {
+      const { labelChars, yAxisWidth, margin } = chartLayout(vw)
+      const labelPx = (labelChars + 1) * TICK_PX * MONO_BOLD_EM + TICK_OFFSET
+      expect(labelPx).toBeLessThanOrEqual(yAxisWidth + margin.left)
+    }
+  })
+
+  it('paints bars in coral and the active one at full strength', () => {
+    expect(barFill('a', 0, 'b')).toMatch(/^rgba\(255, 107, 74, /)
+    expect(barFill('a', 9, 'b')).toMatch(/^rgba\(255, 107, 74, /)
+    expect(barFill('a', 3, 'a')).toBe('rgba(255, 107, 74, 1)')
   })
 })

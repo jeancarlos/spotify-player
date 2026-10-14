@@ -4,6 +4,8 @@ export interface ArcPosition {
   tilt: number
 }
 
+const MAX_STEP_DEG = 25
+
 export function calcArcPositions(
   count: number,
   radius: number,
@@ -12,9 +14,8 @@ export function calcArcPositions(
 ): ArcPosition[] {
   if (count === 0) return []
 
-  const half = arcDeg / 2
-  const step = count > 1 ? arcDeg / (count - 1) : 0
-  const startDeg = count > 1 ? -half : 0
+  const step = count > 1 ? Math.min(arcDeg / (count - 1), MAX_STEP_DEG) : 0
+  const startDeg = (-step * (count - 1)) / 2
 
   return Array.from({ length: count }, (_, i) => {
     const angleDeg = startDeg + step * i + offsetDeg

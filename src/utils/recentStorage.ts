@@ -1,7 +1,8 @@
 import { normalizeTrack } from '@/lib/utils'
+import { STORAGE_KEYS } from '@/lib/storageKeys'
 import type { Track } from '@/types/music'
 
-const STORAGE_KEY = 'spoter_recent_v1'
+const STORAGE_KEY = STORAGE_KEYS.recent
 const MAX_RECENT = 10
 
 export function readRecent(): Track[] {

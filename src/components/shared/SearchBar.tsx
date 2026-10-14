@@ -74,14 +74,14 @@ export function SearchBar({
       {isPending ? (
         <Loader2
           size={15}
-          className="text-black/40 shrink-0 animate-spin"
+          className="text-black/60 shrink-0 animate-spin"
           data-testid="search-spinner"
           aria-hidden="true"
         />
       ) : (
         <Search
           size={15}
-          className="text-black/40 shrink-0"
+          className="text-black/60 shrink-0"
           data-testid="search-icon"
           aria-hidden="true"
         />
@@ -96,7 +96,7 @@ export function SearchBar({
           setQuery(e.target.value)
         }}
         placeholder={t('artists.searchPlaceholder')}
-        className="flex-1 bg-transparent text-sm outline-none text-black placeholder:text-black/30 min-w-0"
+        className="flex-1 bg-transparent text-sm outline-none text-black placeholder:text-black/60 min-w-0"
       />
       <div className="flex gap-1 shrink-0" role="tablist">
         {tabs.map(({ key, label }, i) => (
@@ -115,10 +115,10 @@ export function SearchBar({
             role="tab"
             aria-selected={tab === key}
             className={cn(
-              'text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
+              'tap-target text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
               tab === key
                 ? 'bg-black text-white'
-                : 'text-black/40 hover:text-black hover:bg-black/5'
+                : 'text-black/60 hover:text-black hover:bg-black/5'
             )}
           >
             {label}

@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import { useWindowSize } from '@/hooks/useWindowSize'
 import { motion } from 'framer-motion'
 import { Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -25,21 +26,15 @@ interface CollectionHeaderProps {
   link?: string
 }
 
+const HERO_TOP = 64
+const HERO_GAP = 16
+
 function useCollectionLayout(hasLink: boolean) {
-  const [vw, setVw] = useState(() => window.innerWidth)
-  useEffect(() => {
-    const fn = () => {
-      setVw(window.innerWidth)
-    }
-    window.addEventListener('resize', fn)
-    return () => {
-      window.removeEventListener('resize', fn)
-    }
-  }, [])
+  const { width: vw } = useWindowSize()
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
   const translateY = Math.round(imgPx * 0.25)
-  const headerHeight = imgPx - translateY + 184 + (hasLink ? 28 : 0)
+  const headerHeight = imgPx - translateY + 184 + HERO_TOP + HERO_GAP + (hasLink ? 28 : 0)
 
   return { imgPx, headerHeight }
 }
@@ -70,7 +65,7 @@ export function CollectionHeader({
     <div className="">
       <div
         className="absolute z-1 left-1/2"
-        style={{ transform: 'translateX(-50%) translateY(-16px)', top: 0, zIndex: 2 }}
+        style={{ transform: 'translateX(-50%)', top: HERO_TOP, zIndex: 2 }}
       >
         <motion.div
           initial={{ scale: 0.8, y: 60, opacity: 0 }}
@@ -105,7 +100,7 @@ export function CollectionHeader({
 
       <motion.div
         className="absolute left-0 right-0 flex flex-col items-center pointer-events-auto"
-        style={{ top: imgPx, zIndex: 1 }}
+        style={{ top: HERO_TOP + imgPx + HERO_GAP, zIndex: 1 }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
@@ -116,7 +111,7 @@ export function CollectionHeader({
         >
           {name}
         </h1>
-        <p className="text-sm text-black/50 mt-1">
+        <p className="text-sm text-black/60 mt-1">
           {artists && onArtistClick ? (
             <>
               {artists.map((a, i) => (
@@ -142,8 +137,8 @@ export function CollectionHeader({
         <button
           onClick={onPlay}
           className={cn(
-            'mt-4 px-8 py-3 bg-black text-white text-sm font-bold rounded-full',
-            'hover:bg-black/80 active:scale-95 transition-all shadow-lg'
+            'mt-4 px-8 py-3 bg-primary text-ink text-sm font-bold rounded-full',
+            'hover:bg-primary/85 active:scale-95 transition-all shadow-lg'
           )}
         >
           {playLabel}

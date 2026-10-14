@@ -9,11 +9,9 @@ export function usePopoverDismiss(
   useEffect(() => {
     if (!isOpen) return
     const onMouseDown = (e: MouseEvent) => {
-      if (
-        !popoverRef.current?.contains(e.target as Node) &&
-        !triggerRef.current?.contains(e.target as Node)
-      )
-        onClose()
+      const path = e.composedPath()
+      const inside = [popoverRef.current, triggerRef.current].some((el) => el && path.includes(el))
+      if (!inside) onClose()
     }
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()

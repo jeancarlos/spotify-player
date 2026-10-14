@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Github, Heart, Menu, X, Home } from 'lucide-react'
+import { ArrowLeft, CodeXml, Heart, Menu, X, Home } from 'lucide-react'
 import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -65,7 +65,7 @@ export function HamburgerMenu() {
         <button
           ref={buttonRef}
           onClick={toggle}
-          className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
+          className="tap-target p-2 glass rounded-xl hover:bg-black/5 transition-colors"
           aria-label={t('nav.openMenu')}
           aria-expanded={isOpen}
         >
@@ -86,12 +86,12 @@ export function HamburgerMenu() {
             >
               <div className="flex flex-col py-1.5">
                 <Link to="/" onClick={close} className={itemClass}>
-                  <Home size={16} className="text-black/50 flex-shrink-0" />
+                  <Home size={16} className="text-black/60 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.home')}</span>
                 </Link>
 
                 <Link to="/favorites" onClick={close} className={itemClass}>
-                  <Heart size={16} className="text-black/50 flex-shrink-0" />
+                  <Heart size={16} className="text-black/60 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.favorites')}</span>
                 </Link>
 
@@ -102,8 +102,7 @@ export function HamburgerMenu() {
                   onClick={close}
                   className={itemClass}
                 >
-                  {/* eslint-disable-next-line @typescript-eslint/no-deprecated */}
-                  <Github size={16} className="text-black/50 flex-shrink-0" />
+                  <CodeXml size={16} className="text-black/60 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.sourceCode')}</span>
                 </a>
               </div>
@@ -118,7 +117,7 @@ export function HamburgerMenu() {
             onClick={() => {
               navigate(-1)
             }}
-            className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
+            className="tap-target p-2 glass rounded-xl hover:bg-black/5 transition-colors"
             aria-label={t('common.back')}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}

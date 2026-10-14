@@ -62,14 +62,14 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
 
   return (
     <form onSubmit={onSubmit} noValidate className="p-4 flex flex-col gap-4">
-      <p className="text-xs font-semibold text-black/40 uppercase tracking-wide">
+      <p className="text-xs font-semibold text-black/60 uppercase tracking-wide">
         {t('favorites.addHeading')}
       </p>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="favorite-track" className="text-xs font-medium text-black/60">
           {t('favorites.trackLabel')}{' '}
-          <span aria-hidden className="text-black/30">
+          <span aria-hidden className="text-black/60">
             *
           </span>
         </label>
@@ -103,14 +103,14 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
           placeholder={t('favorites.notePlaceholder')}
           maxLength={MAX_NOTE_LENGTH}
           rows={2}
-          className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/30 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors resize-none"
+          className="w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black placeholder:text-black/60 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors resize-none"
         />
         <div className="flex items-center justify-between">
           {errors.note ? <p className="text-xs text-red-500">{errors.note.message}</p> : <span />}
           <span
             className={cn(
               'text-[11px] tabular-nums',
-              errors.note ? 'text-red-500' : 'text-black/30'
+              errors.note ? 'text-red-500' : 'text-black/60'
             )}
           >
             {t('favorites.noteCharsLeft', { count: noteLength })}
@@ -121,7 +121,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
       <button
         type="submit"
         disabled={!isValid || isSubmitting || isAlreadyFavorite}
-        className="w-full py-2.5 bg-black text-white rounded-xl text-sm font-medium hover:bg-black/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="w-full py-2.5 bg-primary text-ink rounded-xl text-sm font-bold hover:bg-primary/85 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         {t('favorites.addConfirm')}
       </button>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   BarChart,
@@ -12,8 +12,9 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { isPlayable } from '@/lib/deezerMappers'
+import { useWindowSize } from '@/hooks/useWindowSize'
 import type { Track } from '@/types/music'
-import { toChartData, playEntry, chartLayout, type ChartEntry } from './chartData'
+import { toChartData, playEntry, chartLayout, barFill, type ChartEntry } from './chartData'
 import { CustomTooltip } from './ArtistChartTooltip'
 
 interface Props {
@@ -41,7 +42,7 @@ function CustomYTick({ x = 0, y = 0, index = 0, maxChars = 20, payload }: TickPr
         y={-8}
         textAnchor="end"
         fontSize={8}
-        fill="rgba(0,0,0,0.25)"
+        fill="rgba(0,0,0,0.6)"
         fontWeight={900}
         fontFamily="monospace"
         letterSpacing={1}
@@ -77,24 +78,9 @@ function RoundedBar({ x = 0, y = 0, width = 0, height = 0, fill, cursor }: BarSh
   )
 }
 
-function getBarFill(entryId: string, index: number, activeTrackId?: string): string {
-  if (entryId === activeTrackId) return 'rgba(0,0,0,0.78)'
-  if (index === 0) return 'rgba(0,0,0,0.52)'
-  return `rgba(0,0,0,${Math.max(0.12, 0.42 - index * 0.03)})`
-}
-
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   const { t, i18n } = useTranslation()
-  const [vw, setVw] = useState(window.innerWidth)
-  useEffect(() => {
-    const onResize = () => {
-      setVw(window.innerWidth)
-    }
-    window.addEventListener('resize', onResize)
-    return () => {
-      window.removeEventListener('resize', onResize)
-    }
-  }, [])
+  const { width: vw } = useWindowSize()
   const layout = chartLayout(vw)
   const chartData = useMemo(() => toChartData(tracks), [tracks])
 
@@ -139,14 +125,13 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
                 dataKey="rank"
                 position="right"
                 formatter={(n: number) => n.toLocaleString(i18n.language)}
-                style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
+                style={{ fontSize: 10, fill: 'rgba(0,0,0,0.6)', fontWeight: 700 }}
               />
               {chartData.map((entry, i) => {
-                const fill = getBarFill(entry.id, i, activeTrackId)
                 return (
                   <Cell
                     key={entry.id}
-                    fill={fill}
+                    fill={barFill(entry.id, i, activeTrackId)}
                     cursor={isPlayable(entry.track) ? 'pointer' : 'default'}
                   />
                 )
