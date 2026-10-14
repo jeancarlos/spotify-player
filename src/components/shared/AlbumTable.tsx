@@ -18,14 +18,14 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
       <table className="w-full text-xs border-collapse" style={{ minWidth: 500 }}>
         <thead>
           <tr className="border-b border-black/8">
-            <th className="text-left py-2 px-3 text-black/30 font-semibold w-10"></th>
-            <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('common.name')}</th>
-            <th className="text-left py-2 px-3 text-black/30 font-semibold">{t('track.type')}</th>
-            <th className="text-right py-2 px-3 text-black/30 font-semibold">
+            <th className="text-left py-2 px-3 text-black/60 font-semibold w-10"></th>
+            <th className="text-left py-2 px-3 text-black/60 font-semibold">{t('common.name')}</th>
+            <th className="text-left py-2 px-3 text-black/60 font-semibold">{t('track.type')}</th>
+            <th className="text-right py-2 px-3 text-black/60 font-semibold">
               {t('track.releaseYear')}
             </th>
             {showTrackCount && (
-              <th className="text-right py-2 px-3 text-black/30 font-semibold">
+              <th className="text-right py-2 px-3 text-black/60 font-semibold">
                 {t('track.trackCount')}
               </th>
             )}
@@ -63,12 +63,12 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
                   {album.name}
                 </button>
               </td>
-              <td className="py-2 px-3 text-black/50 capitalize">{albumTypeLabel(t, album.album_type)}</td>
-              <td className="py-2 px-3 text-right text-black/40 tabular-nums">
+              <td className="py-2 px-3 text-black/60 capitalize">{albumTypeLabel(t, album.album_type)}</td>
+              <td className="py-2 px-3 text-right text-black/60 tabular-nums">
                 {album.release_date ? formatDate(album.release_date, 'year') : ''}
               </td>
               {showTrackCount && (
-                <td className="py-2 px-3 text-right text-black/40 tabular-nums">
+                <td className="py-2 px-3 text-right text-black/60 tabular-nums">
                   {album.total_tracks ?? '—'}
                 </td>
               )}

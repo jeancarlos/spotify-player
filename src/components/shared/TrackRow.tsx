@@ -53,16 +53,16 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
     ),
     number: cn(
       'text-xs font-bold tabular-nums group-hover:hidden',
-      dark ? 'text-white/30' : 'text-black/30'
+      dark ? 'text-white/60' : 'text-black/60'
     ),
     icon: dark ? 'fill-white text-white' : 'fill-black text-black',
     text: cn('text-sm font-medium truncate', resolveTextColor(dark, isActive)),
-    subtext: cn('text-xs truncate', dark ? 'text-white/40' : 'text-black/40'),
-    duration: cn('text-xs tabular-nums shrink-0', dark ? 'text-white/20' : 'text-black/30'),
+    subtext: cn('text-xs truncate', dark ? 'text-white/60' : 'text-black/60'),
+    duration: cn('text-xs tabular-nums shrink-0', dark ? 'text-white/60' : 'text-black/60'),
     remove: cn(
       'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
       focusRing(dark),
-      dark ? 'text-white/30 hover:text-red-400' : 'text-black/30 hover:text-red-500'
+      dark ? 'text-white/60 hover:text-red-400' : 'text-black/60 hover:text-red-500'
     ),
   }
 }

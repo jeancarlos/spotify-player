@@ -42,7 +42,7 @@ function CustomYTick({ x = 0, y = 0, index = 0, maxChars = 20, payload }: TickPr
         y={-8}
         textAnchor="end"
         fontSize={8}
-        fill="rgba(0,0,0,0.25)"
+        fill="rgba(0,0,0,0.6)"
         fontWeight={900}
         fontFamily="monospace"
         letterSpacing={1}
@@ -131,7 +131,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
                 dataKey="rank"
                 position="right"
                 formatter={(n: number) => n.toLocaleString(i18n.language)}
-                style={{ fontSize: 10, fill: 'rgba(0,0,0,0.38)', fontWeight: 700 }}
+                style={{ fontSize: 10, fill: 'rgba(0,0,0,0.6)', fontWeight: 700 }}
               />
               {chartData.map((entry, i) => {
                 const fill = getBarFill(entry.id, i, activeTrackId)

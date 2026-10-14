@@ -9,7 +9,7 @@ export function LyricsView({ lines }: LyricsViewProps) {
   if (lines.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-white/20 text-sm">{t('lyrics.noLyricsAvailable')}</p>
+        <p className="text-white/60 text-sm">{t('lyrics.noLyricsAvailable')}</p>
       </div>
     )
   }

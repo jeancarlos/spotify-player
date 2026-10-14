@@ -117,7 +117,7 @@ function ToastList() {
               type="button"
               onClick={() => dismiss(item.id)}
               aria-label={t('common.dismissNotification')}
-              className="text-white/30 hover:text-white/70 transition-colors ml-1 rounded focus-visible:outline-2 focus-visible:outline-white"
+              className="text-white/60 hover:text-white/70 transition-colors ml-1 rounded focus-visible:outline-2 focus-visible:outline-white"
             >
               <X size={14} aria-hidden="true" />
             </button>

@@ -90,7 +90,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               {currentTrack.artists.map((a, i) => (
                 <button
                   key={a.id}
-                  className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
+                  className="truncate text-[11px] text-black/60 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
                   onClick={() => {
                     navigate(`/artists/${a.id}`)
                   }}
@@ -106,7 +106,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
                   state: { from: currentPath(location) },
                 })
               }}
-              className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
+              className="text-[10px] font-medium text-black/60 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
             >
               {currentTrack.album.name}
             </button>

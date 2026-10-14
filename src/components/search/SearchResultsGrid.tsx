@@ -80,9 +80,9 @@ export function SearchResultsGrid({
         >
           <ChevronRight
             size={18}
-            className="text-black/30 group-hover:text-black/55 transition-colors"
+            className="text-black/60 group-hover:text-black transition-colors"
           />
-          <span className="text-[8px] font-semibold text-black/30 group-hover:text-black/55 transition-colors uppercase tracking-wider leading-none">
+          <span className="text-[8px] font-semibold text-black/60 group-hover:text-black transition-colors uppercase tracking-wider leading-none">
             {t('artists.next')}
           </span>
         </button>

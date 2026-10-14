@@ -79,7 +79,7 @@ export function Artists() {
       </div>
 
       <div className="pt-36 px-6 pb-32">
-        <p className="text-sm text-black/40 mb-6" aria-live="polite">
+        <p className="text-sm text-black/60 mb-6" aria-live="polite">
           {headerLabel}
           {data && ` — ${t('artists.result', { count: data.total })}`}
         </p>
@@ -87,7 +87,7 @@ export function Artists() {
         <AnimatePresence mode="wait">{renderResults()}</AnimatePresence>
 
         {!isLoading && query && data?.items.length === 0 && (
-          <p className="text-center text-black/30 mt-20">{t('artists.noResults')}</p>
+          <p className="text-center text-black/60 mt-20">{t('artists.noResults')}</p>
         )}
 
         {query && data && data.items.length > 0 && (

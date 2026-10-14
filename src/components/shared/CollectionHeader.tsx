@@ -108,7 +108,7 @@ export function CollectionHeader({
         >
           {name}
         </h1>
-        <p className="text-sm text-black/50 mt-1">
+        <p className="text-sm text-black/60 mt-1">
           {artists && onArtistClick ? (
             <>
               {artists.map((a, i) => (

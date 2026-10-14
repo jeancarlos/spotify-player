@@ -86,7 +86,7 @@ export function ArcCarousel({
           </defs>
           <text
             fontSize="11"
-            fill="rgba(0,0,0,0.4)"
+            fill="rgba(0,0,0,0.6)"
             fontWeight="600"
             letterSpacing="1.4"
             fontFamily="monospace"

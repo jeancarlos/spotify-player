@@ -57,7 +57,7 @@ export function Home() {
 
   const renderCarouselContent = () => {
     if (tracks.length === 0) {
-      return <p className="text-center text-xs text-black/20 mb-12">{t('artists.searchPrompt')}</p>
+      return <p className="text-center text-xs text-black/60 mb-12">{t('artists.searchPrompt')}</p>
     }
     return (
       <div className="relative">
@@ -89,7 +89,7 @@ export function Home() {
           className="fixed left-0 right-0 z-[4] flex justify-center px-8 pointer-events-none"
           style={{ top: hintTop }}
         >
-          <p className="text-center text-[12px] text-black/30 leading-relaxed max-w-xs">
+          <p className="text-center text-[12px] text-black/60 leading-relaxed max-w-xs">
             {t('home.hint')}
           </p>
         </motion.div>

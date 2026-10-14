@@ -22,16 +22,16 @@ export function Pagination({ page, hasNext, onPrev, onNext, className }: Paginat
       <button
         onClick={onPrev}
         disabled={page <= 1}
-        className="flex items-center gap-1.5 text-sm text-black/50 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-1.5 text-sm text-black/60 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft size={16} />
         {t('artists.previous')}
       </button>
-      <span className="text-sm text-black/30 font-mono">{page}</span>
+      <span className="text-sm text-black/60 font-mono">{page}</span>
       <button
         onClick={onNext}
         disabled={!hasNext}
-        className="flex items-center gap-1.5 text-sm text-black/50 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-1.5 text-sm text-black/60 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         {t('artists.next')}
         <ChevronRight size={16} />

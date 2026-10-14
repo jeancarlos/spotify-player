@@ -56,7 +56,7 @@ export function PlaybackControls() {
           aria-pressed={shuffle}
           className={cn(
             'p-1.5 rounded-lg transition-colors',
-            shuffle ? 'text-black' : 'text-black/30 hover:text-black/60'
+            shuffle ? 'text-black bg-black/10' : 'text-black/60 hover:text-black'
           )}
         >
           <Shuffle size={15} />
@@ -119,7 +119,7 @@ export function PlaybackControls() {
           aria-pressed={repeat !== 'off'}
           className={cn(
             'p-1.5 rounded-lg transition-colors',
-            repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60'
+            repeat !== 'off' ? 'text-black bg-black/10' : 'text-black/60 hover:text-black'
           )}
         >
           {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
@@ -131,7 +131,7 @@ export function PlaybackControls() {
         <button
           onClick={toggleQueue}
           aria-label={queueLabel}
-          className="p-1.5 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-black/40 text-black/30 hover:text-black"
+          className="p-1.5 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-black/40 text-black/60 hover:text-black"
         >
           <ListMusic size={15} />
         </button>

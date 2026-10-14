@@ -19,7 +19,7 @@ export function MiniPlayer() {
       animate={{ y: 0 }}
       exit={{ y: 300 }}
       transition={{ type: 'spring', stiffness: 240, damping: 26 }}
-      className="group/miniplayer rounded-full glass shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
+      className="group/miniplayer rounded-full glass bg-white/85 shadow-xl fixed bottom-2 left-2 right-2 z-30 max-w-[600px] mx-auto flex flex-col gap-1"
       aria-label={t('lyrics.nowPlaying', 'Tocando agora')}
     >
       <div className="absolute inset-0 rounded-full pointer-events-none z-0" />

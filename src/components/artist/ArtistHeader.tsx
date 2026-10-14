@@ -108,7 +108,7 @@ export function ArtistHeader({ images, name, subtitle, link, onLayout }: ArtistH
         >
           {name}
         </h1>
-        {subtitle && <p className="text-sm text-black/50 mt-1 text-center px-8">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-black/60 mt-1 text-center px-8">{subtitle}</p>}
         {link && (
           <DeezerAttribution
             href={link}

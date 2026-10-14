@@ -86,12 +86,12 @@ export function HamburgerMenu() {
             >
               <div className="flex flex-col py-1.5">
                 <Link to="/" onClick={close} className={itemClass}>
-                  <Home size={16} className="text-black/50 flex-shrink-0" />
+                  <Home size={16} className="text-black/60 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.home')}</span>
                 </Link>
 
                 <Link to="/favorites" onClick={close} className={itemClass}>
-                  <Heart size={16} className="text-black/50 flex-shrink-0" />
+                  <Heart size={16} className="text-black/60 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.favorites')}</span>
                 </Link>
 
@@ -102,7 +102,7 @@ export function HamburgerMenu() {
                   onClick={close}
                   className={itemClass}
                 >
-                  <CodeXml size={16} className="text-black/50 flex-shrink-0" />
+                  <CodeXml size={16} className="text-black/60 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.sourceCode')}</span>
                 </a>
               </div>

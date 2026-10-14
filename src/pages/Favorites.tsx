@@ -115,7 +115,7 @@ export function Favorites() {
               {t('nav.favorites')}
             </h1>
             <div className="mt-0.5">
-              <span className="text-sm text-black/40 font-medium">{playlistName}</span>
+              <span className="text-sm text-black/60 font-medium">{playlistName}</span>
             </div>
           </div>
 
