@@ -14,7 +14,7 @@ export function ArtistBio({ artistName }: ArtistBioProps) {
   if (!bio.data) return null
 
   return (
-    <section className="mb-8 px-2">
+    <section className="mb-8">
       <h3 className="text-sm font-bold text-black/60 mb-3">{t('artistDetail.bio')}</h3>
       <p className="text-sm text-black/70 leading-relaxed">{bio.data.extract}</p>
       <a

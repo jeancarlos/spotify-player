@@ -32,7 +32,7 @@ export function ArtistDiscography({
 
   return (
     <section className="mb-8">
-      <div className="flex items-center justify-between px-2 mb-3">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-black/60">{t('artistDetail.discography')}</h3>
         <ListTableSwitch view={view} onChange={onViewChange} />
       </div>

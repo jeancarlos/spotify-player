@@ -78,7 +78,7 @@ export function Artists() {
         />
       </div>
 
-      <div className="pt-36 px-6 pb-32">
+      <div className="pt-36 px-4 pb-32">
         <p className="text-sm text-black/60 mb-6" aria-live="polite">
           {headerLabel}
           {data && ` — ${t('artists.result', { count: data.total })}`}
