@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Info, Music2, ListMusic } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { usePlayer, useProgress } from '@/contexts/PlayerContext'
+import { usePlayer } from '@/contexts/PlayerContext'
 import { useLyrics } from '@/hooks/queries/useLyrics'
 import { LyricsView } from '@/components/layout/LyricsView'
 import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
@@ -13,7 +13,6 @@ import { getFromPath } from '@/utils/routerState'
 import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
 import type { Track } from '@/types/music'
 import type { UseQueryResult } from '@tanstack/react-query'
-import type { LyricLine } from '@/types/lyrics'
 
 type PlayerTab = 'lyrics' | 'info' | 'queue'
 
@@ -103,19 +102,19 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
 interface PlayerContentPaneProps {
   activeTab: PlayerTab
   currentTrack: Track | null
-  lyrics: UseQueryResult<LyricLine[]>
-  currentProgress: number
-  onSeek: (ms: number) => void
+  lyrics: UseQueryResult<string[]>
 }
 
-function PlayerContentPane({
-  activeTab,
-  currentTrack,
-  lyrics,
-  currentProgress,
-  onSeek,
-}: PlayerContentPaneProps) {
+function PlayerContentPane({ activeTab, currentTrack, lyrics }: PlayerContentPaneProps) {
   const { t } = useTranslation()
+
+  if (!currentTrack) {
+    return (
+      <div className="h-full flex items-center justify-center px-8">
+        <p className="text-white/60 text-sm text-center">{t('player.noTrack')}</p>
+      </div>
+    )
+  }
 
   if (activeTab === 'info') {
     return (
@@ -126,7 +125,7 @@ function PlayerContentPane({
         exit={{ opacity: 0, x: -20 }}
         className="h-full overflow-y-auto pt-4 pb-40"
       >
-        {currentTrack && <TrackInfoPanel track={currentTrack} />}
+        <TrackInfoPanel track={currentTrack} />
       </motion.div>
     )
   }
@@ -153,21 +152,20 @@ function PlayerContentPane({
       exit={{ opacity: 0, x: 20 }}
       className="h-full flex flex-col"
     >
-      {lyrics.isPending ? (
+      {lyrics.isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-white/30 text-sm animate-pulse">{t('lyrics.searching')}</p>
         </div>
       ) : (
-        <LyricsView lines={lyrics.data ?? []} progress={currentProgress} onSeek={onSeek} />
+        <LyricsView lines={lyrics.data ?? []} />
       )}
     </motion.div>
   )
 }
 
 export function PlayerView() {
-  const { state, controls } = usePlayer()
+  const { state } = usePlayer()
   const { currentTrack } = state
-  const { progressMs: currentProgress } = useProgress()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -187,7 +185,7 @@ export function PlayerView() {
     durationMs: currentTrack?.duration_ms ?? 0,
   })
 
-  const noLyrics = !lyrics.isPending && (!lyrics.data || lyrics.data.length === 0)
+  const noLyrics = !lyrics.isLoading && (!lyrics.data || lyrics.data.length === 0)
 
   useTabRedirect(noLyrics, activeTab, setSearchParams, location.state as unknown)
 
@@ -229,10 +227,6 @@ export function PlayerView() {
             activeTab={activeTab}
             currentTrack={currentTrack}
             lyrics={lyrics}
-            currentProgress={currentProgress}
-            onSeek={(ms) => {
-              controls.seek(ms)
-            }}
           />
         </AnimatePresence>
       </main>

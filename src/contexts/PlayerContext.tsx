@@ -71,7 +71,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (!audio) return
     const request = ++requestRef.current
     audio.pause()
-    stateRef.current = { ...stateRef.current, queue, queueIndex: index, currentTrack: track }
+    audio.removeAttribute('src')
+    audio.load()
+    stateRef.current = { ...stateRef.current, queue, queueIndex: index, currentTrack: track, isLoading: true }
+    dispatch({ type: 'SET_PLAYING', payload: false })
     dispatch({ type: 'SET_QUEUE', payload: queue })
     dispatch({ type: 'SET_QUEUE_INDEX', payload: index })
     dispatch({ type: 'SET_TRACK', payload: track })
@@ -84,10 +87,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       audio.src = fresh.preview_url
       await audio.play()
       if (request !== requestRef.current) return
-      dispatch({ type: 'SET_PLAYING', payload: true })
       pushRecent(track)
     } catch {
-      if (request === requestRef.current) dispatch({ type: 'SET_PLAYING', payload: false })
+      return
     } finally {
       if (request === requestRef.current) dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -95,7 +97,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const stop = useCallback(() => {
     audioRef.current?.pause()
-    dispatch({ type: 'SET_PLAYING', payload: false })
   }, [])
 
   const playTrack = useCallback(
@@ -131,26 +132,26 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const toggle = useCallback(() => {
     const audio = audioRef.current
-    if (!audio || !stateRef.current.currentTrack) return
+    const { currentTrack, isLoading, queue, queueIndex } = stateRef.current
+    if (!audio || !currentTrack || isLoading) return
+    if (!audio.getAttribute('src')) {
+      void startAt(queue, queueIndex)
+      return
+    }
     if (!audio.paused) {
       stop()
       return
     }
-    audio
-      .play()
-      .then(() => {
-        dispatch({ type: 'SET_PLAYING', payload: true })
-      })
-      .catch(() => {
-        dispatch({ type: 'SET_PLAYING', payload: false })
-      })
-  }, [stop])
+    audio.play().catch(() => undefined)
+  }, [startAt, stop])
 
   const seek = useCallback((ms: number) => {
     const audio = audioRef.current
     if (!audio) return
-    audio.currentTime = ms / 1000
-    setProgress((p) => ({ ...p, progressMs: ms }))
+    const durationMs = Number.isFinite(audio.duration) ? audio.duration * 1000 : PREVIEW_MS
+    const clamped = Math.min(Math.max(ms, 0), durationMs)
+    audio.currentTime = clamped / 1000
+    setProgress((p) => ({ ...p, progressMs: clamped }))
   }, [])
 
   const setShuffle = useCallback((on: boolean) => {
@@ -179,17 +180,60 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         return
       }
       audio.currentTime = 0
-      audio.play().catch(() => {
-        dispatch({ type: 'SET_PLAYING', payload: false })
-      })
+      audio.play().catch(() => undefined)
+    }
+    const onPlay = () => {
+      dispatch({ type: 'SET_PLAYING', payload: true })
+    }
+    const onPause = () => {
+      dispatch({ type: 'SET_PLAYING', payload: false })
     }
     audio.addEventListener('timeupdate', onTime)
     audio.addEventListener('ended', onEnded)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('error', onPause)
     return () => {
       audio.removeEventListener('timeupdate', onTime)
       audio.removeEventListener('ended', onEnded)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('error', onPause)
     }
   }, [next])
+
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return
+    const handlers: [MediaSessionAction, () => void][] = [
+      [
+        'play',
+        () => {
+          if (audioRef.current?.paused) toggle()
+        },
+      ],
+      [
+        'pause',
+        () => {
+          audioRef.current?.pause()
+        },
+      ],
+      ['nexttrack', next],
+      ['previoustrack', previous],
+    ]
+    for (const [action, handler] of handlers) navigator.mediaSession.setActionHandler(action, handler)
+  }, [toggle, next, previous])
+
+  const { currentTrack } = state
+  useEffect(() => {
+    if (!currentTrack || !('mediaSession' in navigator)) return
+    const art = currentTrack.album.images[0]?.url
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentTrack.name,
+      artist: currentTrack.artists.map((a) => a.name).join(', '),
+      album: currentTrack.album.name,
+      artwork: art ? [{ src: art }] : [],
+    })
+  }, [currentTrack])
 
   const controls = useMemo<PlayerControls>(
     () => ({ playTrack, toggle, next, previous, seek, setShuffle, cycleRepeat }),

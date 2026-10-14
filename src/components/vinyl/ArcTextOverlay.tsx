@@ -1,21 +1,13 @@
 import { useId } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 
 interface ArcTextOverlayProps {
   label: string
   diskPx: number
-  isPlaying?: boolean
   k?: number // Fraction of disk radius (0.0 – 1.0). Default: 0.88
   arcDeg?: number // Degrees spanned by the arc. Default: 200
 }
 
-export function ArcTextOverlay({
-  label,
-  diskPx,
-  isPlaying = false,
-  k = 0.93,
-  arcDeg = 200,
-}: ArcTextOverlayProps) {
+export function ArcTextOverlay({ label, diskPx, k = 0.93, arcDeg = 200 }: ArcTextOverlayProps) {
   const uid = useId()
 
   const cx = diskPx / 2
@@ -25,49 +17,40 @@ export function ArcTextOverlay({
   const fontSize = 10
   const letterSpacing = 1
 
-  const startAngleRad = (270 - arcDeg / 2) * (Math.PI / 180)
-  const endAngleRad = (270 + arcDeg / 2) * (Math.PI / 180)
+  const deg = diskPx < 640 ? Math.min(arcDeg, 180) : arcDeg
+  const startAngleRad = (270 - deg / 2) * (Math.PI / 180)
+  const endAngleRad = (270 + deg / 2) * (Math.PI / 180)
 
   const x1 = cx + r * Math.cos(startAngleRad)
   const y1 = cy + r * Math.sin(startAngleRad)
   const x2 = cx + r * Math.cos(endAngleRad)
   const y2 = cy + r * Math.sin(endAngleRad)
 
-  const largeArc = arcDeg > 180 ? 1 : 0
+  const largeArc = deg > 180 ? 1 : 0
   const arcPath = `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`
 
-  const rotateTransition = isPlaying
-    ? { duration: 8, ease: 'linear' as const, repeat: Infinity }
-    : { duration: 1.2, ease: 'easeOut' as const }
-
   return (
-    <AnimatePresence>
-      <motion.svg
-        key="arc-overlay"
-        width={diskPx}
-        height={diskPx}
-        className="absolute inset-0 pointer-events-none"
-        initial={{ rotate: -180 }}
-        animate={{ rotate: isPlaying ? 180 : -180 }}
-        transition={rotateTransition}
-        style={{ overflow: 'visible', originX: '50%', originY: '50%' }}
-        aria-hidden
+    <svg
+      width={diskPx}
+      height={diskPx}
+      className="absolute inset-0 pointer-events-none"
+      style={{ overflow: 'visible' }}
+      aria-hidden
+    >
+      <defs>
+        <path id={`arc-fav-${uid}`} d={arcPath} />
+      </defs>
+      <text
+        fontSize={fontSize}
+        fontWeight="700"
+        letterSpacing={letterSpacing}
+        fontFamily="inter"
+        fill="rgba(0,0,0,0.75)"
       >
-        <defs>
-          <path id={`arc-fav-${uid}`} d={arcPath} />
-        </defs>
-        <text
-          fontSize={fontSize}
-          fontWeight="700"
-          letterSpacing={letterSpacing}
-          fontFamily="inter"
-          fill="rgba(0,0,0,0.75)"
-        >
-          <textPath href={`#arc-fav-${uid}`} startOffset="50%" textAnchor="middle">
-            {label}
-          </textPath>
-        </text>
-      </motion.svg>
-    </AnimatePresence>
+        <textPath href={`#arc-fav-${uid}`} startOffset="50%" textAnchor="middle">
+          {label}
+        </textPath>
+      </text>
+    </svg>
   )
 }

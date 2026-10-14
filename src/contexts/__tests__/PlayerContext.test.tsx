@@ -60,10 +60,33 @@ const fresh = (t: Track): Track => ({ ...t, preview_url: `https://fresh.test/${t
 describe('PlayerProvider', () => {
   let play: ReturnType<typeof vi.spyOn>
   let pause: ReturnType<typeof vi.spyOn>
+  let actions: Partial<Record<MediaSessionAction, () => void>>
 
   beforeEach(() => {
-    play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
-    pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+    play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event('play'))
+      return Promise.resolve()
+    })
+    pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event('pause'))
+    })
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
+    actions = {}
+    Object.defineProperty(navigator, 'mediaSession', {
+      configurable: true,
+      value: {
+        metadata: null,
+        setActionHandler: (action: MediaSessionAction, handler: (() => void) | null) => {
+          actions[action] = handler ?? undefined
+        },
+      },
+    })
+    vi.stubGlobal(
+      'MediaMetadata',
+      vi.fn(function (this: object, init: MediaMetadataInit) {
+        Object.assign(this, init)
+      })
+    )
     deezerMock.mockImplementation((path: string) => Promise.resolve(fresh(track(path.split('/')[1]))))
     render(
       <PlayerProvider>
@@ -74,6 +97,8 @@ describe('PlayerProvider', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+    Reflect.deleteProperty(navigator, 'mediaSession')
     deezerMock.mockReset()
     localStorage.clear()
   })
@@ -260,5 +285,109 @@ describe('PlayerProvider', () => {
     expect(deezerMock).toHaveBeenCalledWith('track/5')
     expect(audio().src).toBe('https://fresh.test/5.mp3')
     expect(latest.currentTrack?.id).toBe('5')
+  })
+  it('clears the old source and shows paused while the next track loads', async () => {
+    await act(() => controls.playTrack(track('1')))
+    let release: (t: Track) => void = () => undefined
+    deezerMock.mockImplementationOnce(
+      () =>
+        new Promise<Track>((resolve) => {
+          release = resolve
+        })
+    )
+    let pending: Promise<void> = Promise.resolve()
+    act(() => {
+      pending = controls.playTrack(track('2'))
+    })
+    expect(audio().getAttribute('src')).toBeNull()
+    expect(latest.isPlaying).toBe(false)
+    expect(latest.isLoading).toBe(true)
+    play.mockClear()
+    act(() => {
+      controls.toggle()
+    })
+    expect(play).not.toHaveBeenCalled()
+    await act(async () => {
+      release(fresh(track('2')))
+      await pending
+    })
+    expect(audio().src).toBe('https://fresh.test/2.mp3')
+    expect(latest.isPlaying).toBe(true)
+  })
+
+  it('retries the failed track instead of resuming the previous one', async () => {
+    await act(() => controls.playTrack(track('1')))
+    deezerMock.mockRejectedValueOnce(new Error('timeout'))
+    await act(() => controls.playTrack(track('2')))
+    expect(latest.currentTrack?.id).toBe('2')
+    expect(latest.isPlaying).toBe(false)
+    expect(audio().getAttribute('src')).toBeNull()
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(audio().src).toBe('https://fresh.test/2.mp3')
+    })
+    expect(latest.isPlaying).toBe(true)
+  })
+
+  it('follows play, pause and error events from the element', async () => {
+    await act(() => controls.playTrack(track('1')))
+    expect(latest.isPlaying).toBe(true)
+    act(() => {
+      fireEvent(audio(), new Event('pause'))
+    })
+    expect(latest.isPlaying).toBe(false)
+    act(() => {
+      fireEvent(audio(), new Event('play'))
+    })
+    expect(latest.isPlaying).toBe(true)
+    act(() => {
+      fireEvent(audio(), new Event('error'))
+    })
+    expect(latest.isPlaying).toBe(false)
+  })
+
+  it('publishes media session metadata and handles media keys', async () => {
+    const first = track('1')
+    const list = [{ ...first, album: { ...first.album, images: [{ url: 'https://img.test/1.jpg', width: 500, height: 500 }] } }, track('2')]
+    await act(() => controls.playTrack(list[0], list))
+    expect(navigator.mediaSession.metadata).toMatchObject({
+      title: 'Track 1',
+      artist: 'Artist',
+      album: 'Album',
+      artwork: [{ src: 'https://img.test/1.jpg' }],
+    })
+    act(() => {
+      actions.pause?.()
+    })
+    expect(latest.isPlaying).toBe(false)
+    play.mockClear()
+    act(() => {
+      actions.play?.()
+    })
+    expect(play).toHaveBeenCalled()
+    await act(async () => {
+      actions.nexttrack?.()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(latest.currentTrack?.id).toBe('2')
+    })
+    expect(actions.previoustrack).toBeDefined()
+  })
+
+  it('clamps seek to the preview length', async () => {
+    await act(() => controls.playTrack(track('1')))
+    Object.defineProperty(audio(), 'duration', { configurable: true, value: 30 })
+    act(() => {
+      controls.seek(45000)
+    })
+    expect(audio().currentTime).toBe(30)
+    act(() => {
+      controls.seek(-1000)
+    })
+    expect(audio().currentTime).toBe(0)
   })
 })

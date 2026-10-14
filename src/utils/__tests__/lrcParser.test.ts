@@ -48,13 +48,7 @@ describe('parseLRC without a fractional part', () => {
 })
 
 describe('parsePlainLyrics', () => {
-  it('estimates timestamps correctly', () => {
-    const text = 'Line 1\nLine 2'
-    const durationMs = 10000
-    const result = parsePlainLyrics(text, durationMs)
-    expect(result).toEqual([
-      { time: 0, text: 'Line 1' },
-      { time: 5000, text: 'Line 2' },
-    ])
+  it('splits plain lyrics into trimmed non-empty lines', () => {
+    expect(parsePlainLyrics(' Line 1\n\nLine 2 ')).toEqual(['Line 1', 'Line 2'])
   })
 })

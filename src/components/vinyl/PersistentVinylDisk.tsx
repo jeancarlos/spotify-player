@@ -27,21 +27,6 @@ function getVinylDiskProps(
   return { albumArt, albumName, favoriteLabel }
 }
 
-interface VinylPositions {
-  homeY: number
-  otherY: number
-}
-
-function getVinylY(
-  isHome: boolean,
-  playerHovered: boolean,
-  pos: VinylPositions
-): number {
-  if (isHome) return pos.homeY
-  if (playerHovered) return pos.homeY
-  return pos.otherY
-}
-
 function useVinylY() {
   const [vw, setVw] = useState(() => window.innerWidth)
   useEffect(() => {
@@ -60,11 +45,7 @@ function useVinylY() {
   }
 }
 
-interface PersistentVinylDiskProps {
-  playerHovered?: boolean
-}
-
-export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDiskProps) {
+export function PersistentVinylDisk() {
   const location = useLocation()
   const { state } = usePlayer()
   const { homeY, otherY } = useVinylY()
@@ -72,9 +53,7 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const { tracks, notes } = useFavorites()
   const isFavorite = tracks.some((t) => t.uri === state.currentTrack?.uri)
 
-  const isHome = location.pathname === '/'
-
-  const y = getVinylY(isHome, playerHovered, { homeY, otherY })
+  const y = location.pathname === '/' ? homeY : otherY
   const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite)
 
   return (

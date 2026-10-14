@@ -34,20 +34,9 @@ export function parseLRC(lrc: string): LyricLine[] {
   return result.sort((a, b) => a.time - b.time)
 }
 
-/**
- * Fallback for plain text lyrics without timestamps.
- * Estimates timestamps based on total duration.
- */
-export function parsePlainLyrics(text: string, durationMs: number): LyricLine[] {
-  const lines = text
+export function parsePlainLyrics(text: string): string[] {
+  return text
     .split('\n')
     .map((l) => l.trim())
     .filter(Boolean)
-  if (lines.length === 0) return []
-
-  const lineDuration = durationMs / lines.length
-  return lines.map((text, i) => ({
-    time: i * lineDuration,
-    text,
-  }))
 }
