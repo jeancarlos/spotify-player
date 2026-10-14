@@ -22,4 +22,11 @@ test.describe('Artist detail', () => {
     await page.getByRole('button', { name: /Moon Music/ }).first().click()
     await expect(page).toHaveURL(/\/albums\/\d+$/)
   })
+
+  test('shows the album tracks on the album page', async ({ page }) => {
+    await page.goto('/albums/650278821')
+    await expect(page.getByRole('heading', { name: 'Moon Music' }).first()).toBeVisible()
+    await expect(page.getByText('MOON MUSiC').first()).toBeVisible()
+    await expect(page.getByText('feelslikeimfallinginlove').first()).toBeVisible()
+  })
 })

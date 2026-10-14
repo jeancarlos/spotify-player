@@ -32,7 +32,11 @@ test.describe('Search', () => {
     const previous = page.getByRole('button', { name: 'Previous' })
     await expect(previous).toBeDisabled()
 
+    const pageTwo = page.waitForRequest(
+      (request) => request.url().includes('/search/artist') && /[?&]index=[1-9]/.test(request.url())
+    )
     await page.getByRole('button', { name: 'Next' }).last().click()
+    await pageTwo
     await expect(page).toHaveURL(/page=2/)
     await expect(previous).toBeEnabled()
 
