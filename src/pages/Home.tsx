@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { useRecentlyPlayed } from '@/hooks/useRecentlyPlayed'
 import { useCatalogHealth } from '@/hooks/useCatalogHealth'
+import { useWindowSize } from '@/hooks/useWindowSize'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
@@ -14,18 +15,7 @@ const DISK_ENTRY_DELAY_S = 0.75
 const MAX_CAROUSEL_TRACKS = 5
 
 function useDiskLayout() {
-  const [vw, setVw] = useState(() => window.innerWidth)
-  const [vh, setVh] = useState(() => window.innerHeight)
-  useEffect(() => {
-    const handleResize = () => {
-      setVw(window.innerWidth)
-      setVh(window.innerHeight)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+  const { width: vw, height: vh } = useWindowSize()
 
   const diskPx = Math.min(720, vw)
   const translateY = Math.round(diskPx * 0.28)

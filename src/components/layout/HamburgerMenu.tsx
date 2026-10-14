@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Github, Heart, Menu, X, Home } from 'lucide-react'
+import { ArrowLeft, CodeXml, Heart, Menu, X, Home } from 'lucide-react'
 import { useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -102,8 +102,7 @@ export function HamburgerMenu() {
                   onClick={close}
                   className={itemClass}
                 >
-                  {/* eslint-disable-next-line @typescript-eslint/no-deprecated */}
-                  <Github size={16} className="text-black/50 flex-shrink-0" />
+                  <CodeXml size={16} className="text-black/50 flex-shrink-0" />
                   <span className="text-sm text-black/70">{t('nav.sourceCode')}</span>
                 </a>
               </div>

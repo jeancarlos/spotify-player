@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   BarChart,
@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { isPlayable } from '@/lib/deezerMappers'
+import { useWindowSize } from '@/hooks/useWindowSize'
 import type { Track } from '@/types/music'
 import { toChartData, playEntry, chartLayout, type ChartEntry } from './chartData'
 import { CustomTooltip } from './ArtistChartTooltip'
@@ -85,16 +86,7 @@ function getBarFill(entryId: string, index: number, activeTrackId?: string): str
 
 export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
   const { t, i18n } = useTranslation()
-  const [vw, setVw] = useState(window.innerWidth)
-  useEffect(() => {
-    const onResize = () => {
-      setVw(window.innerWidth)
-    }
-    window.addEventListener('resize', onResize)
-    return () => {
-      window.removeEventListener('resize', onResize)
-    }
-  }, [])
+  const { width: vw } = useWindowSize()
   const layout = chartLayout(vw)
   const chartData = useMemo(() => toChartData(tracks), [tracks])
 
