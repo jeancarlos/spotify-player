@@ -5,7 +5,6 @@ import { AlbumTable } from '../AlbumTable'
 import { TrackTable } from '../TrackTable'
 import { VinylCard } from '../VinylCard'
 import { TiltCover } from '../TiltCover'
-import { LyricsView } from '@/components/layout/LyricsView'
 import { ArtistTopTracksChart } from '@/components/artist/ArtistTopTracksChart'
 vi.mock('recharts', async (orig) => ({
   ...(await orig<Record<string, unknown>>()),
@@ -115,60 +114,6 @@ describe('keyboard operability', () => {
     screen.getByRole('button').dispatchEvent(ev)
     expect(ev.defaultPrevented).toBe(true)
     vi.unstubAllGlobals()
-  })
-
-  it('LyricsView lines are buttons that seek with Enter and Space', async () => {
-    const user = userEvent.setup()
-    const onSeek = vi.fn()
-    render(
-      <LyricsView
-        lines={[
-          { time: 0, text: 'Primeira' },
-          { time: 5000, text: 'Segunda' },
-        ]}
-        progress={0}
-        onSeek={onSeek}
-      />
-    )
-    await user.tab()
-    expect(screen.getByRole('button', { name: 'Primeira' })).toHaveFocus()
-    await user.keyboard('{Enter}')
-    await user.tab()
-    await user.keyboard(' ')
-    expect(onSeek).toHaveBeenNthCalledWith(1, 0)
-    expect(onSeek).toHaveBeenNthCalledWith(2, 5000)
-  })
-
-  it('LyricsView tab order covers at most three lines and a focused line is fully visible', async () => {
-    const user = userEvent.setup()
-    const many = Array.from({ length: 20 }, (_, i) => ({ time: i * 1000, text: `L${i}` }))
-    render(<LyricsView lines={many} progress={10000} onSeek={vi.fn()} />)
-    const tabbable = screen.getAllByRole('button').filter((b) => b.tabIndex === 0)
-    expect(tabbable.map((b) => b.textContent)).toEqual(['L9', 'L10', 'L11'])
-    await user.tab()
-    expect(screen.getByRole('button', { name: 'L9' })).toHaveFocus()
-    await user.tab()
-    await user.tab()
-    await user.tab()
-    expect(document.body).toHaveFocus()
-    const cls = tabbable[0].className
-    expect(cls).toContain('focus-visible:!opacity-100')
-    expect(cls).toContain('focus-visible:![filter:none]')
-  })
-
-  it('LyricsView keeps the same button element for a line as the window advances', () => {
-    const many = Array.from({ length: 20 }, (_, i) => ({ time: i * 1000, text: `L${i}` }))
-    const { rerender } = render(<LyricsView lines={many} progress={10000} onSeek={vi.fn()} />)
-    const el = screen.getByRole('button', { name: 'L11' })
-    rerender(<LyricsView lines={many} progress={11000} onSeek={vi.fn()} />)
-    expect(screen.getByRole('button', { name: 'L11' })).toBe(el)
-  })
-
-  it('LyricsView without onSeek has only disabled buttons', () => {
-    render(<LyricsView lines={[{ time: 0, text: 'Primeira' }]} progress={0} />)
-    screen.getAllByRole('button').forEach((b) => {
-      expect(b).toBeDisabled()
-    })
   })
 
   it('the artist chart has a keyboard path that plays playable bars only', async () => {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { normalizeTrack } from '@/lib/utils'
 import { STORAGE_KEYS } from '@/lib/storageKeys'
 import type { Track } from '@/types/music'
 
@@ -31,7 +32,7 @@ function parseFavorites(raw: string | null): FavoritesData {
     if (typeof parsed !== 'object' || parsed === null) return empty
     const { tracks, notes } = parsed as Record<string, unknown>
     return {
-      tracks: Array.isArray(tracks) ? tracks.filter(isTrack) : [],
+      tracks: Array.isArray(tracks) ? tracks.filter(isTrack).map(normalizeTrack) : [],
       notes: parseNotes(notes),
     }
   } catch {

@@ -31,6 +31,19 @@ describe('useArtistDetailPage playback', () => {
     expect(playTrack).toHaveBeenCalledWith(top[0], top)
   })
 
+  it('resets the album page when the artist changes', () => {
+    const { result, rerender } = renderHook(({ id }) => useArtistDetailPage(id), {
+      wrapper,
+      initialProps: { id: '9' },
+    })
+    act(() => {
+      result.current.setAlbumPage(2)
+    })
+    expect(result.current.albumPage).toBe(2)
+    rerender({ id: '10' })
+    expect(result.current.albumPage).toBe(1)
+  })
+
   it('navigates with the full current path, query included, as from', () => {
     const routedWrapper = ({ children }: { children: ReactNode }) => (
       <MemoryRouter initialEntries={['/artists/9?view=grid']}>

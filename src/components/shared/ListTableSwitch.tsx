@@ -27,7 +27,7 @@ export function ListTableSwitch({ view, onChange, className }: ListTableSwitchPr
         aria-pressed={view === 'list'}
         className={cn(
           'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono transition-colors',
-          view === 'list' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
+          view === 'list' ? 'bg-black text-white' : 'text-black/60 hover:text-black'
         )}
       >
         <List size={13} />
@@ -40,7 +40,7 @@ export function ListTableSwitch({ view, onChange, className }: ListTableSwitchPr
         aria-pressed={view === 'table'}
         className={cn(
           'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono transition-colors',
-          view === 'table' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
+          view === 'table' ? 'bg-black text-white' : 'text-black/60 hover:text-black'
         )}
       >
         <Table2 size={13} />

@@ -1,72 +1,28 @@
-import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import type { LyricLine } from '@/types/lyrics'
-
-const WINDOW = 4
-const SLOT_OPACITY = [0.05, 0.1, 0.18, 0.35, 1.0, 0.35, 0.18, 0.1, 0.05]
-const SLOT_BLUR = [4, 3, 2, 1, 0, 1, 2, 3, 4]
 
 interface LyricsViewProps {
-  lines: LyricLine[]
-  progress: number
-  onSeek?: (ms: number) => void
+  lines: string[]
 }
 
-export function LyricsView({ lines, progress, onSeek }: LyricsViewProps) {
+export function LyricsView({ lines }: LyricsViewProps) {
   const { t } = useTranslation()
   if (lines.length === 0) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-white/20 text-sm">{t('lyrics.noLyricsAvailable')}</p>
+        <p className="text-white/60 text-sm">{t('lyrics.noLyricsAvailable')}</p>
       </div>
     )
   }
 
-  const foundIndex = lines.findLastIndex((line) => line.time <= progress)
-  const activeIndex = Math.max(0, foundIndex)
-
-  const slots = Array.from({ length: WINDOW * 2 + 1 }, (_, i) => {
-    const lineIdx = activeIndex - WINDOW + i
-    const line = lineIdx < 0 || lineIdx >= lines.length ? null : lines[lineIdx]
-    return { line, lineIdx }
-  })
-
   return (
-    <div className="h-full flex flex-col justify-center gap-6 px-8">
-      {slots.map(({ line, lineIdx }, i) => {
-        const isActive = i === WINDOW
-        const seekable = Boolean(line && onSeek)
-        const nearActive = Math.abs(i - WINDOW) <= 1
-
-        return (
-          <motion.button
-            key={lineIdx}
-            type="button"
-            disabled={!seekable}
-            aria-hidden={line ? undefined : true}
-            tabIndex={nearActive ? 0 : -1}
-            animate={{
-              opacity: SLOT_OPACITY[i],
-              filter: `blur(${SLOT_BLUR[i]}px)`,
-            }}
-            transition={{ duration: 0.3 }}
-            onClick={
-              line && onSeek
-                ? () => {
-                    onSeek(line.time)
-                  }
-                : undefined
-            }
-            className={`block w-full text-center leading-tight select-none line-clamp-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none focus-visible:!opacity-100 focus-visible:![filter:none] ${
-              isActive
-                ? 'text-white font-bold text-2xl md:text-3xl'
-                : 'text-white text-lg md:text-xl'
-            } ${seekable ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
-          >
-            {line?.text ?? ''}
-          </motion.button>
-        )
-      })}
+    <div className="h-full overflow-y-auto px-8 pt-4 pb-40">
+      <div className="mx-auto max-w-2xl flex flex-col gap-4 text-center">
+        {lines.map((line, i) => (
+          <p key={i} className="text-white/80 text-lg md:text-xl leading-snug">
+            {line}
+          </p>
+        ))}
+      </div>
     </div>
   )
 }

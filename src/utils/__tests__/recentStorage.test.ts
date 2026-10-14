@@ -63,3 +63,22 @@ describe('recentStorage', () => {
     expect(() => { pushRecent(track); }).not.toThrow()
   })
 })
+
+describe('recentStorage legacy images', () => {
+  it('returns old smallest-first covers largest first', () => {
+    vi.restoreAllMocks()
+    localStorage.clear()
+    const old = {
+      ...track,
+      album: {
+        ...track.album,
+        images: [
+          { url: 'small', width: null, height: null },
+          { url: 'xl', width: null, height: null },
+        ],
+      },
+    }
+    localStorage.setItem('spoter_recent_v1', JSON.stringify([old]))
+    expect(readRecent()[0].album.images.map((i) => i.url)).toEqual(['xl', 'small'])
+  })
+})

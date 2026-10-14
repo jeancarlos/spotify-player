@@ -1,35 +1,32 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import { useWindowSize } from '@/hooks/useWindowSize'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { pickImage, srcSetOf } from '@/lib/utils'
+import type { Image } from '@/types/music'
 import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
 
 interface ArtistHeaderProps {
-  imageUrl: string | undefined
+  images: Image[]
   name: string
   subtitle?: string
   link?: string
   onLayout: (height: number) => void
 }
 
+const HERO_TOP = 64
+const HERO_GAP = 16
+
 function useArtistHeaderLayout(hasLink: boolean) {
-  const [vw, setVw] = useState(() => window.innerWidth)
-  useEffect(() => {
-    const fn = () => {
-      setVw(window.innerWidth)
-    }
-    window.addEventListener('resize', fn)
-    return () => {
-      window.removeEventListener('resize', fn)
-    }
-  }, [])
+  const { width: vw } = useWindowSize()
 
   const imgPx = Math.min(280, Math.round(vw * 0.65))
-  const headerHeight = Math.round(imgPx * 0.75) + 120 + (hasLink ? 28 : 0)
+  const headerHeight = Math.round(imgPx * 0.75) + 120 + HERO_TOP + HERO_GAP + (hasLink ? 28 : 0)
 
   return { imgPx, headerHeight }
 }
 
-export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: ArtistHeaderProps) {
+export function ArtistHeader({ images, name, subtitle, link, onLayout }: ArtistHeaderProps) {
   const { t } = useTranslation()
   const { imgPx, headerHeight } = useArtistHeaderLayout(!!link)
 
@@ -64,7 +61,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: Artis
     >
       <div
         className="absolute left-1/2"
-        style={{ transform: 'translateX(-50%) translateY(-16px)', top: 0, zIndex: 2 }}
+        style={{ transform: 'translateX(-50%)', top: HERO_TOP, zIndex: 2 }}
       >
         <motion.div
           initial={{ scale: 0.8, y: 60, opacity: 0 }}
@@ -72,9 +69,12 @@ export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: Artis
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           style={{ width: imgPx, height: imgPx }}
         >
-          {imageUrl ? (
+          {images.length ? (
             <img
-              src={imageUrl}
+              src={pickImage(images, imgPx)?.url}
+              srcSet={srcSetOf(images)}
+              sizes={`${imgPx}px`}
+              decoding="async"
               alt={name}
               className="w-full h-full object-cover rounded-full shadow-xl"
               draggable={false}
@@ -85,9 +85,9 @@ export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: Artis
         </motion.div>
       </div>
 
-      {imageUrl && (
+      {images.length > 0 && (
         <motion.img
-          src={imageUrl}
+          src={pickImage(images, 250)?.url}
           aria-hidden="true"
           alt={name}
           className="absolute left-0 right-0 top-[-100px] h-[500px]  sepia-[.25] scale-125 opacity-10 w-full blur-3xl z-0"
@@ -100,7 +100,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: Artis
 
       <motion.div
         className="absolute left-0 right-0 flex flex-col items-center"
-        style={{ top: imgPx, zIndex: 1 }}
+        style={{ top: HERO_TOP + imgPx + HERO_GAP, zIndex: 1 }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
@@ -111,7 +111,7 @@ export function ArtistHeader({ imageUrl, name, subtitle, link, onLayout }: Artis
         >
           {name}
         </h1>
-        {subtitle && <p className="text-sm text-black/50 mt-1 text-center px-8">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-black/60 mt-1 text-center px-8">{subtitle}</p>}
         {link && (
           <DeezerAttribution
             href={link}

@@ -24,7 +24,7 @@ export function ControlTip({ label }: { label: string }) {
 
 export function PlaybackControls() {
   const { state, controls } = usePlayer()
-  const { isPlaying, shuffle, repeat, currentTrack } = state
+  const { isPlaying, isLoading, shuffle, repeat, currentTrack } = state
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -56,7 +56,7 @@ export function PlaybackControls() {
           aria-pressed={shuffle}
           className={cn(
             'p-1.5 rounded-lg transition-colors',
-            shuffle ? 'text-black' : 'text-black/30 hover:text-black/60'
+            shuffle ? 'text-black bg-black/10' : 'text-black/60 hover:text-black'
           )}
         >
           <Shuffle size={15} />
@@ -83,12 +83,13 @@ export function PlaybackControls() {
             controls.toggle()
           }}
           aria-label={playLabel}
-          className="w-9 h-9 rounded-full bg-black flex items-center justify-center hover:bg-black/80 transition-colors"
+          disabled={isLoading}
+          className="tap-target w-9 h-9 rounded-full bg-primary text-ink flex items-center justify-center hover:bg-primary/85 transition-colors disabled:opacity-50 disabled:cursor-wait"
         >
           {isPlaying ? (
-            <Pause size={14} className="fill-white text-white" />
+            <Pause size={14} className="fill-current" />
           ) : (
-            <Play size={14} className="fill-white text-white ml-0.5" />
+            <Play size={14} className="fill-current ml-0.5" />
           )}
         </button>
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
@@ -118,7 +119,7 @@ export function PlaybackControls() {
           aria-pressed={repeat !== 'off'}
           className={cn(
             'p-1.5 rounded-lg transition-colors',
-            repeat !== 'off' ? 'text-black' : 'text-black/30 hover:text-black/60'
+            repeat !== 'off' ? 'text-black bg-black/10' : 'text-black/60 hover:text-black'
           )}
         >
           {repeat === 'track' ? <Repeat1 size={15} /> : <Repeat size={15} />}
@@ -130,7 +131,7 @@ export function PlaybackControls() {
         <button
           onClick={toggleQueue}
           aria-label={queueLabel}
-          className="p-1.5 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-black/40 text-black/30 hover:text-black"
+          className="p-1.5 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-black/40 text-black/60 hover:text-black"
         >
           <ListMusic size={15} />
         </button>

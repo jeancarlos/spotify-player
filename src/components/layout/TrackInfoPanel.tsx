@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useArtist } from '@/hooks/queries/useArtist'
 import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
 import { formatDate } from '@/utils/formatDate'
@@ -15,15 +14,12 @@ interface Props {
 export function TrackInfoPanel({ track }: Props) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const artist = useArtist(track.artists[0]?.id)
   const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
-
-  const genres: string[] = artist.data?.genres?.slice(0, 5) ?? []
 
   return (
     <div>
       <div className="flex flex-col items-center gap-6 px-5 py-4 pb-20">
-        <TiltCover imageUrl={track.album.images[0]?.url} size={176} name={track.album.name} />
+        <TiltCover images={track.album.images} size={176} name={track.album.name} />
 
         <div className="text-center space-y-1">
           <div className="flex items-center justify-center gap-2">
@@ -51,16 +47,21 @@ export function TrackInfoPanel({ track }: Props) {
                   {a.name}
                 </button>
                 {i < track.artists.length - 1 && (
-                  <span className="text-white/30 text-sm font-medium ml-1">, </span>
+                  <span className="text-white/60 text-sm font-medium ml-1">, </span>
                 )}
               </span>
             ))}
           </div>
-          <p className="text-white/35 text-xs">{track.album.name}</p>
+          <p className="text-white/60 text-xs">{track.album.name}</p>
         </div>
 
         <div className="flex justify-center gap-2.5 w-full max-w-sm">
-          <StatCard label={t('track.releaseDate')} value={formatDate(track.album.release_date)} />
+          {track.album.release_date && (
+            <StatCard
+              label={t('lyrics.releaseDate')}
+              value={formatDate(track.album.release_date)}
+            />
+          )}
           <StatCard label={t('track.duration')} value={formatDuration(track.duration_ms)} />
         </div>
 
@@ -72,24 +73,13 @@ export function TrackInfoPanel({ track }: Props) {
                 href={wikipedia.data.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[10px] text-white/35 hover:text-white/60 underline mt-2 inline-block transition-colors"
+                className="text-[10px] text-white/60 hover:text-white/90 underline mt-2 inline-block transition-colors"
               >
                 {t('track.readMore')} →
               </a>
             </div>
           </Section>
         )}
-
-        <div className="flex flex-wrap justify-center gap-1.5">
-          {genres.map((g) => (
-            <span
-              key={g}
-              className="text-[10px] px-2.5 py-1 rounded-xl bg-white/5 border border-white/5 text-white/60 capitalize font-medium hover:bg-white/10 transition-colors"
-            >
-              {g}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   )
@@ -98,7 +88,7 @@ export function TrackInfoPanel({ track }: Props) {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="w-full max-w-sm">
-      <p className="text-[9px] text-white/25 uppercase tracking-[0.2em] font-bold mb-4 text-center">
+      <p className="text-[9px] text-white/60 uppercase tracking-[0.2em] font-bold mb-4 text-center">
         {label}
       </p>
       {children}

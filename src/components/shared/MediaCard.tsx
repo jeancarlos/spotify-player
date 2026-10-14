@@ -1,7 +1,11 @@
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
+import type { Image } from '@/types/music'
+
+const GRID_SIZES =
+  '(min-width: 768px) 93px, (min-width: 640px) calc((100vw - 96px) / 5), calc((100vw - 72px) / 3)'
 
 interface MediaCardProps {
-  imageUrl?: string
+  images?: Image[]
   title: string
   subtitle?: string
   onClick: () => void
@@ -11,7 +15,7 @@ interface MediaCardProps {
 }
 
 export function MediaCard({
-  imageUrl,
+  images,
   title,
   subtitle,
   onClick,
@@ -37,9 +41,13 @@ export function MediaCard({
       aria-label={ariaLabel ?? title}
     >
       <div className="relative aspect-square overflow-hidden rounded-[6px] shadow-lg group-hover:shadow-xl ring-1 ring-white/10 transition-all duration-200 group-hover:scale-105 group-active:scale-95">
-        {imageUrl ? (
+        {images?.length ? (
           <img
-            src={imageUrl}
+            src={pickImage(images, 100)?.url}
+            srcSet={srcSetOf(images)}
+            sizes={GRID_SIZES}
+            loading="lazy"
+            decoding="async"
             alt={title}
             className={cn('w-full h-full object-cover', imageClassName)}
             draggable={false}
@@ -53,11 +61,11 @@ export function MediaCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 px-2 pb-1.5">
-          <p className="text-[9px] font-semibold text-white truncate leading-tight drop-shadow">
+          <p className="text-[11px] font-semibold text-white truncate leading-tight drop-shadow">
             {title}
           </p>
           {subtitle && (
-            <p className="text-[8px] text-white/60 truncate leading-tight">{subtitle}</p>
+            <p className="text-[10px] text-white/80 truncate leading-tight">{subtitle}</p>
           )}
         </div>
       </div>

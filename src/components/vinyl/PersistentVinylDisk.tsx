@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { useFavorites } from '@/hooks/useFavorites'
+import { useWindowSize } from '@/hooks/useWindowSize'
+import { homeDiskOffset } from '@/utils/diskLayout'
 import type { Track } from '@/types/music'
 
 const PLAYER_CLEARANCE = 136
@@ -27,44 +28,16 @@ function getVinylDiskProps(
   return { albumArt, albumName, favoriteLabel }
 }
 
-interface VinylPositions {
-  homeY: number
-  otherY: number
-}
-
-function getVinylY(
-  isHome: boolean,
-  playerHovered: boolean,
-  pos: VinylPositions
-): number {
-  if (isHome) return pos.homeY
-  if (playerHovered) return pos.homeY
-  return pos.otherY
-}
-
 function useVinylY() {
-  const [vw, setVw] = useState(() => window.innerWidth)
-  useEffect(() => {
-    const fn = () => {
-      setVw(window.innerWidth)
-    }
-    window.addEventListener('resize', fn)
-    return () => {
-      window.removeEventListener('resize', fn)
-    }
-  }, [])
+  const { width: vw } = useWindowSize()
   const diskPx = Math.min(720, vw)
   return {
-    homeY: Math.round(diskPx * 0.28),
+    homeY: homeDiskOffset(vw),
     otherY: diskPx - PLAYER_CLEARANCE,
   }
 }
 
-interface PersistentVinylDiskProps {
-  playerHovered?: boolean
-}
-
-export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDiskProps) {
+export function PersistentVinylDisk() {
   const location = useLocation()
   const { state } = usePlayer()
   const { homeY, otherY } = useVinylY()
@@ -72,9 +45,7 @@ export function PersistentVinylDisk({ playerHovered = false }: PersistentVinylDi
   const { tracks, notes } = useFavorites()
   const isFavorite = tracks.some((t) => t.uri === state.currentTrack?.uri)
 
-  const isHome = location.pathname === '/'
-
-  const y = getVinylY(isHome, playerHovered, { homeY, otherY })
+  const y = location.pathname === '/' ? homeY : otherY
   const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite)
 
   return (

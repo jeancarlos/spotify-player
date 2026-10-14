@@ -18,7 +18,7 @@ export function AlbumDetail() {
     hasNext,
     albumYear,
     albumSubtitle,
-    imageUrl,
+    images,
     albumName,
     albumArtists,
     albumLink,
@@ -31,7 +31,7 @@ export function AlbumDetail() {
   return (
     <div className="min-h-screen">
       <CollectionHeader
-        imageUrl={imageUrl}
+        images={images}
         name={albumName}
         subtitle={albumSubtitle}
         artists={albumArtists}
@@ -75,18 +75,16 @@ export function AlbumDetail() {
               />
             )}
 
-            {(page > 1 || hasNext) && (
-              <Pagination
-                page={page}
-                hasNext={hasNext}
-                onPrev={() => {
-                  setPage((p) => Math.max(1, p - 1))
-                }}
-                onNext={() => {
-                  setPage((p) => p + 1)
-                }}
-              />
-            )}
+            <Pagination
+              page={page}
+              hasNext={hasNext}
+              onPrev={() => {
+                setPage((p) => Math.max(1, p - 1))
+              }}
+              onNext={() => {
+                setPage((p) => p + 1)
+              }}
+            />
           </div>
         </div>
       </div>

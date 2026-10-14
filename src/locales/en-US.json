@@ -1,21 +1,16 @@
 {
   "nav": {
     "home": "Home",
-    "artists": "Artists",
     "favorites": "Favorites",
-    "collapse": "Collapse",
     "openMenu": "Open menu",
-    "languageSwitcher": "Language switcher"
+    "languageSwitcher": "Language switcher",
+    "sourceCode": "Source code"
   },
   "home": {
     "recentlyPlayed": "Recently Played",
-    "newReleases": "New Releases",
-    "recommendations": "Recommended for You",
-    "seeMore": "See more",
     "hint": "Tap a vinyl to hear a 30-second preview"
   },
   "player": {
-    "nowPlaying": "Now playing",
     "noTrack": "Pick a vinyl to start a preview",
     "lyrics": "Lyrics",
     "queue": "Queue",
@@ -29,7 +24,9 @@
     "pause": "Pause",
     "seek": "Seek",
     "playTrack": "Play {{name}}",
-    "progressText": "{{current}} of {{total}}"
+    "progressText": "{{current}} of {{total}}",
+    "viewTrack": "View song",
+    "emptyQueue": "The queue is empty"
   },
   "catalog": {
     "unavailable": "The Deezer catalog is unreachable. Favorites and recently played are still listed, but playback is paused."
@@ -37,7 +34,6 @@
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
-    "retry": "Try again",
     "back": "Back",
     "poweredByDeezer": "Music data and previews by Deezer",
     "openOnDeezer": "Open on Deezer",
@@ -46,7 +42,7 @@
     "table": "Table",
     "rank": "Rank",
     "name": "Name",
-    "clear": "Clear"
+    "dismissNotification": "Dismiss notification"
   },
   "artists": {
     "searchPlaceholder": "Search...",
@@ -56,7 +52,6 @@
     "tabArtist": "Artist",
     "tabAlbum": "Album",
     "tabPlaylist": "Playlist",
-    "filterByGenre": "Filter by genre",
     "noResults": "No results found",
     "result_one": "{{count}} result",
     "result_other": "{{count}} results",
@@ -64,53 +59,33 @@
     "charts": "Top charts on Deezer",
     "previous": "Previous",
     "next": "Next",
-    "all": "All",
-    "unknownGenre": "Unknown genre",
-    "followers_one": "{{count}} follower",
-    "followers_other": "{{count}} followers"
+    "followers_one": "{{count, number(notation: compact)}} follower",
+    "followers_other": "{{count, number(notation: compact)}} followers"
   },
   "artistDetail": {
-    "topTracks": "Top Tracks",
-    "albums": "Albums",
-    "previous": "Previous",
-    "next": "Next",
     "discography": "Discography",
     "bio": "About the artist",
-    "relatedArtists": "Similar Artists",
-    "loadMore": "Load more",
     "topTracksRanked": "Top tracks on Deezer",
     "deezerRank": "Deezer rank"
   },
   "albumDetail": {
     "playAlbum": "Play album",
-    "tracks": "Tracks",
-    "by": "by"
+    "tracks": "Tracks"
   },
   "playlistDetail": {
     "playPlaylist": "Play playlist",
     "tracks": "Tracks",
-    "by": "by",
     "owner": "by {{name}}"
   },
   "favorites": {
     "saveFailed": "Couldn't save your favorites in this browser",
-    "song": "Song",
-    "artist": "Artist",
     "album": "Album",
-    "note": "Personal note",
     "addButton": "Add favorite",
     "addHeading": "Add Favorite",
-    "searchPlaceholder": "Search favorites...",
-    "searchAddPlaceholder": "Song or artist...",
     "emptyList": "No favorites yet",
     "removeConfirm": "Remove",
     "cancel": "Cancel",
-    "songRequired": "Song is required",
-    "artistRequired": "Artist is required",
-    "minQuery": "Type at least 2 characters",
     "close": "Close",
-    "dismissNotification": "Dismiss notification",
-    "addTrack": "+ Add",
     "addToList": "Add to Vinyla List",
     "removeFromList": "Remove from Vinyla List",
     "addedToList": "Added!",
@@ -123,29 +98,19 @@
     "trackLabel": "Song",
     "addConfirm": "Add to favorites",
     "searchAutocomplete": "Search song or artist...",
-    "isFavorite": "♥ FAVORITE",
     "noteCharsLeft": "{{count}}/80",
-    "editNote": "Edit note",
-    "clearTrack": "Clear selection",
-    "reorderError": "Reorder failed. Previous order restored.",
-    "reorderPosition": "Edit position of {{name}}"
+    "clearTrack": "Clear selection"
   },
   "lyrics": {
     "searching": "Searching lyrics...",
-    "notFound": "Lyrics not found",
-    "album": "Album",
     "releaseDate": "Release date",
-    "duration": "Duration",
     "nowPlaying": "Now playing",
     "noLyricsAvailable": "No lyrics available"
   },
-  "trackRow": {},
   "track": {
     "noPreview": "Preview unavailable",
     "duration": "Duration",
-    "instrumental": "Instrumental",
     "songDetails": "Song details",
-    "bpm": "BPM",
     "explicit": "Explicit",
     "trackNumber": "#",
     "albumCol": "Album",
@@ -164,5 +129,11 @@
     "updateAvailable": "Update available",
     "newVersion": "A new version of Vinyla is available. Reload to update.",
     "reload": "Reload & Update"
+  },
+  "albumType": {
+    "album": "Album",
+    "single": "Single",
+    "compilation": "Compilation",
+    "ep": "EP"
   }
 }

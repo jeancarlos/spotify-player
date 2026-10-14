@@ -71,7 +71,7 @@ function AddButton({ existingFavorites, onAdd }: AddButtonProps) {
         {open && (
           <motion.div
             ref={popoverRef}
-            className="absolute top-[calc(100%+8px)] right-0 w-80 glass rounded-2xl shadow-xl overflow-hidden z-30"
+            className="absolute top-[calc(100%+8px)] right-0 w-80 max-w-[calc(100vw-2rem)] glass bg-white/90 rounded-2xl shadow-xl z-30"
             initial={{ opacity: 0, scale: 0.92, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: -6 }}
@@ -105,7 +105,7 @@ export function Favorites() {
 
   return (
     <div className="min-h-screen pt-16 px-4 pb-24">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6 pt-6">
           <div>
             <h1
@@ -115,7 +115,7 @@ export function Favorites() {
               {t('nav.favorites')}
             </h1>
             <div className="mt-0.5">
-              <span className="text-sm text-black/40 font-medium">{playlistName}</span>
+              <span className="text-sm text-black/60 font-medium">{playlistName}</span>
             </div>
           </div>
 

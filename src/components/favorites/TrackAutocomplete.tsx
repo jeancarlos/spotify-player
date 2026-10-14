@@ -4,7 +4,7 @@ import { X } from 'lucide-react'
 import { useSearchTracks } from '@/hooks/queries/useSearchTracks'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
-import { cn } from '@/lib/utils'
+import { cn, pickImage, srcSetOf } from '@/lib/utils'
 import type { Track } from '@/types/music'
 
 interface ResultsListProps {
@@ -21,7 +21,7 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
       id={listboxId}
       role="listbox"
       aria-label={label}
-      className="absolute top-full rounded-xl rounded-t-none h-[160px] mt-1 left-0 right-0 bg-white/90 backdrop-blur-sm overflow-y-auto max-h-60 z-50 shadow-xl"
+      className="absolute top-full rounded-xl rounded-t-none h-[160px] mt-1 left-0 right-0 bg-white overflow-y-auto max-h-60 z-50 shadow-xl"
     >
       {results.map((track, i) => (
         <li
@@ -39,13 +39,17 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
           )}
         >
           <img
-            src={track.album.images[0]?.url}
+            src={pickImage(track.album.images, 32)?.url}
+            srcSet={srcSetOf(track.album.images)}
+            sizes="32px"
+            loading="lazy"
+            decoding="async"
             className="w-8 h-8 rounded-lg object-cover shrink-0"
             alt=""
           />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-black truncate">{track.name}</p>
-            <p className="text-[11px] text-black/50 truncate">
+            <p className="text-[11px] text-black/60 truncate">
               {track.artists.map((a) => a.name).join(', ')}
             </p>
           </div>
@@ -65,19 +69,22 @@ function SelectedTrack({ track, onClear, clearLabel }: SelectedTrackProps) {
   return (
     <div className="flex items-center gap-2 px-3 py-2 bg-black/5 rounded-xl">
       <img
-        src={track.album.images[0]?.url}
+        src={pickImage(track.album.images, 24)?.url}
+        srcSet={srcSetOf(track.album.images)}
+        sizes="24px"
+        decoding="async"
         className="w-6 h-6 rounded object-cover shrink-0"
         alt=""
       />
       <span className="text-sm text-black flex-1 truncate">{track.name}</span>
-      <span className="text-[11px] text-black/40 truncate hidden sm:block">
+      <span className="text-[11px] text-black/60 truncate hidden sm:block">
         {track.artists.map((a) => a.name).join(', ')}
       </span>
       <button
         type="button"
         onClick={onClear}
         aria-label={clearLabel}
-        className="p-0.5 text-black/30 hover:text-black/70 transition-colors shrink-0"
+        className="p-0.5 text-black/60 hover:text-black/70 transition-colors shrink-0"
       >
         <X size={14} />
       </button>
@@ -161,7 +168,7 @@ function TrackSearchInput({
         placeholder={placeholder}
         className={cn(
           'w-full px-3 py-2 bg-black/5 rounded-xl text-sm text-black',
-          'placeholder:text-black/30 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors',
+          'placeholder:text-black/60 outline-none focus-visible:ring-2 focus-visible:ring-black/40 focus:bg-black/[0.08] transition-colors',
           isOpen ? 'rounded-b-none' : 'rounded-xl',
           error && 'ring-1 ring-red-400'
         )}
@@ -187,7 +194,7 @@ function TrackSearchInput({
 
       {isPending && debouncedQuery.length >= 2 && (
         <div className="absolute top-full mt-1 left-0 right-0 bg-white rounded-xl p-3 z-50 shadow-xl">
-          <p className="text-xs text-black/40 text-center">{loadingText}</p>
+          <p className="text-xs text-black/60 text-center">{loadingText}</p>
         </div>
       )}
 

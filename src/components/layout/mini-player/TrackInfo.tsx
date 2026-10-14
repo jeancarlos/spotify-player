@@ -3,6 +3,7 @@ import { Info } from 'lucide-react'
 import { usePlayer, useProgress } from '@/contexts/PlayerContext'
 import { useTranslation } from 'react-i18next'
 import { VinylDisk } from '@/components/vinyl/VinylDisk'
+import { pickImage, srcSetOf } from '@/lib/utils'
 import { formatDuration } from '@/utils/formatDuration'
 import { currentPath, getFromPath } from '@/utils/routerState'
 
@@ -67,7 +68,10 @@ export function TrackInfo({ notes }: TrackInfoProps) {
             className="block rounded-full focus-visible:ring-2 focus-visible:ring-black/40 focus-visible:outline-none"
           >
             <img
-              src={currentTrack.album.images[0]?.url}
+              src={pickImage(currentTrack.album.images, 48)?.url}
+              srcSet={srcSetOf(currentTrack.album.images)}
+              sizes="48px"
+              decoding="async"
               alt=""
               className="w-12 h-12 rounded-full"
             />
@@ -86,7 +90,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               {currentTrack.artists.map((a, i) => (
                 <button
                   key={a.id}
-                  className="truncate text-[11px] text-black/50 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
+                  className="truncate text-[11px] text-black/60 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
                   onClick={() => {
                     navigate(`/artists/${a.id}`)
                   }}
@@ -102,7 +106,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
                   state: { from: currentPath(location) },
                 })
               }}
-              className="text-[10px] font-medium text-black/30 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
+              className="text-[10px] font-medium text-black/60 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
             >
               {currentTrack.album.name}
             </button>

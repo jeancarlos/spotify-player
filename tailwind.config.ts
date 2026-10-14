@@ -13,6 +13,8 @@ const config: Config = {
       colors: {
         primary: 'rgb(var(--color-primary) / <alpha-value>)',
         secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+        ink: '#16131A',
+        cream: '#FFF6F2',
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { STORAGE_KEYS } from '@/lib/storageKeys'
 import { readRecent } from '@/utils/recentStorage'
 import type { Track } from '@/types/music'
 
@@ -8,7 +9,7 @@ export function useRecentlyPlayed(limit: number): { data: Track[] } {
   useEffect(() => {
     const refresh = () => { setData(readRecent().slice(0, limit)); }
     const onStorage = (e: StorageEvent) => {
-      if (e.key === 'spoter_recent_v1' || e.key === null) refresh()
+      if (e.key === STORAGE_KEYS.recent || e.key === null) refresh()
     }
     refresh()
     window.addEventListener('spoter:recent-changed', refresh)

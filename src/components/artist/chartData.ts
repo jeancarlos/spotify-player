@@ -1,5 +1,5 @@
 import { isPlayable } from '@/lib/deezerMappers'
-import type { Track } from '@/types/music'
+import type { Image, Track } from '@/types/music'
 
 export interface ChartEntry {
   id: string
@@ -7,7 +7,7 @@ export interface ChartEntry {
   name: string
   artists: string
   albumName: string
-  albumArt: string
+  albumImages: Image[]
   rank: number
   track: Track
 }
@@ -23,7 +23,7 @@ export function toChartData(tracks: Track[]): ChartEntry[] {
       name: t.name,
       artists: t.artists.map((a) => a.name).join(', '),
       albumName: t.album.name,
-      albumArt: (t.album.images.at(1) ?? t.album.images.at(0))?.url ?? '',
+      albumImages: t.album.images,
       rank: t.rank,
       track: t,
     }))
@@ -41,7 +41,14 @@ export function chartLayout(viewportWidth: number) {
     ? { top: 4, right: 40, bottom: 4, left: 0 }
     : { top: 4, right: 64, bottom: 4, left: 8 }
   const yAxisWidth = narrow ? 96 : 144
-  const labelChars = narrow ? 11 : 20
+  const labelChars = narrow ? 9 : 17
   const plotWidth = viewportWidth - PAGE_GUTTER - margin.left - margin.right - yAxisWidth
   return { margin, yAxisWidth, labelChars, plotWidth }
+}
+
+const CORAL_RGB = '255, 107, 74'
+
+export function barFill(entryId: string, index: number, activeTrackId?: string): string {
+  const alpha = entryId === activeTrackId ? 1 : Math.max(0.25, 0.9 - index * 0.07)
+  return `rgba(${CORAL_RGB}, ${String(Number(alpha.toFixed(2)))})`
 }

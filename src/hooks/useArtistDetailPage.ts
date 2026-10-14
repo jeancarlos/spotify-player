@@ -4,25 +4,23 @@ import { currentPath } from '@/utils/routerState'
 import { useArtist } from '@/hooks/queries/useArtist'
 import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
+import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
-import type { AlbumSimple, Artist, Track } from '@/types/music'
+import type { AlbumSimple, Artist, Image, Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 interface ArtistMeta {
-  artistSubtitle: string
-  artistImageUrl: string | undefined
+  artistImages: Image[]
   artistName: string
   artistLink: string | undefined
 }
 
 function deriveArtistMeta(data: Artist | undefined): ArtistMeta {
   if (!data) {
-    return { artistSubtitle: '', artistImageUrl: undefined, artistName: '', artistLink: undefined }
+    return { artistImages: [], artistName: '', artistLink: undefined }
   }
-  const genres = data.genres?.slice(0, 2) ?? []
   return {
-    artistSubtitle: genres.join(' · '),
-    artistImageUrl: data.images[0]?.url,
+    artistImages: data.images,
     artistName: data.name,
     artistLink: data.link,
   }
@@ -39,7 +37,7 @@ export function useArtistDetailPage(id: string | undefined) {
     [controls]
   )
 
-  const [albumPage, setAlbumPage] = useState(1)
+  const [albumPage, setAlbumPage] = useScopedPage(id)
   const [discographyView, setDiscographyView] = useState<ViewMode>('list')
   const [headerHeight, setHeaderHeight] = useState(0)
 

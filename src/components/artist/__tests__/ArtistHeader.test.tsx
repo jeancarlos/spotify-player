@@ -12,12 +12,22 @@ describe('ArtistHeader', () => {
     main.id = 'main-content'
     document.body.appendChild(main)
     main.scrollTop = 100
-    const { container } = render(<ArtistHeader imageUrl={undefined} name="A" onLayout={vi.fn()} />)
+    const { container } = render(<ArtistHeader images={[]} name="A" onLayout={vi.fn()} />)
     const header = container.firstElementChild as HTMLElement
     const imgPx = Math.min(280, Math.round(window.innerWidth * 0.65))
-    const fadeEnd = (Math.round(imgPx * 0.75) + 120) * 0.65
+    const fadeEnd = (Math.round(imgPx * 0.75) + 120 + 80) * 0.65
     await waitFor(() => {
       expect(Number(header.style.opacity)).toBeCloseTo(1 - 100 / fadeEnd, 3)
     })
+  })
+
+  it('starts the cover below the top bar and the content below the cover', () => {
+    const onLayout = vi.fn()
+    const { container } = render(<ArtistHeader images={[]} name="A" onLayout={onLayout} />)
+    const imgPx = Math.min(280, Math.round(window.innerWidth * 0.65))
+    const cover = container.querySelector<HTMLElement>('.left-1\\/2')!
+    expect(cover.style.top).toBe('64px')
+    expect(cover.style.transform).not.toContain('translateY')
+    expect(onLayout.mock.calls[0][0]).toBeGreaterThan(64 + imgPx)
   })
 })

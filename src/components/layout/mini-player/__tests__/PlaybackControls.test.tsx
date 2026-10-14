@@ -38,6 +38,14 @@ describe('PlaybackControls', () => {
     expect(controls.toggle).toHaveBeenCalledOnce()
   })
 
+  it('disables play while a preview is loading', () => {
+    const controls = setup({ isLoading: true })
+    const btn = screen.getByRole('button', { name: 'player.play' })
+    expect(btn).toBeDisabled()
+    fireEvent.click(btn)
+    expect(controls.toggle).not.toHaveBeenCalled()
+  })
+
   it('labels the button Pause while playing', () => {
     setup({ isPlaying: true })
     expect(screen.getByRole('button', { name: 'player.pause' })).toBeInTheDocument()

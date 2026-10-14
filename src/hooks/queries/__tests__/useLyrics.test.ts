@@ -36,8 +36,7 @@ describe('fetchLyrics', () => {
       'fetch',
       vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ syncedLyrics: '[00:01.00]hi' }) })
     )
-    const lines = await fetchLyrics(params)
-    expect(lines).toHaveLength(1)
+    await expect(fetchLyrics(params)).resolves.toEqual(['hi'])
   })
 
   it('falls back to plain lyrics when the synced ones parse to nothing', async () => {
@@ -49,7 +48,14 @@ describe('fetchLyrics', () => {
         json: () => Promise.resolve({ syncedLyrics: 'no stamps here', plainLyrics: 'one\ntwo' }),
       })
     )
-    const lines = await fetchLyrics(params)
-    expect(lines.map((l) => l.text)).toEqual(['one', 'two'])
+    await expect(fetchLyrics(params)).resolves.toEqual(['one', 'two'])
+  })
+
+  it('returns plain lyrics without a track duration', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ plainLyrics: 'one\ntwo' }) })
+    )
+    await expect(fetchLyrics({ ...params, durationMs: undefined })).resolves.toEqual(['one', 'two'])
   })
 })
