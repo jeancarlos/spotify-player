@@ -12,6 +12,7 @@ interface PaginationProps {
 
 export function Pagination({ page, hasNext, onPrev, onNext, className }: PaginationProps) {
   const { t } = useTranslation()
+  if (page <= 1 && !hasNext) return null
   return (
     <div
       className={cn(

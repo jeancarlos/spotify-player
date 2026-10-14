@@ -56,10 +56,6 @@ export function Artists() {
             artists={artists.data?.items}
             albums={albums.data?.items}
             playlists={playlists.data?.items}
-            hasNext={hasNext}
-            onNextPage={() => {
-              handlePageChange(page + 1)
-            }}
           />
         </motion.div>
       )

@@ -58,6 +58,13 @@ describe('Artists page', () => {
     expect(deezerMock).toHaveBeenCalledWith('search/artist', { q: 'coldplay', index: 0, limit: 20 })
   })
 
+  it('offers a single next-page control for search results', async () => {
+    renderArtists()
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'coldplay' } })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })
+    expect(screen.getAllByRole('button', { name: /artists\.next/ })).toHaveLength(1)
+  })
+
   it('shows the artist chart when the query is empty', async () => {
     renderArtists()
     expect(screen.getByText(/artists\.charts/)).toBeInTheDocument()
