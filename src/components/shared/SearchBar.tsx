@@ -115,7 +115,7 @@ export function SearchBar({
             role="tab"
             aria-selected={tab === key}
             className={cn(
-              'text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
+              'tap-target text-[11px] px-2.5 py-1 rounded-full transition-colors font-medium',
               tab === key
                 ? 'bg-black text-white'
                 : 'text-black/60 hover:text-black hover:bg-black/5'

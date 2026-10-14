@@ -65,7 +65,7 @@ export function HamburgerMenu() {
         <button
           ref={buttonRef}
           onClick={toggle}
-          className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
+          className="tap-target p-2 glass rounded-xl hover:bg-black/5 transition-colors"
           aria-label={t('nav.openMenu')}
           aria-expanded={isOpen}
         >
@@ -117,7 +117,7 @@ export function HamburgerMenu() {
             onClick={() => {
               navigate(-1)
             }}
-            className="p-2 glass rounded-xl hover:bg-black/5 transition-colors"
+            className="tap-target p-2 glass rounded-xl hover:bg-black/5 transition-colors"
             aria-label={t('common.back')}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}

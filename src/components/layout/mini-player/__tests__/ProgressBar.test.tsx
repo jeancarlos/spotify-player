@@ -17,6 +17,13 @@ describe('ProgressBar', () => {
     expect(slider).toHaveAttribute('max', '30000')
   })
 
+  it('draws a thin track on a touch-sized slider', () => {
+    render(<ProgressBar />)
+    const slider = screen.getByRole('slider')
+    expect(slider).toHaveClass('h-4')
+    expect(slider.style.background).toContain('1px')
+  })
+
   it('seeks once per change with the slider value', () => {
     render(<ProgressBar />)
     fireEvent.change(screen.getByRole('slider'), { target: { value: '21000' } })

@@ -62,6 +62,14 @@ describe('TrackRow', () => {
     expect(screen.getByRole('button', { name: /favorites\.removeConfirm/i })).toBeInTheDocument()
   })
 
+  it('keeps the remove button visible on touch screens and tappable', () => {
+    render(<TrackRow track={track} onRemove={vi.fn()} />)
+    const remove = screen.getByRole('button', { name: /favorites\.removeConfirm/i })
+    expect(remove).toHaveClass('tap-target')
+    expect(remove.className).toContain('[@media(hover:hover)]:opacity-0')
+    expect(remove.className).not.toMatch(/(^|\s)opacity-0/)
+  })
+
   it('calls onRemove and not onPlay when trash clicked', () => {
     const onRemove = vi.fn()
     const onPlay = vi.fn()

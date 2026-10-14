@@ -60,7 +60,7 @@ function buildTrackTheme(dark: boolean, isActive: boolean): TrackTheme {
     subtext: cn('text-xs truncate', dark ? 'text-white/60' : 'text-black/60'),
     duration: cn('text-xs tabular-nums shrink-0', dark ? 'text-white/60' : 'text-black/60'),
     remove: cn(
-      'p-1 rounded-lg transition-colors opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
+      'tap-target p-1 rounded-lg transition-colors [@media(hover:hover)]:opacity-0 group-hover:opacity-100 shrink-0 outline-none focus:opacity-100',
       focusRing(dark),
       dark ? 'text-white/60 hover:text-red-400' : 'text-black/60 hover:text-red-500'
     ),

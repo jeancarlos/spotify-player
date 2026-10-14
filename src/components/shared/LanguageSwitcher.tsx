@@ -27,7 +27,7 @@ export function LanguageSwitcher({ className = '' }: LanguageSwitcherProps) {
             dispatch({ type: 'SET_LANGUAGE', payload: code })
           }}
           aria-pressed={state.language === code}
-          className={`px-3 py-1 rounded-full font-mono text-xs transition-colors ${
+          className={`tap-target px-3 py-1 rounded-full font-mono text-xs transition-colors ${
             state.language === code ? 'bg-black text-white' : 'text-black/60 hover:text-black'
           }`}
         >
