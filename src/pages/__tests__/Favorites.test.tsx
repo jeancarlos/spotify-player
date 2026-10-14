@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import type { Track } from '@/types/music'
@@ -16,9 +16,10 @@ vi.mock('framer-motion', () => ({
 }))
 
 const playTrackMock = vi.fn()
+let mockCurrent: { uri: string } | null = null
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({
-    state: { currentTrack: null, isPlaying: false },
+    state: { currentTrack: mockCurrent, isPlaying: false },
     controls: { playTrack: playTrackMock },
   }),
 }))
@@ -30,6 +31,7 @@ vi.mock('@/hooks/usePopoverDismiss', () => ({
 vi.mock('@/components/favorites/AddFavoriteForm', () => ({
   AddFavoriteForm: ({
     onClose,
+    onAdd,
   }: {
     onClose: () => void
     existingFavorites: Track[]
@@ -38,6 +40,22 @@ vi.mock('@/components/favorites/AddFavoriteForm', () => ({
     <div data-testid="add-favorite-form">
       <button type="button" onClick={onClose}>
         Fechar form
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          onAdd({ id: 'n' } as Track, ' nota ')
+        }}
+      >
+        Add com nota
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          onAdd({ id: 'n' } as Track)
+        }}
+      >
+        Add sem nota
       </button>
     </div>
   ),
@@ -100,6 +118,7 @@ function renderFavorites() {
 beforeEach(() => {
   vi.clearAllMocks()
   mockUnavailable = false
+  mockCurrent = null
   mockFavorites.tracks = []
 })
 
@@ -205,5 +224,66 @@ describe('Favorites', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('add-favorite-form')).toBeNull()
     })
+  })
+
+  it('adds a trimmed note and toasts only when the save fails', async () => {
+    const user = userEvent.setup()
+    renderFavorites()
+    await user.click(screen.getByRole('button', { name: /favorites\.addButton/i }))
+    mockFavorites.addTrack.mockReturnValue(true)
+    await user.click(await screen.findByText('Add com nota'))
+    expect(mockFavorites.addTrack).toHaveBeenCalledWith({ id: 'n' }, 'nota')
+    expect(mockToast).not.toHaveBeenCalled()
+    mockFavorites.addTrack.mockReturnValue(false)
+    await user.click(screen.getByText('Add sem nota'))
+    expect(mockFavorites.addTrack).toHaveBeenLastCalledWith({ id: 'n' }, undefined)
+    expect(mockToast).toHaveBeenCalledWith('favorites.saveFailed', 'error')
+  })
+
+  it('closes the popover from the form', async () => {
+    const user = userEvent.setup()
+    renderFavorites()
+    await user.click(screen.getByRole('button', { name: /favorites\.addButton/i }))
+    await user.click(await screen.findByText('Fechar form'))
+    await waitFor(() => {
+      expect(screen.queryByTestId('add-favorite-form')).toBeNull()
+    })
+  })
+
+  it('keeps the editor open and toasts when saving the note fails', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1')]
+    mockFavorites.setNote.mockReturnValue(false)
+    renderFavorites()
+    await user.click(screen.getByRole('button', { name: /favorites\.editNote/i }))
+    await user.type(screen.getByRole('textbox', { name: 'favorites.noteLabel' }), 'x{Enter}')
+    expect(mockToast).toHaveBeenCalledWith('favorites.saveFailed', 'error')
+    expect(screen.getByRole('textbox', { name: 'favorites.noteLabel' })).toBeInTheDocument()
+  })
+
+  it('plays a favorite with the whole list and marks the current one active', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1'), mockTrack('t2')]
+    renderFavorites()
+    await user.click(screen.getAllByRole('button', { name: /player\.playTrack/ })[1])
+    expect(playTrackMock).toHaveBeenCalledWith(mockFavorites.tracks[1], mockFavorites.tracks, 1)
+  })
+
+  it('marks the playing favorite active', () => {
+    mockFavorites.tracks = [mockTrack('t1')]
+    mockCurrent = { uri: 'deezer:track:t1' }
+    renderFavorites()
+    expect(screen.getByText('Track t1')).toBeInTheDocument()
+  })
+
+  it('opens and closes the editor when nothing holds focus', async () => {
+    const user = userEvent.setup()
+    mockFavorites.tracks = [mockTrack('t1')]
+    renderFavorites()
+    const spy = vi.spyOn(document, 'activeElement', 'get').mockReturnValue(null)
+    fireEvent.click(screen.getByRole('button', { name: /favorites\.editNote/i }))
+    spy.mockRestore()
+    await user.type(screen.getByRole('textbox', { name: 'favorites.noteLabel' }), '{Escape}')
+    expect(screen.queryByRole('textbox', { name: 'favorites.noteLabel' })).toBeNull()
   })
 })

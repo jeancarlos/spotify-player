@@ -13,7 +13,7 @@ const mk = (n: number) =>
     album: { name: `Album ${n}` },
   }) as unknown as Track
 
-const state = { queue: [mk(0), mk(1), mk(2), mk(3)], queueIndex: 0 }
+let state = { queue: [mk(0), mk(1), mk(2), mk(3)], queueIndex: 0 }
 
 vi.mock('@/contexts/PlayerContext', () => ({ usePlayer: () => ({ state }) }))
 
@@ -43,5 +43,39 @@ describe('LyricsPreloader', () => {
     expect(spy.mock.calls[0][0].queryKey).toEqual(
       lyricsKey({ artist: 'Artist 1', title: 'Song 1', album: 'Album 1', durationMs: 1000 })
     )
+  })
+
+  it('skips tracks without an artist or title and tracks already cached', () => {
+    const noArtist = { ...mk(1), artists: [] } as unknown as Track
+    const cached = mk(2)
+    state = { queue: [mk(0), noArtist, cached], queueIndex: 0 }
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(
+      lyricsKey({ artist: 'Artist 2', title: 'Song 2', album: 'Album 2', durationMs: 2000 }),
+      'cached'
+    )
+    const spy = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <LyricsPreloader />
+      </QueryClientProvider>
+    )
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('runs the lyrics fetcher through the prefetch query function', async () => {
+    state = { queue: [mk(0), mk(1)], queueIndex: 0 }
+    const queryClient = new QueryClient()
+    const spy = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+    render(
+      <QueryClientProvider client={queryClient}>
+        <LyricsPreloader />
+      </QueryClientProvider>
+    )
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('{}', { status: 404 }))
+    const queryFn = (spy.mock.calls[0][0] as unknown as { queryFn: () => Promise<unknown> }).queryFn
+    await expect(queryFn()).resolves.toEqual([])
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    fetchSpy.mockRestore()
   })
 })

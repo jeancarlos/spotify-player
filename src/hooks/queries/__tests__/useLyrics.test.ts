@@ -31,6 +31,11 @@ describe('fetchLyrics', () => {
     await expect(fetchLyrics(params)).rejects.toThrow('offline')
   })
 
+  it('returns an empty list when neither synced nor plain lyrics exist', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({}) }))
+    await expect(fetchLyrics(params)).resolves.toEqual([])
+  })
+
   it('parses synced lyrics', async () => {
     vi.stubGlobal(
       'fetch',

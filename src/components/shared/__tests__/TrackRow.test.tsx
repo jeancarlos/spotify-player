@@ -145,4 +145,22 @@ describe('TrackRow', () => {
     render(<TrackRow track={{ ...track, is_playable: false }} onPlay={vi.fn()} />)
     expect(screen.getByRole('button', { name: /player\.playTrack/i })).toBeDisabled()
   })
+
+  it('renders the dark theme in both active states', () => {
+    const { rerender } = render(<TrackRow track={track} theme="dark" />)
+    expect(screen.getByText('Test Track')).toHaveClass('text-white/80')
+    rerender(<TrackRow track={track} theme="dark" isActive />)
+    expect(screen.getByText('Test Track')).toHaveClass('text-white')
+    rerender(<TrackRow track={track} isActive />)
+    expect(screen.getByText('Test Track')).toHaveClass('text-black')
+  })
+
+  it('calls onEditNote and not onPlay when the pencil is clicked', () => {
+    const onEditNote = vi.fn()
+    const onPlay = vi.fn()
+    render(<TrackRow track={track} onPlay={onPlay} onEditNote={onEditNote} />)
+    fireEvent.click(screen.getByRole('button', { name: /favorites\.editNote/i }))
+    expect(onEditNote).toHaveBeenCalledWith('deezer:track:t1')
+    expect(onPlay).not.toHaveBeenCalled()
+  })
 })

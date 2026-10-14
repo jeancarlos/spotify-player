@@ -52,7 +52,7 @@ export function ArtistDetail() {
         <div className="max-w-3xl mx-auto px-4">
           <ArtistBio artistName={artistName} />
 
-          {(topTracks.data?.length ?? 0) > 0 && (
+          {topTracks.data && topTracks.data.length > 0 && (
             <section className="mb-8">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-bold text-black/60">
@@ -60,9 +60,9 @@ export function ArtistDetail() {
                 </h3>
               </div>
               <ArtistTopTracksChart
-                tracks={topTracks.data ?? []}
+                tracks={topTracks.data}
                 activeTrackId={activeTrackId}
-                onPlay={async (track) => playTrack(track, (topTracks.data ?? []))}
+                onPlay={async (track) => playTrack(track, topTracks.data)}
               />
             </section>
           )}

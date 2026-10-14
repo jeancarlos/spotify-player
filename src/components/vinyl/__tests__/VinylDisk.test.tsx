@@ -29,3 +29,21 @@ describe('VinylDisk arc overlay size', () => {
     }
   })
 })
+
+describe('VinylDisk props', () => {
+  it('renders the album art with a translated alt and a custom class', () => {
+    const { container } = render(
+      <VinylDisk size="sm" albumArt="a.jpg" albumName="Abbey" className="extra" />
+    )
+    expect(container.firstElementChild?.className).toContain('extra')
+    const art = container.querySelectorAll('img')[1]
+    expect(art.getAttribute('src')).toBe('a.jpg')
+    expect(art.getAttribute('alt')).toBe('favorites.album: Abbey')
+  })
+
+  it('falls back to the label svg and skips the overlay on the xs size', () => {
+    const { container } = render(<VinylDisk size="xs" favoriteLabel="fav" />)
+    expect(container.querySelectorAll('img')[1].getAttribute('src')).toBe('/vinyla-label.svg')
+    expect(container.querySelector('svg')).toBeNull()
+  })
+})

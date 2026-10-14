@@ -165,4 +165,34 @@ describe('TrackAutocomplete', () => {
     expect(screen.getByRole('listbox')).toBeInTheDocument()
     expect(input).not.toHaveAttribute('aria-activedescendant')
   })
+
+  it('mostra o estado de carregamento e o erro', async () => {
+    const user = userEvent.setup()
+    mockUseSearchTracks.mockReturnValue({ data: [], isPending: true })
+    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} error="bad" />)
+    await user.type(screen.getByRole('combobox'), 'ab')
+    expect(screen.getByText('common.loading')).toBeInTheDocument()
+    expect(screen.getByText('bad')).toBeInTheDocument()
+  })
+
+  it('devolve o foco ao input depois de limpar', async () => {
+    const { rerender } = render(
+      <TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
+    rerender(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10))
+    })
+    expect(screen.getByRole('combobox')).toHaveFocus()
+  })
+
+  it('ignora o foco quando o input ainda nao existe', async () => {
+    render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
+    fireEvent.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10))
+    })
+    expect(onChange).toHaveBeenCalledWith(null)
+  })
 })

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { ArtistHeader } from '../ArtistHeader'
 
 describe('ArtistHeader', () => {
@@ -29,5 +29,26 @@ describe('ArtistHeader', () => {
     expect(cover.style.top).toBe('64px')
     expect(cover.style.transform).not.toContain('translateY')
     expect(onLayout.mock.calls[0][0]).toBeGreaterThan(64 + imgPx)
+  })
+
+  it('renders cover, backdrop, subtitle and link, and tracks scroll', () => {
+    const main = document.createElement('div')
+    main.id = 'main-content'
+    document.body.appendChild(main)
+    const onLayout = vi.fn()
+    const images = [{ url: 'u', width: 300, height: 300 }]
+    const { container, rerender, unmount } = render(
+      <ArtistHeader images={images} name="Nm" subtitle="Sub" link="http://d" onLayout={onLayout} />
+    )
+    expect(screen.getByText('Sub')).toBeInTheDocument()
+    expect(screen.getByRole('link')).toHaveAttribute('href', 'http://d')
+    expect(container.querySelectorAll('img').length).toBeGreaterThanOrEqual(2)
+    main.scrollTop = 50
+    main.dispatchEvent(new Event('scroll'))
+    rerender(
+      <ArtistHeader images={images} name="Nm" subtitle="Sub" link="http://d" onLayout={onLayout} />
+    )
+    expect(onLayout).toHaveBeenCalledTimes(1)
+    unmount()
   })
 })

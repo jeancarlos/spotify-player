@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { Track } from '@/types/music'
 
@@ -30,6 +30,7 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
     onChange,
     value,
     id,
+    error,
   }: {
     id?: string
     onChange: (t: Track | null) => void
@@ -38,17 +39,30 @@ vi.mock('@/components/favorites/TrackAutocomplete', () => ({
     error?: string
   }) =>
     value ? (
-      <div data-testid="selected-track">{value.name}</div>
+      <div data-testid="selected-track">
+        {value.name}
+        <button
+          type="button"
+          onClick={() => {
+            onChange(null)
+          }}
+        >
+          Limpar música
+        </button>
+      </div>
     ) : (
-      <button
-        data-input-id={id}
-        type="button"
-        onClick={() => {
-          onChange(mockTrack)
-        }}
-      >
-        Selecionar música
-      </button>
+      <>
+        <button
+          data-input-id={id}
+          type="button"
+          onClick={() => {
+            onChange(mockTrack)
+          }}
+        >
+          Selecionar música
+        </button>
+        {error && <p data-testid="track-error">{error}</p>}
+      </>
     ),
 }))
 
@@ -151,5 +165,19 @@ describe('AddFavoriteForm', () => {
     renderForm()
     await user.click(screen.getByRole('button', { name: /selecionar música/i }))
     expect(screen.getByText(/favorites\.noteCharsLeft/i)).toBeInTheDocument()
+  })
+
+  it('mostra o erro de track ao limpar a seleção', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await user.click(await screen.findByRole('button', { name: /limpar música/i }))
+    expect(await screen.findByTestId('track-error')).toHaveTextContent('favorites.trackRequired')
+  })
+
+  it('mostra o erro de nota longa', async () => {
+    renderForm()
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'x'.repeat(1000) } })
+    expect(await screen.findByText('favorites.noteTooLong')).toBeInTheDocument()
   })
 })

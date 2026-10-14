@@ -46,6 +46,15 @@ describe('useRecentlyPlayed', () => {
     expect(screen.getByTestId('recent-list').textContent).toBe('3')
   })
 
+  it('refreshes on a storage event without a key and ignores other keys', () => {
+    render(<List limit={10} />)
+    localStorage.setItem('spoter_recent_v1', JSON.stringify([{ ...track, id: '6' }]))
+    fireEvent(window, new StorageEvent('storage', { key: 'other' }))
+    expect(screen.getByTestId('recent-list').textContent).toBe('')
+    fireEvent(window, new StorageEvent('storage', { key: null }))
+    expect(screen.getByTestId('recent-list').textContent).toBe('6')
+  })
+
   it('updates on storage event', () => {
     render(<List limit={10} />)
     localStorage.setItem('spoter_recent_v1', JSON.stringify([{ ...track, id: '5' }]))

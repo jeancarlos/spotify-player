@@ -81,12 +81,15 @@ export interface DzList<T> {
   next?: string
 }
 
-const IMAGE_SIZES = [1000, 500, 250, 56]
-
-const toImages = (...urls: (string | undefined)[]): Image[] =>
-  urls.flatMap((url, i) =>
-    url ? [{ url, width: IMAGE_SIZES[i] ?? null, height: IMAGE_SIZES[i] ?? null }] : []
-  )
+const toImages = (xl?: string, big?: string, medium?: string, small?: string): Image[] =>
+  (
+    [
+      [xl, 1000],
+      [big, 500],
+      [medium, 250],
+      [small, 56],
+    ] as const
+  ).flatMap(([url, size]) => (url ? [{ url, width: size, height: size }] : []))
 
 const toArtistRef = (a: DzArtistRef | undefined): ArtistSimple => ({
   id: String(a?.id ?? 0),

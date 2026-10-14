@@ -1,20 +1,21 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { TrackInfo } from '../TrackInfo'
 import type { Track } from '@/types/music'
 
-const track = {
+const baseTrack = {
   id: '1',
   uri: 'u1',
   name: 'Song',
   artists: [{ id: 'a', name: 'Artist' }],
   album: { id: 'b', name: 'Album', images: [] },
 } as unknown as Track
+let current: Track | null = baseTrack
 
 vi.mock('@/contexts/PlayerContext', () => ({
-  usePlayer: () => ({ state: { currentTrack: track } }),
+  usePlayer: () => ({ state: { currentTrack: current } }),
   useProgress: () => ({ progressMs: 12000, durationMs: 30000 }),
 }))
 
@@ -23,6 +24,9 @@ function Where() {
   return <output data-testid="where">{l.pathname + l.search}</output>
 }
 describe('TrackInfo', () => {
+  beforeEach(() => {
+    current = baseTrack
+  })
   it('has no fake role=button wrapper and opens the lyrics once from the keyboard', async () => {
     const user = userEvent.setup()
     const { container } = render(
@@ -94,5 +98,59 @@ describe('TrackInfo', () => {
       'tabindex',
       '-1'
     )
+  })
+
+  it('shows the empty state without a track', () => {
+    current = null
+    render(
+      <MemoryRouter>
+        <TrackInfo notes={{}} />
+      </MemoryRouter>
+    )
+    expect(screen.getByText('player.noTrack')).toBeInTheDocument()
+  })
+
+  it('goes back to the origin from the player page', async () => {
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/player', state: { from: '/favorites' } }]}>
+        <TrackInfo notes={{}} />
+        <Where />
+      </MemoryRouter>
+    )
+    await userEvent.click(screen.getByRole('button', { name: /Song/ }))
+    expect(screen.getByTestId('where')).toHaveTextContent('/favorites')
+  })
+
+  it('navigates to every artist and to the album', async () => {
+    current = {
+      ...baseTrack,
+      artists: [
+        { id: 'a', name: 'Artist' },
+        { id: 'c', name: 'Other' },
+      ],
+    } as unknown as Track
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <TrackInfo notes={{}} />
+        <Where />
+      </MemoryRouter>
+    )
+    await userEvent.click(screen.getByRole('button', { name: /Other/ }))
+    expect(screen.getByTestId('where')).toHaveTextContent('/artists/c')
+    await userEvent.click(screen.getByRole('button', { name: 'Album' }))
+    expect(screen.getByTestId('where')).toHaveTextContent('/albums/b')
+  })
+
+  it('uses the album image as the cover', () => {
+    current = {
+      ...baseTrack,
+      album: { id: 'b', name: 'Album', images: [{ url: 'https://img.test/c.jpg', width: 96, height: 96 }] },
+    } as unknown as Track
+    const { container } = render(
+      <MemoryRouter>
+        <TrackInfo notes={{}} />
+      </MemoryRouter>
+    )
+    expect(container.querySelector('img')?.getAttribute('src')).toBe('https://img.test/c.jpg')
   })
 })

@@ -56,6 +56,17 @@ describe('useFavorites', () => {
     expect(stored().tracks).toHaveLength(2)
   })
 
+  it('treats adding an already favorited track as a no-op success', () => {
+    const { result } = renderHook(() => useFavorites())
+    let again = false
+    act(() => {
+      result.current.addTrack(mk('1'))
+      again = result.current.addTrack(mk('1'), 'note')
+    })
+    expect(again).toBe(true)
+    expect(stored().tracks).toHaveLength(1)
+  })
+
   it('shows a track added by one mounted hook in another', () => {
     const a = renderHook(() => useFavorites())
     const b = renderHook(() => useFavorites())

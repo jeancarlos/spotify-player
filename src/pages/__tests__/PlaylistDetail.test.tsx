@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { PlaylistDetail } from '../PlaylistDetail'
 import type { Track } from '@/types/music'
@@ -19,7 +19,7 @@ const tracks = [
 const hook = {
   playlist: { data: undefined },
   playlistTracks: tracks,
-  playerState: { currentTrack: null },
+  playerState: { currentTrack: null } as { currentTrack: { id: string } | null },
   view: 'table',
   setView: vi.fn(),
   page: 3,
@@ -37,9 +37,24 @@ vi.mock('@/hooks/usePlaylistDetailPage', () => ({
   PLAYLIST_LIMIT: 20,
   usePlaylistDetailPage: () => hook,
 }))
+const captured = {
+  pagination: undefined as undefined | { onPrev: () => void; onNext: () => void },
+  row: undefined as undefined | { onPlay: (t: Track) => Promise<void> },
+}
 vi.mock('@/components/shared/CollectionHeader', () => ({ CollectionHeader: () => <div /> }))
 vi.mock('@/components/shared/ListTableSwitch', () => ({ ListTableSwitch: () => <div /> }))
-vi.mock('@/components/shared/Pagination', () => ({ Pagination: () => <div /> }))
+vi.mock('@/components/shared/Pagination', () => ({
+  Pagination: (props: { onPrev: () => void; onNext: () => void }) => {
+    captured.pagination = props
+    return <div />
+  },
+}))
+vi.mock('@/components/shared/TrackRow', () => ({
+  TrackRow: (props: { track: Track; isActive: boolean; onPlay: (t: Track) => Promise<void> }) => {
+    captured.row = props
+    return <div data-testid="row" data-active={String(props.isActive)} />
+  },
+}))
 
 function Probe() {
   const l = useLocation()
@@ -84,5 +99,55 @@ describe('PlaylistDetail table view', () => {
     expect(screen.getByText('common.notFound')).toBeInTheDocument()
     expect(screen.queryByText('41')).toBeNull()
     hook.notFound = false
+  })
+
+  it('plays a table row at its absolute index', () => {
+    hook.playerState = { currentTrack: { id: 't1' } }
+    renderPage()
+    hook.playerState = { currentTrack: null }
+    fireEvent.click(screen.getByRole('button', { name: 'player.playTrack' }))
+    expect(hook.playTrack).toHaveBeenCalledWith(tracks[0], 40)
+  })
+
+  it('pages back and forward with a floor of one', () => {
+    renderPage()
+    act(() => {
+      captured.pagination?.onPrev()
+      captured.pagination?.onNext()
+    })
+    const [prev, next] = hook.setPage.mock.calls.map((c) => c[0] as (p: number) => number)
+    expect(prev(1)).toBe(1)
+    expect(prev(3)).toBe(2)
+    expect(next(3)).toBe(4)
+  })
+
+  describe('list view', () => {
+    beforeEach(() => {
+      hook.view = 'list'
+      hook.playerState = { currentTrack: null }
+    })
+    afterEach(() => {
+      hook.view = 'table'
+      hook.playerState = { currentTrack: null }
+    })
+
+    it('renders rows and plays at the absolute index', async () => {
+      renderPage()
+      expect(screen.getByTestId('row').dataset.active).toBe('false')
+      await captured.row?.onPlay(tracks[0])
+      expect(hook.playTrack).toHaveBeenCalledWith(tracks[0], 40)
+    })
+
+    it('marks the current track active', () => {
+      hook.playerState = { currentTrack: { id: 't1' } }
+      renderPage()
+      expect(screen.getByTestId('row').dataset.active).toBe('true')
+    })
+  })
+
+  it('falls back to a blank header when the playlist has no data', () => {
+    hook.playlist = { data: { name: 'N', images: [], link: 'l' } } as unknown as typeof hook.playlist
+    renderPage()
+    hook.playlist = { data: undefined }
   })
 })

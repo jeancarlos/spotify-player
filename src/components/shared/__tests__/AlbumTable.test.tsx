@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { AlbumTable } from '../AlbumTable'
 import type { AlbumSimple } from '@/types/music'
 
@@ -30,5 +30,30 @@ describe('AlbumTable', () => {
     render(<AlbumTable albums={[{ ...album, total_tracks: 12 }]} onClick={vi.fn()} />)
     expect(screen.getAllByRole('columnheader')).toHaveLength(5)
     expect(screen.queryByText(/pop/i)).not.toBeInTheDocument()
+  })
+
+  it('opens the album from a row click', () => {
+    const onClick = vi.fn()
+    render(<AlbumTable albums={[album]} onClick={onClick} />)
+    fireEvent.click(screen.getByRole('row', { name: /Test Album/ }))
+    expect(onClick).toHaveBeenCalledWith(album)
+  })
+
+  it('handles an album with cover art and no release date', () => {
+    const onClick = vi.fn()
+    render(
+      <AlbumTable
+        albums={[
+          {
+            ...album,
+            images: [{ url: 'https://img.test/a.jpg', width: 64, height: 64 }],
+            release_date: '',
+          },
+        ]}
+        onClick={onClick}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Test Album' }))
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 })

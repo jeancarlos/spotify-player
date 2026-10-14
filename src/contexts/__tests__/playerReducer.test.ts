@@ -60,4 +60,8 @@ describe('playerReducer', () => {
     expect(next.queueIndex).toBe(3)
     expect(initialPlayerState.queueIndex).toBe(0)
   })
+
+  it('ignores unknown actions', () => {
+    expect(playerReducer(initialPlayerState, { type: 'NOPE' } as never)).toBe(initialPlayerState)
+  })
 })

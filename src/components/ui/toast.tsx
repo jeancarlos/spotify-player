@@ -27,8 +27,6 @@ function toastReducer(state: Toast[], action: ToastAction): Toast[] {
       return [...state, action.payload]
     case 'REMOVE':
       return state.filter((t) => t.id !== action.payload)
-    default:
-      return state
   }
 }
 

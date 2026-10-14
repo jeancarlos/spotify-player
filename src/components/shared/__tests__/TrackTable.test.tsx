@@ -64,4 +64,33 @@ describe('TrackTable', () => {
     render(<TrackTable tracks={[albumTrack]} startIndex={40} />)
     expect(screen.getByText('41')).toBeInTheDocument()
   })
+
+  it('wires the album link, explicit flag and active row', () => {
+    const onAlbumClick = vi.fn()
+    const onPlay = vi.fn()
+    const t = { ...fullTrack, explicit: true }
+    render(
+      <TrackTable
+        tracks={[t, { ...albumTrack, album: { ...album, id: '' } }]}
+        activeTrackId="t2"
+        onAlbumClick={onAlbumClick}
+        onPlay={onPlay}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Test Album' }))
+    expect(onAlbumClick).toHaveBeenCalledWith('alb1')
+    expect(onPlay).not.toHaveBeenCalled()
+    expect(screen.getByText('E')).toBeInTheDocument()
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0)
+    expect(screen.getByText('Full Track').closest('tr')?.className).toContain('bg-black/6')
+    fireEvent.click(screen.getAllByRole('button', { name: 'player.playTrack' })[0])
+    expect(onPlay).toHaveBeenCalledWith(t, 0)
+  })
+
+  it('tolerates missing handlers', () => {
+    render(<TrackTable tracks={[fullTrack]} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Test Album' }))
+    fireEvent.click(screen.getByRole('button', { name: 'player.playTrack' }))
+    fireEvent.click(screen.getByText('Full Track').closest('tr') as HTMLElement)
+  })
 })

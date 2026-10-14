@@ -41,6 +41,12 @@ describe('deezer', () => {
     await expect(promise).rejects.toMatchObject({ name: 'DeezerError', code: 800, message: 'no data' })
   })
 
+  it('falls back to code 0 and a generic message for a bare error body', async () => {
+    const promise = deezer('artist/0')
+    callbacks[callbackOf(lastScript())]?.({ error: {} })
+    await expect(promise).rejects.toMatchObject({ code: 0, message: 'Deezer error' })
+  })
+
   it('rejects on timeout and tolerates a late response', async () => {
     const promise = deezer('search', { q: 'x' }, 1000)
     const script = lastScript()

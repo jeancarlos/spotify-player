@@ -115,6 +115,12 @@ describe('deezerMappers', () => {
     })
   })
 
+  it('maps playlist descriptions: empty to null, text kept, missing to null', () => {
+    expect(toPlaylist({ id: 1, title: 'p', description: '' }).description).toBeNull()
+    expect(toPlaylist({ id: 1, title: 'p', description: 'd' }).description).toBe('d')
+    expect(toPlaylist({ id: 1, title: 'p' }).description).toBeNull()
+  })
+
   it('maps a playlist', () => {
     const r = toPlaylist(playlist)
     expect(r.id).toBe('5207214368')

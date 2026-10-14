@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SearchBar } from '../SearchBar'
 
@@ -44,5 +44,30 @@ describe('SearchBar tablist', () => {
     await user.keyboard('{Home}')
     expect(tabs[0]).toHaveFocus()
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('debounces typing into a search and switches tab on click', async () => {
+    const onSearch = vi.fn()
+    render(<SearchBar onSearch={onSearch} />)
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'abba' } })
+    expect(screen.getByTestId('search-spinner')).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(onSearch).toHaveBeenCalledWith('abba', 'artist')
+      },
+      { timeout: 2000 }
+    )
+    fireEvent.click(screen.getAllByRole('tab')[1])
+    await waitFor(() => {
+      expect(onSearch).toHaveBeenLastCalledWith('abba', 'album')
+    })
+    expect(screen.getByTestId('search-icon')).toBeInTheDocument()
+  })
+
+  it('ignores unrelated keys on a tab', () => {
+    const tabs = setup()
+    tabs[0].focus()
+    fireEvent.keyDown(tabs[0], { key: 'x' })
+    expect(tabs[0]).toHaveFocus()
   })
 })

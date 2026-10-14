@@ -123,4 +123,14 @@ describe('PlaybackControls queue toggle', () => {
     fireEvent.click(screen.getByRole('button', { name: 'player.closeQueue' }))
     expect(loc().p).toBe('/x?y=1')
   })
+
+  it('renders nothing without a track', () => {
+    setup({ currentTrack: null })
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('marks shuffle as active', () => {
+    setup({ shuffle: true })
+    expect(screen.getByRole('button', { name: 'player.shuffle' })).toHaveClass('bg-black/10')
+  })
 })

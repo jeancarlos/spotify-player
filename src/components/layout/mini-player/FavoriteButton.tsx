@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { Heart } from 'lucide-react'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { useToast } from '@/components/ui/toast'
@@ -15,8 +14,9 @@ export function FavoriteButton() {
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  const handleHeart = useCallback(() => {
-    if (!currentTrack) return
+  if (!currentTrack) return null
+
+  const handleHeart = () => {
     if (isSaved) {
       if (removeTrack(currentTrack.uri)) toast(t('favorites.removedFromList'), 'info')
       else toast(t('favorites.saveFailed'), 'error')
@@ -25,9 +25,7 @@ export function FavoriteButton() {
     } else {
       toast(t('favorites.saveFailed'), 'error')
     }
-  }, [currentTrack, isSaved, addTrack, removeTrack, toast, t])
-
-  if (!currentTrack) return null
+  }
 
   return (
     <div className="relative group shrink-0">

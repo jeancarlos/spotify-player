@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { I18nextProvider } from 'react-i18next'
 import { Home } from '../Home'
 import { PlayerContext } from '@/contexts/PlayerContext'
@@ -30,7 +30,13 @@ vi.mock('@/hooks/queries/useChart', () => ({
   useChartTracks: (enabled: boolean) => useChartTracks(enabled),
 }))
 
+let unavailable = false
+vi.mock('@/hooks/useCatalogHealth', () => ({
+  useCatalogHealth: () => ({ unavailable }),
+}))
+
 beforeEach(() => {
+  unavailable = false
   chartData = popularPage
   localStorage.setItem('spoter_recent_v1', JSON.stringify(recent))
 })
@@ -38,6 +44,11 @@ beforeEach(() => {
 beforeAll(async () => {
   await i18n.changeLanguage('pt-BR')
 })
+function Where() {
+  const l = useLocation()
+  return <output data-testid="where">{l.pathname + l.search}</output>
+}
+
 function renderHome() {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -62,6 +73,7 @@ function renderHome() {
           >
             <ToastProvider>
               <Home />
+              <Where />
             </ToastProvider>
           </PlayerContext.Provider>
         </QueryClientProvider>
@@ -70,7 +82,16 @@ function renderHome() {
   )
 }
 
+function resize(w: number, h: number) {
+  Object.defineProperty(window, 'innerWidth', { configurable: true, value: w })
+  Object.defineProperty(window, 'innerHeight', { configurable: true, value: h })
+}
+
 describe('Página Home', () => {
+  afterEach(() => {
+    resize(1024, 768)
+  })
+
   it('renderiza o título da seção de tocadas recentemente', async () => {
     renderHome()
     expect(await screen.findByText(/Tocadas Recentemente/i)).toBeInTheDocument()
@@ -126,5 +147,34 @@ describe('Página Home', () => {
     const prompt = screen.getByText(/Digite para buscar/)
     expect(prompt.closest('.z-\\[4\\]')).not.toBeNull()
     expect(prompt.closest('.z-\\[5\\]')).toBeNull()
+  })
+
+  it('navigates to the artists page with the typed query', async () => {
+    renderHome()
+    await userEvent.type(screen.getByRole('textbox'), 'coldplay')
+    await waitFor(() => {
+      expect(screen.getByTestId('where').textContent).toBe('/artists?q=coldplay&tab=artist')
+    })
+  })
+
+  it('stays on the page when the query is blank', async () => {
+    renderHome()
+    await userEvent.type(screen.getByRole('textbox'), '   ')
+    await new Promise((r) => setTimeout(r, 600))
+    expect(screen.getByTestId('where').textContent).toBe('/')
+  })
+
+  it('shows the hint on a tall narrow screen', () => {
+    resize(500, 2000)
+    renderHome()
+    expect(screen.getByText('home.hint')).toBeInTheDocument()
+  })
+
+  it('does not play when the catalog is unavailable', async () => {
+    unavailable = true
+    renderHome()
+    playTrack.mockClear()
+    await userEvent.click(await screen.findByText('Mock Track 1'))
+    expect(playTrack).not.toHaveBeenCalled()
   })
 })

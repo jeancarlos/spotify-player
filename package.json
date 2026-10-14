@@ -9,7 +9,7 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write src/",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",

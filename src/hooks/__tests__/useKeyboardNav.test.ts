@@ -10,13 +10,16 @@ function setup(over: Partial<Parameters<typeof useKeyboardNav>[0]> = {}) {
     isOpen: true,
     results: [track],
     highlightIndex: 0,
-    setHighlightIndex: vi.fn(),
+    setHighlightIndex: vi.fn<(u: unknown) => void>(),
     onSelect: vi.fn(),
     onClose: vi.fn(),
     ...over,
   }
   const press = (key: string) => {
-    useKeyboardNav(opts)({ key, preventDefault: vi.fn() } as unknown as KeyboardEvent<HTMLInputElement>)
+    useKeyboardNav(opts)({
+      key,
+      preventDefault: vi.fn(),
+    } as unknown as KeyboardEvent<HTMLInputElement>)
   }
   return { opts, press }
 }
@@ -45,5 +48,32 @@ describe('useKeyboardNav', () => {
     press('Escape')
     expect(opts.onClose).toHaveBeenCalled()
     expect(opts.setHighlightIndex).toHaveBeenCalled()
+  })
+
+  it('ArrowDown and ArrowUp clamp the highlight within the list', () => {
+    const { opts, press } = setup({ results: [track, track] })
+    press('ArrowDown')
+    press('ArrowUp')
+    const [down, up] = vi.mocked(opts.setHighlightIndex).mock.calls.map(([fn]: unknown[]) => fn as (i: number) => number)
+    expect(down(0)).toBe(1)
+    expect(down(1)).toBe(1)
+    expect(up(1)).toBe(0)
+    expect(up(0)).toBe(0)
+  })
+
+  it('ignores other keys and a closed list', () => {
+    const a = setup()
+    a.press('a')
+    const b = setup({ isOpen: false })
+    b.press('ArrowDown')
+    expect(a.opts.setHighlightIndex).not.toHaveBeenCalled()
+    expect(b.opts.setHighlightIndex).not.toHaveBeenCalled()
+  })
+
+  it('Escape resets the highlight', () => {
+    const { opts, press } = setup()
+    press('Escape')
+    const reset = vi.mocked(opts.setHighlightIndex).mock.calls[0][0] as unknown as () => number
+    expect(reset()).toBe(-1)
   })
 })

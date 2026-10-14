@@ -6,13 +6,17 @@ import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
 import type { Track } from '@/types/music'
 
+const lyricsSpy = vi.hoisted(() => vi.fn())
 let lyricsResult: object = { isPending: false, isLoading: false, data: ['la'] }
 vi.mock('@/hooks/queries/useLyrics', () => ({
   useLyrics: () => lyricsResult,
 }))
-vi.mock('@/components/layout/LyricsView', () => ({ LyricsView: () => <div /> }))
-vi.mock('@/components/layout/TrackInfoPanel', () => ({ TrackInfoPanel: () => <div /> }))
-vi.mock('@/components/layout/PlayerQueue', () => ({ PlayerQueue: () => <div /> }))
+vi.mock('@/components/layout/LyricsView', () => ({ LyricsView: (p: { lines: string[] }) => {
+    lyricsSpy(p.lines)
+    return <div data-testid="lyrics-view" />
+  } }))
+vi.mock('@/components/layout/TrackInfoPanel', () => ({ TrackInfoPanel: () => <div data-testid="info-panel" /> }))
+vi.mock('@/components/layout/PlayerQueue', () => ({ PlayerQueue: () => <div data-testid="queue-panel" /> }))
 vi.mock('@/contexts/PlayerContext', async (orig) => ({
   ...(await orig<Record<string, unknown>>()),
   useProgress: () => {
@@ -74,6 +78,95 @@ describe('PlayerView', () => {
     setup(false)
     expect(screen.getByText('player.noTrack')).toBeInTheDocument()
     expect(screen.queryByText('lyrics.searching')).toBeNull()
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
+  })
+})
+
+describe('PlayerView panes', () => {
+  const mk = (extra: object = {}) =>
+    ({
+      id: '1',
+      name: 'Song',
+      duration_ms: 1000,
+      artists: [{ name: 'A' }],
+      album: { name: 'B', images: [{ url: 'cover.jpg' }] },
+      ...extra,
+    }) as unknown as Track
+
+  const mount = (track: Track | null, search = '', state?: object) =>
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/player', search, state }]}>
+        <PlayerContext.Provider value={{ state: { ...initialPlayerState, currentTrack: track }, controls: {} } as never}>
+          <Routes>
+            <Route path="/player" element={<PlayerView />} />
+            <Route path="*" element={<Probe />} />
+          </Routes>
+        </PlayerContext.Provider>
+      </MemoryRouter>
+    )
+
+  it('renders the blurred cover and the lyrics pane by default', async () => {
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
+    const { container } = mount(mk())
+    expect(await screen.findByTestId('lyrics-view')).toBeInTheDocument()
+    expect(container.innerHTML).toContain('cover.jpg')
+  })
+
+  it('omits the cover and falls back to empty fields without artist or art', async () => {
+    const { container } = mount(
+      mk({ artists: [], album: { name: 'B', images: [] } }),
+      '?tab=queue'
+    )
+    expect(await screen.findByTestId('queue-panel')).toBeInTheDocument()
+    expect(container.innerHTML).not.toContain('blur(100px)')
+  })
+
+  it('shows the info pane', async () => {
+    mount(mk(), '?tab=info')
+    expect(await screen.findByTestId('info-panel')).toBeInTheDocument()
+  })
+
+  it('shows the searching state while lyrics load', async () => {
+    lyricsResult = { isPending: true, isLoading: true, data: undefined }
+    mount(mk())
+    expect(await screen.findByText('lyrics.searching')).toBeInTheDocument()
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
+  })
+
+  it('redirects to the info tab and hides the lyrics tab when there are none', async () => {
+    lyricsResult = { isPending: false, isLoading: false, data: [] }
+    mount(mk(), '?tab=lyrics')
+    expect(await screen.findByTestId('info-panel')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'player.lyrics' })).toBeNull()
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
+  })
+
+  it('hides the lyrics tab when the lyrics query has no data', async () => {
+    lyricsResult = { isPending: false, isLoading: false, data: undefined }
+    mount(mk(), '?tab=queue')
+    expect(await screen.findByTestId('queue-panel')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'player.lyrics' })).toBeNull()
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
+  })
+
+  it('treats a missing duration as zero', async () => {
+    mount(mk({ duration_ms: undefined }))
+    expect(await screen.findByTestId('lyrics-view')).toBeInTheDocument()
+  })
+
+  it('switches between the lyrics and info tabs', async () => {
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
+    mount(mk(), '?tab=queue')
+    fireEvent.click(await screen.findByRole('button', { name: 'player.lyrics' }))
+    expect(await screen.findByTestId('lyrics-view')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'track.songDetails' }))
+    expect(await screen.findByTestId('info-panel')).toBeInTheDocument()
+  })
+
+  it('renders an empty lyrics view for one frame when the query has no data', () => {
+    lyricsResult = { isPending: false, isLoading: false, data: undefined }
+    mount(mk(), '?tab=lyrics')
+    expect(lyricsSpy).toHaveBeenCalledWith([])
     lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
   })
 })

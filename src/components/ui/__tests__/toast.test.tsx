@@ -81,4 +81,24 @@ describe('toast', () => {
     expect(screen.getAllByText('x')).toHaveLength(2)
     expect(renders).toBe(before)
   })
+
+  it('removes a toast after its timeout and tolerates a late dismiss', () => {
+    vi.useFakeTimers()
+    render(
+      <ToastProvider>
+        <Grab />
+      </ToastProvider>
+    )
+    act(() => api.toast('Gone'))
+    expect(screen.getByText('Gone')).toBeInTheDocument()
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+    act(() => api.dismiss('missing'))
+  })
+
+  it('throws outside a provider', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    expect(() => render(<Grab />)).toThrow('useToast must be used inside ToastProvider')
+  })
 })

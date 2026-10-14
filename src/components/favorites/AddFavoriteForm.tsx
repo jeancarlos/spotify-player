@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useForm, Controller, useWatch } from 'react-hook-form'
+import { useForm, Controller, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
@@ -19,6 +19,11 @@ interface FormValues {
   note: string
 }
 
+interface SubmittedValues {
+  track: Track
+  note: string
+}
+
 export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavoriteFormProps) {
   const { t } = useTranslation()
 
@@ -29,7 +34,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
           (val) => val !== null && typeof val === 'object' && 'uri' in val,
           { message: t('favorites.trackRequired') }
         ),
-        note: z.string().max(MAX_NOTE_LENGTH, t('favorites.noteTooLong')).default(''),
+        note: z.string().max(MAX_NOTE_LENGTH, t('favorites.noteTooLong')),
       }),
     [t]
   )
@@ -40,8 +45,8 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
     handleSubmit,
     reset,
     formState: { errors, isValid, isSubmitting },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+  } = useForm<FormValues, unknown, SubmittedValues>({
+    resolver: zodResolver(schema) as Resolver<FormValues, unknown, SubmittedValues>,
     mode: 'onChange',
     defaultValues: { note: '' },
   })
@@ -53,7 +58,6 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
   const noteLength = watchedNote.length
 
   const onSubmit = handleSubmit(({ track, note }) => {
-    if (!track) return
     if (!onAdd(track, note.trim() || undefined)) return
     reset()
     onClose()

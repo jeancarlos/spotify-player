@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { PlayerProvider, usePlayer, useProgress, type PlayerControls } from '../PlayerContext'
 import { deezer } from '@/lib/deezer'
 import { readRecent } from '@/utils/recentStorage'
@@ -470,5 +470,131 @@ describe('PlayerProvider', () => {
       controls.seek(-1000)
     })
     expect(audio().currentTime).toBe(0)
+  })
+
+  it('pauses on toggle while the preview is playing', async () => {
+    await act(() => controls.playTrack(track('1')))
+    Object.defineProperty(audio(), 'paused', { configurable: true, value: false })
+    pause.mockClear()
+    act(() => {
+      controls.toggle()
+    })
+    expect(pause).toHaveBeenCalled()
+    expect(latest.isPlaying).toBe(false)
+  })
+
+  it('stops at the end when shuffle has no other playable track', async () => {
+    await act(() => controls.playTrack(track('1')))
+    act(() => {
+      controls.setShuffle(true)
+    })
+    pause.mockClear()
+    act(() => {
+      controls.next()
+    })
+    expect(pause).toHaveBeenCalled()
+  })
+
+  it('does nothing once the provider is unmounted', async () => {
+    const saved = controls
+    cleanup()
+    deezerMock.mockClear()
+    await act(() => saved.playTrack(track('1')))
+    act(() => {
+      saved.seek(1000)
+    })
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
+  it('leaves loading cleared when the fresh track has no preview', async () => {
+    deezerMock.mockImplementation((path: string) =>
+      Promise.resolve({ ...fresh(track(path.split('/')[1])), preview_url: null })
+    )
+    await act(() => controls.playTrack(track('1')))
+    expect(latest.isLoading).toBe(false)
+    expect(latest.isPlaying).toBe(false)
+  })
+
+  it('drops a play that finishes after a newer one started', async () => {
+    let release: () => void = () => undefined
+    play.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve
+        })
+    )
+    let first: Promise<void> = Promise.resolve()
+    await act(async () => {
+      first = controls.playTrack(track('1'))
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    await act(() => controls.playTrack(track('2')))
+    await act(async () => {
+      release()
+      await first
+    })
+    expect(latest.currentTrack?.id).toBe('2')
+    expect(readRecent().map((t) => t.id)).toEqual(['2'])
+  })
+
+  it('ignores a failed resume that a newer request superseded', async () => {
+    await act(() => controls.playTrack(track('1')))
+    act(() => {
+      controls.toggle()
+    })
+    let reject: (e: unknown) => void = () => undefined
+    play.mockImplementationOnce(
+      () =>
+        new Promise<void>((_, rej) => {
+          reject = rej
+        })
+    )
+    act(() => {
+      controls.toggle()
+    })
+    await act(() => controls.playTrack(track('2')))
+    deezerMock.mockClear()
+    await act(async () => {
+      reject(new Error('late'))
+      await Promise.resolve()
+    })
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
+  it('reads the finite duration on timeupdate', async () => {
+    await act(() => controls.playTrack(track('1')))
+    Object.defineProperty(audio(), 'duration', { configurable: true, value: 20 })
+    act(() => {
+      fireEvent(audio(), new Event('timeupdate'))
+    })
+    expect(screen.getByTestId('progress')).toBeInTheDocument()
+  })
+})
+
+describe('PlayerProvider without a media session', () => {
+  it('plays without registering handlers', async () => {
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
+    vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
+    deezerMock.mockImplementation((path: string) => Promise.resolve(fresh(track(path.split('/')[1]))))
+    render(
+      <PlayerProvider>
+        <Probe />
+      </PlayerProvider>
+    )
+    await act(() => controls.playTrack(track('1')))
+    expect(latest.currentTrack?.id).toBe('1')
+    vi.restoreAllMocks()
+    deezerMock.mockReset()
+    localStorage.clear()
+  })
+})
+
+describe('usePlayer', () => {
+  it('throws outside the provider', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    expect(() => render(<Probe />)).toThrow('usePlayer must be used inside PlayerProvider')
+    spy.mockRestore()
   })
 })

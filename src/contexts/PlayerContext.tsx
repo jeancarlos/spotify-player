@@ -178,42 +178,26 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'SET_REPEAT', payload: repeat })
   }, [])
 
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    const onTime = () => {
-      setProgress({
-        progressMs: audio.currentTime * 1000,
-        durationMs: Number.isFinite(audio.duration) ? audio.duration * 1000 : PREVIEW_MS,
-      })
+  const onAudioTime = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    const audio = e.currentTarget
+    setProgress({
+      progressMs: audio.currentTime * 1000,
+      durationMs: Number.isFinite(audio.duration) ? audio.duration * 1000 : PREVIEW_MS,
+    })
+  }
+
+  const onAudioEnded = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    if (stateRef.current.repeat !== 'track') {
+      next()
+      return
     }
-    const onEnded = () => {
-      if (stateRef.current.repeat !== 'track') {
-        next()
-        return
-      }
-      audio.currentTime = 0
-      audio.play().catch(() => undefined)
-    }
-    const onPlay = () => {
-      dispatch({ type: 'SET_PLAYING', payload: true })
-    }
-    const onPause = () => {
-      dispatch({ type: 'SET_PLAYING', payload: false })
-    }
-    audio.addEventListener('timeupdate', onTime)
-    audio.addEventListener('ended', onEnded)
-    audio.addEventListener('play', onPlay)
-    audio.addEventListener('pause', onPause)
-    audio.addEventListener('error', onPause)
-    return () => {
-      audio.removeEventListener('timeupdate', onTime)
-      audio.removeEventListener('ended', onEnded)
-      audio.removeEventListener('play', onPlay)
-      audio.removeEventListener('pause', onPause)
-      audio.removeEventListener('error', onPause)
-    }
-  }, [next])
+    e.currentTarget.currentTime = 0
+    e.currentTarget.play().catch(() => undefined)
+  }
+
+  const setPlaying = (payload: boolean) => () => {
+    dispatch({ type: 'SET_PLAYING', payload })
+  }
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return
@@ -258,7 +242,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     <PlayerContext.Provider value={value}>
       <ProgressContext.Provider value={progress}>
         {children}
-        <audio ref={audioRef} data-testid="player-audio" preload="none" />
+        <audio
+          ref={audioRef}
+          data-testid="player-audio"
+          preload="none"
+          onTimeUpdate={onAudioTime}
+          onEnded={onAudioEnded}
+          onPlay={setPlaying(true)}
+          onPause={setPlaying(false)}
+          onError={setPlaying(false)}
+        />
       </ProgressContext.Provider>
     </PlayerContext.Provider>
   )

@@ -3,10 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { ProgressBar } from '../ProgressBar'
 
 const seek = vi.fn()
+let duration = 30000
 
 vi.mock('@/contexts/PlayerContext', () => ({
   usePlayer: () => ({ controls: { seek } }),
-  useProgress: () => ({ progressMs: 12000, durationMs: 30000 }),
+  useProgress: () => ({ progressMs: 12000, durationMs: duration }),
 }))
 
 describe('ProgressBar', () => {
@@ -29,5 +30,14 @@ describe('ProgressBar', () => {
     fireEvent.change(screen.getByRole('slider'), { target: { value: '21000' } })
     expect(seek).toHaveBeenCalledTimes(1)
     expect(seek).toHaveBeenCalledWith(21000)
+  })
+
+  it('shows an empty bar when the duration is unknown', () => {
+    duration = 0
+    render(<ProgressBar />)
+    const slider = screen.getByRole('slider')
+    expect(slider).toHaveAttribute('max', '1')
+    expect(slider.style.background).toContain('0%')
+    duration = 30000
   })
 })
