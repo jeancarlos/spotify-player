@@ -10,8 +10,17 @@ export type UIAction =
   | { type: 'OPEN_SIDEBAR' }
   | { type: 'CLOSE_SIDEBAR' }
 
+function readLanguage(): UIState['language'] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.language)
+    return stored === 'en-US' ? stored : 'pt-BR'
+  } catch {
+    return 'pt-BR'
+  }
+}
+
 export const initialUIState: UIState = {
-  language: (localStorage.getItem(STORAGE_KEYS.language) ?? 'pt-BR') as 'pt-BR' | 'en-US',
+  language: readLanguage(),
   sidebarOpen: false,
 }
 

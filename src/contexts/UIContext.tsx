@@ -17,7 +17,11 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     if (i18n.language !== state.language) {
       void i18n.changeLanguage(state.language)
     }
-    localStorage.setItem(STORAGE_KEYS.language, state.language)
+    try {
+      localStorage.setItem(STORAGE_KEYS.language, state.language)
+    } catch {
+      return
+    }
   }, [state.language])
 
   return <UIContext.Provider value={{ state, dispatch }}>{children}</UIContext.Provider>

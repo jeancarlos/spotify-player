@@ -24,7 +24,10 @@ export function loadLastSearch(): { q: string; tab: SearchTab } | null {
 }
 
 export function saveLastSearch(q: string, tab: SearchTab) {
-  if (q.trim()) {
+  if (!q.trim()) return
+  try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ q, tab }))
+  } catch {
+    return
   }
 }
