@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { SearchX } from 'lucide-react'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { currentPath } from '@/utils/routerState'
 import { usePlaylistDetailPage, PLAYLIST_LIMIT } from '@/hooks/usePlaylistDetailPage'
@@ -27,7 +29,16 @@ export function PlaylistDetail() {
     handlePlay,
     handleLayout,
     playTrack,
+    notFound,
   } = usePlaylistDetailPage()
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen pt-16 px-4">
+        <EmptyState message={t('common.notFound')} icon={<SearchX size={32} />} />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">

@@ -30,6 +30,7 @@ const hook = {
   handlePlay: vi.fn(),
   handleLayout: vi.fn(),
   playTrack: vi.fn(),
+  notFound: false,
 }
 
 vi.mock('@/hooks/usePlaylistDetailPage', () => ({
@@ -75,5 +76,13 @@ describe('PlaylistDetail table view', () => {
   it('keeps the track list in the same centred column as album pages', () => {
     renderPage()
     expect(screen.getByText('41').closest('.max-w-3xl')).not.toBeNull()
+  })
+
+  it('shows a not-found state instead of an empty header when Deezer has no data', () => {
+    hook.notFound = true
+    renderPage()
+    expect(screen.getByText('common.notFound')).toBeInTheDocument()
+    expect(screen.queryByText('41')).toBeNull()
+    hook.notFound = false
   })
 })

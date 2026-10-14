@@ -1,3 +1,5 @@
+import { SearchX } from 'lucide-react'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { useAlbumDetailPage, ALBUM_LIMIT } from '@/hooks/useAlbumDetailPage'
 import { CollectionHeader } from '@/components/shared/CollectionHeader'
 import { ListTableSwitch } from '@/components/shared/ListTableSwitch'
@@ -25,8 +27,17 @@ export function AlbumDetail() {
     handlePlay,
     handleLayout,
     handleArtistClick,
+    notFound,
     t,
   } = useAlbumDetailPage()
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen pt-16 px-4">
+        <EmptyState message={t('common.notFound')} icon={<SearchX size={32} />} />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">

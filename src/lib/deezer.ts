@@ -10,6 +10,10 @@ export class DeezerError extends Error {
 
 export const DEEZER_TIMEOUT_CODE = -1
 
+export function isNoData(error: unknown): boolean {
+  return error instanceof DeezerError && error.code === 800
+}
+
 interface DeezerErrorBody {
   error: { type?: string; message?: string; code?: number }
 }

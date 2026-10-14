@@ -42,7 +42,8 @@
     "table": "Tabela",
     "rank": "Rank",
     "name": "Nome",
-    "dismissNotification": "Dispensar notificação"
+    "dismissNotification": "Dispensar notificação",
+    "notFound": "Esta página não existe no Deezer"
   },
   "artists": {
     "searchPlaceholder": "Buscar...",

@@ -7,6 +7,7 @@ import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
 import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
+import { isNoData } from '@/lib/deezer'
 import { formatDate } from '@/utils/formatDate'
 import { QUEUE_LIMIT } from '@/utils/constants'
 import type {
@@ -121,6 +122,7 @@ export function useAlbumDetailPage() {
     setPage,
     headerHeight,
     hasNext,
+    notFound: isNoData(album.error),
     handlePlay,
     handleLayout,
     handleArtistClick,

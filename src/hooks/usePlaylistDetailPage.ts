@@ -6,6 +6,7 @@ import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
 import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
+import { isNoData } from '@/lib/deezer'
 import { QUEUE_LIMIT } from '@/utils/constants'
 import type { Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
@@ -60,6 +61,7 @@ export function usePlaylistDetailPage() {
     setPage,
     headerHeight,
     hasNext,
+    notFound: isNoData(playlist.error),
     subtitle,
     handlePlay,
     handleLayout,

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { useQueryClient, type QueryCache, type QueryCacheNotifyEvent } from '@tanstack/react-query'
-import { DeezerError } from '@/lib/deezer'
+import { DeezerError, isNoData } from '@/lib/deezer'
 
 const FAILURE_LIMIT = 3
 
@@ -14,7 +14,7 @@ type QueryAction = Extract<QueryCacheNotifyEvent, { type: 'updated' }>['action']
 function nextFailures(action: QueryAction, failures: number): number | null {
   if (action.type === 'success') return 0
   if (action.type !== 'error' || !(action.error instanceof DeezerError)) return null
-  return action.error.code === 800 ? 0 : failures + 1
+  return isNoData(action.error) ? 0 : failures + 1
 }
 
 const stores = new WeakMap<QueryCache, HealthStore>()

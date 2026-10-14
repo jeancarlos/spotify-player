@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { SearchX } from 'lucide-react'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { useArtistDetailPage } from '@/hooks/useArtistDetailPage'
 import { ArtistHeader } from '@/components/artist/ArtistHeader'
 import { ArtistBio } from '@/components/artist/ArtistBio'
@@ -26,7 +28,16 @@ export function ArtistDetail() {
     artistLink,
     albumItems,
     activeTrackId,
+    notFound,
   } = useArtistDetailPage(id)
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen pt-16 px-4">
+        <EmptyState message={t('common.notFound')} icon={<SearchX size={32} />} />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">

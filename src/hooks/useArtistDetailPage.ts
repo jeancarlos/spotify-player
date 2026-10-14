@@ -6,6 +6,7 @@ import { useArtistAlbums } from '@/hooks/queries/useArtistAlbums'
 import { useArtistTopTracks } from '@/hooks/queries/useArtistTopTracks'
 import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
+import { isNoData } from '@/lib/deezer'
 import type { AlbumSimple, Artist, Image, Track } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
@@ -63,6 +64,7 @@ export function useArtistDetailPage(id: string | undefined) {
   const meta = useMemo(() => deriveArtistMeta(artist.data), [artist.data])
   const albumItems = useMemo(() => albums.data?.items ?? [], [albums.data])
   const activeTrackId = state.currentTrack?.id
+  const notFound = isNoData(artist.error)
 
   return useMemo(
     () => ({
@@ -78,6 +80,7 @@ export function useArtistDetailPage(id: string | undefined) {
       playTrack,
       albumItems,
       activeTrackId,
+      notFound,
       ...meta,
     }),
     [
@@ -93,6 +96,7 @@ export function useArtistDetailPage(id: string | undefined) {
       playTrack,
       albumItems,
       activeTrackId,
+      notFound,
       meta,
     ]
   )
