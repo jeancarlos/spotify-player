@@ -6,15 +6,18 @@ import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
 import type { Track } from '@/types/music'
 
+let lyricsResult: object = { isPending: false, isLoading: false, data: ['la'] }
 vi.mock('@/hooks/queries/useLyrics', () => ({
-  useLyrics: () => ({ isPending: false, data: [{ timeMs: 0, text: 'la' }] }),
+  useLyrics: () => lyricsResult,
 }))
 vi.mock('@/components/layout/LyricsView', () => ({ LyricsView: () => <div /> }))
 vi.mock('@/components/layout/TrackInfoPanel', () => ({ TrackInfoPanel: () => <div /> }))
 vi.mock('@/components/layout/PlayerQueue', () => ({ PlayerQueue: () => <div /> }))
 vi.mock('@/contexts/PlayerContext', async (orig) => ({
   ...(await orig<Record<string, unknown>>()),
-  useProgress: () => ({ progressMs: 0, durationMs: 0 }),
+  useProgress: () => {
+    throw new Error('PlayerView must not re-render on every timeupdate')
+  },
 }))
 
 function Probe() {
@@ -22,7 +25,7 @@ function Probe() {
   return <output data-testid="loc">{JSON.stringify({ p: l.pathname + l.search, s: l.state })}</output>
 }
 
-function setup() {
+function setup(withTrack = true) {
   const track = {
     id: '1',
     name: 'Song',
@@ -33,7 +36,7 @@ function setup() {
   const controls = { seek: vi.fn() }
   render(
     <MemoryRouter initialEntries={[{ pathname: '/player', search: '?tab=lyrics', state: { from: '/playlists/9?page=2' } }]}>
-      <PlayerContext.Provider value={{ state: { ...initialPlayerState, currentTrack: track }, controls } as never}>
+      <PlayerContext.Provider value={{ state: { ...initialPlayerState, currentTrack: withTrack ? track : null }, controls } as never}>
         <Routes>
           <Route path="/player" element={<PlayerView />} />
           <Route path="*" element={null} />
@@ -64,5 +67,13 @@ describe('PlayerView', () => {
     for (const key of ['player.lyrics', 'track.songDetails', 'player.queue']) {
       expect(screen.getByRole('button', { name: key })).toHaveAttribute('aria-label', key)
     }
+  })
+
+  it('shows the no-track state instead of searching forever', () => {
+    lyricsResult = { isPending: true, isLoading: false, data: undefined }
+    setup(false)
+    expect(screen.getByText('player.noTrack')).toBeInTheDocument()
+    expect(screen.queryByText('lyrics.searching')).toBeNull()
+    lyricsResult = { isPending: false, isLoading: false, data: ['la'] }
   })
 })

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import type { LyricLine } from '@/types/lyrics'
 import { parseLRC, parsePlainLyrics } from '@/utils/lrcParser'
 
 export function cleanTitle(title: string): string {
@@ -23,7 +22,7 @@ export async function fetchLyrics({
   title,
   album,
   durationMs,
-}: FetchLyricsParams): Promise<LyricLine[]> {
+}: FetchLyricsParams): Promise<string[]> {
   const cleanedTitle = cleanTitle(title)
   const url = new URL('https://lrclib.net/api/get')
   url.searchParams.set('artist_name', artist)
@@ -40,14 +39,13 @@ export async function fetchLyrics({
     plainLyrics?: string
   }
 
-  const synced = data.syncedLyrics ? parseLRC(data.syncedLyrics) : []
+  const synced = data.syncedLyrics
+    ? parseLRC(data.syncedLyrics)
+        .map((l) => l.text)
+        .filter(Boolean)
+    : []
   if (synced.length > 0) return synced
-
-  if (data.plainLyrics && durationMs) {
-    return parsePlainLyrics(data.plainLyrics, durationMs)
-  }
-
-  return []
+  return data.plainLyrics ? parsePlainLyrics(data.plainLyrics) : []
 }
 
 export function lyricsKey({ artist, title, album, durationMs }: FetchLyricsParams) {
@@ -57,7 +55,7 @@ export function lyricsKey({ artist, title, album, durationMs }: FetchLyricsParam
 export type UseLyricsParams = FetchLyricsParams
 
 export function useLyrics(params: UseLyricsParams) {
-  return useQuery<LyricLine[]>({
+  return useQuery<string[]>({
     queryKey: lyricsKey(params),
     enabled: !!params.artist && !!params.title,
     retry: false,
