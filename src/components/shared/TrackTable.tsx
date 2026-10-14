@@ -26,11 +26,11 @@ interface TrackTableRowProps {
 
 function resolveTrackMeta(track: Track) {
   return {
-    albumImages: 'album' in track ? track.album.images : undefined,
-    albumId: 'album' in track ? track.album.id : undefined,
-    albumName: 'album' in track ? track.album.name : '—',
-    artistNames: 'artists' in track ? track.artists.map((a) => a.name).join(', ') : '—',
-    rank: ('rank' in track ? track.rank : undefined) ?? '—',
+    albumImages: track.album.images,
+    albumId: track.album.id,
+    albumName: track.album.name,
+    artistNames: track.artists.map((a) => a.name).join(', '),
+    rank: track.rank ?? '—',
   }
 }
 
@@ -87,7 +87,7 @@ function TrackTableRow({
         </button>
       </td>
       <td className="py-2 px-3 w-10">
-        {albumImages && <AlbumThumb images={albumImages} />}
+        <AlbumThumb images={albumImages} />
       </td>
       <td className="py-2 px-3 font-medium text-black/90 whitespace-nowrap max-w-[180px] truncate">
         {track.name}
@@ -132,7 +132,7 @@ export function TrackTable({
   onPlay,
   onAlbumClick,
 }: TrackTableProps) {
-  const showRank = tracks.some((track) => 'rank' in track && track.rank != null)
+  const showRank = tracks.some((track) => track.rank != null)
   const { t } = useTranslation()
   return (
     <div className="overflow-x-auto">
@@ -168,7 +168,7 @@ export function TrackTable({
         <tbody>
           {tracks.map((track, i) => (
             <TrackTableRow
-              key={track.id}
+              key={startIndex + i}
               track={track}
               index={startIndex + i}
               isActive={track.id === activeTrackId}

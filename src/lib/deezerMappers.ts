@@ -70,6 +70,7 @@ export interface DzPlaylist {
   nb_tracks?: number
   public?: boolean
   creator?: { id: number; name: string }
+  user?: { id: number; name: string }
   link?: string
 }
 
@@ -96,8 +97,13 @@ const toArtistRef = (a: DzArtistRef | undefined): ArtistSimple => ({
 const coverImages = (a: DzAlbumRef) =>
   toImages(a.cover_xl, a.cover_big, a.cover_medium, a.cover_small)
 
-const albumType = (t?: string): AlbumSimple['album_type'] =>
-  t === 'single' || t === 'compilation' ? t : 'album'
+const ALBUM_TYPES: Record<string, AlbumSimple['album_type']> = {
+  single: 'single',
+  ep: 'ep',
+  compile: 'compilation',
+}
+
+const albumType = (t?: string): AlbumSimple['album_type'] => ALBUM_TYPES[t ?? ''] ?? 'album'
 
 export function toArtist(a: DzArtist): Artist {
   return {
@@ -174,6 +180,7 @@ export function toTrack(t: DzTrack, album?: AlbumSimple): Track {
 
 export function toPlaylist(p: DzPlaylist): Playlist {
   const total = p.nb_tracks ?? 0
+  const creator = p.creator ?? p.user
   return {
     id: String(p.id),
     name: p.title,
@@ -181,13 +188,8 @@ export function toPlaylist(p: DzPlaylist): Playlist {
     uri: `deezer:playlist:${p.id}`,
     type: 'playlist',
     images: toImages(p.picture_xl, p.picture_big, p.picture_medium, p.picture_small),
-    owner: {
-      id: String(p.creator?.id ?? 0),
-      display_name: p.creator?.name ?? 'Unknown',
-      type: 'user',
-    },
+    owner: creator ? { id: String(creator.id), display_name: creator.name } : undefined,
     items: { total, href: '' },
-    tracks: { total, href: '' },
     public: p.public ?? true,
     link: p.link,
   }

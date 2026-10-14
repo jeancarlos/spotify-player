@@ -3,6 +3,7 @@ import { AlbumTable } from '@/components/shared/AlbumTable'
 import { ListTableSwitch, type ViewMode } from '@/components/shared/ListTableSwitch'
 import { Pagination } from '@/components/shared/Pagination'
 import { pickImage, srcSetOf } from '@/lib/utils'
+import { albumTypeLabel } from '@/utils/albumType'
 import { formatDate } from '@/utils/formatDate'
 import type { AlbumSimple } from '@/types/music'
 
@@ -71,7 +72,7 @@ export function ArtistDiscography({
                   {album.release_date ? formatDate(album.release_date, 'year') : ''}
                 </p>
               </div>
-              <span className="text-xs text-black/30 shrink-0 capitalize">{album.album_type}</span>
+              <span className="text-xs text-black/30 shrink-0 capitalize">{albumTypeLabel(t, album.album_type)}</span>
             </div>
           ))}
         </div>

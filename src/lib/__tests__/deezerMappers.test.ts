@@ -89,13 +89,31 @@ describe('deezerMappers', () => {
     expect(toTrack((artistTop as unknown as DzList<DzTrack>).data[0]).rank).toBe(971942)
   })
 
+  it('maps Deezer record types to album types', () => {
+    const type = (record_type: string) => toAlbum({ ...album, record_type }).album_type
+    expect(type('album')).toBe('album')
+    expect(type('single')).toBe('single')
+    expect(type('ep')).toBe('ep')
+    expect(type('compile')).toBe('compilation')
+    expect(type('unheard')).toBe('album')
+  })
+
+  it('omits the owner when Deezer sends no creator and reads search results user', () => {
+    const { creator: _creator, ...bare } = playlist
+    expect(toPlaylist(bare).owner).toBeUndefined()
+    expect(toPlaylist({ ...bare, user: { id: 7, name: 'Ana' } }).owner).toEqual({
+      id: '7',
+      display_name: 'Ana',
+    })
+  })
+
   it('maps a playlist', () => {
     const r = toPlaylist(playlist)
     expect(r.id).toBe('5207214368')
     expect(r.name).toBe('Top 50 Sertanejo')
     expect(r.uri).toBe('deezer:playlist:5207214368')
     expect(r.description).toBe('Ouça os maiores sucessos do sertanejo! Capa: Simone Mendes.')
-    expect(r.owner.display_name).toBe('Daniel - Editor Deezer Brasil')
+    expect(r.owner?.display_name).toBe('Daniel - Editor Deezer Brasil')
     expect(r.items.total).toBe(50)
     expect(r.images.map((i) => i.width)).toEqual([1000, 500, 250, 56])
     expect(r.images[0].url).toBe(playlist.picture_xl)

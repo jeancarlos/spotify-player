@@ -10,7 +10,7 @@ export function PlayerQueue() {
   if (upcoming.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-white/30 text-sm">{t('player.emptyQueue', 'A fila está vazia')}</p>
+        <p className="text-white/30 text-sm">{t('player.emptyQueue')}</p>
       </div>
     )
   }

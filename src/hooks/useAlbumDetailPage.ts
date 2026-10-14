@@ -4,6 +4,7 @@ import { currentPath } from '@/utils/routerState'
 import { useTranslation } from 'react-i18next'
 import { useAlbum } from '@/hooks/queries/useAlbum'
 import { useAlbumTracks } from '@/hooks/queries/useAlbumTracks'
+import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
 import { formatDate } from '@/utils/formatDate'
@@ -67,7 +68,7 @@ export function useAlbumDetailPage() {
   const location = useLocation()
   const { t } = useTranslation()
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useScopedPage(id)
   const [view, setView] = useState<ViewMode>('list')
   const [headerHeight, setHeaderHeight] = useState(0)
 

@@ -21,7 +21,6 @@ export function ArtistDetail() {
     handleHeaderHeightChange,
     handleAlbumClick,
     playTrack,
-    artistSubtitle,
     artistImages,
     artistName,
     artistLink,
@@ -34,7 +33,6 @@ export function ArtistDetail() {
       <ArtistHeader
         images={artistImages}
         name={artistName}
-        subtitle={artistSubtitle}
         link={artistLink}
         onLayout={handleHeaderHeightChange}
       />

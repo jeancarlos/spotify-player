@@ -52,7 +52,7 @@ export function PlaylistDetail() {
             <div className="flex flex-col gap-0.5">
               {playlistTracks.map((track, i) => (
                 <TrackRow
-                  key={track.id}
+                  key={(page - 1) * PLAYLIST_LIMIT + i}
                   track={track}
                   index={(page - 1) * PLAYLIST_LIMIT + i}
                   isActive={playerState.currentTrack?.id === track.id}

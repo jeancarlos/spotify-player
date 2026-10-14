@@ -102,7 +102,7 @@ describe('playlist hooks', () => {
     })
     expect(deezerMock).toHaveBeenCalledWith('playlist/908622995/tracks', { index: 50, limit: 50 })
     expect(result.current.data?.items).toEqual(
-      playlistTracks.data.map((t) => ({ added_at: null, item: toTrack(t), track: toTrack(t) }))
+      playlistTracks.data.map((t) => toTrack(t))
     )
     expect(result.current.data?.offset).toBe(50)
     expect(result.current.data?.limit).toBe(50)

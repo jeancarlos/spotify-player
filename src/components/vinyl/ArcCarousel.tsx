@@ -14,7 +14,6 @@ interface ArcCarouselProps {
   offsetDeg?: number
   baseDelay?: number
   title?: string
-  inverted?: boolean
 }
 
 export function ArcCarousel({

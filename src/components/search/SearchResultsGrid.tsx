@@ -65,7 +65,7 @@ export function SearchResultsGrid({
               key={playlist.id}
               title={playlist.name}
               images={playlist.images}
-              subtitle={playlist.owner.display_name}
+              subtitle={playlist.owner?.display_name}
               onClick={() => {
                 navigate(`/playlists/${playlist.id}`)
               }}

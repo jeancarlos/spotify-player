@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePlaylist } from '@/hooks/queries/usePlaylist'
 import { usePlaylistTracks } from '@/hooks/queries/usePlaylistTracks'
+import { useScopedPage } from '@/hooks/useScopedPage'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { isPlayable } from '@/lib/deezerMappers'
 import type { Track } from '@/types/music'
@@ -14,7 +15,7 @@ export function usePlaylistDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useScopedPage(id)
   const [view, setView] = useState<ViewMode>('list')
   const [headerHeight, setHeaderHeight] = useState(0)
 
@@ -22,7 +23,7 @@ export function usePlaylistDetailPage() {
   const tracks = usePlaylistTracks(id ?? '', !!id, page, PLAYLIST_LIMIT)
   const { state: playerState, controls } = usePlayer()
 
-  const playlistTracks: Track[] = (tracks.data?.items ?? []).map((item) => item.item)
+  const playlistTracks: Track[] = useMemo(() => tracks.data?.items ?? [], [tracks.data])
 
   const playTrack = useCallback(
     async (track: Track, list?: Track[]) => {
@@ -41,8 +42,8 @@ export function usePlaylistDetailPage() {
   }, [])
 
   const hasNext = tracks.data ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
-  const ownerName = playlist.data?.owner.display_name ?? ''
-  const subtitle = t('playlistDetail.owner', { name: ownerName })
+  const ownerName = playlist.data?.owner?.display_name
+  const subtitle = ownerName ? t('playlistDetail.owner', { name: ownerName }) : ''
 
   return {
     id,
