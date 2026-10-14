@@ -47,6 +47,14 @@ describe('cleanupLegacyStorage', () => {
     expect(localStorage.getItem('unrelated')).toBe('x')
   })
 
+  it('keeps future favorites key versions', () => {
+    localStorage.setItem('spoter_favorites_v3', '{}')
+    localStorage.setItem('spoter_favorites_v12', '{}')
+    cleanupLegacyStorage()
+    expect(localStorage.getItem('spoter_favorites_v3')).toBe('{}')
+    expect(localStorage.getItem('spoter_favorites_v12')).toBe('{}')
+  })
+
   it('does not throw when localStorage throws', () => {
     vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
       throw new Error('blocked')
