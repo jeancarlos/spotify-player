@@ -1,21 +1,16 @@
 {
   "nav": {
     "home": "Início",
-    "artists": "Artistas",
     "favorites": "Favoritos",
-    "collapse": "Recolher",
     "openMenu": "Abrir menu",
-    "languageSwitcher": "Seletor de idioma"
+    "languageSwitcher": "Seletor de idioma",
+    "sourceCode": "Código-fonte"
   },
   "home": {
     "recentlyPlayed": "Tocadas Recentemente",
-    "newReleases": "Novos Lançamentos",
-    "recommendations": "Recomendados para Você",
-    "seeMore": "Ver mais",
     "hint": "Toque em um vinil para ouvir uma prévia de 30 segundos"
   },
   "player": {
-    "nowPlaying": "Tocando agora",
     "noTrack": "Escolha um vinil para ouvir uma prévia",
     "lyrics": "Letra",
     "queue": "Fila",
@@ -29,7 +24,9 @@
     "pause": "Pausar",
     "seek": "Buscar",
     "playTrack": "Tocar {{name}}",
-    "progressText": "{{current}} de {{total}}"
+    "progressText": "{{current}} de {{total}}",
+    "viewTrack": "Ver música",
+    "emptyQueue": "A fila está vazia"
   },
   "catalog": {
     "unavailable": "O catálogo do Deezer está inacessível. Favoritos e tocadas recentemente continuam listados, mas a reprodução está pausada."
@@ -37,7 +34,6 @@
   "common": {
     "loading": "Carregando...",
     "error": "Algo deu errado",
-    "retry": "Tentar novamente",
     "back": "Voltar",
     "poweredByDeezer": "Dados e prévias de música por Deezer",
     "openOnDeezer": "Abrir no Deezer",
@@ -46,7 +42,7 @@
     "table": "Tabela",
     "rank": "Rank",
     "name": "Nome",
-    "clear": "Limpar"
+    "dismissNotification": "Dispensar notificação"
   },
   "artists": {
     "searchPlaceholder": "Buscar...",
@@ -56,7 +52,6 @@
     "tabArtist": "Artista",
     "tabAlbum": "Álbum",
     "tabPlaylist": "Playlist",
-    "filterByGenre": "Filtrar por gênero",
     "noResults": "Nenhum resultado encontrado",
     "result_one": "{{count}} resultado",
     "result_other": "{{count}} resultados",
@@ -64,53 +59,33 @@
     "charts": "Em alta no Deezer",
     "previous": "Anterior",
     "next": "Próxima",
-    "all": "Todos",
-    "unknownGenre": "Gênero desconhecido",
-    "followers_one": "{{count}} seguidor",
-    "followers_other": "{{count}} seguidores"
+    "followers_one": "{{count, number(notation: compact)}} seguidor",
+    "followers_other": "{{count, number(notation: compact)}} seguidores"
   },
   "artistDetail": {
-    "topTracks": "Top Tracks",
-    "albums": "Álbuns",
-    "previous": "Anterior",
-    "next": "Próxima",
     "discography": "Discografia",
     "bio": "Sobre o artista",
-    "relatedArtists": "Artistas Similares",
-    "loadMore": "Carregar mais",
     "topTracksRanked": "Mais populares no Deezer",
     "deezerRank": "Rank no Deezer"
   },
   "albumDetail": {
     "playAlbum": "Tocar álbum",
-    "tracks": "Faixas",
-    "by": "por"
+    "tracks": "Faixas"
   },
   "playlistDetail": {
     "playPlaylist": "Tocar playlist",
     "tracks": "Faixas",
-    "by": "por",
     "owner": "por {{name}}"
   },
   "favorites": {
     "saveFailed": "Não foi possível salvar seus favoritos neste navegador",
-    "song": "Música",
-    "artist": "Artista",
     "album": "Álbum",
-    "note": "Nota pessoal",
     "addButton": "Adicionar favorito",
     "addHeading": "Adicionar Favorito",
-    "searchPlaceholder": "Buscar nos favoritos...",
-    "searchAddPlaceholder": "Música ou artista...",
     "emptyList": "Nenhum favorito ainda",
     "removeConfirm": "Remover",
     "cancel": "Cancelar",
-    "songRequired": "Música é obrigatória",
-    "artistRequired": "Artista é obrigatório",
-    "minQuery": "Digite pelo menos 2 caracteres",
     "close": "Fechar",
-    "dismissNotification": "Dispensar notificação",
-    "addTrack": "+ Adicionar",
     "addToList": "Adicionar à Vinyla List",
     "removeFromList": "Remover da Vinyla List",
     "addedToList": "Adicionada!",
@@ -123,29 +98,19 @@
     "trackLabel": "Música",
     "addConfirm": "Adicionar ao favorito",
     "searchAutocomplete": "Buscar música ou artista...",
-    "isFavorite": "♥ FAVORITO",
     "noteCharsLeft": "{{count}}/80",
-    "editNote": "Editar nota",
-    "clearTrack": "Limpar seleção",
-    "reorderError": "Erro ao reordenar. A ordem anterior foi restaurada.",
-    "reorderPosition": "Editar posição de {{name}}"
+    "clearTrack": "Limpar seleção"
   },
   "lyrics": {
     "searching": "Buscando letra...",
-    "notFound": "Letra não encontrada",
-    "album": "Álbum",
     "releaseDate": "Lançamento",
-    "duration": "Duração",
     "nowPlaying": "Tocando agora",
     "noLyricsAvailable": "Sem letra disponível"
   },
-  "trackRow": {},
   "track": {
     "noPreview": "Prévia indisponível",
     "duration": "Duração",
-    "instrumental": "Instrumental",
     "songDetails": "Detalhes da música",
-    "bpm": "BPM",
     "explicit": "Explícito",
     "trackNumber": "Nº",
     "albumCol": "Álbum",
@@ -164,5 +129,11 @@
     "updateAvailable": "Atualização disponível",
     "newVersion": "Uma nova versão do Vinyla está disponível. Recarregue para atualizar.",
     "reload": "Recarregar e Atualizar"
+  },
+  "albumType": {
+    "album": "Álbum",
+    "single": "Single",
+    "compilation": "Coletânea",
+    "ep": "EP"
   }
 }

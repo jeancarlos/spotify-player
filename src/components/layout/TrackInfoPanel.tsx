@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useArtist } from '@/hooks/queries/useArtist'
 import { useTrackWikipedia } from '@/hooks/queries/useTrackWikipedia'
 import { formatDuration } from '@/utils/formatDuration'
 import { formatDate } from '@/utils/formatDate'
@@ -15,10 +14,7 @@ interface Props {
 export function TrackInfoPanel({ track }: Props) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const artist = useArtist(track.artists[0]?.id)
   const wikipedia = useTrackWikipedia(track.name, track.artists[0]?.name)
-
-  const genres: string[] = artist.data?.genres?.slice(0, 5) ?? []
 
   return (
     <div>
@@ -60,7 +56,12 @@ export function TrackInfoPanel({ track }: Props) {
         </div>
 
         <div className="flex justify-center gap-2.5 w-full max-w-sm">
-          <StatCard label={t('track.releaseDate')} value={formatDate(track.album.release_date)} />
+          {track.album.release_date && (
+            <StatCard
+              label={t('lyrics.releaseDate')}
+              value={formatDate(track.album.release_date)}
+            />
+          )}
           <StatCard label={t('track.duration')} value={formatDuration(track.duration_ms)} />
         </div>
 
@@ -79,17 +80,6 @@ export function TrackInfoPanel({ track }: Props) {
             </div>
           </Section>
         )}
-
-        <div className="flex flex-wrap justify-center gap-1.5">
-          {genres.map((g) => (
-            <span
-              key={g}
-              className="text-[10px] px-2.5 py-1 rounded-xl bg-white/5 border border-white/5 text-white/60 capitalize font-medium hover:bg-white/10 transition-colors"
-            >
-              {g}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   )
