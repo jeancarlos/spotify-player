@@ -8,7 +8,7 @@ import { isPlayable } from '@/lib/deezerMappers'
 import { shuffled } from '@/utils/shuffled'
 import { useCatalogHealth } from '@/hooks/useCatalogHealth'
 import { useWindowSize } from '@/hooks/useWindowSize'
-import { homeDiskOffset } from '@/utils/diskLayout'
+import { arcGeometry, homeDiskPx } from '@/utils/diskLayout'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { ArcCarousel } from '@/components/vinyl/ArcCarousel'
 import { VinylCard } from '@/components/shared/VinylCard'
@@ -21,10 +21,7 @@ const MAX_CAROUSEL_TRACKS = 5
 function useDiskLayout() {
   const { width: vw, height: vh } = useWindowSize()
 
-  const diskPx = Math.min(720, vw)
-  const translateY = homeDiskOffset(vw)
-  const arcRadius = Math.max(130, Math.round(diskPx * 0.45))
-  const arcBottom = Math.max(80, diskPx - translateY - arcRadius - (vw < 768 ? 0 : 20))
+  const { translateY, arcRadius, arcBottom } = arcGeometry(homeDiskPx(vw, vh), vw)
   const arcDeg = vw < 768 ? 90 : 75
 
   const carouselContainerTop = vh - arcBottom - (arcRadius + 70)

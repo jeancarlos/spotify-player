@@ -4,7 +4,7 @@ import { VinylDisk } from './VinylDisk'
 import { usePlayer } from '@/contexts/PlayerContext'
 import { useFavorites } from '@/hooks/useFavorites'
 import { useWindowSize } from '@/hooks/useWindowSize'
-import { homeDiskOffset } from '@/utils/diskLayout'
+import { homeDiskOffset, homeDiskPx } from '@/utils/diskLayout'
 import type { Track } from '@/types/music'
 
 const PLAYER_CLEARANCE = 136
@@ -29,10 +29,11 @@ function getVinylDiskProps(
 }
 
 function useVinylY() {
-  const { width: vw } = useWindowSize()
+  const { width: vw, height: vh } = useWindowSize()
   const diskPx = Math.min(720, vw)
   return {
-    homeY: homeDiskOffset(vw),
+    homeY: homeDiskOffset(vw, vh),
+    homeScale: homeDiskPx(vw, vh) / diskPx,
     otherY: diskPx - PLAYER_CLEARANCE,
   }
 }
@@ -40,20 +41,22 @@ function useVinylY() {
 export function PersistentVinylDisk() {
   const location = useLocation()
   const { state } = usePlayer()
-  const { homeY, otherY } = useVinylY()
+  const { homeY, homeScale, otherY } = useVinylY()
 
   const { tracks, notes } = useFavorites()
   const isFavorite = tracks.some((t) => t.uri === state.currentTrack?.uri)
 
-  const y = location.pathname === '/' ? homeY : otherY
+  const isHome = location.pathname === '/'
+  const y = isHome ? homeY : otherY
   const diskProps = getVinylDiskProps(state.currentTrack, notes, isFavorite)
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[15] pointer-events-none flex justify-center">
       <motion.div
-        animate={{ y }}
+        animate={{ y, scale: isHome ? homeScale : 1 }}
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         initial={false}
+        style={{ transformOrigin: '50% 100%' }}
       >
         <VinylDisk size="xl" isPlaying={state.isPlaying} {...diskProps} />
       </motion.div>
