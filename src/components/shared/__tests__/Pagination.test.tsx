@@ -2,12 +2,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Pagination } from '../Pagination'
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}))
-
 describe('Pagination', () => {
   it('renders correctly with current page', () => {
     render(<Pagination page={2} hasNext={true} onPrev={vi.fn()} onNext={vi.fn()} />)

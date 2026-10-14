@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { AppShell } from '../AppShell'
 
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (k: string) => k }) }))
 vi.mock('../HamburgerMenu', () => ({ HamburgerMenu: () => null }))
 vi.mock('../ReloadPrompt', () => ({ ReloadPrompt: () => null }))
 vi.mock('@/components/shared/LanguageSwitcher', () => ({ LanguageSwitcher: () => null }))

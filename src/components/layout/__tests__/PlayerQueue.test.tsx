@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlayerContext } from '@/contexts/PlayerContext'
@@ -44,6 +44,18 @@ function renderQueue(queue: Track[], queueIndex: number) {
 }
 
 describe('PlayerQueue', () => {
+  beforeAll(() => {
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(600)
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(400)
+  })
+
+  it('renders only a window of a long queue', () => {
+    renderQueue(Array.from({ length: 1000 }, (_, i) => mk(String(i))), 0)
+    const rows = screen.getAllByText(/^Name /)
+    expect(rows.length).toBeLessThan(50)
+    expect(rows[0].textContent).toBe('Name 1')
+  })
+
   it('renders only tracks after queueIndex, in order', () => {
     renderQueue([A, B, C], 0)
     const names = screen.getAllByText(/^Name /).map((e) => e.textContent)
