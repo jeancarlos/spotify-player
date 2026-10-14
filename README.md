@@ -1,45 +1,28 @@
 <p align="center">
-  <img src="docs/assets/header-repo.png" alt="Spoter Header" width="600px">
+  <img src="docs/assets/header-repo.png" alt="Vinyla" width="600px">
 </p>
 
-# Spoter
+# Vinyla
 
-Spoter é um player de música web imersivo integrado com a API do Spotify, utilizando React, TypeScript, Vite, Tailwind CSS e Shadcn/UI com "Glassmorfismo".
+Vinyla é um player de música web imersivo, feito com React, TypeScript, Vite e Tailwind CSS, com visual em "Glassmorfismo". O catálogo e as prévias de 30 segundos vêm da API pública do [Deezer](https://www.deezer.com), sem login e sem conta.
 
 **Link:** https://spoter.jeansouza.dev/
-(se for testar aqui, me mande o email cadastrado no spotify para liberação)
 
-## Configuração do Spotify (Obtendo o Client ID)
+É um projeto de portfólio, sem fins comerciais. Dados e prévias de música fornecidos pelo Deezer.
 
-Para que a autenticação e as chamadas à API funcionem, você precisa de um **Client ID** do Spotify e configurar o Redirect URI. Siga os passos abaixo:
+## O que dá para fazer
 
-1. **Acesse o Dashboard de Desenvolvedor do Spotify:**
-   Vá para [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) e faça login com a sua conta do Spotify.
-
-2. **Crie uma aplicação (Create app):**
-   - Preencha o nome (ex: `Spoter Local`) e a descrição.
-   - Em **Redirect URIs**, insira exatamente: `http://127.0.0.1:5173/callback`
-     - `https://localhost...` não funciona pois o spotify não aceita `localhost` apenas `127.0.0.1`
-   - Marque as opções necessárias e aceite os termos para criar o app.
-
-3. **Copie o Client ID:**
-   Na página da sua nova aplicação, clique em **Settings** (Configurações) e copie a string alfanumérica em **Client ID**.
-
-4. **Configure o `.env`:**
-   No diretório raiz do projeto, crie ou edite o arquivo `.env` (use o `.env.example` como base) e adicione seu Client ID:
-
-   ```bash
-   VITE_SPOTIFY_CLIENT_ID=cole_seu_client_id_aqui
-   VITE_SPOTIFY_REDIRECT_URI=http://127.0.0.1:5173/callback
-   ```
+- Buscar artistas, álbuns e playlists, ou navegar pelos charts do Deezer quando a busca está vazia.
+- Ver detalhes de artista (bio, top faixas pelo rank do Deezer, discografia), álbum e playlist, com link para a página no Deezer.
+- Ouvir prévias de 30 segundos no próprio navegador, com fila, repetir, aleatório e letras sincronizadas (via [LRCLIB](https://lrclib.net)).
+- Salvar favoritos com notas e ver as últimas faixas tocadas, tudo guardado no navegador (localStorage).
+- Usar em português ou inglês.
 
 ## Executando o Projeto
 
-1. Obtenha o ClientID do Spotify seguindo os passos acima
-   - https://developer.spotify.com/dashboard
-   - Copie e coloque no .env
+Não precisa de chave de API nem de arquivo `.env`.
 
-2. Instale as dependências:
+1. Instale as dependências:
    ```bash
    yarn
    ```
@@ -57,39 +40,44 @@ Para que a autenticação e as chamadas à API funcionem, você precisa de um **
 - `yarn test`: Roda a suíte de testes com o Vitest.
 - `yarn test:e2e`: Executa os testes de ponta a ponta (E2E) com Playwright.
 
+## Como funciona
+
+- **Dados:** a API do Deezer não envia cabeçalhos CORS, então as chamadas saem do navegador via JSONP (`src/lib/deezer.ts`) e são convertidas para os tipos do app em `src/lib/deezerMappers.ts`.
+- **Player:** um único elemento `<audio>` toca as prévias. Os links de prévia expiram em cerca de 15 minutos, então cada faixa busca um link novo antes de tocar.
+- **Sem backend:** o site é estático (GitHub Pages). Favoritos, notas e histórico ficam só no navegador de quem usa.
+
 ## Testes End-to-End (E2E)
 
-O projeto utiliza **Playwright** para garantir a integridade dos fluxos principais. Os testes rodam em um ambiente isolado com mocks da API do Spotify.
+O projeto utiliza **Playwright** para garantir a integridade dos fluxos principais. Os testes rodam em um ambiente isolado, com respostas da API do Deezer e áudio de prévia simulados.
 
 ### Fluxos Cobertos
 
 ```mermaid
 graph TD
-    Start((Início)) --> Login[Página de Login]
-    Login --> i18n{Troca de Idioma PT/EN}
-    Login --> Auth[Autenticação Mock]
-    Auth --> SearchBar[Campo de Busca]
-    SearchBar --> Spinner(Debounce / Spinner)
+    Start((Início)) --> Home[Página Inicial]
+    Home --> i18n{Troca de Idioma PT/EN}
+    Home --> SearchBar[Campo de Busca]
+    SearchBar --> Charts(Charts com busca vazia)
     SearchBar --> Tabs[Filtros: Artista · Álbum · Playlist]
     Tabs --> Results[Resultados em Grid]
     Results --> Pagination[Paginação Next/Prev]
     Results --> ArtistDetail[Detalhes do Artista]
     Results --> AlbumDetail[Detalhes do Álbum]
-    ArtistDetail --> Content(Top Tracks, Bio, Discos)
-    ArtistDetail --> Chart(Gráficos de Popularidade)
-    Auth --> Favs[Gerenciamento de Favoritos]
-    Favs --> Form(Formulário com Validação)
-    Form --> Storage(Persistência LocalStorage)
+    ArtistDetail --> Content(Top Faixas, Bio, Discos)
+    ArtistDetail --> Chart(Gráfico do Rank no Deezer)
+    Results --> Player[Player de Prévias]
+    Player --> Favs[Gerenciamento de Favoritos]
+    Favs --> Storage(Persistência LocalStorage)
 ```
 
 | Arquivo | Funcionalidades Testadas |
 | :--- | :--- |
-| `smoke.spec.ts` | Carregamento inicial, título da página e visibilidade do login. |
+| `smoke.spec.ts` | Carregamento inicial sem login e título da página. |
 | `i18n.spec.ts` | Tradução dinâmica (PT/EN) e persistência do idioma entre rotas. |
-| `artists.spec.ts` | Renderização de cards, paginação básica e alternância de abas. |
-| `search.spec.ts` | SearchBar (spinner/debounce), busca por artista/álbum/playlist, paginação completa (next/prev/URL direta), card de próxima página na grid, estado sem resultados e navegação para detalhe. |
-| `artist-detail.spec.ts` | Exibição de bio, tabela de faixas mais ouvidas e integração com Recharts (SVG). |
-| `favorites.spec.ts` | Fluxo completo de CRUD (LocalStorage), busca de faixas e validação de formulário. |
+| `artists.spec.ts` | Charts com busca vazia, renderização de cards e alternância de abas. |
+| `search.spec.ts` | Busca por artista/álbum/playlist, paginação, estado sem resultados e navegação para detalhe. |
+| `artist-detail.spec.ts` | Bio, top faixas, discografia e gráfico do rank (SVG). |
+| `favorites.spec.ts` | Tocar uma prévia, favoritar e manter os favoritos após recarregar a página. |
 
 ### Executando os Testes E2E
 
