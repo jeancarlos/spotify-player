@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { normalizeTrack } from '@/lib/utils'
+import { isStoredTrack, normalizeTrack } from '@/lib/utils'
 import { STORAGE_KEYS } from '@/lib/storageKeys'
 import type { Track } from '@/types/music'
 
@@ -10,12 +10,6 @@ interface FavoritesData {
 }
 
 const CHANGED_EVENT = 'spoter:favorites-changed'
-
-const isTrack = (value: unknown): value is Track =>
-  typeof value === 'object' &&
-  value !== null &&
-  typeof (value as Track).uri === 'string' &&
-  typeof (value as Track).name === 'string'
 
 function parseNotes(notes: unknown): Record<string, string> {
   if (typeof notes !== 'object' || notes === null || Array.isArray(notes)) return {}
@@ -32,7 +26,7 @@ function parseFavorites(raw: string | null): FavoritesData {
     if (typeof parsed !== 'object' || parsed === null) return empty
     const { tracks, notes } = parsed as Record<string, unknown>
     return {
-      tracks: Array.isArray(tracks) ? tracks.filter(isTrack).map(normalizeTrack) : [],
+      tracks: Array.isArray(tracks) ? tracks.filter(isStoredTrack).map(normalizeTrack) : [],
       notes: parseNotes(notes),
     }
   } catch {

@@ -39,13 +39,21 @@ function localizeUnknown<T extends { id: string; name: string }>(ref: T): T {
   return ref.id === UNKNOWN_ID ? { ...ref, name: i18n.t('common.unknown') } : ref
 }
 
+export function isStoredTrack(value: unknown): value is Track {
+  const t = value as Record<string, unknown> | null
+  return (
+    typeof t?.uri === 'string' &&
+    typeof t.name === 'string' &&
+    Array.isArray(t.artists) &&
+    typeof t.album === 'object' &&
+    t.album !== null
+  )
+}
+
 export function normalizeTrack(track: Track): Track {
-  const artists = Array.isArray(track.artists) ? track.artists.map(localizeUnknown) : track.artists
-  const album = track.album as Track['album'] | undefined
-  if (!album) return { ...track, artists }
   return {
     ...track,
-    artists,
-    album: { ...localizeUnknown(album), images: normalizeImages<Image>(album.images) },
+    artists: track.artists.map(localizeUnknown),
+    album: { ...localizeUnknown(track.album), images: normalizeImages<Image>(track.album.images) },
   }
 }

@@ -1,4 +1,4 @@
-import { normalizeTrack } from '@/lib/utils'
+import { isStoredTrack, normalizeTrack } from '@/lib/utils'
 import { STORAGE_KEYS } from '@/lib/storageKeys'
 import type { Track } from '@/types/music'
 
@@ -9,8 +9,8 @@ export function readRecent(): Track[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
-    const tracks = JSON.parse(raw) as Track[]
-    return Array.isArray(tracks) ? tracks.map(normalizeTrack) : []
+    const tracks: unknown = JSON.parse(raw)
+    return Array.isArray(tracks) ? tracks.filter(isStoredTrack).map(normalizeTrack) : []
   } catch {
     return []
   }

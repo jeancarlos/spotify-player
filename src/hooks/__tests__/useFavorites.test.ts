@@ -5,18 +5,19 @@ import type { Track } from '@/types/music'
 
 const KEY = 'spoter_favorites_v2'
 
-const mk = (id: string): Track => ({
-  uri: `deezer:track:${id}`,
-  id,
-  name: `Track ${id}`,
-  type: 'track',
-  explicit: false,
-  is_playable: true,
-  preview_url: 'http://preview.mp3',
-  duration_ms: 180000,
-  artists: [{ uri: 'deezer:artist:1', id: '1', name: 'A', type: 'artist' }],
-  album: { uri: 'deezer:album:1', id: '1', name: 'Album', type: 'album', images: [] },
-} as unknown as Track)
+const mk = (id: string): Track =>
+  ({
+    uri: `deezer:track:${id}`,
+    id,
+    name: `Track ${id}`,
+    type: 'track',
+    explicit: false,
+    is_playable: true,
+    preview_url: 'http://preview.mp3',
+    duration_ms: 180000,
+    artists: [{ uri: 'deezer:artist:1', id: '1', name: 'A', type: 'artist' }],
+    album: { uri: 'deezer:album:1', id: '1', name: 'Album', type: 'album', images: [] },
+  }) as unknown as Track
 
 const stored = () => JSON.parse(localStorage.getItem(KEY) ?? '{}')
 
@@ -99,6 +100,19 @@ describe('useFavorites', () => {
       expect(result.current.notes).toEqual({})
       unmount()
     }
+  })
+
+  it('drops stored tracks without an album or artists list', () => {
+    const { album: _album, ...noAlbum } = mk('2')
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        tracks: [mk('1'), { ...noAlbum, uri: 'deezer:track:2' }, { ...mk('3'), artists: null }],
+        notes: {},
+      })
+    )
+    const { result } = renderHook(() => useFavorites())
+    expect(result.current.tracks.map((t) => t.uri)).toEqual(['deezer:track:1'])
   })
 
   it('returns false and leaves state unchanged when setItem throws', () => {

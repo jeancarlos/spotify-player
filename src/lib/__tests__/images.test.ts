@@ -58,6 +58,7 @@ describe('normalizeTrack', () => {
     const t = {
       uri: 'x',
       name: 'n',
+      artists: [],
       album: {
         images: [
           { url: 'small', width: null, height: null },

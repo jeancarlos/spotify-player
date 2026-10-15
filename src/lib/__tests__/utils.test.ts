@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { cn, normalizeTrack, normalizeImages, pickImage, srcSetOf } from '@/lib/utils'
+import {
+  cn,
+  isStoredTrack,
+  normalizeTrack,
+  normalizeImages,
+  pickImage,
+  srcSetOf,
+} from '@/lib/utils'
 import type { Track } from '@/types/music'
 
 describe('cn', () => {
@@ -33,18 +40,19 @@ describe('images', () => {
       { url: 'b' },
       { url: 'a' },
     ])
-    expect(normalizeImages([{ url: 'a', width: 1 }, { url: 'b' }, { url: 'c', width: 9 }])).toEqual([
-      { url: 'c', width: 9 },
-      { url: 'a', width: 1 },
-      { url: 'b' },
-    ])
+    expect(normalizeImages([{ url: 'a', width: 1 }, { url: 'b' }, { url: 'c', width: 9 }])).toEqual(
+      [{ url: 'c', width: 9 }, { url: 'a', width: 1 }, { url: 'b' }]
+    )
   })
 })
 
 describe('normalizeTrack', () => {
   const base = {
     id: '1',
-    artists: [{ id: '0', name: 'x' }, { id: '2', name: 'Real' }],
+    artists: [
+      { id: '0', name: 'x' },
+      { id: '2', name: 'Real' },
+    ],
     album: { id: '0', name: 'x', images: [{ url: 'a' }, { url: 'b' }] },
   } as unknown as Track
 
@@ -54,10 +62,24 @@ describe('normalizeTrack', () => {
     expect(out.album.name).toBe('Unknown')
     expect(out.album.images.map((i) => i.url)).toEqual(['b', 'a'])
   })
+})
 
-  it('keeps a missing album and non-array artists untouched', () => {
-    const out = normalizeTrack({ id: '1', artists: undefined } as unknown as Track)
-    expect(out.artists).toBeUndefined()
-    expect(out.album).toBeUndefined()
+describe('isStoredTrack', () => {
+  const whole = { uri: 'u', name: 'n', artists: [], album: {} }
+
+  it('accepts a whole track and rejects anything missing a field render reads', () => {
+    expect(isStoredTrack(whole)).toBe(true)
+    for (const bad of [
+      null,
+      5,
+      'x',
+      { ...whole, uri: 1 },
+      { ...whole, name: null },
+      { ...whole, artists: {} },
+      { ...whole, album: null },
+      { ...whole, album: 'a' },
+    ]) {
+      expect(isStoredTrack(bad)).toBe(false)
+    }
   })
 })

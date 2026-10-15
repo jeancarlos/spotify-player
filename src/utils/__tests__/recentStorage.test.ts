@@ -32,7 +32,9 @@ describe('recentStorage', () => {
     expect(stored).toHaveLength(1)
     expect(stored[0].preview_url).toBeNull()
     expect(stored[0].is_playable).toBe(true)
-    expect(eventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'spoter:recent-changed' }))
+    expect(eventSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'spoter:recent-changed' })
+    )
   })
 
   it('dedupes by uri, keeps newest first', () => {
@@ -56,11 +58,27 @@ describe('recentStorage', () => {
     expect(readRecent()).toEqual([])
   })
 
+  it('drops stored entries that are not whole tracks', () => {
+    localStorage.setItem(
+      'spoter_recent_v1',
+      JSON.stringify([
+        track,
+        null,
+        5,
+        { uri: 'x', name: 'no album', artists: [] },
+        { ...track, artists: 'A' },
+      ])
+    )
+    expect(readRecent().map((t) => t.uri)).toEqual([track.uri])
+  })
+
   it('handles storage errors gracefully', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('QuotaExceededError')
     })
-    expect(() => { pushRecent(track); }).not.toThrow()
+    expect(() => {
+      pushRecent(track)
+    }).not.toThrow()
   })
 })
 
