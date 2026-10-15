@@ -123,7 +123,7 @@ export default defineConfig(() => ({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test-setup.ts',
-    exclude: ['node_modules', '.claude/**', 'tests-e2e/**'],
+    exclude: ['node_modules', '.*/**', 'tests-e2e/**'],
     coverage: { provider: 'v8', include: ['src/**/*.{ts,tsx}'], thresholds: { 100: true } },
   },
 }))

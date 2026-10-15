@@ -12,7 +12,7 @@ export default tseslint.config(
       'coverage',
       'node_modules',
       'src/components/ui/**',
-      '.claude',
+      '.*/**',
       'playwright.config.ts',
       'tailwind.config.ts',
       'vite.config.ts',
