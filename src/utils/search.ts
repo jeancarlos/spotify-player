@@ -15,9 +15,11 @@ interface StoredSearch {
 
 export function loadLastSearch(): { q: string; tab: SearchTab } | null {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null') as StoredSearch | null
-    if (!raw) return null
-    return { q: raw.q, tab: migrateTab(raw.tab) }
+    const raw = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) ?? 'null'
+    ) as Partial<StoredSearch> | null
+    if (typeof raw?.q !== 'string') return null
+    return { q: raw.q, tab: migrateTab(String(raw.tab)) }
   } catch {
     return null
   }

@@ -57,6 +57,10 @@ describe('search storage', () => {
     expect(localStorage.getItem('last-search')).toBeNull()
     localStorage.setItem('last-search', '{bad')
     expect(loadLastSearch()).toBeNull()
+    for (const raw of ['5', '{"q":5,"tab":"album"}', '{"tab":"album"}']) {
+      localStorage.setItem('last-search', raw)
+      expect(loadLastSearch()).toBeNull()
+    }
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('full')
     })
