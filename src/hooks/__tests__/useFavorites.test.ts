@@ -194,4 +194,118 @@ describe('useFavorites', () => {
     expect(result.current.notes).toEqual({})
     expect(stored().notes).toEqual({})
   })
+
+  it('parseNotes loads tracks even when notes is null', () => {
+    const track = mk('1')
+    localStorage.setItem(KEY, JSON.stringify({ tracks: [track], notes: null }))
+    const { result } = renderHook(() => useFavorites())
+    expect(result.current.tracks.map((t) => t.id)).toEqual(['1'])
+    expect(result.current.notes).toEqual({})
+  })
+
+  it('parseNotes treats a string note value as empty object', () => {
+    const track = mk('1')
+    localStorage.setItem(KEY, JSON.stringify({ tracks: [track], notes: 'ab' }))
+    const { result } = renderHook(() => useFavorites())
+    expect(result.current.notes).toEqual({})
+  })
+
+  it('parseNotes treats an array note value as empty object', () => {
+    const track = mk('1')
+    localStorage.setItem(KEY, JSON.stringify({ tracks: [track], notes: ['x'] }))
+    const { result } = renderHook(() => useFavorites())
+    expect(result.current.notes).toEqual({})
+  })
+
+  it('parseNotes filters out non-string values', () => {
+    const track = mk('1')
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        tracks: [track],
+        notes: { 'deezer:track:1': 'ok', 'deezer:track:2': 5 },
+      })
+    )
+    const { result } = renderHook(() => useFavorites())
+    expect(result.current.notes).toEqual({ 'deezer:track:1': 'ok' })
+  })
+
+  it('addTrack returns true on success', () => {
+    const { result } = renderHook(() => useFavorites())
+    let ok = false
+    act(() => {
+      ok = result.current.addTrack(mk('1'))
+    })
+    expect(ok).toBe(true)
+  })
+
+  it('setNote returns true on success', () => {
+    const { result } = renderHook(() => useFavorites())
+    act(() => {
+      result.current.addTrack(mk('1'))
+    })
+    let ok = false
+    act(() => {
+      ok = result.current.setNote('deezer:track:1', 'hello')
+    })
+    expect(ok).toBe(true)
+  })
+
+  it('removeTrack returns true on success', () => {
+    const { result } = renderHook(() => useFavorites())
+    act(() => {
+      result.current.addTrack(mk('1'))
+    })
+    let ok = false
+    act(() => {
+      ok = result.current.removeTrack('deezer:track:1')
+    })
+    expect(ok).toBe(true)
+  })
+
+  it('removeTrack leaves the other track when removing one', () => {
+    const { result } = renderHook(() => useFavorites())
+    act(() => {
+      result.current.addTrack(mk('1'))
+      result.current.addTrack(mk('2'))
+    })
+    act(() => {
+      result.current.removeTrack('deezer:track:1')
+    })
+    expect(result.current.tracks.map((t) => t.uri)).toEqual(['deezer:track:2'])
+  })
+
+  it('ignores storage events for other keys', () => {
+    const { result } = renderHook(() => useFavorites())
+    act(() => {
+      result.current.addTrack(mk('1'))
+    })
+    const next = JSON.stringify({ tracks: [mk('9')], notes: {} })
+    act(() => {
+      localStorage.setItem(KEY, next)
+      window.dispatchEvent(new StorageEvent('storage', { key: 'other-key' }))
+    })
+    expect(result.current.tracks.map((t) => t.id)).toEqual(['1'])
+  })
+
+  it('updates on storage events with null key', () => {
+    const { result } = renderHook(() => useFavorites())
+    act(() => {
+      result.current.addTrack(mk('1'))
+    })
+    const next = JSON.stringify({ tracks: [mk('9')], notes: {} })
+    act(() => {
+      localStorage.setItem(KEY, next)
+      window.dispatchEvent(new StorageEvent('storage', { key: null }))
+    })
+    expect(result.current.tracks.map((t) => t.id)).toEqual(['9'])
+  })
+
+  it('removes event listeners on unmount', () => {
+    const spy = vi.spyOn(window, 'removeEventListener')
+    const { unmount } = renderHook(() => useFavorites())
+    unmount()
+    expect(spy).toHaveBeenCalledWith('storage', expect.any(Function))
+    expect(spy).toHaveBeenCalledWith('spoter:favorites-changed', expect.any(Function))
+  })
 })

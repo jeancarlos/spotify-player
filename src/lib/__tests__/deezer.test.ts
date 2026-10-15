@@ -5,7 +5,9 @@ type Callbacks = Record<string, ((data: unknown) => void) | undefined>
 const callbacks = window as unknown as Callbacks
 
 function lastScript(): HTMLScriptElement {
-  const scripts = document.head.querySelectorAll<HTMLScriptElement>('script[src^="https://api.deezer.com/"]')
+  const scripts = document.head.querySelectorAll<HTMLScriptElement>(
+    'script[src^="https://api.deezer.com/"]'
+  )
   return scripts[scripts.length - 1]
 }
 
@@ -37,8 +39,14 @@ describe('deezer', () => {
 
   it('rejects with DeezerError carrying the code of an error body', async () => {
     const promise = deezer('artist/0')
-    callbacks[callbackOf(lastScript())]?.({ error: { type: 'DataException', message: 'no data', code: 800 } })
-    await expect(promise).rejects.toMatchObject({ name: 'DeezerError', code: 800, message: 'no data' })
+    callbacks[callbackOf(lastScript())]?.({
+      error: { type: 'DataException', message: 'no data', code: 800 },
+    })
+    await expect(promise).rejects.toMatchObject({
+      name: 'DeezerError',
+      code: 800,
+      message: 'no data',
+    })
   })
 
   it('falls back to code 0 and a generic message for a bare error body', async () => {
@@ -76,5 +84,23 @@ describe('deezer', () => {
     expect(url.searchParams.has('limit')).toBe(false)
     expect(url.searchParams.get('output')).toBe('jsonp')
     expect(url.searchParams.get('callback')).toMatch(/^__deezer_cb_/)
+  })
+
+  it('resolves a primitive JSONP response instead of hanging', async () => {
+    const promise = deezer('artist/0')
+    callbacks[callbackOf(lastScript())]?.(5)
+    await expect(promise).resolves.toBe(5)
+  })
+
+  it('resolves null JSONP response', async () => {
+    const promise = deezer('artist/0')
+    callbacks[callbackOf(lastScript())]?.(null)
+    await expect(promise).resolves.toBeNull()
+  })
+
+  it('resolves plain object response without error field', async () => {
+    const promise = deezer('artist/0')
+    callbacks[callbackOf(lastScript())]?.({ foo: 'bar' })
+    await expect(promise).resolves.toEqual({ foo: 'bar' })
   })
 })

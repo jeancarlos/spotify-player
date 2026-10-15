@@ -43,12 +43,16 @@ let latest: ReturnType<typeof usePlayer>['state']
 
 function Probe() {
   const player = usePlayer()
-  const { progressMs } = useProgress()
+  const { progressMs, durationMs } = useProgress()
   useEffect(() => {
     controls = player.controls
     latest = player.state
   })
-  return <span data-testid="progress">{Math.round(progressMs)}</span>
+  return (
+    <span data-testid="progress" data-duration={durationMs}>
+      {Math.round(progressMs)}
+    </span>
+  )
 }
 
 function audio(): HTMLAudioElement {
@@ -63,11 +67,15 @@ describe('PlayerProvider', () => {
   let actions: Partial<Record<MediaSessionAction, () => void>>
 
   beforeEach(() => {
-    play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (this: HTMLMediaElement) {
+    play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(function (
+      this: HTMLMediaElement
+    ) {
       this.dispatchEvent(new Event('play'))
       return Promise.resolve()
     })
-    pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(function (this: HTMLMediaElement) {
+    pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(function (
+      this: HTMLMediaElement
+    ) {
       this.dispatchEvent(new Event('pause'))
     })
     vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
@@ -87,7 +95,9 @@ describe('PlayerProvider', () => {
         Object.assign(this, init)
       })
     )
-    deezerMock.mockImplementation((path: string) => Promise.resolve(fresh(track(path.split('/')[1]))))
+    deezerMock.mockImplementation((path: string) =>
+      Promise.resolve(fresh(track(path.split('/')[1])))
+    )
     render(
       <PlayerProvider>
         <Probe />
@@ -129,7 +139,9 @@ describe('PlayerProvider', () => {
     })
     audio().currentTime = 12
     deezerMock.mockClear()
-    play.mockImplementationOnce(() => Promise.reject(new DOMException('expired', 'NotSupportedError')))
+    play.mockImplementationOnce(() =>
+      Promise.reject(new DOMException('expired', 'NotSupportedError'))
+    )
     await act(async () => {
       controls.toggle()
       await Promise.resolve()
@@ -147,7 +159,9 @@ describe('PlayerProvider', () => {
       controls.toggle()
     })
     deezerMock.mockClear()
-    play.mockImplementationOnce(() => Promise.reject(new DOMException('blocked', 'NotAllowedError')))
+    play.mockImplementationOnce(() =>
+      Promise.reject(new DOMException('blocked', 'NotAllowedError'))
+    )
     await act(async () => {
       controls.toggle()
       await Promise.resolve()
@@ -162,7 +176,9 @@ describe('PlayerProvider', () => {
     })
     audio().currentTime = 12
     deezerMock.mockRejectedValueOnce(new Error('offline'))
-    play.mockImplementationOnce(() => Promise.reject(new DOMException('expired', 'NotSupportedError')))
+    play.mockImplementationOnce(() =>
+      Promise.reject(new DOMException('expired', 'NotSupportedError'))
+    )
     await act(async () => {
       controls.toggle()
       await Promise.resolve()
@@ -348,7 +364,9 @@ describe('PlayerProvider', () => {
 
   it('ignores playTrack for an unplayable track', async () => {
     const list = [track('1'), track('2')]
-    deezerMock.mockImplementation((path: string) => Promise.resolve(fresh(list[Number(path.slice(-1)) - 1])))
+    deezerMock.mockImplementation((path: string) =>
+      Promise.resolve(fresh(list[Number(path.slice(-1)) - 1]))
+    )
     await act(() => controls.playTrack(list[0], list))
     const src = audio().src
     deezerMock.mockClear()
@@ -432,7 +450,16 @@ describe('PlayerProvider', () => {
 
   it('publishes media session metadata and handles media keys', async () => {
     const first = track('1')
-    const list = [{ ...first, album: { ...first.album, images: [{ url: 'https://img.test/1.jpg', width: 500, height: 500 }] } }, track('2')]
+    const list = [
+      {
+        ...first,
+        album: {
+          ...first.album,
+          images: [{ url: 'https://img.test/1.jpg', width: 500, height: 500 }],
+        },
+      },
+      track('2'),
+    ]
     await act(() => controls.playTrack(list[0], list))
     expect(navigator.mediaSession.metadata).toMatchObject({
       title: 'Track 1',
@@ -568,7 +595,185 @@ describe('PlayerProvider', () => {
     act(() => {
       fireEvent(audio(), new Event('timeupdate'))
     })
-    expect(screen.getByTestId('progress')).toBeInTheDocument()
+    expect(screen.getByTestId('progress').dataset.duration).toBe('20000')
+  })
+
+  it('starts with zero progress', () => {
+    expect(screen.getByTestId('progress').textContent).toBe('0')
+  })
+
+  const ended = () =>
+    act(() => {
+      fireEvent(audio(), new Event('ended'))
+      return Promise.resolve()
+    })
+
+  it('advances to the next track mid-queue when repeat is context', async () => {
+    const list = [track('1'), track('2'), track('3')]
+    await act(() => controls.playTrack(list[0], list))
+    act(() => {
+      controls.cycleRepeat()
+    })
+    await ended()
+    await waitFor(() => {
+      expect(latest.queueIndex).toBe(1)
+    })
+  })
+
+  it('keeps the last track and fetches nothing at the end of the queue', async () => {
+    const list = [track('1'), track('2')]
+    await act(() => controls.playTrack(list[1], list))
+    deezerMock.mockClear()
+    await ended()
+    expect(latest.queueIndex).toBe(1)
+    expect(latest.currentTrack?.id).toBe('2')
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
+  it('never shuffles onto the current or an unplayable track', async () => {
+    const list = [track('1'), track('2', false), track('3')]
+    await act(() => controls.playTrack(list[0], list))
+    act(() => {
+      controls.setShuffle(true)
+    })
+    expect(latest.shuffle).toBe(true)
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    await act(async () => {
+      controls.next()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(latest.queueIndex).toBe(2)
+    })
+  })
+
+  it('stops when shuffle finds only unplayable tracks', async () => {
+    const list = [track('1'), track('2', false)]
+    await act(() => controls.playTrack(list[0], list))
+    act(() => {
+      controls.setShuffle(true)
+    })
+    deezerMock.mockClear()
+    act(() => {
+      controls.next()
+    })
+    expect(latest.queueIndex).toBe(0)
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
+  it('restarts the first track on previous instead of leaving the queue', async () => {
+    const list = [track('1', false), track('2')]
+    await act(() => controls.playTrack(list[1], list))
+    audio().currentTime = 1
+    deezerMock.mockClear()
+    act(() => {
+      controls.previous()
+    })
+    expect(audio().currentTime).toBe(0)
+    expect(latest.queueIndex).toBe(1)
+    expect(deezerMock).not.toHaveBeenCalled()
+  })
+
+  it('goes back on previous at exactly 3 seconds', async () => {
+    const list = [track('1'), track('2')]
+    await act(() => controls.playTrack(list[1], list))
+    audio().currentTime = 3
+    await act(async () => {
+      controls.previous()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(latest.currentTrack?.id).toBe('1')
+    })
+  })
+
+  it('plays a track alone when the list does not contain it', async () => {
+    const list = [track('1'), track('2')]
+    await act(() => controls.playTrack(track('9'), list))
+    expect(latest.queue.map((t) => t.id)).toEqual(['9'])
+    expect(latest.queueIndex).toBe(0)
+  })
+
+  it('falls back to searching the list when the index is out of range or missing', async () => {
+    const list = [track('1'), track('2')]
+    await act(() => controls.playTrack(list[1], list, 99))
+    expect(latest.queueIndex).toBe(1)
+    await act(() => controls.playTrack(track('5'), undefined, 0))
+    expect(latest.queue.map((t) => t.id)).toEqual(['5'])
+  })
+
+  it('keeps loading while a newer request is still pending', async () => {
+    const releases: ((t: Track) => void)[] = []
+    deezerMock.mockImplementation(
+      () =>
+        new Promise<Track>((resolve) => {
+          releases.push(resolve)
+        })
+    )
+    let first: Promise<void> = Promise.resolve()
+    let second: Promise<void> = Promise.resolve()
+    act(() => {
+      first = controls.playTrack(track('1'))
+      second = controls.playTrack(track('2'))
+    })
+    await act(async () => {
+      releases[0](fresh(track('1')))
+      await first
+    })
+    expect(latest.isLoading).toBe(true)
+    await act(async () => {
+      releases[1](fresh(track('2')))
+      await second
+    })
+    expect(latest.isLoading).toBe(false)
+  })
+
+  it('ignores toggle before any track and in the same tick a play starts', async () => {
+    act(() => {
+      controls.toggle()
+    })
+    expect(deezerMock).not.toHaveBeenCalled()
+    expect(play).not.toHaveBeenCalled()
+    expect(HTMLMediaElement.prototype.load).not.toHaveBeenCalled()
+    await act(async () => {
+      const pending = controls.playTrack(track('1'))
+      controls.toggle()
+      await pending
+    })
+    expect(deezerMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows the resume position while the refetch loads', async () => {
+    await act(() => controls.playTrack(track('1')))
+    audio().currentTime = 7
+    play.mockRejectedValueOnce(new Error('expired'))
+    await act(async () => {
+      controls.toggle()
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(deezerMock).toHaveBeenCalledTimes(2)
+    })
+    expect(screen.getByTestId('progress').textContent).toBe('7000')
+  })
+
+  it('ignores the media play key while already playing', async () => {
+    await act(() => controls.playTrack(track('1')))
+    Object.defineProperty(audio(), 'paused', { configurable: true, value: false })
+    pause.mockClear()
+    play.mockClear()
+    act(() => {
+      actions.play?.()
+    })
+    expect(play).not.toHaveBeenCalled()
+    expect(pause).not.toHaveBeenCalled()
+  })
+
+  it('joins several artists and leaves artwork empty without a cover', async () => {
+    const t = track('1')
+    const duo = { ...t, artists: [...t.artists, { ...t.artists[0], id: 'b', name: 'Other' }] }
+    await act(() => controls.playTrack(duo))
+    expect(navigator.mediaSession.metadata).toMatchObject({ artist: 'Artist, Other', artwork: [] })
   })
 })
 
@@ -577,7 +782,9 @@ describe('PlayerProvider without a media session', () => {
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
     vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined)
     vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined)
-    deezerMock.mockImplementation((path: string) => Promise.resolve(fresh(track(path.split('/')[1]))))
+    deezerMock.mockImplementation((path: string) =>
+      Promise.resolve(fresh(track(path.split('/')[1])))
+    )
     render(
       <PlayerProvider>
         <Probe />
@@ -596,5 +803,16 @@ describe('usePlayer', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     expect(() => render(<Probe />)).toThrow('usePlayer must be used inside PlayerProvider')
     spy.mockRestore()
+  })
+})
+
+describe('useProgress', () => {
+  it('reads zero outside the provider', () => {
+    function Bare() {
+      const { progressMs, durationMs } = useProgress()
+      return <span data-testid="bare">{`${String(progressMs)}/${String(durationMs)}`}</span>
+    }
+    render(<Bare />)
+    expect(screen.getByTestId('bare').textContent).toBe('0/0')
   })
 })
