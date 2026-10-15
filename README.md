@@ -6,7 +6,7 @@
 
 Vinyla é um player de música web imersivo, feito com React, TypeScript, Vite e Tailwind CSS, com visual em "Glassmorfismo". O catálogo e as prévias de 30 segundos vêm da API pública do [Deezer](https://www.deezer.com), sem login e sem conta.
 
-**Link:** https://spoter.jeansouza.dev/
+**Link:** https://vinyla.jeansouza.dev/
 
 É um projeto de portfólio, sem fins comerciais. Dados e prévias de música fornecidos pelo Deezer.
 
