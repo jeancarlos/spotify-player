@@ -81,7 +81,7 @@ describe('TrackTable', () => {
     expect(onAlbumClick).toHaveBeenCalledWith('alb1')
     expect(onPlay).not.toHaveBeenCalled()
     expect(screen.getByText('E')).toBeInTheDocument()
-    expect(screen.getAllByText('—').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('-').length).toBeGreaterThan(0)
     expect(screen.getByText('Full Track').closest('tr')?.className).toContain('bg-black/6')
     fireEvent.click(screen.getAllByRole('button', { name: 'player.playTrack' })[0])
     expect(onPlay).toHaveBeenCalledWith(t, 0)

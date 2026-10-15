@@ -3,7 +3,7 @@ import { useId } from 'react'
 interface ArcTextOverlayProps {
   label: string
   diskPx: number
-  k?: number // Fraction of disk radius (0.0 – 1.0). Default: 0.88
+  k?: number // Fraction of disk radius (0.0 to 1.0). Default: 0.88
   arcDeg?: number // Degrees spanned by the arc. Default: 200
 }
 

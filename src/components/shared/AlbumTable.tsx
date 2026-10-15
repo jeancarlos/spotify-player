@@ -69,7 +69,7 @@ export function AlbumTable({ albums, onClick }: AlbumTableProps) {
               </td>
               {showTrackCount && (
                 <td className="py-2 px-3 text-right text-black/60 tabular-nums">
-                  {album.total_tracks ?? '—'}
+                  {album.total_tracks ?? '-'}
                 </td>
               )}
             </tr>

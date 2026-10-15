@@ -30,7 +30,7 @@ function resolveTrackMeta(track: Track) {
     albumId: track.album.id,
     albumName: track.album.name,
     artistNames: track.artists.map((a) => a.name).join(', '),
-    rank: track.rank ?? '—',
+    rank: track.rank ?? '-',
   }
 }
 
@@ -107,7 +107,7 @@ function TrackTableRow({
               {albumName}
             </button>
           ) : (
-            '—'
+            '-'
           )}
         </td>
       )}

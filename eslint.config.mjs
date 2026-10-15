@@ -97,7 +97,7 @@ export default tseslint.config(
       ],
     },
   },
-  // React contexts export createContext + Provider together — accepted pattern
+  // React contexts export createContext + Provider together: accepted pattern
   {
     files: ['src/contexts/**/*.tsx'],
     rules: {
