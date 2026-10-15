@@ -9,6 +9,7 @@ export default tseslint.config(
   {
     ignores: [
       'dist',
+      'coverage',
       'node_modules',
       'src/components/ui/**',
       '.claude',
