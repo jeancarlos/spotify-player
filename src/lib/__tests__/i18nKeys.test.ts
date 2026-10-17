@@ -13,15 +13,22 @@ function sources(dir: string): string[] {
 }
 
 function has(locale: unknown, key: string): boolean {
-  const node = key.split('.').reduce<unknown>(
-    (acc, part) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined),
-    locale,
-  )
+  const node = key
+    .split('.')
+    .reduce<unknown>(
+      (acc, part) =>
+        acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined,
+      locale
+    )
   if (node !== undefined) return true
-  const parent = key.split('.').slice(0, -1).reduce<unknown>(
-    (acc, part) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined),
-    locale,
-  )
+  const parent = key
+    .split('.')
+    .slice(0, -1)
+    .reduce<unknown>(
+      (acc, part) =>
+        acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined,
+      locale
+    )
   return !!parent && typeof parent === 'object' && `${key.split('.').pop()}_other` in parent
 }
 
@@ -45,7 +52,7 @@ describe('i18n keys', () => {
   it('keeps both locales on the same keys', () => {
     const flat = (o: unknown, p = ''): string[] =>
       Object.entries(o as Record<string, unknown>).flatMap(([k, v]) =>
-        typeof v === 'object' && v ? flat(v, `${p}${k}.`) : [`${p}${k}`],
+        typeof v === 'object' && v ? flat(v, `${p}${k}.`) : [`${p}${k}`]
       )
     expect(flat(en).sort()).toEqual(flat(pt).sort())
   })

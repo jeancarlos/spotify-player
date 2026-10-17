@@ -19,6 +19,15 @@ interface WikiOptions {
   safe?: boolean
 }
 
+function safeWikiUrl(raw: string | undefined): string | undefined {
+  try {
+    const u = new URL(raw ?? '')
+    return u.protocol === 'https:' && u.hostname.endsWith('.wikipedia.org') ? u.href : undefined
+  } catch {
+    return undefined
+  }
+}
+
 export async function fetchWikiSummary(
   lang: WikiLang,
   title: string,
@@ -34,7 +43,8 @@ export async function fetchWikiSummary(
   return {
     extract,
     lang,
-    url: data.content_urls?.desktop?.page ?? `${base}/wiki/${encodeURIComponent(title)}`,
+    url:
+      safeWikiUrl(data.content_urls?.desktop?.page) ?? `${base}/wiki/${encodeURIComponent(title)}`,
   }
 }
 

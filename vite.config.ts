@@ -5,10 +5,25 @@ import path from 'path'
 
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Dev server injects an inline HMR preamble, so the CSP is only applied to the build.
+const CSP =
+  "default-src 'self'; script-src 'self' https://api.deezer.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src https:; connect-src 'self' https://api.deezer.com https://lrclib.net https://*.wikipedia.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+
 export default defineConfig(() => ({
   base: '/',
   plugins: [
     react(),
+    {
+      name: 'inject-csp',
+      apply: 'build' as const,
+      transformIndexHtml: () => [
+        {
+          tag: 'meta',
+          attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP },
+          injectTo: 'head-prepend' as const,
+        },
+      ],
+    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [

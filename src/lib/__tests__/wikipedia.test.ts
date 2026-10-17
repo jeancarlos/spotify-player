@@ -9,12 +9,21 @@ describe('fetchWikiSummary', () => {
   it('truncates long extracts and returns the page url', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(
-        json({ extract: 'a'.repeat(20), content_urls: { desktop: { page: 'https://x/p' } } })
-      )
+      vi
+        .fn()
+        .mockResolvedValue(
+          json({
+            extract: 'a'.repeat(20),
+            content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/T' } },
+          })
+        )
     )
     const r = await fetchWikiSummary('en', 'T', 10)
-    expect(r).toEqual({ extract: 'a'.repeat(10) + '...', lang: 'en', url: 'https://x/p' })
+    expect(r).toEqual({
+      extract: 'a'.repeat(10) + '...',
+      lang: 'en',
+      url: 'https://en.wikipedia.org/wiki/T',
+    })
   })
 
   it('builds a fallback url and returns null on non-ok or empty extract', async () => {
@@ -30,6 +39,19 @@ describe('fetchWikiSummary', () => {
     expect(await fetchWikiSummary('pt', 'A', 10)).toBeNull()
     expect(await fetchWikiSummary('pt', 'A', 10)).toBeNull()
   })
+})
+
+describe('fetchWikiSummary url safety', () => {
+  it.each(['javascript:alert(1)', 'https://evil.example/p', 'not a url'])(
+    'falls back to the wiki url for %s',
+    async (page) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(json({ extract: 'hi', content_urls: { desktop: { page } } }))
+      )
+      expect((await fetchWikiSummary('en', 'T', 10))?.url).toBe('https://en.wikipedia.org/wiki/T')
+    }
+  )
 })
 
 describe('searchWikiTitle', () => {

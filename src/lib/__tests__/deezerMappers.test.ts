@@ -151,7 +151,9 @@ describe('deezerMappers', () => {
   })
 
   it('maps is_playable from readable and a non-empty preview', () => {
-    expect(toTrack({ ...tracks[0], readable: true, preview: 'https://p/1.mp3' }).is_playable).toBe(true)
+    expect(toTrack({ ...tracks[0], readable: true, preview: 'https://p/1.mp3' }).is_playable).toBe(
+      true
+    )
     expect(toTrack({ ...tracks[0], readable: true, preview: '' }).is_playable).toBe(false)
     expect(toTrack(noPreview).is_playable).toBe(false)
   })
