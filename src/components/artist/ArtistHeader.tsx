@@ -113,7 +113,7 @@ export function ArtistHeader({ images, name, subtitle, link, onLayout }: ArtistH
           <DeezerAttribution
             href={link}
             label={t('common.openOnDeezer')}
-            className="mt-2 pointer-events-auto"
+            className="mt-4 pointer-events-auto"
           />
         )}
       </motion.div>

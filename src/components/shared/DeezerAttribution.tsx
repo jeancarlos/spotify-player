@@ -19,12 +19,13 @@ export function DeezerAttribution({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label ?? t('common.poweredByDeezer')}
+      title={t('common.poweredByDeezer')}
       className={cn(
         'inline-flex items-center gap-1.5 text-xs font-medium opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded',
         className
       )}
     >
-      <img src="/deezer-logo.png" alt="" className="h-5 w-auto" />
+      <img src="/deezer-logo.png" alt="" className="block h-4 w-auto shrink-0" />
       {label && <span>{label}</span>}
     </a>
   )
