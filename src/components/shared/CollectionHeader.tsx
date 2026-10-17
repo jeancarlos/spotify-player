@@ -105,10 +105,7 @@ export function CollectionHeader({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       >
-        <h1
-          className="text-2xl font-black text-black text-center px-8 leading-tight"
-          style={{ fontFamily: 'Inter, sans-serif' }}
-        >
+        <h1 className="font-sans text-2xl font-black text-black text-center px-8 leading-tight">
           {name}
         </h1>
         <p className="text-sm text-black/60 mt-1">
@@ -133,7 +130,9 @@ export function CollectionHeader({
           )}
           {year ? ` · ${year}` : ''}
         </p>
-        {link && <DeezerAttribution href={link} label={t('common.openOnDeezer')} className="mt-2" />}
+        {link && (
+          <DeezerAttribution href={link} label={t('common.openOnDeezer')} className="mt-2" />
+        )}
         <button
           onClick={onPlay}
           className={cn(

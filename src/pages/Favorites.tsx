@@ -97,7 +97,8 @@ export function Favorites() {
   const editOpener = useRef<HTMLElement | null>(null)
 
   const openEditor = (uri: string) => {
-    editOpener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    editOpener.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
     setEditing(uri)
   }
 
@@ -126,12 +127,7 @@ export function Favorites() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6 pt-6">
           <div>
-            <h1
-              className="text-2xl font-black text-black"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              {t('nav.favorites')}
-            </h1>
+            <h1 className="font-sans text-2xl font-black text-black">{t('nav.favorites')}</h1>
             <div className="mt-0.5">
               <span className="text-sm text-black/60 font-medium">{playlistName}</span>
             </div>
@@ -155,7 +151,9 @@ export function Favorites() {
                   index={i}
                   note={notes[track.uri] ?? undefined}
                   isActive={playerState.currentTrack?.uri === track.uri}
-                  onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)}
+                  onPlay={
+                    unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)
+                  }
                   onEditNote={openEditor}
                   onRemove={handleRemove}
                 />

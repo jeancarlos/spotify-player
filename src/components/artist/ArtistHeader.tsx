@@ -105,10 +105,7 @@ export function ArtistHeader({ images, name, subtitle, link, onLayout }: ArtistH
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       >
-        <h1
-          className="text-2xl font-black text-black text-center px-8 leading-tight"
-          style={{ fontFamily: 'Inter, sans-serif' }}
-        >
+        <h1 className="font-sans text-2xl font-black text-black text-center px-8 leading-tight">
           {name}
         </h1>
         {subtitle && <p className="text-sm text-black/60 mt-1 text-center px-8">{subtitle}</p>}

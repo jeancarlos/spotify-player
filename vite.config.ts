@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // Dev server injects an inline HMR preamble, so the CSP is only applied to the build.
 const CSP =
-  "default-src 'self'; script-src 'self' https://api.deezer.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; media-src https:; connect-src 'self' https://api.deezer.com https://lrclib.net https://*.wikipedia.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+  "default-src 'self'; script-src 'self' https://api.deezer.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src https:; connect-src 'self' https://api.deezer.com https://lrclib.net https://*.wikipedia.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
 
 export default defineConfig(() => ({
   base: '/',
@@ -112,7 +112,6 @@ export default defineConfig(() => ({
   },
   test: {
     environment: 'jsdom',
-    testTimeout: 15000,
     globals: true,
     setupFiles: './src/test-setup.ts',
     exclude: ['node_modules', '.*/**', 'tests-e2e/**'],

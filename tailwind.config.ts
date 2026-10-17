@@ -7,8 +7,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['"JetBrains Mono Variable"', 'monospace'],
-        sans: ['"Inter Variable"', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'monospace'],
+        sans: ['Manrope', 'sans-serif'],
       },
       colors: {
         primary: 'rgb(var(--color-primary) / <alpha-value>)',
