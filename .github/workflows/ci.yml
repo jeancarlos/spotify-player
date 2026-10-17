@@ -29,6 +29,8 @@ jobs:
 
       - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn lint
+      - name: Check dependency licenses
+        run: npx --yes license-checker-rseidelsohn@4.4.2 --production --onlyAllow 'MIT;ISC;BSD-3-Clause;BSD-2-Clause;0BSD;Apache-2.0;MIT AND ISC' --excludePrivatePackages
       - run: yarn test
       - run: yarn build
 
@@ -41,10 +43,14 @@ jobs:
           persist-credentials: false
 
       - name: Audit production dependencies
-        # yarn v1 exit code is a bitmask: 8 = high, 16 = critical
         run: |
-          yarn audit --groups dependencies || rc=$?
-          [ $(( ${rc:-0} & 24 )) -eq 0 ]
+          yarn audit --groups dependencies --json > audit.json || true
+          node -e "
+            const s = require('fs').readFileSync('audit.json', 'utf8').trim().split('\\n')
+              .map((l) => JSON.parse(l)).find((l) => l.type === 'auditSummary');
+            if (!s) { console.error('audit did not complete'); process.exit(1); }
+            const v = s.data.vulnerabilities;
+            if (v.high + v.critical > 0) { console.error(v); process.exit(1); }"
 
       - name: Review dependency changes
         if: github.event_name == 'pull_request'

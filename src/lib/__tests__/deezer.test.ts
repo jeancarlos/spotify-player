@@ -98,6 +98,12 @@ describe('deezer', () => {
     await expect(promise).resolves.toBeNull()
   })
 
+  it('treats a null error field as a plain response', async () => {
+    const promise = deezer('x')
+    callbacks[callbackOf(lastScript())]?.({ error: null })
+    await expect(promise).resolves.toEqual({ error: null })
+  })
+
   it('resolves plain object response without error field', async () => {
     const promise = deezer('artist/0')
     callbacks[callbackOf(lastScript())]?.({ foo: 'bar' })

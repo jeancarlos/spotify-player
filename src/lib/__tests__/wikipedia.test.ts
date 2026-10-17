@@ -9,14 +9,12 @@ describe('fetchWikiSummary', () => {
   it('truncates long extracts and returns the page url', async () => {
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValue(
-          json({
-            extract: 'a'.repeat(20),
-            content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/T' } },
-          })
-        )
+      vi.fn().mockResolvedValue(
+        json({
+          extract: 'a'.repeat(20),
+          content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/T' } },
+        })
+      )
     )
     const r = await fetchWikiSummary('en', 'T', 10)
     expect(r).toEqual({

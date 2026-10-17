@@ -21,7 +21,13 @@ interface DeezerErrorBody {
 type Callbacks = Record<string, ((data: unknown) => void) | undefined>
 
 function isErrorBody(data: unknown): data is DeezerErrorBody {
-  return typeof data === 'object' && data !== null && 'error' in data
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'error' in data &&
+    typeof data.error === 'object' &&
+    data.error !== null
+  )
 }
 
 let counter = 0
