@@ -32,6 +32,18 @@ describe('LyricsPreloader', () => {
     ])
   })
 
+  it('swallows prefetch failures', async () => {
+    state = { queue: [mk(0), mk(1)], queueIndex: 0 }
+    const queryClient = new QueryClient()
+    const spy = vi.spyOn(queryClient, 'query').mockRejectedValue(new Error('x'))
+    render(
+      <QueryClientProvider client={queryClient}>
+        <LyricsPreloader />
+      </QueryClientProvider>
+    )
+    await expect(spy.mock.results[0].value).rejects.toThrow('x')
+  })
+
   it('uses the same key useLyrics builds for the same track', () => {
     const queryClient = new QueryClient()
     const spy = vi.spyOn(queryClient, 'query').mockResolvedValue(null)

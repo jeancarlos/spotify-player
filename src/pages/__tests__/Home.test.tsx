@@ -160,7 +160,7 @@ describe('Página Home', () => {
   it('stays on the page when the query is blank', async () => {
     renderHome()
     await userEvent.type(screen.getByRole('textbox'), '   ')
-    await new Promise((r) => setTimeout(r, 600))
+    await new Promise((r) => setTimeout(r, 800))
     expect(screen.getByTestId('where').textContent).toBe('/')
   })
 

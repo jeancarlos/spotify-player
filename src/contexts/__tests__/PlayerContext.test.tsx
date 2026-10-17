@@ -270,6 +270,23 @@ describe('PlayerProvider', () => {
     expect(latest.currentTrack?.id).toBe('1')
   })
 
+  it('ignores a rejected play() when replaying with repeat track', async () => {
+    const list = [track('1'), track('2')]
+    await act(() => controls.playTrack(list[0], list))
+    act(() => {
+      controls.cycleRepeat()
+      controls.cycleRepeat()
+    })
+    play.mockClear()
+    play.mockRejectedValueOnce(new Error('blocked'))
+    await act(() => {
+      fireEvent(audio(), new Event('ended'))
+      return Promise.resolve()
+    })
+    expect(play).toHaveBeenCalledTimes(1)
+    expect(latest.currentTrack?.id).toBe('1')
+  })
+
   it('keeps only the latest track when plays overlap', async () => {
     let releaseFirst: (t: Track) => void = () => undefined
     deezerMock.mockImplementationOnce(

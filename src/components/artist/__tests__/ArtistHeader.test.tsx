@@ -21,6 +21,15 @@ describe('ArtistHeader', () => {
     })
   })
 
+  it('does not call onLayout again when only the callback identity changes', () => {
+    const first = vi.fn()
+    const { rerender } = render(<ArtistHeader images={[]} name="A" onLayout={first} />)
+    const second = vi.fn()
+    rerender(<ArtistHeader images={[]} name="A" onLayout={second} />)
+    expect(first).toHaveBeenCalledTimes(1)
+    expect(second).not.toHaveBeenCalled()
+  })
+
   it('starts the cover below the top bar and the content below the cover', () => {
     const onLayout = vi.fn()
     const { container } = render(<ArtistHeader images={[]} name="A" onLayout={onLayout} />)

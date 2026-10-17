@@ -22,14 +22,6 @@ export function TrackInfo({ notes }: TrackInfoProps) {
   const isPlayerPage = location.pathname === '/player'
   const personalNote = currentTrack ? (notes[currentTrack.uri] ?? '') : ''
 
-  const handleTrackClick = () => {
-    if (isPlayerPage) {
-      navigate(getFromPath(location.state))
-    } else if (currentTrack) {
-      navigate('/player?tab=lyrics', { state: { from: currentPath(location) } })
-    }
-  }
-
   if (!currentTrack) {
     return (
       <div className="flex items-center gap-2 w-full cursor-default flex-1">
@@ -37,6 +29,14 @@ export function TrackInfo({ notes }: TrackInfoProps) {
         <p className="text-xs text-black/70">{t('player.noTrack')}</p>
       </div>
     )
+  }
+
+  const handleTrackClick = () => {
+    if (isPlayerPage) {
+      navigate(getFromPath(location.state))
+    } else {
+      navigate('/player?tab=lyrics', { state: { from: currentPath(location) } })
+    }
   }
 
   return (

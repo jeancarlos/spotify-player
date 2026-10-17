@@ -26,6 +26,20 @@ describe('fetchLyrics', () => {
     await expect(fetchLyrics(params)).rejects.toThrow(String(status))
   })
 
+  it('omits the album parameter when the track has none', async () => {
+    const f = vi.fn().mockResolvedValue({ ok: false, status: 404 })
+    vi.stubGlobal('fetch', f)
+    await fetchLyrics({ ...params, album: '' })
+    expect(String(f.mock.calls[0][0])).not.toContain('album_name=')
+  })
+
+  it('omits the duration parameter when the track has none', async () => {
+    const f = vi.fn().mockResolvedValue({ ok: false, status: 404 })
+    vi.stubGlobal('fetch', f)
+    await fetchLyrics({ ...params, durationMs: 0 })
+    expect(String(f.mock.calls[0][0])).not.toContain('duration=')
+  })
+
   it('throws on network failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('offline')))
     await expect(fetchLyrics(params)).rejects.toThrow('offline')
