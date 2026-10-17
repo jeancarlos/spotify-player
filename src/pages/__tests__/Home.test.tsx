@@ -26,6 +26,9 @@ const popular = Array.from({ length: 8 }, (_, i) => ({
 const popularPage = { items: popular, offset: 0, limit: 20, total: popular.length }
 let chartData: typeof popularPage | undefined = popularPage
 const useChartTracks = vi.fn((_enabled: boolean) => ({ data: chartData }))
+// The debounce has its own unit tests in SearchBar.test.tsx; here it would only add wall-clock time.
+vi.mock('@/hooks/useDebounce', () => ({ useDebounce: <T,>(value: T) => value }))
+
 vi.mock('@/hooks/queries/useChart', () => ({
   useChartTracks: (enabled: boolean) => useChartTracks(enabled),
 }))
@@ -152,18 +155,15 @@ describe('Página Home', () => {
   it('navigates to the artists page with the typed query', async () => {
     renderHome()
     await userEvent.type(screen.getByRole('textbox'), 'coldplay')
-    await waitFor(
-      () => {
-        expect(screen.getByTestId('where').textContent).toBe('/artists?q=coldplay&tab=artist')
-      },
-      { timeout: 8000 }
-    )
+    await waitFor(() => {
+      expect(screen.getByTestId('where').textContent).toBe('/artists?q=coldplay&tab=artist')
+    })
   })
 
   it('stays on the page when the query is blank', async () => {
     renderHome()
     await userEvent.type(screen.getByRole('textbox'), '   ')
-    await new Promise((r) => setTimeout(r, 800))
+    expect(screen.getByRole('textbox')).toHaveValue('   ')
     expect(screen.getByTestId('where').textContent).toBe('/')
   })
 

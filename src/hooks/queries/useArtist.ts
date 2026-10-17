@@ -1,15 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
-import { TIME_30_MINUTES } from '@/utils/constants'
-import { deezer } from '@/lib/deezer'
+import { useDeezerEntity } from './useDeezerEntity'
 import { toArtist, type DzArtist } from '@/lib/deezerMappers'
 import type { Artist } from '@/types/music'
 
 export function useArtist(id: string | undefined) {
-  return useQuery<Artist>({
-    queryKey: ['artist', id],
-    meta: { source: 'deezer' },
-    enabled: !!id,
-    staleTime: TIME_30_MINUTES,
-    queryFn: async () => toArtist(await deezer<DzArtist>(`artist/${id ?? ''}`)),
-  })
+  return useDeezerEntity<DzArtist, Artist>('artist', id, toArtist)
 }

@@ -47,6 +47,9 @@ function getHeaderLabel(tab: SearchTab, t: TFunction): string {
   return labels[tab]
 }
 
+const queryFor = (active: SearchTab, tab: SearchTab, query: string) => (active === tab ? query : '')
+const pickSource = <T>(isSearch: boolean, search: T, chart: T): T => (isSearch ? search : chart)
+
 export function useArtistsPage() {
   const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -57,16 +60,16 @@ export function useArtistsPage() {
   const isSearch = query.trim().length > 0
   const chartTab = isSearch ? null : tab
 
-  const searchArtists = useArtists(tab === 'artist' ? query : '', page)
-  const searchAlbums = useSearchAlbums(tab === 'album' ? query : '', page)
-  const searchPlaylists = useSearchPlaylists(tab === 'playlist' ? query : '', page)
+  const searchArtists = useArtists(queryFor('artist', tab, query), page)
+  const searchAlbums = useSearchAlbums(queryFor('album', tab, query), page)
+  const searchPlaylists = useSearchPlaylists(queryFor('playlist', tab, query), page)
   const chartArtists = useChartArtists(chartTab === 'artist')
   const chartAlbums = useChartAlbums(chartTab === 'album')
   const chartPlaylists = useChartPlaylists(chartTab === 'playlist')
 
-  const artists = isSearch ? searchArtists : chartArtists
-  const albums = isSearch ? searchAlbums : chartAlbums
-  const playlists = isSearch ? searchPlaylists : chartPlaylists
+  const artists = pickSource(isSearch, searchArtists, chartArtists)
+  const albums = pickSource(isSearch, searchAlbums, chartAlbums)
+  const playlists = pickSource(isSearch, searchPlaylists, chartPlaylists)
 
   const activeQuery = useMemo(
     () => getActiveQuery(tab, artists, albums, playlists),

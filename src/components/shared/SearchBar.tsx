@@ -3,7 +3,7 @@ import { Search, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useDebounce } from '@/hooks/useDebounce'
 import { cn } from '@/lib/utils'
-import { saveLastSearch, type SearchTab } from '@/utils/search'
+import { SEARCH_DEBOUNCE_MS, saveLastSearch, type SearchTab } from '@/utils/search'
 
 interface SearchBarProps {
   onSearch: (query: string, tab: SearchTab) => void
@@ -21,7 +21,7 @@ export function SearchBar({
   const { t } = useTranslation()
   const [query, setQuery] = useState(defaultQuery)
   const [tab, setTab] = useState<SearchTab>(defaultTab)
-  const debouncedQuery = useDebounce(query, 700)
+  const debouncedQuery = useDebounce(query, SEARCH_DEBOUNCE_MS)
   const isPending = query !== debouncedQuery
   const lastSubmittedSearch = useRef(`${defaultQuery}\u0000${defaultTab}`)
   const onSearchRef = useRef(onSearch)

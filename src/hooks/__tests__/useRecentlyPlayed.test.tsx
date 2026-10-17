@@ -24,41 +24,45 @@ function List({ limit }: { limit: number }) {
 
 const push = (id: string) => { pushRecent({ ...track, id, uri: `deezer:track:${id}` }); }
 
+const listText = () => screen.getByTestId('recent-list').textContent
+const storeRaw = (id: string) =>
+  { localStorage.setItem('spoter_recent_v1', JSON.stringify([{ ...track, id }])); }
+
 describe('useRecentlyPlayed', () => {
   beforeEach(() => { localStorage.clear(); })
 
   it('reads initial recent tracks', () => {
     push('1')
     render(<List limit={10} />)
-    expect(screen.getByTestId('recent-list').textContent).toBe('1')
+    expect(listText()).toBe('1')
   })
 
   it('respects limit', () => {
     for (let i = 0; i < 10; i++) push(String(i))
     render(<List limit={5} />)
-    expect(screen.getByTestId('recent-list').textContent).toBe('9,8,7,6,5')
+    expect(listText()).toBe('9,8,7,6,5')
   })
 
   it('updates on spoter:recent-changed', () => {
     render(<List limit={10} />)
-    expect(screen.getByTestId('recent-list').textContent).toBe('')
+    expect(listText()).toBe('')
     act(() => { push('3'); })
-    expect(screen.getByTestId('recent-list').textContent).toBe('3')
+    expect(listText()).toBe('3')
   })
 
   it('refreshes on a storage event without a key and ignores other keys', () => {
     render(<List limit={10} />)
-    localStorage.setItem('spoter_recent_v1', JSON.stringify([{ ...track, id: '6' }]))
+    storeRaw('6')
     fireEvent(window, new StorageEvent('storage', { key: 'other' }))
-    expect(screen.getByTestId('recent-list').textContent).toBe('')
+    expect(listText()).toBe('')
     fireEvent(window, new StorageEvent('storage', { key: null }))
-    expect(screen.getByTestId('recent-list').textContent).toBe('6')
+    expect(listText()).toBe('6')
   })
 
   it('updates on storage event', () => {
     render(<List limit={10} />)
-    localStorage.setItem('spoter_recent_v1', JSON.stringify([{ ...track, id: '5' }]))
+    storeRaw('5')
     fireEvent(window, new StorageEvent('storage', { key: 'spoter_recent_v1' }))
-    expect(screen.getByTestId('recent-list').textContent).toBe('5')
+    expect(listText()).toBe('5')
   })
 })

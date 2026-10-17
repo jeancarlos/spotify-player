@@ -31,11 +31,15 @@ const succeed = (client: QueryClient, key: string, meta: Record<string, unknown>
     await client.query({ queryKey: [key], meta, queryFn: () => Promise.resolve(1), staleTime: 0 })
   })
 
+const failTwice = async (client: QueryClient) => {
+  await fail(client, 'a')
+  await fail(client, 'b')
+}
+
 describe('useCatalogHealth', () => {
   it('is available until the third consecutive Deezer failure', async () => {
     const { client, result } = setup()
-    await fail(client, 'a')
-    await fail(client, 'b')
+    await failTwice(client)
     expect(result.current.unavailable).toBe(false)
     await fail(client, 'c')
     expect(result.current.unavailable).toBe(true)
@@ -49,8 +53,7 @@ describe('useCatalogHealth', () => {
 
   it('resets after one success', async () => {
     const { client, result } = setup()
-    await fail(client, 'a')
-    await fail(client, 'b')
+    await failTwice(client)
     await fail(client, 'c')
     expect(result.current.unavailable).toBe(true)
     await succeed(client, 'd')
@@ -59,8 +62,7 @@ describe('useCatalogHealth', () => {
 
   it('a success in between restarts the count', async () => {
     const { client, result } = setup()
-    await fail(client, 'a')
-    await fail(client, 'b')
+    await failTwice(client)
     await succeed(client, 'd')
     await fail(client, 'c')
     expect(result.current.unavailable).toBe(false)
@@ -74,8 +76,7 @@ describe('useCatalogHealth', () => {
 
   it('ignores queries not marked as Deezer in both directions', async () => {
     const { client, result } = setup()
-    await fail(client, 'a')
-    await fail(client, 'b')
+    await failTwice(client)
     await fail(client, 'lyrics', new DeezerError(-1, 'timeout'), {})
     await succeed(client, 'track-wikipedia', {})
     await succeed(client, 'artist-bio', {})

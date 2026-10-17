@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { sources } from './sourceFiles'
 
 const FAINT = /(?<![\w-])text-(black|white)\/([1-5]\d|[1-9])\b/g
 const DECORATION = [
@@ -8,14 +9,6 @@ const DECORATION = [
   { file: 'shared/TiltCover.tsx', needle: 'text-5xl' },
   { file: 'shared/MediaCard.tsx', needle: 'text-4xl' },
 ]
-
-function sources(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name)
-    if (statSync(path).isDirectory()) return name === '__tests__' ? [] : sources(path)
-    return name.endsWith('.tsx') ? [path] : []
-  })
-}
 
 describe('text contrast', () => {
   it('keeps readable text at text-black/60 or stronger', () => {

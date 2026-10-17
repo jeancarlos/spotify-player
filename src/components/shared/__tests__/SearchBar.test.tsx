@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { SEARCH_DEBOUNCE_MS } from '@/utils/search'
 import { SearchBar } from '../SearchBar'
 
 const setup = () => {
@@ -46,22 +47,50 @@ describe('SearchBar tablist', () => {
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('debounces typing into a search and switches tab on click', async () => {
-    const onSearch = vi.fn()
-    render(<SearchBar onSearch={onSearch} />)
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'abba' } })
-    expect(screen.getByTestId('search-spinner')).toBeInTheDocument()
-    await waitFor(
-      () => {
-        expect(onSearch).toHaveBeenCalledWith('abba', 'artist')
-      },
-      { timeout: 2000 }
-    )
-    fireEvent.click(screen.getAllByRole('tab')[1])
-    await waitFor(() => {
+  describe('debounce', () => {
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    })
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('waits for the debounce window before searching', async () => {
+      const onSearch = vi.fn()
+      render(<SearchBar onSearch={onSearch} />)
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'abba' } })
+      expect(screen.getByTestId('search-spinner')).toBeInTheDocument()
+
+      await act(() => vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS - 1))
+      expect(onSearch).not.toHaveBeenCalled()
+
+      await act(() => vi.advanceTimersByTimeAsync(1))
+      expect(onSearch).toHaveBeenCalledExactlyOnceWith('abba', 'artist')
+      expect(screen.getByTestId('search-icon')).toBeInTheDocument()
+    })
+
+    it('restarts the window while the user keeps typing', async () => {
+      const onSearch = vi.fn()
+      render(<SearchBar onSearch={onSearch} />)
+      const input = screen.getByRole('textbox')
+      fireEvent.change(input, { target: { value: 'ab' } })
+      await act(() => vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS - 1))
+      fireEvent.change(input, { target: { value: 'abba' } })
+      await act(() => vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS - 1))
+      expect(onSearch).not.toHaveBeenCalled()
+
+      await act(() => vi.advanceTimersByTimeAsync(1))
+      expect(onSearch).toHaveBeenCalledExactlyOnceWith('abba', 'artist')
+    })
+
+    it('searches again with the new tab when a tab is clicked', async () => {
+      const onSearch = vi.fn()
+      render(<SearchBar onSearch={onSearch} />)
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'abba' } })
+      await act(() => vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS))
+      fireEvent.click(screen.getAllByRole('tab')[1])
       expect(onSearch).toHaveBeenLastCalledWith('abba', 'album')
     })
-    expect(screen.getByTestId('search-icon')).toBeInTheDocument()
   })
 
   it('ignores unrelated keys on a tab', () => {

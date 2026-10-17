@@ -5,7 +5,12 @@ import { toPage, toTrack, type DzList, type DzTrack } from '@/lib/deezerMappers'
 import { albumQuery } from './useAlbum'
 import type { PagingObject, Track } from '@/types/music'
 
-export function useAlbumTracks(albumId: string | undefined, page: number, limit = 20, background = false) {
+export function useAlbumTracks(
+  albumId: string | undefined,
+  page: number,
+  limit = 20,
+  background = false
+) {
   const queryClient = useQueryClient()
   const index = (page - 1) * limit
   return useQuery<PagingObject<Track>>({

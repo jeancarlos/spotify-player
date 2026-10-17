@@ -1,17 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { sources } from './sourceFiles'
 
 const RING = /(focus-visible|focus-within|focus):ring-|focusRing\(/
 const ALLOWED = [{ file: 'shared/SearchBar.tsx', needle: 'bg-transparent text-sm outline-none' }]
-
-function sources(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name)
-    if (statSync(path).isDirectory()) return name === '__tests__' ? [] : sources(path)
-    return name.endsWith('.tsx') ? [path] : []
-  })
-}
 
 function expressionAround(text: string, at: number): string {
   const start = Math.max(

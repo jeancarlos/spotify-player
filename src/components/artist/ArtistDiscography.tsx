@@ -12,10 +12,7 @@ interface ArtistDiscographyProps {
   view: ViewMode
   onViewChange: (view: ViewMode) => void
   onAlbumClick: (album: AlbumSimple) => void
-  page: number
-  hasNext: boolean
-  onPrevPage: () => void
-  onNextPage: () => void
+  pagination: { page: number; hasNext: boolean; onPrev: () => void; onNext: () => void }
 }
 
 export function ArtistDiscography({
@@ -23,10 +20,7 @@ export function ArtistDiscography({
   view,
   onViewChange,
   onAlbumClick,
-  page,
-  hasNext,
-  onPrevPage,
-  onNextPage,
+  pagination,
 }: ArtistDiscographyProps) {
   const { t } = useTranslation()
 
@@ -78,13 +72,7 @@ export function ArtistDiscography({
         </div>
       )}
 
-      <Pagination
-        page={page}
-        hasNext={hasNext}
-        onPrev={onPrevPage}
-        onNext={onNextPage}
-        className="mt-4"
-      />
+      <Pagination {...pagination} className="mt-4" />
     </section>
   )
 }

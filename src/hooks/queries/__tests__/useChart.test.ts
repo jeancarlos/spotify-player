@@ -29,36 +29,33 @@ beforeEach(() => {
 })
 
 describe('chart hooks', () => {
-  it('useChartArtists requests chart/0/artists with limit 20 and maps a single page', async () => {
-    deezerMock.mockResolvedValue(chartArtists)
-    const { result } = renderWithClient(() => useChartArtists())
+  async function renderChart<T>(hook: () => { isSuccess: boolean; data?: T }, fixture: unknown) {
+    deezerMock.mockResolvedValue(fixture)
+    const { result } = renderWithClient(hook)
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
     })
+    return result.current.data
+  }
+
+  it('useChartArtists requests chart/0/artists with limit 20 and maps a single page', async () => {
+    const data = await renderChart(() => useChartArtists(), chartArtists)
     expect(deezerMock).toHaveBeenCalledWith('chart/0/artists', { limit: 20 })
-    expect(result.current.data?.items).toEqual(chartArtists.data.map((a) => toArtist(a)))
-    expect(result.current.data?.offset).toBe(0)
-    expect(result.current.data?.total).toBe(chartArtists.data.length)
+    expect(data?.items).toEqual(chartArtists.data.map((a) => toArtist(a)))
+    expect(data?.offset).toBe(0)
+    expect(data?.total).toBe(chartArtists.data.length)
   })
 
   it('useChartAlbums requests chart/0/albums and maps albums', async () => {
-    deezerMock.mockResolvedValue(chartAlbums)
-    const { result } = renderWithClient(() => useChartAlbums())
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
-    })
+    const data = await renderChart(() => useChartAlbums(), chartAlbums)
     expect(deezerMock).toHaveBeenCalledWith('chart/0/albums', { limit: 20 })
-    expect(result.current.data?.items).toEqual(chartAlbums.data.map((a) => toAlbum(a)))
+    expect(data?.items).toEqual(chartAlbums.data.map((a) => toAlbum(a)))
   })
 
   it('useChartPlaylists requests chart/0/playlists and maps playlists', async () => {
-    deezerMock.mockResolvedValue(chartPlaylists)
-    const { result } = renderWithClient(() => useChartPlaylists())
-    await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true)
-    })
+    const data = await renderChart(() => useChartPlaylists(), chartPlaylists)
     expect(deezerMock).toHaveBeenCalledWith('chart/0/playlists', { limit: 20 })
-    expect(result.current.data?.items).toEqual(chartPlaylists.data.map((p) => toPlaylist(p)))
+    expect(data?.items).toEqual(chartPlaylists.data.map((p) => toPlaylist(p)))
   })
 
   it('stays idle when disabled', () => {

@@ -52,31 +52,43 @@ beforeEach(() => {
   mockUseSearchTracks.mockReturnValue({ data: [], isPending: false })
 })
 
+const renderEmpty = () =>
+  render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+const renderSelected = () =>
+  render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
+const clearButton = () => screen.getByRole('button', { name: /favorites\.clearTrack/i })
+
+async function typeWithResults(text = 'Re') {
+  mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
+  const user = userEvent.setup()
+  renderEmpty()
+  const input = screen.getByRole('combobox')
+  await user.type(input, text)
+  return { user, input }
+}
+
 describe('TrackAutocomplete', () => {
   it('renderiza o combobox com placeholder correto', () => {
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    renderEmpty()
     expect(screen.getByRole('combobox')).toBeInTheDocument()
   })
 
   it('não busca quando query tem menos de 2 caracteres', async () => {
     const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    renderEmpty()
     await user.type(screen.getByRole('combobox'), 'a')
     expect(mockUseSearchTracks).toHaveBeenCalledWith('a', false)
   })
 
   it('busca quando query tem 2+ caracteres', async () => {
     const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+    renderEmpty()
     await user.type(screen.getByRole('combobox'), 'Mo')
     expect(mockUseSearchTracks).toHaveBeenCalledWith('Mo', true)
   })
 
   it('mostra resultados quando a busca retorna dados', async () => {
-    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
-    const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
-    await user.type(screen.getByRole('combobox'), 'Re')
+    await typeWithResults()
     await waitFor(() => {
       expect(screen.getByRole('listbox')).toBeInTheDocument()
       expect(screen.getByText('Resultado Um')).toBeInTheDocument()
@@ -84,25 +96,22 @@ describe('TrackAutocomplete', () => {
   })
 
   it('clicar em um resultado chama onChange com a track', async () => {
-    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
-    const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
-    await user.type(screen.getByRole('combobox'), 'Re')
+    const { user } = await typeWithResults()
     await waitFor(() => screen.getByText('Resultado Um'))
     await user.click(screen.getByText('Resultado Um'))
     expect(onChange).toHaveBeenCalledWith(mockSearchResults[0])
   })
 
   it('quando value está definido, renderiza SelectedTrack em vez do input', () => {
-    render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
+    renderSelected()
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(screen.getByText('Resultado Um')).toBeInTheDocument()
   })
 
   it('botão de limpar chama onChange(null)', async () => {
     const user = userEvent.setup()
-    render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
-    await user.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
+    renderSelected()
+    await user.click(clearButton())
     expect(onChange).toHaveBeenCalledWith(null)
   })
 
@@ -110,7 +119,7 @@ describe('TrackAutocomplete', () => {
     vi.useFakeTimers()
     try {
       mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
-      render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
+      renderEmpty()
       const input = screen.getByRole('combobox')
       fireEvent.change(input, { target: { value: 'Re' } })
       expect(screen.getByText('Resultado Um')).toBeInTheDocument()
@@ -128,21 +137,14 @@ describe('TrackAutocomplete', () => {
   })
 
   it('mouseDown na opcao evita o blur do input', async () => {
-    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
-    const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
-    await user.type(screen.getByRole('combobox'), 'Re')
+    await typeWithResults()
     await waitFor(() => screen.getByText('Resultado Um'))
     const notPrevented = fireEvent.mouseDown(screen.getByText('Resultado Um'))
     expect(notPrevented).toBe(false)
   })
 
   it('reabre a lista ao focar quando ha resultados', async () => {
-    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
-    const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
-    const input = screen.getByRole('combobox')
-    await user.type(input, 'Re')
+    const { input } = await typeWithResults()
     fireEvent.keyDown(input, { key: 'Escape' })
     act(() => {
       input.blur()
@@ -157,11 +159,7 @@ describe('TrackAutocomplete', () => {
   })
 
   it('aria-activedescendant so existe com a lista renderizada', async () => {
-    mockUseSearchTracks.mockReturnValue({ data: mockSearchResults, isPending: false })
-    const user = userEvent.setup()
-    render(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
-    const input = screen.getByRole('combobox')
-    await user.type(input, 'Re')
+    const { input } = await typeWithResults()
     expect(screen.getByRole('listbox')).toBeInTheDocument()
     expect(input).not.toHaveAttribute('aria-activedescendant')
   })
@@ -179,7 +177,7 @@ describe('TrackAutocomplete', () => {
     const { rerender } = render(
       <TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />
     )
-    fireEvent.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
+    fireEvent.click(clearButton())
     rerender(<TrackAutocomplete value={null} onChange={onChange} onBlur={onBlur} />)
     await act(async () => {
       await new Promise((r) => setTimeout(r, 10))
@@ -188,8 +186,8 @@ describe('TrackAutocomplete', () => {
   })
 
   it('ignora o foco quando o input ainda nao existe', async () => {
-    render(<TrackAutocomplete value={mockSearchResults[0]} onChange={onChange} onBlur={onBlur} />)
-    fireEvent.click(screen.getByRole('button', { name: /favorites\.clearTrack/i }))
+    renderSelected()
+    fireEvent.click(clearButton())
     await act(async () => {
       await new Promise((r) => setTimeout(r, 10))
     })

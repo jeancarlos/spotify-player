@@ -15,6 +15,8 @@ describe('lyricsKey', () => {
   })
 })
 
+const okJson = (body: unknown) => ({ ok: true, status: 200, json: () => Promise.resolve(body) })
+
 describe('fetchLyrics', () => {
   it('returns an empty list when lrclib has no match', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404 }))
@@ -26,18 +28,14 @@ describe('fetchLyrics', () => {
     await expect(fetchLyrics(params)).rejects.toThrow(String(status))
   })
 
-  it('omits the album parameter when the track has none', async () => {
+  it.each([
+    ['omits the album parameter when the track has none', { album: '' }, 'album_name='],
+    ['omits the duration parameter when the track has none', { durationMs: 0 }, 'duration='],
+  ])('%s', async (_name, override, param) => {
     const f = vi.fn().mockResolvedValue({ ok: false, status: 404 })
     vi.stubGlobal('fetch', f)
-    await fetchLyrics({ ...params, album: '' })
-    expect(String(f.mock.calls[0][0])).not.toContain('album_name=')
-  })
-
-  it('omits the duration parameter when the track has none', async () => {
-    const f = vi.fn().mockResolvedValue({ ok: false, status: 404 })
-    vi.stubGlobal('fetch', f)
-    await fetchLyrics({ ...params, durationMs: 0 })
-    expect(String(f.mock.calls[0][0])).not.toContain('duration=')
+    await fetchLyrics({ ...params, ...override })
+    expect(String(f.mock.calls[0][0])).not.toContain(param)
   })
 
   it('throws on network failure', async () => {
@@ -46,14 +44,14 @@ describe('fetchLyrics', () => {
   })
 
   it('returns an empty list when neither synced nor plain lyrics exist', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({}) }))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(okJson({})))
     await expect(fetchLyrics(params)).resolves.toEqual([])
   })
 
   it('parses synced lyrics', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ syncedLyrics: '[00:01.00]hi' }) })
+      vi.fn().mockResolvedValue(okJson({ syncedLyrics: '[00:01.00]hi' }))
     )
     await expect(fetchLyrics(params)).resolves.toEqual(['hi'])
   })
@@ -61,11 +59,7 @@ describe('fetchLyrics', () => {
   it('falls back to plain lyrics when the synced ones parse to nothing', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve({ syncedLyrics: 'no stamps here', plainLyrics: 'one\ntwo' }),
-      })
+      vi.fn().mockResolvedValue(okJson({ syncedLyrics: 'no stamps here', plainLyrics: 'one\ntwo' }))
     )
     await expect(fetchLyrics(params)).resolves.toEqual(['one', 'two'])
   })
@@ -73,7 +67,7 @@ describe('fetchLyrics', () => {
   it('returns plain lyrics without a track duration', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ plainLyrics: 'one\ntwo' }) })
+      vi.fn().mockResolvedValue(okJson({ plainLyrics: 'one\ntwo' }))
     )
     await expect(fetchLyrics({ ...params, durationMs: undefined })).resolves.toEqual(['one', 'two'])
   })

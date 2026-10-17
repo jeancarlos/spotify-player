@@ -14,10 +14,7 @@ function setup(view: 'list' | 'table') {
     view,
     onViewChange: vi.fn(),
     onAlbumClick: vi.fn(),
-    page: 1,
-    hasNext: true,
-    onPrevPage: vi.fn(),
-    onNextPage: vi.fn(),
+    pagination: { page: 1, hasNext: true, onPrev: vi.fn(), onNext: vi.fn() },
   }
   render(<ArtistDiscography {...props} />)
   return props

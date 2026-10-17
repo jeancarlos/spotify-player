@@ -34,3 +34,11 @@ export function useSearchPaged<R, T>({
     },
   })
 }
+
+// R only appears in `map`, but it must be explicit so each hook types its Deezer payload
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function createSearchHook<R, T>(queryKeyPrefix: string, path: string, map: (raw: R) => T) {
+  return function useSearch(query: string, page: number) {
+    return useSearchPaged<R, T>({ queryKeyPrefix, path, query, page, map })
+  }
+}

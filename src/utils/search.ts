@@ -1,3 +1,5 @@
+export const SEARCH_DEBOUNCE_MS = 700
+
 export type SearchTab = 'artist' | 'album' | 'playlist'
 
 const STORAGE_KEY = 'last-search'

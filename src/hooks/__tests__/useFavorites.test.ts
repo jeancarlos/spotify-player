@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useFavorites } from '../useFavorites'
+import { STORAGE_KEYS } from '@/lib/storageKeys'
 import type { Track } from '@/types/music'
 
-const KEY = 'spoter_favorites_v2'
+const KEY = STORAGE_KEYS.favorites
 
 const mk = (id: string): Track =>
   ({
@@ -20,6 +21,22 @@ const mk = (id: string): Track =>
   }) as unknown as Track
 
 const stored = () => JSON.parse(localStorage.getItem(KEY) ?? '{}')
+
+const withTrack1 = () => {
+  const hook = renderHook(() => useFavorites())
+  act(() => {
+    hook.result.current.addTrack(mk('1'))
+  })
+  return hook
+}
+
+const externalWrite = (eventKey: string | null) => {
+  const next = JSON.stringify({ tracks: [mk('9')], notes: {} })
+  act(() => {
+    localStorage.setItem(KEY, next)
+    window.dispatchEvent(new StorageEvent('storage', { key: eventKey }))
+  })
+}
 
 describe('useFavorites', () => {
   beforeEach(() => {
@@ -172,10 +189,7 @@ describe('useFavorites', () => {
   })
 
   it('setNote updates the note', () => {
-    const { result } = renderHook(() => useFavorites())
-    act(() => {
-      result.current.addTrack(mk('1'))
-    })
+    const { result } = withTrack1()
     act(() => {
       result.current.setNote('deezer:track:1', 'hello')
     })
@@ -195,25 +209,14 @@ describe('useFavorites', () => {
     expect(stored().notes).toEqual({})
   })
 
-  it('parseNotes loads tracks even when notes is null', () => {
-    const track = mk('1')
-    localStorage.setItem(KEY, JSON.stringify({ tracks: [track], notes: null }))
+  it.each([
+    ['null', null],
+    ['a string', 'ab'],
+    ['an array', ['x']],
+  ])('parseNotes treats notes as %s as empty object', (_label, notes) => {
+    localStorage.setItem(KEY, JSON.stringify({ tracks: [mk('1')], notes }))
     const { result } = renderHook(() => useFavorites())
     expect(result.current.tracks.map((t) => t.id)).toEqual(['1'])
-    expect(result.current.notes).toEqual({})
-  })
-
-  it('parseNotes treats a string note value as empty object', () => {
-    const track = mk('1')
-    localStorage.setItem(KEY, JSON.stringify({ tracks: [track], notes: 'ab' }))
-    const { result } = renderHook(() => useFavorites())
-    expect(result.current.notes).toEqual({})
-  })
-
-  it('parseNotes treats an array note value as empty object', () => {
-    const track = mk('1')
-    localStorage.setItem(KEY, JSON.stringify({ tracks: [track], notes: ['x'] }))
-    const { result } = renderHook(() => useFavorites())
     expect(result.current.notes).toEqual({})
   })
 
@@ -239,26 +242,14 @@ describe('useFavorites', () => {
     expect(ok).toBe(true)
   })
 
-  it('setNote returns true on success', () => {
-    const { result } = renderHook(() => useFavorites())
-    act(() => {
-      result.current.addTrack(mk('1'))
-    })
+  it.each([
+    ['setNote', (r: ReturnType<typeof useFavorites>) => r.setNote('deezer:track:1', 'hello')],
+    ['removeTrack', (r: ReturnType<typeof useFavorites>) => r.removeTrack('deezer:track:1')],
+  ])('%s returns true on success', (_name, call) => {
+    const { result } = withTrack1()
     let ok = false
     act(() => {
-      ok = result.current.setNote('deezer:track:1', 'hello')
-    })
-    expect(ok).toBe(true)
-  })
-
-  it('removeTrack returns true on success', () => {
-    const { result } = renderHook(() => useFavorites())
-    act(() => {
-      result.current.addTrack(mk('1'))
-    })
-    let ok = false
-    act(() => {
-      ok = result.current.removeTrack('deezer:track:1')
+      ok = call(result.current)
     })
     expect(ok).toBe(true)
   })
@@ -276,28 +267,14 @@ describe('useFavorites', () => {
   })
 
   it('ignores storage events for other keys', () => {
-    const { result } = renderHook(() => useFavorites())
-    act(() => {
-      result.current.addTrack(mk('1'))
-    })
-    const next = JSON.stringify({ tracks: [mk('9')], notes: {} })
-    act(() => {
-      localStorage.setItem(KEY, next)
-      window.dispatchEvent(new StorageEvent('storage', { key: 'other-key' }))
-    })
+    const { result } = withTrack1()
+    externalWrite('other-key')
     expect(result.current.tracks.map((t) => t.id)).toEqual(['1'])
   })
 
   it('updates on storage events with null key', () => {
-    const { result } = renderHook(() => useFavorites())
-    act(() => {
-      result.current.addTrack(mk('1'))
-    })
-    const next = JSON.stringify({ tracks: [mk('9')], notes: {} })
-    act(() => {
-      localStorage.setItem(KEY, next)
-      window.dispatchEvent(new StorageEvent('storage', { key: null }))
-    })
+    const { result } = withTrack1()
+    externalWrite(null)
     expect(result.current.tracks.map((t) => t.id)).toEqual(['9'])
   })
 

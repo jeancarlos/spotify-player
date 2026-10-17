@@ -18,7 +18,14 @@ vi.mock('@/lib/deezer', async (importOriginal) => ({
   deezer: vi.fn(),
 }))
 
+// The debounce has its own unit tests in SearchBar.test.tsx; here it would only add wall-clock time.
+vi.mock('@/hooks/useDebounce', () => ({ useDebounce: <T,>(value: T) => value }))
+
 const deezerMock = vi.mocked(deezer)
+
+const type = (value: string) => {
+  fireEvent.change(screen.getByRole('textbox'), { target: { value } })
+}
 
 beforeEach(() => {
   localStorage.clear()
@@ -58,18 +65,15 @@ describe('Artists page', () => {
 
   it('shows artist results after typing a query', async () => {
     renderArtists()
-    const input = screen.getByRole('textbox')
-    fireEvent.change(input, { target: { value: 'coldplay' } })
-    expect(
-      (await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })).length
-    ).toBeGreaterThan(0)
+    type('coldplay')
+    expect((await screen.findAllByText(searchArtist.data[0]?.name ?? '')).length).toBeGreaterThan(0)
     expect(deezerMock).toHaveBeenCalledWith('search/artist', { q: 'coldplay', index: 0, limit: 20 })
   })
 
   it('offers a single next-page control for search results', async () => {
     renderArtists()
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'coldplay' } })
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
+    type('coldplay')
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '')
     expect(screen.getAllByRole('button', { name: /artists\.next/ })).toHaveLength(1)
   })
 
@@ -84,13 +88,10 @@ describe('Artists page', () => {
 
   it('goes back to the chart when the query is cleared', async () => {
     renderArtists()
-    const input = screen.getByRole('textbox')
-    fireEvent.change(input, { target: { value: 'coldplay' } })
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
-    fireEvent.change(input, { target: { value: '' } })
-    expect(
-      await screen.findByText(chartArtists.data[0]?.name ?? '', {}, { timeout: 8000 })
-    ).toBeInTheDocument()
+    type('coldplay')
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '')
+    type('')
+    expect(await screen.findByText(chartArtists.data[0]?.name ?? '')).toBeInTheDocument()
     expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 
@@ -114,12 +115,12 @@ describe('Artists page', () => {
   it('pages forward and back through the search results', async () => {
     deezerMock.mockResolvedValue({ ...searchArtist, total: 100 })
     renderArtists('/?q=coldplay&page=2')
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '')
     fireEvent.click(screen.getByRole('button', { name: 'artists.next' }))
     await waitFor(() => {
       expect(screen.getByTestId('where').textContent).toContain('page=3')
     })
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '')
     fireEvent.click(screen.getByRole('button', { name: 'artists.previous' }))
     await waitFor(() => {
       expect(screen.getByTestId('where').textContent).toContain('page=2')
@@ -129,16 +130,14 @@ describe('Artists page', () => {
   it('shows album search results on the album tab', async () => {
     deezerMock.mockResolvedValue(searchAlbum)
     renderArtists('/?q=x&tab=album')
-    expect(
-      (await screen.findAllByText(searchAlbum.data[0]?.title ?? '', {}, { timeout: 8000 })).length
-    ).toBeGreaterThan(0)
+    expect((await screen.findAllByText(searchAlbum.data[0]?.title ?? '')).length).toBeGreaterThan(0)
   })
 
   it('shows playlist search results on the playlist tab', async () => {
     deezerMock.mockResolvedValue(searchPlaylist)
     renderArtists('/?q=x&tab=playlist')
     expect(
-      (await screen.findAllByText(searchPlaylist.data[0]?.title ?? '', {}, { timeout: 8000 })).length
+      (await screen.findAllByText(searchPlaylist.data[0]?.title ?? '')).length
     ).toBeGreaterThan(0)
   })
 })

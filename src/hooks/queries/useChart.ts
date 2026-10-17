@@ -14,13 +14,7 @@ import {
   type DzTrack,
 } from '@/lib/deezerMappers'
 import { PAGE_SIZE } from './useSearchPaged'
-import type {
-  PagingObject,
-  AlbumSimple,
-  Artist,
-  Playlist,
-  Track,
-} from '@/types/music'
+import type { PagingObject, AlbumSimple, Artist, Playlist, Track } from '@/types/music'
 
 interface UseChartOptions<R, T> {
   kind: 'artists' | 'albums' | 'playlists' | 'tracks'

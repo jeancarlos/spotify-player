@@ -72,13 +72,15 @@ export function ArtistDetail() {
             view={discographyView}
             onViewChange={setDiscographyView}
             onAlbumClick={handleAlbumClick}
-            page={albumPage}
-            hasNext={hasNextAlbums}
-            onPrevPage={() => {
-              setAlbumPage((prevPage) => Math.max(1, prevPage - 1))
-            }}
-            onNextPage={() => {
-              setAlbumPage((prevPage) => prevPage + 1)
+            pagination={{
+              page: albumPage,
+              hasNext: hasNextAlbums,
+              onPrev: () => {
+                setAlbumPage((prevPage) => Math.max(1, prevPage - 1))
+              },
+              onNext: () => {
+                setAlbumPage((prevPage) => prevPage + 1)
+              },
             }}
           />
         </div>

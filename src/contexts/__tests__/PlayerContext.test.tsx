@@ -61,6 +61,30 @@ function audio(): HTMLAudioElement {
 
 const fresh = (t: Track): Track => ({ ...t, preview_url: `https://fresh.test/${t.id}.mp3` })
 
+const ended = () =>
+  act(() => {
+    fireEvent(audio(), new Event('ended'))
+    return Promise.resolve()
+  })
+
+const playLastOfTwo = async () => {
+  const list = [track('1'), track('2')]
+  await act(() => controls.playTrack(list[1], list))
+}
+
+const toggleAsync = () =>
+  act(async () => {
+    controls.toggle()
+    await Promise.resolve()
+  })
+
+const playThenPause = async (id = '1') => {
+  await act(() => controls.playTrack(track(id)))
+  act(() => {
+    controls.toggle()
+  })
+}
+
 describe('PlayerProvider', () => {
   let play: ReturnType<typeof vi.spyOn>
   let pause: ReturnType<typeof vi.spyOn>
@@ -133,19 +157,13 @@ describe('PlayerProvider', () => {
   })
 
   it('refetches the preview at the paused position when resuming fails', async () => {
-    await act(() => controls.playTrack(track('1')))
-    act(() => {
-      controls.toggle()
-    })
+    await playThenPause()
     audio().currentTime = 12
     deezerMock.mockClear()
     play.mockImplementationOnce(() =>
       Promise.reject(new DOMException('expired', 'NotSupportedError'))
     )
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     await waitFor(() => {
       expect(latest.isPlaying).toBe(true)
     })
@@ -154,43 +172,28 @@ describe('PlayerProvider', () => {
   })
 
   it('does not refetch when the browser blocks playback', async () => {
-    await act(() => controls.playTrack(track('1')))
-    act(() => {
-      controls.toggle()
-    })
+    await playThenPause()
     deezerMock.mockClear()
     play.mockImplementationOnce(() =>
       Promise.reject(new DOMException('blocked', 'NotAllowedError'))
     )
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     expect(deezerMock).not.toHaveBeenCalled()
   })
 
   it('keeps the paused position when the resume refetch fails', async () => {
-    await act(() => controls.playTrack(track('1')))
-    act(() => {
-      controls.toggle()
-    })
+    await playThenPause()
     audio().currentTime = 12
     deezerMock.mockRejectedValueOnce(new Error('offline'))
     play.mockImplementationOnce(() =>
       Promise.reject(new DOMException('expired', 'NotSupportedError'))
     )
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     await waitFor(() => {
       expect(latest.isLoading).toBe(false)
     })
     expect(audio().getAttribute('src')).toBeNull()
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     await waitFor(() => {
       expect(latest.isPlaying).toBe(true)
     })
@@ -198,26 +201,17 @@ describe('PlayerProvider', () => {
   })
 
   it('does not refetch when a resume is aborted', async () => {
-    await act(() => controls.playTrack(track('1')))
-    act(() => {
-      controls.toggle()
-    })
+    await playThenPause()
     deezerMock.mockClear()
     play.mockImplementationOnce(() => Promise.reject(new DOMException('aborted', 'AbortError')))
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     expect(deezerMock).not.toHaveBeenCalled()
   })
 
   it('advances on ended and skips unplayable tracks', async () => {
     const list = [track('1'), track('2', false), track('3')]
     await act(() => controls.playTrack(list[0], list))
-    await act(() => {
-      fireEvent(audio(), new Event('ended'))
-      return Promise.resolve()
-    })
+    await ended()
     await waitFor(() => {
       expect(latest.currentTrack?.id).toBe('3')
     })
@@ -227,25 +221,18 @@ describe('PlayerProvider', () => {
   it('stops at the end of the queue when repeat is off', async () => {
     const list = [track('1')]
     await act(() => controls.playTrack(list[0], list))
-    await act(() => {
-      fireEvent(audio(), new Event('ended'))
-      return Promise.resolve()
-    })
+    await ended()
     expect(pause).toHaveBeenCalled()
     expect(latest.isPlaying).toBe(false)
   })
 
   it('wraps to the first playable track when repeat is context', async () => {
-    const list = [track('1'), track('2')]
-    await act(() => controls.playTrack(list[1], list))
+    await playLastOfTwo()
     act(() => {
       controls.cycleRepeat()
     })
     expect(latest.repeat).toBe('context')
-    await act(() => {
-      fireEvent(audio(), new Event('ended'))
-      return Promise.resolve()
-    })
+    await ended()
     await waitFor(() => {
       expect(latest.currentTrack?.id).toBe('1')
     })
@@ -261,10 +248,7 @@ describe('PlayerProvider', () => {
     expect(latest.repeat).toBe('track')
     deezerMock.mockClear()
     play.mockClear()
-    await act(() => {
-      fireEvent(audio(), new Event('ended'))
-      return Promise.resolve()
-    })
+    await ended()
     expect(play).toHaveBeenCalledTimes(1)
     expect(deezerMock).not.toHaveBeenCalled()
     expect(latest.currentTrack?.id).toBe('1')
@@ -279,10 +263,7 @@ describe('PlayerProvider', () => {
     })
     play.mockClear()
     play.mockRejectedValueOnce(new Error('blocked'))
-    await act(() => {
-      fireEvent(audio(), new Event('ended'))
-      return Promise.resolve()
-    })
+    await ended()
     expect(play).toHaveBeenCalledTimes(1)
     expect(latest.currentTrack?.id).toBe('1')
   })
@@ -331,8 +312,7 @@ describe('PlayerProvider', () => {
   })
 
   it('restarts the track on previous after 3 seconds, otherwise goes back', async () => {
-    const list = [track('1'), track('2')]
-    await act(() => controls.playTrack(list[1], list))
+    await playLastOfTwo()
     audio().currentTime = 5
     act(() => {
       controls.previous()
@@ -438,10 +418,7 @@ describe('PlayerProvider', () => {
     expect(latest.currentTrack?.id).toBe('2')
     expect(latest.isPlaying).toBe(false)
     expect(audio().getAttribute('src')).toBeNull()
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     await waitFor(() => {
       expect(audio().src).toBe('https://fresh.test/2.mp3')
     })
@@ -583,10 +560,7 @@ describe('PlayerProvider', () => {
   })
 
   it('ignores a failed resume that a newer request superseded', async () => {
-    await act(() => controls.playTrack(track('1')))
-    act(() => {
-      controls.toggle()
-    })
+    await playThenPause()
     let reject: (e: unknown) => void = () => undefined
     play.mockImplementationOnce(
       () =>
@@ -619,12 +593,6 @@ describe('PlayerProvider', () => {
     expect(screen.getByTestId('progress').textContent).toBe('0')
   })
 
-  const ended = () =>
-    act(() => {
-      fireEvent(audio(), new Event('ended'))
-      return Promise.resolve()
-    })
-
   it('advances to the next track mid-queue when repeat is context', async () => {
     const list = [track('1'), track('2'), track('3')]
     await act(() => controls.playTrack(list[0], list))
@@ -638,8 +606,7 @@ describe('PlayerProvider', () => {
   })
 
   it('keeps the last track and fetches nothing at the end of the queue', async () => {
-    const list = [track('1'), track('2')]
-    await act(() => controls.playTrack(list[1], list))
+    await playLastOfTwo()
     deezerMock.mockClear()
     await ended()
     expect(latest.queueIndex).toBe(1)
@@ -692,8 +659,7 @@ describe('PlayerProvider', () => {
   })
 
   it('goes back on previous at exactly 3 seconds', async () => {
-    const list = [track('1'), track('2')]
-    await act(() => controls.playTrack(list[1], list))
+    await playLastOfTwo()
     audio().currentTime = 3
     await act(async () => {
       controls.previous()
@@ -764,10 +730,7 @@ describe('PlayerProvider', () => {
     await act(() => controls.playTrack(track('1')))
     audio().currentTime = 7
     play.mockRejectedValueOnce(new Error('expired'))
-    await act(async () => {
-      controls.toggle()
-      await Promise.resolve()
-    })
+    await toggleAsync()
     await waitFor(() => {
       expect(deezerMock).toHaveBeenCalledTimes(2)
     })

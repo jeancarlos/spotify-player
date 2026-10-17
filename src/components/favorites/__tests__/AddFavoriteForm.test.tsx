@@ -81,6 +81,17 @@ function renderForm(existingFavorites: Track[] = []) {
   )
 }
 
+const pickTrack = (user: ReturnType<typeof userEvent.setup>) =>
+  user.click(screen.getByRole('button', { name: /selecionar música/i }))
+const submitButton = () => screen.getByRole('button', { name: /favorites\.addConfirm/i })
+
+async function renderAndPick(existingFavorites: Track[] = []) {
+  const user = userEvent.setup()
+  renderForm(existingFavorites)
+  await pickTrack(user)
+  return user
+}
+
 describe('AddFavoriteForm', () => {
   it('associates both labels with their controls', () => {
     renderForm()
@@ -96,42 +107,34 @@ describe('AddFavoriteForm', () => {
   })
   it('botão de submit está desabilitado sem track selecionada', () => {
     renderForm()
-    expect(screen.getByRole('button', { name: /favorites\.addConfirm/i })).toBeDisabled()
+    expect(submitButton()).toBeDisabled()
   })
 
   it('selecionar track habilita o botão de submit', async () => {
-    const user = userEvent.setup()
-    renderForm()
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await renderAndPick()
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /favorites\.addConfirm/i })).not.toBeDisabled()
+      expect(submitButton()).not.toBeDisabled()
     })
   })
 
   it('exibe aviso quando track já está nos favoritos', async () => {
-    const user = userEvent.setup()
-    renderForm([mockTrack])
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await renderAndPick([mockTrack])
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument()
     })
   })
 
   it('submit desabilitado quando track já é favorita', async () => {
-    const user = userEvent.setup()
-    renderForm([mockTrack])
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await renderAndPick([mockTrack])
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /favorites\.addConfirm/i })).toBeDisabled()
+      expect(submitButton()).toBeDisabled()
     })
   })
 
   it('submit chama onAdd e onClose com track e nota', async () => {
-    const user = userEvent.setup()
-    renderForm()
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    const user = await renderAndPick()
     await user.type(screen.getByRole('textbox'), 'ouço no treino')
-    await user.click(screen.getByRole('button', { name: /favorites\.addConfirm/i }))
+    await user.click(submitButton())
     await waitFor(() => {
       expect(onAdd).toHaveBeenCalledWith(mockTrack, 'ouço no treino')
       expect(onClose).toHaveBeenCalled()
@@ -139,11 +142,9 @@ describe('AddFavoriteForm', () => {
   })
 
   it('submit nao fecha o form quando onAdd falha', async () => {
-    const user = userEvent.setup()
     onAdd.mockReturnValueOnce(false)
-    renderForm()
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
-    await user.click(screen.getByRole('button', { name: /favorites\.addConfirm/i }))
+    const user = await renderAndPick()
+    await user.click(submitButton())
     await waitFor(() => {
       expect(onAdd).toHaveBeenCalled()
     })
@@ -151,26 +152,20 @@ describe('AddFavoriteForm', () => {
   })
 
   it('submit com nota vazia chama onAdd com undefined como nota', async () => {
-    const user = userEvent.setup()
-    renderForm()
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
-    await user.click(screen.getByRole('button', { name: /favorites\.addConfirm/i }))
+    const user = await renderAndPick()
+    await user.click(submitButton())
     await waitFor(() => {
       expect(onAdd).toHaveBeenCalledWith(mockTrack, undefined)
     })
   })
 
   it('contador de nota está visível no formulário', async () => {
-    const user = userEvent.setup()
-    renderForm()
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    await renderAndPick()
     expect(screen.getByText(/favorites\.noteCharsLeft/i)).toBeInTheDocument()
   })
 
   it('mostra o erro de track ao limpar a seleção', async () => {
-    const user = userEvent.setup()
-    renderForm()
-    await user.click(screen.getByRole('button', { name: /selecionar música/i }))
+    const user = await renderAndPick()
     await user.click(await screen.findByRole('button', { name: /limpar música/i }))
     expect(await screen.findByTestId('track-error')).toHaveTextContent('favorites.trackRequired')
   })

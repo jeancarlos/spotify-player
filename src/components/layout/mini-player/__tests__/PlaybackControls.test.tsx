@@ -6,6 +6,8 @@ import { PlayerContext } from '@/contexts/PlayerContext'
 import { initialPlayerState } from '@/contexts/playerReducer'
 import type { Track } from '@/types/music'
 
+const playingState = { ...initialPlayerState, currentTrack: { id: '1', name: 'Song' } as Track }
+
 function setup(overrides: Partial<typeof initialPlayerState> = {}) {
   const controls = {
     playTrack: vi.fn(() => Promise.resolve()),
@@ -16,11 +18,7 @@ function setup(overrides: Partial<typeof initialPlayerState> = {}) {
     setShuffle: vi.fn(),
     cycleRepeat: vi.fn(),
   }
-  const state = {
-    ...initialPlayerState,
-    currentTrack: { id: '1', name: 'Song' } as Track,
-    ...overrides,
-  }
+  const state = { ...playingState, ...overrides }
   render(
     <MemoryRouter>
       <PlayerContext.Provider value={{ state, controls }}>
@@ -86,17 +84,7 @@ function Probe() {
 function setupAt(entry: Parameters<typeof MemoryRouter>[0]['initialEntries']) {
   render(
     <MemoryRouter initialEntries={entry}>
-      <PlayerContext.Provider
-        value={
-          {
-            state: {
-              ...initialPlayerState,
-              currentTrack: { id: '1', name: 'Song' } as Track,
-            },
-            controls: {},
-          } as never
-        }
-      >
+      <PlayerContext.Provider value={{ state: playingState, controls: {} } as never}>
         <PlaybackControls />
         <Probe />
       </PlayerContext.Provider>
@@ -106,22 +94,30 @@ function setupAt(entry: Parameters<typeof MemoryRouter>[0]['initialEntries']) {
 }
 
 describe('PlaybackControls queue toggle', () => {
-  it('opens the queue tab and remembers the full path with its query', () => {
-    const loc = setupAt(['/playlists/9?page=2'])
-    fireEvent.click(screen.getByRole('button', { name: 'player.queue' }))
-    expect(loc()).toEqual({ p: '/player?tab=queue', s: { from: '/playlists/9?page=2' } })
-  })
-
-  it('reaches the queue from the lyrics tab keeping the state', () => {
-    const loc = setupAt([{ pathname: '/player', search: '?tab=lyrics', state: { from: '/x?y=1' } }])
-    fireEvent.click(screen.getByRole('button', { name: 'player.queue' }))
-    expect(loc()).toEqual({ p: '/player?tab=queue', s: { from: '/x?y=1' } })
-  })
-
-  it('closes the queue back to where the player was opened', () => {
-    const loc = setupAt([{ pathname: '/player', search: '?tab=queue', state: { from: '/x?y=1' } }])
-    fireEvent.click(screen.getByRole('button', { name: 'player.closeQueue' }))
-    expect(loc().p).toBe('/x?y=1')
+  type Entry = Parameters<typeof setupAt>[0]
+  it.each<[string, Entry, string, { p: string; s?: unknown }]>([
+    [
+      'opens the queue tab and remembers the full path with its query',
+      ['/playlists/9?page=2'],
+      'player.queue',
+      { p: '/player?tab=queue', s: { from: '/playlists/9?page=2' } },
+    ],
+    [
+      'reaches the queue from the lyrics tab keeping the state',
+      [{ pathname: '/player', search: '?tab=lyrics', state: { from: '/x?y=1' } }],
+      'player.queue',
+      { p: '/player?tab=queue', s: { from: '/x?y=1' } },
+    ],
+    [
+      'closes the queue back to where the player was opened',
+      [{ pathname: '/player', search: '?tab=queue', state: { from: '/x?y=1' } }],
+      'player.closeQueue',
+      { p: '/x?y=1' },
+    ],
+  ])('%s', (_name, entry, button, expected) => {
+    const loc = setupAt(entry)
+    fireEvent.click(screen.getByRole('button', { name: button }))
+    expect(loc()).toMatchObject(expected)
   })
 
   it('renders nothing without a track', () => {

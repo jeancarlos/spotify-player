@@ -23,45 +23,35 @@ const fail = (client: QueryClient, key: string) =>
 const succeed = (client: QueryClient, key: string) =>
   client.query({ queryKey: [key], queryFn: () => Promise.resolve(1), staleTime: 0 })
 
+type Step = ['fail' | 'succeed' | 'remove', string]
+
+async function run(steps: Step[]) {
+  const client = setup()
+  for (const [op, key] of steps) {
+    if (op === 'fail') await fail(client, key)
+    else if (op === 'succeed') await succeed(client, key)
+    else client.removeQueries({ queryKey: [key] })
+  }
+}
+
 describe('QueryErrorHandler', () => {
-  it('toasts once when the same query keeps failing', async () => {
-    const client = setup()
-    await fail(client, 'a')
-    await fail(client, 'a')
-    await fail(client, 'a')
-    expect(toast).toHaveBeenCalledTimes(1)
-  })
-
-  it('toasts once for several queries failing in one episode', async () => {
-    const client = setup()
-    await fail(client, 'a')
-    await fail(client, 'b')
-    expect(toast).toHaveBeenCalledTimes(1)
-  })
-
-  it('toasts again after every failing query has recovered', async () => {
-    const client = setup()
-    await fail(client, 'a')
-    await succeed(client, 'a')
-    await fail(client, 'a')
-    expect(toast).toHaveBeenCalledTimes(2)
-  })
-
-  it('does not end the episode while another query is still failing', async () => {
-    const client = setup()
-    await fail(client, 'a')
-    await fail(client, 'b')
-    await succeed(client, 'a')
-    await fail(client, 'a')
-    expect(toast).toHaveBeenCalledTimes(1)
-  })
-
-  it('toasts again when a failed query is garbage collected without recovering', async () => {
-    const client = setup()
-    await fail(client, 'a')
-    client.removeQueries({ queryKey: ['a'] })
-    await fail(client, 'b')
-    expect(toast).toHaveBeenCalledTimes(2)
+  it.each<[string, Step[], number]>([
+    ['toasts once when the same query keeps failing', [['fail', 'a'], ['fail', 'a'], ['fail', 'a']], 1],
+    ['toasts once for several queries failing in one episode', [['fail', 'a'], ['fail', 'b']], 1],
+    ['toasts again after every failing query has recovered', [['fail', 'a'], ['succeed', 'a'], ['fail', 'a']], 2],
+    [
+      'does not end the episode while another query is still failing',
+      [['fail', 'a'], ['fail', 'b'], ['succeed', 'a'], ['fail', 'a']],
+      1,
+    ],
+    [
+      'toasts again when a failed query is garbage collected without recovering',
+      [['fail', 'a'], ['remove', 'a'], ['fail', 'b']],
+      2,
+    ],
+  ])('%s', async (_name, steps, calls) => {
+    await run(steps)
+    expect(toast).toHaveBeenCalledTimes(calls)
   })
 
   it('ignores background queries', async () => {

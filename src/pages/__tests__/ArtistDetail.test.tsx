@@ -27,7 +27,7 @@ const hook = {
 
 const captured = {
   chart: undefined as undefined | { onPlay: (t: Track) => Promise<void> },
-  disco: undefined as undefined | { onPrevPage: () => void; onNextPage: () => void },
+  disco: undefined as undefined | { pagination: { onPrev: () => void; onNext: () => void } },
 }
 
 vi.mock('@/hooks/useArtistDetailPage', () => ({ useArtistDetailPage: () => hook }))
@@ -40,7 +40,7 @@ vi.mock('@/components/artist/ArtistTopTracksChart', () => ({
   },
 }))
 vi.mock('@/components/artist/ArtistDiscography', () => ({
-  ArtistDiscography: (props: { onPrevPage: () => void; onNextPage: () => void }) => {
+  ArtistDiscography: (props: { pagination: { onPrev: () => void; onNext: () => void } }) => {
     captured.disco = props
     return <div />
   },
@@ -84,8 +84,8 @@ describe('ArtistDetail', () => {
   it('pages the discography with a floor of one', () => {
     renderPage()
     act(() => {
-      captured.disco?.onPrevPage()
-      captured.disco?.onNextPage()
+      captured.disco?.pagination.onPrev()
+      captured.disco?.pagination.onNext()
     })
     const [prev, next] = hook.setAlbumPage.mock.calls.map((c) => (c as unknown as [(p: number) => number])[0])
     expect(prev(1)).toBe(1)
