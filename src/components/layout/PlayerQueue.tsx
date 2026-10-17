@@ -30,7 +30,7 @@ export function PlayerQueue() {
 
   return (
     <div className="h-full flex flex-col pt-4">
-      <h3 className="text-[10px] text-white/60 uppercase tracking-[0.2em] font-bold mb-4 text-center">
+      <h3 className="text-xs text-white/60 uppercase tracking-[0.2em] font-bold mb-4 text-center">
         {t('player.nextUp')}
       </h3>
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-4 pb-40">

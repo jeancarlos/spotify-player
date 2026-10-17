@@ -50,6 +50,6 @@ describe('VinylCard', () => {
 
   it('renders without album art', () => {
     render(<VinylCard track={track({ album: { name: 'Al', images: [] } as never })} />)
-    expect(screen.getByAltText('Al')).toBeInTheDocument()
+    expect(screen.getByRole('button').querySelector('img')).toHaveAttribute('alt', '')
   })
 })

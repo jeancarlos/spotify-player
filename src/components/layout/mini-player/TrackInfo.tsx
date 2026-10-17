@@ -54,7 +54,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               </button>
               <span
                 aria-hidden="true"
-                className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-[10px] leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 group-focus-within/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]"
+                className="absolute regular bottom-full left-0 mb-1.5 px-2 py-0.5 text-xs leading-snug bg-black/80 text-white rounded opacity-0 group-hover/note:opacity-100 group-focus-within/note:opacity-100 transition-opacity pointer-events-none z-50 w-max max-w-[200px]"
               >
                 {personalNote}
               </span>
@@ -90,7 +90,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
               {currentTrack.artists.map((a, i) => (
                 <button
                   key={a.id}
-                  className="truncate text-[11px] text-black/60 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
+                  className="truncate text-xs text-black/60 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
                   onClick={() => {
                     void navigate(`/artists/${a.id}`)
                   }}
@@ -106,7 +106,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
                   state: { from: currentPath(location) },
                 })
               }}
-              className="text-[10px] font-medium text-black/60 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
+              className="text-xs font-medium text-black/60 hover:text-black hover:underline truncate outline-none rounded text-left w-fit focus-visible:ring-2 focus-visible:ring-black/40"
             >
               {currentTrack.album.name}
             </button>
@@ -115,12 +115,8 @@ export function TrackInfo({ notes }: TrackInfoProps) {
       </div>
 
       <div className="flex flex-col gap-0.5 ml-auto pr-2" aria-hidden="true">
-        <span className="text-[10px] font-mono shrink-0 tabular-nums">
-          {formatDuration(progress)}
-        </span>
-        <span className="text-[10px] font-mono shrink-0 tabular-nums">
-          {formatDuration(duration)}
-        </span>
+        <span className="text-xs font-mono shrink-0 tabular-nums">{formatDuration(progress)}</span>
+        <span className="text-xs font-mono shrink-0 tabular-nums">{formatDuration(duration)}</span>
       </div>
     </div>
   )

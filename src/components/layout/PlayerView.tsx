@@ -58,7 +58,7 @@ function PlayerTabBar({ activeTab, noLyrics, onTabChange }: PlayerTabBarProps) {
   const { t } = useTranslation()
   const tabClass = (tab: PlayerTab) =>
     cn(
-      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-white/60',
+      'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-white/60',
       activeTab === tab ? 'bg-white text-black shadow-lg' : 'text-white/60 hover:text-white/70'
     )
   return (

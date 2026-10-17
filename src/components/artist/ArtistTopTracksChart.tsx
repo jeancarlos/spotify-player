@@ -49,7 +49,7 @@ function CustomYTick({ x = 0, y = 0, index = 0, maxChars = 20, payload }: TickPr
       >
         {position}
       </text>
-      <text x={-8} y={8} textAnchor="end" fontSize={11} fill="rgba(0,0,0,0.72)" fontWeight={600}>
+      <text x={-8} y={8} textAnchor="end" fontSize={12} fill="rgba(0,0,0,0.72)" fontWeight={600}>
         {name}
       </text>
     </g>
@@ -90,11 +90,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
     <>
       <div aria-hidden="true" style={{ width: '100%', height: chartData.length * 46 + 28 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            layout="vertical"
-            margin={layout.margin}
-          >
+          <BarChart data={chartData} layout="vertical" margin={layout.margin}>
             <CartesianGrid horizontal={false} stroke="rgba(0,0,0,0.04)" />
 
             <XAxis type="number" tick={false} axisLine={false} tickLine={false} />
@@ -125,7 +121,7 @@ export function ArtistTopTracksChart({ tracks, activeTrackId, onPlay }: Props) {
                 dataKey="rank"
                 position="right"
                 formatter={(n: number) => n.toLocaleString(i18n.language)}
-                style={{ fontSize: 10, fill: 'rgba(0,0,0,0.6)', fontWeight: 700 }}
+                style={{ fontSize: 12, fill: 'rgba(0,0,0,0.6)', fontWeight: 700 }}
               />
               {chartData.map((entry, i) => {
                 return (

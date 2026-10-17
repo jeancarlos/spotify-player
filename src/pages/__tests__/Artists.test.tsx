@@ -61,7 +61,7 @@ describe('Artists page', () => {
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'coldplay' } })
     expect(
-      (await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })).length
+      (await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })).length
     ).toBeGreaterThan(0)
     expect(deezerMock).toHaveBeenCalledWith('search/artist', { q: 'coldplay', index: 0, limit: 20 })
   })
@@ -69,7 +69,7 @@ describe('Artists page', () => {
   it('offers a single next-page control for search results', async () => {
     renderArtists()
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'coldplay' } })
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
     expect(screen.getAllByRole('button', { name: /artists\.next/ })).toHaveLength(1)
   })
 
@@ -86,10 +86,10 @@ describe('Artists page', () => {
     renderArtists()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'coldplay' } })
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
     fireEvent.change(input, { target: { value: '' } })
     expect(
-      await screen.findByText(chartArtists.data[0]?.name ?? '', {}, { timeout: 3000 })
+      await screen.findByText(chartArtists.data[0]?.name ?? '', {}, { timeout: 8000 })
     ).toBeInTheDocument()
     expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
@@ -114,12 +114,12 @@ describe('Artists page', () => {
   it('pages forward and back through the search results', async () => {
     deezerMock.mockResolvedValue({ ...searchArtist, total: 100 })
     renderArtists('/?q=coldplay&page=2')
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
     fireEvent.click(screen.getByRole('button', { name: 'artists.next' }))
     await waitFor(() => {
       expect(screen.getByTestId('where').textContent).toContain('page=3')
     })
-    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 3000 })
+    await screen.findAllByText(searchArtist.data[0]?.name ?? '', {}, { timeout: 8000 })
     fireEvent.click(screen.getByRole('button', { name: 'artists.previous' }))
     await waitFor(() => {
       expect(screen.getByTestId('where').textContent).toContain('page=2')
@@ -130,7 +130,7 @@ describe('Artists page', () => {
     deezerMock.mockResolvedValue(searchAlbum)
     renderArtists('/?q=x&tab=album')
     expect(
-      (await screen.findAllByText(searchAlbum.data[0]?.title ?? '', {}, { timeout: 3000 })).length
+      (await screen.findAllByText(searchAlbum.data[0]?.title ?? '', {}, { timeout: 8000 })).length
     ).toBeGreaterThan(0)
   })
 
@@ -138,7 +138,7 @@ describe('Artists page', () => {
     deezerMock.mockResolvedValue(searchPlaylist)
     renderArtists('/?q=x&tab=playlist')
     expect(
-      (await screen.findAllByText(searchPlaylist.data[0]?.title ?? '', {}, { timeout: 3000 })).length
+      (await screen.findAllByText(searchPlaylist.data[0]?.title ?? '', {}, { timeout: 8000 })).length
     ).toBeGreaterThan(0)
   })
 })

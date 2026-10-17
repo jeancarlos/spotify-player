@@ -7,8 +7,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['"JetBrains Mono"', 'monospace'],
-        sans: ['Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono Variable"', 'monospace'],
+        sans: ['"Inter Variable"', 'sans-serif'],
       },
       colors: {
         primary: 'rgb(var(--color-primary) / <alpha-value>)',
@@ -27,4 +27,3 @@ const config: Config = {
 }
 
 export default config
-

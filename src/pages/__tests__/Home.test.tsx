@@ -152,9 +152,12 @@ describe('Página Home', () => {
   it('navigates to the artists page with the typed query', async () => {
     renderHome()
     await userEvent.type(screen.getByRole('textbox'), 'coldplay')
-    await waitFor(() => {
-      expect(screen.getByTestId('where').textContent).toBe('/artists?q=coldplay&tab=artist')
-    })
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('where').textContent).toBe('/artists?q=coldplay&tab=artist')
+      },
+      { timeout: 8000 }
+    )
   })
 
   it('stays on the page when the query is blank', async () => {

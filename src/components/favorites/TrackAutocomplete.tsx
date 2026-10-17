@@ -49,7 +49,7 @@ function ResultsList({ listboxId, results, highlightIndex, onSelect, label }: Re
           />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-black truncate">{track.name}</p>
-            <p className="text-[11px] text-black/60 truncate">
+            <p className="text-xs text-black/60 truncate">
               {track.artists.map((a) => a.name).join(', ')}
             </p>
           </div>
@@ -77,7 +77,7 @@ function SelectedTrack({ track, onClear, clearLabel }: SelectedTrackProps) {
         alt=""
       />
       <span className="text-sm text-black flex-1 truncate">{track.name}</span>
-      <span className="text-[11px] text-black/60 truncate hidden sm:block">
+      <span className="text-xs text-black/60 truncate hidden sm:block">
         {track.artists.map((a) => a.name).join(', ')}
       </span>
       <button

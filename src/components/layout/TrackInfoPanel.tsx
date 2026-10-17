@@ -30,7 +30,7 @@ export function TrackInfoPanel({ track }: Props) {
               {track.name}
             </h2>
             {track.explicit && (
-              <span className="text-[9px] font-black text-black bg-white/80 rounded px-1 py-0.5 shrink-0">
+              <span className="text-xs font-black text-black bg-white/80 rounded px-1 py-0.5 shrink-0">
                 E
               </span>
             )}
@@ -73,7 +73,7 @@ export function TrackInfoPanel({ track }: Props) {
                 href={wikipedia.data.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[10px] text-white/60 hover:text-white/90 underline mt-2 inline-block transition-colors"
+                className="text-xs text-white/60 hover:text-white/90 underline mt-2 inline-block transition-colors"
               >
                 {t('track.readMore')} →
               </a>
@@ -88,7 +88,7 @@ export function TrackInfoPanel({ track }: Props) {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="w-full max-w-sm">
-      <p className="text-[9px] text-white/60 uppercase tracking-[0.2em] font-bold mb-4 text-center">
+      <p className="text-xs text-white/60 uppercase tracking-[0.2em] font-bold mb-4 text-center">
         {label}
       </p>
       {children}

@@ -30,10 +30,9 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
   const schema = useMemo(
     () =>
       z.object({
-        track: z.custom<Track>(
-          (val) => val !== null && typeof val === 'object' && 'uri' in val,
-          { message: t('favorites.trackRequired') }
-        ),
+        track: z.custom<Track>((val) => val !== null && typeof val === 'object' && 'uri' in val, {
+          message: t('favorites.trackRequired'),
+        }),
         note: z.string().max(MAX_NOTE_LENGTH, t('favorites.noteTooLong')),
       }),
     [t]
@@ -111,10 +110,7 @@ export function AddFavoriteForm({ existingFavorites, onAdd, onClose }: AddFavori
         <div className="flex items-center justify-between">
           {errors.note ? <p className="text-xs text-red-500">{errors.note.message}</p> : <span />}
           <span
-            className={cn(
-              'text-[11px] tabular-nums',
-              errors.note ? 'text-red-500' : 'text-black/60'
-            )}
+            className={cn('text-xs tabular-nums', errors.note ? 'text-red-500' : 'text-black/60')}
           >
             {t('favorites.noteCharsLeft', { count: noteLength })}
           </span>

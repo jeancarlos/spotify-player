@@ -6,7 +6,7 @@ const images = [{ url: 'https://img.test/c.jpg', width: 300, height: 300 }]
 
 describe('MediaCard', () => {
   it('renders title, subtitle and image', () => {
-    render(
+    const { container } = render(
       <MediaCard
         images={images}
         title="T"
@@ -16,9 +16,9 @@ describe('MediaCard', () => {
         className="y"
       />
     )
-    expect(screen.getByAltText('T')).toHaveClass('x')
+    expect(container.querySelector('img')).toHaveClass('x')
     expect(screen.getByText('S')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'T' })).toHaveClass('y')
+    expect(screen.getByRole('button', { name: /^T/ })).toHaveClass('y')
   })
 
   it('falls back to a placeholder with no subtitle and a custom label', () => {

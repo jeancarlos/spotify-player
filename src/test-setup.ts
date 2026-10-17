@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
+import { configure } from '@testing-library/react'
+
+// the search debounce is 700 ms, so the 1 s default is too tight on a slow runner
+configure({ asyncUtilTimeout: 4000 })
 
 vi.mock('react-i18next', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()

@@ -16,7 +16,7 @@ import { currentPath, getFromPath } from '@/utils/routerState'
 
 export function ControlTip({ label }: { label: string }) {
   return (
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 text-[10px] bg-black/80 text-white rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-0.5 text-xs bg-black/80 text-white rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
       {label}
     </span>
   )
@@ -93,7 +93,7 @@ export function PlaybackControls() {
             <Play size={14} className="fill-current ml-0.5" />
           )}
         </button>
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-[11px] text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 text-center text-xs text-white bg-black/85 rounded-lg px-3 py-2 opacity-0 group-hover/play:opacity-100 transition-opacity pointer-events-none whitespace-normal leading-snug z-50">
           {playLabel}
         </div>
       </div>

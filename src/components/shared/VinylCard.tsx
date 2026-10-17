@@ -20,8 +20,9 @@ function stateClass(play: unknown): string {
   return play ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'
 }
 
-function cardLabel(t: TFunction, name: string, playable: boolean): string {
-  const base = t('player.playTrack', { name })
+function cardLabel(t: TFunction, track: Track, playable: boolean): string {
+  const visible = `${track.name} ${track.artists.map((a) => a.name).join(', ')}`
+  const base = `${visible}. ${t('player.playTrack', { name: track.name })}`
   return playable ? base : `${base}. ${t('track.noPreview')}`
 }
 
@@ -47,7 +48,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           play?.(track)
         }
       }}
-      aria-label={cardLabel(t, track.name, Boolean(play))}
+      aria-label={cardLabel(t, track, Boolean(play))}
     >
       {!play && <span className="sr-only">{t('track.noPreview')}</span>}
       <div
@@ -67,7 +68,7 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
           sizes={`${dim}px`}
           loading="lazy"
           decoding="async"
-          alt={track.album.name}
+          alt=""
           className="w-full h-full object-cover"
           draggable={false}
         />
@@ -97,10 +98,10 @@ export function VinylCard({ track, isActive = false, onPlay, size = 'md' }: Viny
         )}
 
         <div className="absolute inset-x-0 bottom-0 px-3 pb-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-          <p className="text-[11px] font-bold text-white truncate leading-tight drop-shadow-sm">
+          <p className="text-xs font-bold text-white truncate leading-tight drop-shadow-sm">
             {track.name}
           </p>
-          <p className="text-[10px] text-white/70 truncate leading-tight mt-0.5">
+          <p className="text-xs text-white/70 truncate leading-tight mt-0.5">
             {track.artists.map((a) => a.name).join(', ')}
           </p>
         </div>
