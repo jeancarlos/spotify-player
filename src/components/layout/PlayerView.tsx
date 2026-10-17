@@ -10,7 +10,6 @@ import { TrackInfoPanel } from '@/components/layout/TrackInfoPanel'
 import { PlayerQueue } from '@/components/layout/PlayerQueue'
 import { cn } from '@/lib/utils'
 import { getFromPath } from '@/utils/routerState'
-import { DeezerAttribution } from '@/components/shared/DeezerAttribution'
 import type { Track } from '@/types/music'
 import type { UseQueryResult } from '@tanstack/react-query'
 
@@ -217,8 +216,6 @@ export function PlayerView() {
         </button>
 
         <PlayerTabBar activeTab={activeTab} noLyrics={noLyrics} onTabChange={handleTabChange} />
-
-        <DeezerAttribution className="rounded bg-white px-2 py-1" />
       </header>
 
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
