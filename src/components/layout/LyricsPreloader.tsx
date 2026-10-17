@@ -17,11 +17,13 @@ export function LyricsPreloader() {
       if (!artist || !title) return
       const queryKey = lyricsKey({ artist, title, album, durationMs })
       if (queryClient.getQueryData(queryKey)) return
-      void queryClient.prefetchQuery({
-        queryKey,
-        queryFn: async () => fetchLyrics({ artist, title, album, durationMs }),
-        staleTime: Infinity,
-      })
+      queryClient
+        .query({
+          queryKey,
+          queryFn: async () => fetchLyrics({ artist, title, album, durationMs }),
+          staleTime: Infinity,
+        })
+        .catch(() => undefined)
     })
   }, [queue, queueIndex, queryClient])
 

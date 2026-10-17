@@ -16,7 +16,7 @@ export function useAlbumTracks(albumId: string | undefined, page: number, limit 
     staleTime: TIME_60_MINUTES,
     queryFn: async () => {
       const [album, list] = await Promise.all([
-        queryClient.ensureQueryData(albumQuery(albumId)),
+        queryClient.query({ ...albumQuery(albumId), staleTime: 'static' }),
         deezer<DzList<DzTrack>>(
           `album/${albumId ?? ''}/tracks`,
           { index, limit },

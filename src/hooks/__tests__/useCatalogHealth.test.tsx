@@ -23,12 +23,12 @@ const fail = (
 ) =>
   act(async () => {
     await client
-      .fetchQuery({ queryKey: [key], meta, queryFn: () => Promise.reject(error) })
+      .query({ queryKey: [key], meta, queryFn: () => Promise.reject(error) })
       .catch(() => undefined)
   })
 const succeed = (client: QueryClient, key: string, meta: Record<string, unknown> = DEEZER) =>
   act(async () => {
-    await client.fetchQuery({ queryKey: [key], meta, queryFn: () => Promise.resolve(1), staleTime: 0 })
+    await client.query({ queryKey: [key], meta, queryFn: () => Promise.resolve(1), staleTime: 0 })
   })
 
 describe('useCatalogHealth', () => {

@@ -20,7 +20,7 @@ vi.mock('@/contexts/PlayerContext', () => ({ usePlayer: () => ({ state }) }))
 describe('LyricsPreloader', () => {
   it('prefetches lyrics for the next two queue tracks only', () => {
     const queryClient = new QueryClient()
-    const spy = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+    const spy = vi.spyOn(queryClient, 'query').mockResolvedValue(null)
     render(
       <QueryClientProvider client={queryClient}>
         <LyricsPreloader />
@@ -34,7 +34,7 @@ describe('LyricsPreloader', () => {
 
   it('uses the same key useLyrics builds for the same track', () => {
     const queryClient = new QueryClient()
-    const spy = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+    const spy = vi.spyOn(queryClient, 'query').mockResolvedValue(null)
     render(
       <QueryClientProvider client={queryClient}>
         <LyricsPreloader />
@@ -54,7 +54,7 @@ describe('LyricsPreloader', () => {
       lyricsKey({ artist: 'Artist 2', title: 'Song 2', album: 'Album 2', durationMs: 2000 }),
       'cached'
     )
-    const spy = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+    const spy = vi.spyOn(queryClient, 'query').mockResolvedValue(null)
     render(
       <QueryClientProvider client={queryClient}>
         <LyricsPreloader />
@@ -66,7 +66,7 @@ describe('LyricsPreloader', () => {
   it('runs the lyrics fetcher through the prefetch query function', async () => {
     state = { queue: [mk(0), mk(1)], queueIndex: 0 }
     const queryClient = new QueryClient()
-    const spy = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+    const spy = vi.spyOn(queryClient, 'query').mockResolvedValue(null)
     render(
       <QueryClientProvider client={queryClient}>
         <LyricsPreloader />

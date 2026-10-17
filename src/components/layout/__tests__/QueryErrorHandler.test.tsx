@@ -19,9 +19,9 @@ const setup = () => {
 }
 
 const fail = (client: QueryClient, key: string) =>
-  client.fetchQuery({ queryKey: [key], queryFn: () => Promise.reject(new Error('x')) }).catch(() => undefined)
+  client.query({ queryKey: [key], queryFn: () => Promise.reject(new Error('x')) }).catch(() => undefined)
 const succeed = (client: QueryClient, key: string) =>
-  client.fetchQuery({ queryKey: [key], queryFn: () => Promise.resolve(1), staleTime: 0 })
+  client.query({ queryKey: [key], queryFn: () => Promise.resolve(1), staleTime: 0 })
 
 describe('QueryErrorHandler', () => {
   it('toasts once when the same query keeps failing', async () => {
@@ -67,7 +67,7 @@ describe('QueryErrorHandler', () => {
   it('ignores background queries', async () => {
     const client = setup()
     await client
-      .fetchQuery({ queryKey: ['bg'], meta: { background: true }, queryFn: () => Promise.reject(new Error('x')) })
+      .query({ queryKey: ['bg'], meta: { background: true }, queryFn: () => Promise.reject(new Error('x')) })
       .catch(() => undefined)
     expect(toast).not.toHaveBeenCalled()
   })
