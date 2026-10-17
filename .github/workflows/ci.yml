@@ -41,7 +41,10 @@ jobs:
           persist-credentials: false
 
       - name: Audit production dependencies
-        run: yarn audit --groups dependencies --level high
+        # yarn v1 exit code is a bitmask: 8 = high, 16 = critical
+        run: |
+          yarn audit --groups dependencies || rc=$?
+          [ $(( ${rc:-0} & 24 )) -eq 0 ]
 
       - name: Review dependency changes
         if: github.event_name == 'pull_request'
