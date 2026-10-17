@@ -208,7 +208,7 @@ export function PlayerView() {
       <header className="relative z-20 flex items-center justify-between p-6 shrink-0">
         <button
           onClick={() => {
-            navigate(getFromPath(location.state))
+            void navigate(getFromPath(location.state))
           }}
           className="p-2.5 rounded-2xl glass hover:bg-white/10 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           aria-label={t('common.back')}
@@ -223,11 +223,7 @@ export function PlayerView() {
 
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
         <AnimatePresence mode="wait">
-          <PlayerContentPane
-            activeTab={activeTab}
-            currentTrack={currentTrack}
-            lyrics={lyrics}
-          />
+          <PlayerContentPane activeTab={activeTab} currentTrack={currentTrack} lyrics={lyrics} />
         </AnimatePresence>
       </main>
 

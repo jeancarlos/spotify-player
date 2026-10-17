@@ -11,12 +11,7 @@ import { isPlayable } from '@/lib/deezerMappers'
 import { isNoData } from '@/lib/deezer'
 import { formatDate } from '@/utils/formatDate'
 import { QUEUE_LIMIT } from '@/utils/constants'
-import type {
-  Track,
-  AlbumSimple,
-  AlbumFull,
-  Image,
-} from '@/types/music'
+import type { Track, AlbumSimple, AlbumFull, Image } from '@/types/music'
 import type { ViewMode } from '@/components/shared/ListTableSwitch'
 
 export const ALBUM_LIMIT = 20
@@ -86,7 +81,7 @@ export function useAlbumDetailPage() {
 
   const handleArtistClick = useCallback(
     (artistId: string) => {
-      navigate(`/artists/${artistId}`, { state: { from: currentPath(location) } })
+      void navigate(`/artists/${artistId}`, { state: { from: currentPath(location) } })
     },
     [navigate, location]
   )
@@ -97,10 +92,8 @@ export function useAlbumDetailPage() {
   const loadQueue = useQueueLoader(allTracks)
   const pageOffset = (page - 1) * ALBUM_LIMIT
 
-
   const hasNext =
     tracks.data != null ? tracks.data.offset + tracks.data.limit < tracks.data.total : false
-
 
   const handleTrackPlay = useCallback(
     async (track: Track, index: number) => {

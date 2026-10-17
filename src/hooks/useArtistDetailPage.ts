@@ -56,7 +56,7 @@ export function useArtistDetailPage(id: string | undefined) {
 
   const handleAlbumClick = useCallback(
     (album: AlbumSimple) => {
-      navigate(`/albums/${album.id}`, { state: { from: currentPath(location) } })
+      void navigate(`/albums/${album.id}`, { state: { from: currentPath(location) } })
     },
     [navigate, location]
   )

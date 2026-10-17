@@ -37,10 +37,11 @@ export function PlaybackControls() {
   const queueLabel =
     isPlayerPage && activeTab === 'queue' ? t('player.closeQueue') : t('player.queue')
   const toggleQueue = () => {
-    if (!isPlayerPage) navigate('/player?tab=queue', { state: { from: currentPath(location) } })
+    if (!isPlayerPage)
+      void navigate('/player?tab=queue', { state: { from: currentPath(location) } })
     else if (activeTab !== 'queue')
-      navigate('/player?tab=queue', { replace: true, state: location.state as unknown })
-    else navigate(getFromPath(location.state))
+      void navigate('/player?tab=queue', { replace: true, state: location.state as unknown })
+    else void navigate(getFromPath(location.state))
   }
 
   if (!currentTrack) return null

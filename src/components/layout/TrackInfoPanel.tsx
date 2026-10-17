@@ -40,7 +40,7 @@ export function TrackInfoPanel({ track }: Props) {
               <span key={a.id} className="flex items-center">
                 <button
                   onClick={() => {
-                    navigate(`/artists/${a.id}`)
+                    void navigate(`/artists/${a.id}`)
                   }}
                   className="text-white/70 text-sm font-medium hover:text-white hover:underline cursor-pointer transition-colors rounded outline-none focus:text-white focus:underline focus-visible:ring-2 focus-visible:ring-white/60"
                 >

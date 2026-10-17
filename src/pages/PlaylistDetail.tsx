@@ -84,7 +84,7 @@ export function PlaylistDetail() {
                   void playTrack(track, index)
                 }}
                 onAlbumClick={(albumId) => {
-                  navigate(`/albums/${albumId}`, { state: { from: currentPath(location) } })
+                  void navigate(`/albums/${albumId}`, { state: { from: currentPath(location) } })
                 }}
               />
             )}

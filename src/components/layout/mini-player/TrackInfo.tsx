@@ -33,9 +33,9 @@ export function TrackInfo({ notes }: TrackInfoProps) {
 
   const handleTrackClick = () => {
     if (isPlayerPage) {
-      navigate(getFromPath(location.state))
+      void navigate(getFromPath(location.state))
     } else {
-      navigate('/player?tab=lyrics', { state: { from: currentPath(location) } })
+      void navigate('/player?tab=lyrics', { state: { from: currentPath(location) } })
     }
   }
 
@@ -92,7 +92,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
                   key={a.id}
                   className="truncate text-[11px] text-black/60 hover:text-black hover:underline cursor-pointer transition-colors outline-none rounded focus:text-black focus:underline focus-visible:ring-2 focus-visible:ring-black/40"
                   onClick={() => {
-                    navigate(`/artists/${a.id}`)
+                    void navigate(`/artists/${a.id}`)
                   }}
                 >
                   {a.name}
@@ -102,7 +102,7 @@ export function TrackInfo({ notes }: TrackInfoProps) {
             </div>
             <button
               onClick={() => {
-                navigate(`/albums/${currentTrack.album.id}`, {
+                void navigate(`/albums/${currentTrack.album.id}`, {
                   state: { from: currentPath(location) },
                 })
               }}

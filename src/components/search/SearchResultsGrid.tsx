@@ -29,7 +29,7 @@ export function SearchResultsGrid({ tab, artists, albums, playlists }: SearchRes
                 : undefined
             }
             onClick={() => {
-              navigate(`/artists/${artist.id}`)
+              void navigate(`/artists/${artist.id}`)
             }}
           />
         ))}
@@ -42,7 +42,7 @@ export function SearchResultsGrid({ tab, artists, albums, playlists }: SearchRes
             images={album.images}
             subtitle={album.artists.map((a) => a.name).join(', ')}
             onClick={() => {
-              navigate(`/albums/${album.id}`)
+              void navigate(`/albums/${album.id}`)
             }}
           />
         ))}
@@ -57,7 +57,7 @@ export function SearchResultsGrid({ tab, artists, albums, playlists }: SearchRes
               images={playlist.images}
               subtitle={playlist.owner?.display_name}
               onClick={() => {
-                navigate(`/playlists/${playlist.id}`)
+                void navigate(`/playlists/${playlist.id}`)
               }}
             />
           ))}

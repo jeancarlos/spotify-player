@@ -57,7 +57,7 @@ export function Home() {
 
   const handleSearch = useCallback(
     (query: string, tab: SearchTab) => {
-      if (query.trim()) navigate(`/artists?q=${encodeURIComponent(query)}&tab=${tab}`)
+      if (query.trim()) void navigate(`/artists?q=${encodeURIComponent(query)}&tab=${tab}`)
     },
     [navigate]
   )
@@ -69,7 +69,15 @@ export function Home() {
         <ArcCarousel
           items={tracks.map((track, i) => ({
             id: track.id,
-            content: <VinylCard track={track} onPlay={unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)} size="sm" />,
+            content: (
+              <VinylCard
+                track={track}
+                onPlay={
+                  unavailable ? undefined : async (track) => controls.playTrack(track, tracks, i)
+                }
+                size="sm"
+              />
+            ),
           }))}
           radius={arcRadius}
           arcDeg={arcDeg}

@@ -115,7 +115,7 @@ export function HamburgerMenu() {
         {!isHome && (
           <motion.button
             onClick={() => {
-              navigate(-1)
+              void navigate(-1)
             }}
             className="tap-target p-2 glass rounded-xl hover:bg-black/5 transition-colors"
             aria-label={t('common.back')}
